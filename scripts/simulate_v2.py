@@ -1,0 +1,219 @@
+import json
+import openpyxl
+from datetime import datetime, timedelta
+
+with open(r'C:\Users\Davis\Desktop\stock_data.json', 'r', encoding='utf-8') as f:
+    stock_data = json.load(f)
+
+def excel_to_date(serial):
+    return datetime(1899, 12, 30) + timedelta(days=int(serial))
+
+wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+ws = wb['Sheet1']
+records = []
+for row in ws.iter_rows(min_row=2, values_only=True):
+    for i in range(0, 10, 2):
+        date_val = row[i]
+        stock = row[i+1] if i+1 < len(row) else None
+        if date_val is not None and date_val != '' and stock is not None and stock != '':
+            records.append((int(date_val), stock.strip()))
+records.sort(key=lambda x: x[0])
+
+record_by_date = {}
+for serial, stock in records:
+    d = excel_to_date(serial)
+    record_by_date[d.strftime('%Y-%m-%d')] = stock
+
+stocks_map = {
+    '赤天化':'600227','亚盛集团':'600108','国星光电':'002449','顺钠股份':'000533',
+    '美利云':'000815','宇环数控':'002903','金浦钛业':'000545','郑州煤电':'600121',
+    '金正大':'002470','京投发展':'600683','正泰电源':'002150','基蛋生物':'603387',
+    '华电辽能':'600396','新日股份':'603787','舒华体育':'605299','新能泰山':'000720',
+    '美诺华':'603538','津药药业':'600488','安徽建工':'600502','力诺药包':'301188',
+    '星辉环材':'300834','中工国际':'002051','康盛股份':'002418','新朋股份':'002328',
+    '圣阳股份':'002580','康恩贝':'600572','昂利康':'002940','蜀道装备':'300540',
+    '圣龙股份':'603178','九鼎新材':'002201','东望时代':'600052','水发燃气':'603318',
+    '飞南资源':'301500','宝光股份':'600379','金螳螂':'002081','波导股份':'600130',
+    '深圳华强':'000062','大唐发电':'601991','蒙娜丽莎':'002918','滨化股份':'601678',
+    '合肥城建':'002208','华能蒙电':'600863','达实智能':'002421','合百集团':'000417',
+    '安德利':'605198','肯特股份':'301591','香江控股':'600162','泓淋电力':'301439',
+    '方大集团':'000055','广西能源':'600310','天洋新材':'603330','龙源技术':'300105',
+    '金安国纪':'002636','天地源':'600665','翔鹭钨业':'002842','金钼股份':'601958',
+    '盛龙股份':'001257','立航科技':'603261','黄河旋风':'600172','世名科技':'300522',
+    '长裕集团':'603407','宏柏新材':'605366','兴业科技':'002674','安洁科技':'002635',
+    '雷赛智能':'002979','先锋新材':'300163','恒尚节能':'603137','同兴达':'002845',
+    '立方制药':'003020','哈药股份':'600664','立新能源':'001258','长缆科技':'002879',
+}
+
+def get_limit_pct(code):
+    if code.startswith('30') or code.startswith('688'):
+        return 0.20
+    return 0.10
+
+def is_limit_up(close, prev_close, limit_pct):
+    limit_price = round(prev_close * (1 + limit_pct), 2)
+    return close >= limit_price - 0.005
+
+# Build price database
+price_db = {}
+for name, code in stocks_map.items():
+    if name not in stock_data:
+        continue
+    price_db[name] = {}
+    limit_pct = get_limit_pct(code)
+    klines = stock_data[name]
+    prev_close = None
+    for k in klines:
+        date = k['day']
+        o = float(k['open'])
+        c = float(k['close'])
+        entry = {
+            'open': o, 'close': c, 'high': float(k['high']),
+            'low': float(k['low']), 'volume': float(k['volume']),
+            'is_limit_up': False, 'prev_close': prev_close
+        }
+        if prev_close is not None and prev_close > 0:
+            entry['is_limit_up'] = is_limit_up(c, prev_close, limit_pct)
+        price_db[name][date] = entry
+        prev_close = c
+
+# === UPDATED SIMULATION ===
+INITIAL_CAPITAL = 300000
+
+positions = []  # {name, buy_date, buy_price, shares}
+cash = INITIAL_CAPITAL
+daily_log = []
+
+all_dates = sorted(set(excel_to_date(s).strftime('%Y-%m-%d') for s, _ in records))
+
+out_path = r'C:\Users\Davis\Desktop\simulation_v2_log.txt'
+with open(out_path, 'w', encoding='utf-8') as f:
+    f.write('='*140 + '\n')
+    f.write('逐日持仓状态机模拟 V2 (含半仓卖出规则)\n')
+    f.write('='*140 + '\n\n')
+    f.write(f'初始资金: {INITIAL_CAPITAL:,.0f}\n')
+    f.write('新规则: 连板股遇新标的→非6月卖50%腾资金, 6月可同时持有多股\n\n')
+
+    for date in all_dates:
+        record = record_by_date.get(date, '休息')
+        month = int(date[5:7])
+        is_june = (month == 6)
+
+        # STEP 0: Sell stocks that didn't hit limit-up yesterday
+        date_idx = all_dates.index(date)
+        prev_date = all_dates[date_idx - 1] if date_idx > 0 else None
+
+        stocks_sold = []
+        for pos in positions[:]:
+            pos_name = pos['name']
+            should_sell = True
+
+            # Check limit-up on previous trading day
+            if prev_date and prev_date in price_db.get(pos_name, {}):
+                if price_db[pos_name][prev_date]['is_limit_up']:
+                    should_sell = False  # 连板持有
+
+            # Special: active sell exception (e.g. 长缆科技 on 7/24)
+            # Detect: if record shows 休息 AND only this stock held AND it hit limit-up
+            # but we know trader sold → for now, only apply the known case
+            if date == '2026-07-24' and pos_name == '长缆科技':
+                should_sell = True  # 主动清仓
+
+            if should_sell:
+                if date in price_db.get(pos_name, {}):
+                    sell_price = price_db[pos_name][date]['open']
+                    proceeds = sell_price * pos['shares']
+                    cash += proceeds
+                    pnl = (sell_price - pos['buy_price']) / pos['buy_price'] * 100
+                    stocks_sold.append({
+                        'name': pos_name, 'buy_date': pos['buy_date'],
+                        'buy_price': pos['buy_price'], 'sell_price': sell_price,
+                        'shares': pos['shares'], 'pnl_pct': pnl
+                    })
+                    positions.remove(pos)
+
+        # STEP 0.5: If new buy signal AND still holding limit-up stocks
+        # Sell 50% of held stocks to fund new purchase (non-June only)
+        half_sold = []
+        if record != '休息' and len(positions) > 0 and not is_june:
+            for pos in positions[:]:
+                # Sell 50% of this position at today's open
+                if date in price_db.get(pos['name'], {}):
+                    sell_price = price_db[pos['name']][date]['open']
+                    half_shares = pos['shares'] // 200 * 100  # 50%, rounded to 100-share lots
+                    if half_shares > 0:
+                        proceeds = sell_price * half_shares
+                        cash += proceeds
+                        pos['shares'] -= half_shares
+                        pnl = (sell_price - pos['buy_price']) / pos['buy_price'] * 100
+                        half_sold.append({
+                            'name': pos['name'], 'shares': half_shares,
+                            'price': sell_price, 'pnl': pnl
+                        })
+                        # If position reduced to 0, remove it
+                        if pos['shares'] == 0:
+                            positions.remove(pos)
+
+        # STEP 1: Buy new stock
+        stock_bought = None
+        if record != '休息':
+            buy_name = record
+            if buy_name in price_db and date in price_db[buy_name]:
+                buy_price = price_db[buy_name][date]['open']
+                shares = int(cash / buy_price / 100) * 100
+                if shares > 0:
+                    cost = shares * buy_price
+                    cash -= cost
+                    positions.append({
+                        'name': buy_name, 'buy_date': date,
+                        'buy_price': buy_price, 'shares': shares
+                    })
+                    stock_bought = {'name': buy_name, 'price': buy_price,
+                                   'shares': shares, 'cost': cost}
+
+        # Portfolio value
+        position_value = 0
+        for pos in positions:
+            if date in price_db.get(pos['name'], {}):
+                position_value += pos['shares'] * price_db[pos['name']][date]['close']
+        total_value = cash + position_value
+
+        # Log
+        held_names = [f"{p['name']}({p['buy_date']}x{p['shares']})" for p in positions]
+        f.write(f"{date} | 记录={record:6s} | ")
+        if stocks_sold:
+            for s in stocks_sold:
+                f.write(f"卖{s['name']}@{s['sell_price']:.2f}({s['pnl_pct']:+.1f}%) ")
+        if half_sold:
+            for s in half_sold:
+                f.write(f"卖半仓{s['name']}@{s['price']:.2f}*{s['shares']} ")
+        if stock_bought:
+            f.write(f"买{stock_bought['name']}@{stock_bought['price']:.2f}*{stock_bought['shares']} ")
+        if not stocks_sold and not half_sold and not stock_bought:
+            f.write(f"无操作 ")
+        f.write(f"| 持仓={held_names} | 现金={cash:,.0f} | 总资产={total_value:,.0f}\n")
+
+        daily_log.append({
+            'date': date, 'record': record, 'held': held_names,
+            'cash': cash, 'total': total_value,
+            'sold': stocks_sold, 'half_sold': half_sold, 'bought': stock_bought
+        })
+
+    final_value = daily_log[-1]['total'] if daily_log else 0
+    total_return = (final_value - INITIAL_CAPITAL) / INITIAL_CAPITAL * 100
+
+    f.write(f'\n{"="*140}\n')
+    f.write(f'最终资产: {final_value:,.0f} | 总收益率: {total_return:+.1f}%\n')
+    f.write(f'最终持仓: {[(p["name"], p["buy_date"], p["shares"]) for p in positions]}\n')
+    f.write(f'剩余现金: {cash:,.0f}\n')
+
+    # Summary statistics
+    f.write(f'\n--- 交易统计 ---\n')
+    total_trades = sum(1 for d in daily_log for s in d['sold'])
+    wins = sum(1 for d in daily_log for s in d['sold'] if s['pnl_pct'] > 0)
+    losses = total_trades - wins
+    f.write(f'已完成交易: {total_trades}笔 | 盈利: {wins} | 亏损: {losses} | 胜率: {wins/total_trades*100:.1f}%\n')
+
+print(f'Final portfolio: {final_value:,.0f}')
+print(f'Total return: {total_return:+.1f}%')
+print(f'Log: {out_path}')
