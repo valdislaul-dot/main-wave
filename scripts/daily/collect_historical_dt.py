@@ -82,7 +82,7 @@ def fetch_daily_block_trades(date_str):
     return results
 
 
-def get_trading_days(n_days=250):
+def get_trading_days(n_days=750):
     """生成近N个交易日"""
     days = []
     d = datetime.now() - timedelta(days=1)
@@ -94,7 +94,7 @@ def get_trading_days(n_days=250):
 
 
 def main():
-    days = get_trading_days(250)
+    days = get_trading_days(750)
     print(f"收集区间: {days[0]} → {days[-1]} (共{len(days)}个交易日)")
 
     dt_all = {}
@@ -106,8 +106,13 @@ def main():
         # 跳过已收集的
         save_file = os.path.join(DATA_DIR, f'{date}.json')
         if os.path.exists(save_file):
-            with open(save_file) as f:
-                prev = json.load(f)
+            for enc in ['utf-8', 'gbk']:
+                try:
+                    with open(save_file, encoding=enc) as f:
+                        prev = json.load(f)
+                    break
+                except (UnicodeDecodeError, json.JSONDecodeError):
+                    continue
             dt_all[date] = prev.get('dragon_tiger', [])
             block_all[date] = prev.get('block_trades', [])
             if dt_all[date]: dt_days += 1
