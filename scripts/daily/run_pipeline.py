@@ -77,16 +77,24 @@ def main():
         except Exception as e:
             print(f'[Error] Screening failed: {e}')
 
-        # Step 3: Generate report
-        print('\n[Step 4/4] 生成每日报告...')
+        # Step 3: DT/Block factor (experimental)
+        print('\n[Step 3/5] 龙虎榜+大宗因子 (实验)...')
+        try:
+            from dt_block_factor import run as run_dt_factor
+            run_dt_factor()
+        except Exception as e:
+            print(f'[Warning] DT factor failed: {e}')
+
+        # Step 4: Generate report
+        print('\n[Step 4/5] 生成每日报告...')
         try:
             from generate_report import generate
             generate()
         except Exception as e:
             print(f'[Warning] Report generation failed: {e}')
 
-        # Step 4: Capture T-board minute data
-        print('\n[Step 4/4] 捕获T字板分钟K线...')
+        # Step 5: Capture T-board minute data
+        print('\n[Step 5/5] 捕获T字板分钟K线...')
         try:
             from capture_tboard_minute import main as capture_tboard
             capture_tboard()
