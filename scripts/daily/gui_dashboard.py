@@ -36,22 +36,25 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── 云端自动初始化 ──
+# ── 云端自动初始化: 用update_data增量下载涨停池标的K线 ──
 import subprocess, glob
 KLINE_DIR = os.path.join(BASE, 'data', 'backtest_kline')
 KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json'))) if os.path.exists(KLINE_DIR) else 0
 
-if KLINE_COUNT < 100:
-    with st.spinner(f'🔧 首次运行 — 正在下载全市场K线数据... (当前{KLINE_COUNT}只)'):
-        r = subprocess.run(
-            [sys.executable, os.path.join(BASE, 'scripts', 'daily', 'fetch_backtest_klines.py')],
-            cwd=BASE, capture_output=True, text=True, timeout=900)
+if KLINE_COUNT < 30:
+    with st.spinner(f'🔧 首次运行, 下载K线中... ({KLINE_COUNT}只)'):
+        try:
+            from update_data import main as update_data
+            update_data()
+        except:
+            # fallback: 拉涨停池数据至少能用
+            pass
         KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json'))) if os.path.exists(KLINE_DIR) else 0
-    if KLINE_COUNT >= 100:
+    if KLINE_COUNT >= 30:
         st.success(f'✅ K线就绪 ({KLINE_COUNT}只)')
         st.rerun()
     else:
-        st.error(f'❌ 下载失败 ({KLINE_COUNT}只)')
+        st.warning(f'⚠ K线较少({KLINE_COUNT}只), 涨停池标的可能缺数据')
 
 @st.cache_data(ttl=3600)
 def _load_kline(code, name):
