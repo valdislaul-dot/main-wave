@@ -135,14 +135,19 @@ for s in stocks:
     kls = _load_kline(code, name)
     if not kls or len(kls) < 25: continue
 
-    # 补上今天的涨停数据(compute_score要求最后一天是涨停日)
-    price = s.get('price', 0)
+    # 补上今天的涨停数据: compute_score要求最后一天是涨停日
+    # K线最新只到昨天, 今天的数据从zt_pool取
     today = state.get('as_of_date', '2026-08-04')
-    if kls[-1].get('date','') != today:
-        prev_c = kls[-1].get('close', price * 0.9)
-        kls = kls + [{'date': today, 'open': price, 'high': price,
-                       'low': price * 0.99, 'close': price,
-                       'volume': s.get('amount', 1e8)}]
+    today_clean = today.replace('-', '')
+    last_date = kls[-1].get('date', '').replace('-', '')
+    if last_date < today_clean:
+        price = s.get('price', 0)
+        if price <= 0: price = kls[-1].get('close', 10) * 1.1
+        kls = kls + [{
+            'date': today, 'open': price, 'high': price,
+            'low': round(price * 0.99, 2), 'close': price,
+            'volume': s.get('amount', 1e8)
+        }]
 
     ft = s.get('first_seal','')
     lt = s.get('last_seal', ft)
@@ -152,7 +157,10 @@ for s in stocks:
         'zhaban': s.get('break_times', 0),
         'sector_count': industries.get(s.get('industry',''), 1),
     }
-    score, det = compute_score(code, kls, details_raw, 'v3', cfg)
+    try:
+        score, det = compute_score(code, kls, details_raw, 'v3', cfg)
+    except Exception:
+        continue
     if score is None: continue
 
     scored.append({
