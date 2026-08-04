@@ -36,25 +36,28 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── 云端自动初始化: 用update_data增量下载涨停池标的K线 ──
-import subprocess, glob
+# ── 云端自动初始化: 解压预置K线包 ──
+import subprocess, glob, tarfile
 KLINE_DIR = os.path.join(BASE, 'data', 'backtest_kline')
 KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json'))) if os.path.exists(KLINE_DIR) else 0
 
-if KLINE_COUNT < 30:
-    with st.spinner(f'🔧 首次运行, 下载K线中... ({KLINE_COUNT}只)'):
-        try:
-            from update_data import main as update_data
-            update_data()
-        except:
-            # fallback: 拉涨停池数据至少能用
-            pass
-        KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json'))) if os.path.exists(KLINE_DIR) else 0
-    if KLINE_COUNT >= 30:
-        st.success(f'✅ K线就绪 ({KLINE_COUNT}只)')
-        st.rerun()
+if KLINE_COUNT < 200:
+    tgz = os.path.join(BASE, 'kline_data.tar.gz')
+    if os.path.exists(tgz):
+        with st.spinner(f'🔧 解压K线数据包...'):
+            os.makedirs(KLINE_DIR, exist_ok=True)
+            with tarfile.open(tgz, 'r:gz') as tar:
+                # tar contains 'backtest_kline/xxx.json'
+                for member in tar.getmembers():
+                    if member.name.endswith('.json'):
+                        member.name = os.path.basename(member.name)
+                        tar.extract(member, KLINE_DIR)
+            KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json')))
+        if KLINE_COUNT >= 200:
+            st.success(f'✅ K线就绪 ({KLINE_COUNT}只)')
+            st.rerun()
     else:
-        st.warning(f'⚠ K线较少({KLINE_COUNT}只), 涨停池标的可能缺数据')
+        st.warning(f'⚠ K线数据包缺失({KLINE_COUNT}只), 点刷新补下载')
 
 @st.cache_data(ttl=3600)
 def _load_kline(code, name):
