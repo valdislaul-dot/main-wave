@@ -21,7 +21,13 @@ def get_lp(code):
 def is_limit_up(close, prev_close, lpct):
     if prev_close is None or prev_close <= 0:
         return False
-    return close >= round(prev_close * (1 + lpct), 2) - 0.005
+    # 正常涨停: close >= 昨收*(1+涨跌幅)
+    if close >= round(prev_close * (1 + lpct), 2) - 0.005:
+        return True
+    # 连续一字板: close ≈ prev_close (涨停价未变)
+    if abs(close - prev_close) < 0.01:
+        return True
+    return False
 
 
 def piecewise_linear(x, anchors):
