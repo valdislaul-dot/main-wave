@@ -69,28 +69,35 @@ c2.markdown(f"<div style='text-align:center;font-size:1.4rem;font-weight:bold;ma
 c2.caption(f"V3 | >= {cfg['score_min']} |  -10%")
 
 if c3.button("🔄 刷新数据", use_container_width=True):
-    with st.spinner("拉涨停池+更新K线..."):
+    with st.spinner("拉涨停池+更新K线(仅最新日)..."):
         today = datetime.now().strftime('%Y-%m-%d')
         # 1. 拉涨停池
         sp.run([sys.executable, '-c',
             'import sys; sys.path.insert(0,"scripts/daily"); from zt_pool import update_zt_pool; update_zt_pool()'],
             cwd=BASE, capture_output=True, text=True, timeout=60)
-        # 2. 更新池中所有标的的K线到最新日期
+        # 2. 对新标的下载完整K线, 已有标的只追加最新日
         ztp = os.path.join(BASE, 'data', 'zt_pool_state.json')
         codes = []
         if os.path.exists(ztp):
             with open(ztp, encoding='utf-8') as f:
                 codes = [s['code'] for s in json.load(f).get('stocks', [])]
         if codes:
-            st.info(f'更新{len(codes)}只K线到{today}...')
+            # 区分新标的(无文件) vs 已有标的(只追加最后一天)
+            new_codes = [c for c in codes if not os.path.exists(os.path.join(KLINE_DIR, f'{c}.json'))]
+            old_codes = [c for c in codes if c not in new_codes]
+            msg = f'新{len(new_codes)}只+更新{len(old_codes)}只...'
+            st.info(msg)
             sp.run([sys.executable, '-c', f'''
 import baostock as bs, json, os
 bs.login()
-codes = {repr(codes)}
+new_codes = {repr(new_codes)}
+old_codes = {repr(old_codes)}
 today = "{today}"
 out_dir = r"{KLINE_DIR}"
 os.makedirs(out_dir, exist_ok=True)
-for c in codes:
+
+# 新标的: 下载完整3年K线
+for c in new_codes:
     bc = "sh."+c if c.startswith("6") else "sz."+c
     rs = bs.query_history_k_data_plus(bc, "date,open,high,low,close,volume",
         start_date="2023-08-04", end_date=today, frequency="d", adjustflag="2")
@@ -99,9 +106,24 @@ for c in codes:
         r2 = rs.get_row_data()
         if r2[0]: rows.append({{"date":r2[0],"open":round(float(r2[1]),2),"high":round(float(r2[2]),2),"low":round(float(r2[3]),2),"close":round(float(r2[4]),2),"volume":float(r2[5]) if r2[5] else 0}})
     if rows: json.dump(rows, open(os.path.join(out_dir, f"{{c}}.json"), "w"), ensure_ascii=False)
+
+# 已有标的: 只更新最近7天(快速追加)
+for c in old_codes:
+    old_path = os.path.join(out_dir, f"{{c}}.json")
+    old_data = json.load(open(old_path)) if os.path.exists(old_path) else []
+    last_date = old_data[-1]["date"] if old_data else "2023-08-04"
+    bc = "sh."+c if c.startswith("6") else "sz."+c
+    rs = bs.query_history_k_data_plus(bc, "date,open,high,low,close,volume",
+        start_date=last_date, end_date=today, frequency="d", adjustflag="2")
+    new_rows = []
+    while rs.next():
+        r2 = rs.get_row_data()
+        if r2[0] and r2[0] > last_date:
+            new_rows.append({{"date":r2[0],"open":round(float(r2[1]),2),"high":round(float(r2[2]),2),"low":round(float(r2[3]),2),"close":round(float(r2[4]),2),"volume":float(r2[5]) if r2[5] else 0}})
+    if new_rows:
+        json.dump(old_data + new_rows, open(old_path, "w"), ensure_ascii=False)
 bs.logout()
-print(f"OK: {{len(codes)}} stocks")
-'''], cwd=BASE, capture_output=True, text=True, timeout=300)
+'''], cwd=BASE, capture_output=True, text=True, timeout=120)
         st.success("完成!")
         st.rerun()
 
