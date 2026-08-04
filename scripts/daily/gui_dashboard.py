@@ -26,8 +26,8 @@ st.markdown("""
     h3 { font-size: 1rem !important; }
     /* 表格紧凑 */
     .stDataFrame { font-size: 0.8rem !important; }
-    /* 侧边栏缩小 */
-    [data-testid="stSidebar"] { min-width: 200px !important; max-width: 220px !important; }
+    /* 隐藏侧边栏 */
+    [data-testid="stSidebar"] { display: none !important; }
     /* 手机适配 */
     @media (max-width: 768px) {
         html { font-size: 12px; }
@@ -298,5 +298,5 @@ if os.path.exists(journal_path):
             st.caption("暂无交易记录")
 
 # ── 侧边栏 ──
-with st.sidebar:
-    st.caption("主升浪 V3.0 | 3年回测+2,734%")
+# 隐藏侧边栏
+st.markdown("<style>[data-testid=\"stSidebar\"] {display: none !important;}</style>", unsafe_allow_html=True)
