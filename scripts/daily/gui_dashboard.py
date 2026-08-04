@@ -68,31 +68,39 @@ c2.markdown(f"<div style='text-align:center;font-size:1.4rem;font-weight:bold;ma
             f"{now.strftime('%m月%d日')} {wd}</div>", unsafe_allow_html=True)
 c2.caption(f"V3 | >= {cfg['score_min']} |  -10%")
 
-if c3.button("🔄 刷新涨停池", use_container_width=True):
-    with st.spinner("更新涨停池..."):
+if c3.button("🔄 刷新数据", use_container_width=True):
+    with st.spinner("拉涨停池+更新K线..."):
+        today = datetime.now().strftime('%Y-%m-%d')
+        # 1. 拉涨停池
         sp.run([sys.executable, '-c',
             'import sys; sys.path.insert(0,"scripts/daily"); from zt_pool import update_zt_pool; update_zt_pool()'],
             cwd=BASE, capture_output=True, text=True, timeout=60)
+        # 2. 更新池中所有标的的K线到最新日期
         ztp = os.path.join(BASE, 'data', 'zt_pool_state.json')
+        codes = []
         if os.path.exists(ztp):
             with open(ztp, encoding='utf-8') as f:
                 codes = [s['code'] for s in json.load(f).get('stocks', [])]
-            missing = [c for c in codes if not os.path.exists(os.path.join(KLINE_DIR, f'{c}.json'))]
-            if missing:
-                st.info(f'补下载{len(missing)}只K线...')
-                sp.run([sys.executable, '-c', f'''
+        if codes:
+            st.info(f'更新{len(codes)}只K线到{today}...')
+            sp.run([sys.executable, '-c', f'''
 import baostock as bs, json, os
 bs.login()
-for c in {repr(missing)}:
-    bc="sh."+c if c.startswith("6") else "sz."+c
-    rs=bs.query_history_k_data_plus(bc,"date,open,high,low,close,volume",
-        start_date="2023-08-04",end_date="2026-08-04",frequency="d",adjustflag="2")
-    rows=[]
+codes = {repr(codes)}
+today = "{today}"
+out_dir = r"{KLINE_DIR}"
+os.makedirs(out_dir, exist_ok=True)
+for c in codes:
+    bc = "sh."+c if c.startswith("6") else "sz."+c
+    rs = bs.query_history_k_data_plus(bc, "date,open,high,low,close,volume",
+        start_date="2023-08-04", end_date=today, frequency="d", adjustflag="2")
+    rows = []
     while rs.next():
-        r2=rs.get_row_data()
+        r2 = rs.get_row_data()
         if r2[0]: rows.append({{"date":r2[0],"open":round(float(r2[1]),2),"high":round(float(r2[2]),2),"low":round(float(r2[3]),2),"close":round(float(r2[4]),2),"volume":float(r2[5]) if r2[5] else 0}})
-    if rows: json.dump(rows,open(os.path.join(r"{KLINE_DIR}",f"{{c}}.json"),"w"),ensure_ascii=False)
+    if rows: json.dump(rows, open(os.path.join(out_dir, f"{{c}}.json"), "w"), ensure_ascii=False)
 bs.logout()
+print(f"OK: {{len(codes)}} stocks")
 '''], cwd=BASE, capture_output=True, text=True, timeout=300)
         st.success("完成!")
         st.rerun()
@@ -134,20 +142,6 @@ for s in stocks:
     code, name = s['code'], s['name']
     kls = _load_kline(code, name)
     if not kls or len(kls) < 25: continue
-
-    # 补上今天的涨停数据: compute_score要求最后一天是涨停日
-    # K线最新只到昨天, 今天的数据从zt_pool取
-    today = state.get('as_of_date', '2026-08-04')
-    today_clean = today.replace('-', '')
-    last_date = kls[-1].get('date', '').replace('-', '')
-    if last_date < today_clean:
-        price = s.get('price', 0)
-        if price <= 0: price = kls[-1].get('close', 10) * 1.1
-        kls = kls + [{
-            'date': today, 'open': price, 'high': price,
-            'low': round(price * 0.99, 2), 'close': price,
-            'volume': s.get('amount', 1e8)
-        }]
 
     ft = s.get('first_seal','')
     lt = s.get('last_seal', ft)
