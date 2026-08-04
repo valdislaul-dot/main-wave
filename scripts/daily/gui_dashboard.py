@@ -28,8 +28,10 @@ h3{font-size:1rem!important}
 @media(max-width:768px){html{font-size:12px}.stMetric [data-testid="stMetricValue"]{font-size:.9rem!important}}
 </style>""", unsafe_allow_html=True)
 
-# ── K线直接从repo加载, 无需解压 ──
+# ── K线直接从repo加载 ──
 KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json'))) if os.path.exists(KLINE_DIR) else 0
+# 临时debug
+st.caption(f"DEBUG: BASE={BASE} | KLINE_DIR有{KLINE_COUNT}个文件")
 
 @st.cache_data(ttl=3600)
 def _load_kline(code, name):
@@ -146,10 +148,13 @@ st.caption(f"截至{state.get('as_of_date','?')} | {len(stocks)}只 | 1板:{n1} 
 
 industries = Counter(s.get('industry','') for s in stocks)
 scored = []
+no_kline = 0; score_fail = 0
 for s in stocks:
     code, name = s['code'], s['name']
     kls = _load_kline(code, name)
-    if not kls or len(kls) < 25: continue
+    if not kls or len(kls) < 25:
+        no_kline += 1
+        continue
 
     ft = s.get('first_seal','')
     lt = s.get('last_seal', ft)
@@ -162,8 +167,11 @@ for s in stocks:
     try:
         score, det = compute_score(code, kls, details_raw, 'v3', cfg)
     except Exception:
+        score_fail += 1
         continue
-    if score is None: continue
+    if score is None:
+        score_fail += 1
+        continue
 
     scored.append({
         'code': code, 'name': name, 'score': score,
@@ -176,6 +184,7 @@ for s in stocks:
         'gap_val': det.get('gap',0),
     })
 
+st.caption(f"DEBUG: 池{len(stocks)}只 | 有K线{len(stocks)-no_kline}只 | 缺K线{no_kline}只 | 评分失败{score_fail}只")
 scored.sort(key=lambda x: x['score'], reverse=True)
 filtered = [r for r in scored if not r['true_one']
     and not (r['one_line'] and r['limit_days']>=4)
