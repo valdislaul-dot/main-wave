@@ -156,6 +156,14 @@ for s in stocks:
         no_kline += 1
         continue
 
+    # 确保最后一天是涨停日: K线可能在池子日期之前截止
+    pool_date = state.get('as_of_date', '')
+    if kls[-1].get('date', '') < pool_date:
+        price = s.get('price', 0) or kls[-1].get('close', 10)
+        kls.append({'date': pool_date, 'open': price, 'high': price,
+                     'low': round(price*0.99,2), 'close': price,
+                     'volume': s.get('amount', 1e8)})
+
     ft = s.get('first_seal','')
     lt = s.get('last_seal', ft)
     details_raw = {
