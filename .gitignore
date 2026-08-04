@@ -1,11 +1,16 @@
 data/kline_data/
+data/backtest_kline/
+data/zt_pool_history/
+data/dt_block/
+data/minute_kline/
+data/auction/
 logs/
 results/
 每日收盘数据/
 __pycache__/
 .DS_Store
 *.pyc
-# zt_pool/auction 纳入版本管理(校准用), kline_data 排除(过大)
+# zt_pool/auction 纳入版本管理(校准用), kline_data/backtest_kline 排除(过大)
 data/industry_map.json
 data/zhaban_map.json
 data/副本主升浪.xlsx

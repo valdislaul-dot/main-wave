@@ -114,13 +114,13 @@ def analyze_seats(buy_seats, sell_seats):
 
 
 def main():
-    # 一年范围
-    one_year_ago = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
+    # 近一年范围
+    cutoff = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
 
     # 列出需要补全的文件(近一年)
     files = sorted([f for f in os.listdir(DT_DIR)
                     if f.endswith('.json') and not f.startswith('_')
-                    and f.replace('.json', '') >= one_year_ago])
+                    and f.replace('.json', '') >= cutoff])
 
     print(f"席位补全: {len(files)} 天 ({files[0]} → {files[-1]})")
 

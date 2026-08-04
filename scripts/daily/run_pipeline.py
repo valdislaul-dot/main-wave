@@ -58,43 +58,51 @@ def main():
         else:
             print('Usage: python run_pipeline.py [--status|--buy|--sell|--value]')
     else:
-        # Default: update data + screen candidates
+        # Default: update data + ZT pool + screen candidates
         print('=' * 60)
         print('  每日选股流水线')
         print('=' * 60)
 
         # Step 1: Update data
-        print('\n[Step 1/2] 更新K线数据...')
+        print('\n[Step 1/6] 更新K线数据...')
         try:
             update_data()
         except Exception as e:
             print(f'[Warning] Data update failed: {e}')
 
-        # Step 2: Screen candidates
-        print('\n[Step 2/4] 筛选候选标的...')
+        # Step 2: Update ZT pool (NEW v3)
+        print('\n[Step 2/6] 更新涨停池...')
+        try:
+            from zt_pool import update_zt_pool
+            update_zt_pool()
+        except Exception as e:
+            print(f'[Warning] ZT pool update failed: {e}')
+
+        # Step 3: Screen candidates
+        print('\n[Step 3/6] 筛选候选标的...')
         try:
             screen_candidates()
         except Exception as e:
             print(f'[Error] Screening failed: {e}')
 
-        # Step 3: DT/Block factor (experimental)
-        print('\n[Step 3/5] 龙虎榜+大宗因子 (实验)...')
+        # Step 4: DT/Block factor (experimental)
+        print('\n[Step 4/6] 龙虎榜+大宗因子 (实验)...')
         try:
             from dt_block_factor import run as run_dt_factor
             run_dt_factor()
         except Exception as e:
             print(f'[Warning] DT factor failed: {e}')
 
-        # Step 4: Generate report
-        print('\n[Step 4/5] 生成每日报告...')
+        # Step 5: Generate report
+        print('\n[Step 5/6] 生成每日报告...')
         try:
             from generate_report import generate
             generate()
         except Exception as e:
             print(f'[Warning] Report generation failed: {e}')
 
-        # Step 5: Capture T-board minute data
-        print('\n[Step 5/5] 捕获T字板分钟K线...')
+        # Step 6: Capture T-board minute data
+        print('\n[Step 6/6] 捕获T字板分钟K线...')
         try:
             from capture_tboard_minute import main as capture_tboard
             capture_tboard()

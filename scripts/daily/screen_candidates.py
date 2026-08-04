@@ -1,11 +1,18 @@
 """
-盘后选股 v2.1：东财直连涨停池 → V2评分 → 输出明日候选清单
+盘后选股 v3.0：东财直连涨停池 → V2/V3评分(配置驱动) → 输出明日候选清单
 数据源：东财 push2ex（替代 akshare，减少依赖）
 """
 import json, os, time, random, requests
 from datetime import datetime, timedelta
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# v3: use unified scoring module
+from scoring import (
+    score_v2, score_v3, load_config as load_scoring_config,
+    score_to_prob, score_to_position, get_buy_window, get_score_min,
+    load_config
+)
 LOG_DIR = os.path.join(BASE, 'logs')
 os.makedirs(LOG_DIR, exist_ok=True)
 
@@ -93,170 +100,8 @@ def load_kline(name, code):
     return None
 
 def compute_v2_score(code, klines, details_raw=None):
-    """V2.1 multi-board scoring with 5-day volume for 连板≥2"""
-    if len(klines) < 25:
-        return None, None
-
-    # Round prices to 2 decimals
-    for k in klines:
-        for field in ['open', 'close', 'high', 'low']:
-            k[field] = round(k[field], 2)
-
-    pdb = {}
-    prev_close = None
-    lpct = get_lp(code)
-
-    for i, k in enumerate(klines):
-        dt = k['date']
-        o = k['open']; c = k['close']
-        h = k['high']; l = k['low']; v = k['volume']
-
-        entry = {'open': o, 'close': c, 'high': h, 'low': l, 'volume': v,
-                 'is_limit_up': False, 'prev_close': prev_close, 'gap_open_pct': 0}
-        if prev_close and prev_close > 0:
-            entry['is_limit_up'] = is_limit_up(c, prev_close, lpct)
-            entry['gap_open_pct'] = round((o - prev_close) / prev_close * 100, 2)
-        if i >= 5:
-            entry['vol_ma5'] = sum(klines[j]['volume'] for j in range(i-4, i+1)) / 5
-        else:
-            entry['vol_ma5'] = v
-        if i >= 20:
-            entry['vol_ma20'] = sum(klines[j]['volume'] for j in range(i-19, i+1)) / 20
-        else:
-            entry['vol_ma20'] = v
-        entry['vol_ratio5'] = round(v / entry['vol_ma5'], 2) if entry['vol_ma5'] > 0 else 1
-        entry['vol_ratio20'] = round(v / entry['vol_ma20'], 2) if entry['vol_ma20'] > 0 else 1
-
-        if h > 0 and l > 0:
-            if abs(h - l) < 0.001:
-                entry['is_one_line'] = True
-            elif h > l:
-                us = (h - max(o, c)) / (h - l)
-                body = abs(c - o) / (h - l)
-                entry['is_one_line'] = (us < 0.1 and body < 0.1)
-            else:
-                entry['is_one_line'] = False
-        else:
-            entry['is_one_line'] = False
-
-        cons = 0
-        for j in range(i-1, max(i-10, -1), -1):
-            cd_ = klines[j]['date']
-            if cd_ in pdb and pdb[cd_]['is_limit_up']:
-                cons += 1
-            else:
-                break
-        entry['cons_lu_before'] = cons
-        pdb[dt] = entry
-        prev_close = c
-
-    today_dt = klines[-1]['date']
-    if today_dt not in pdb or not pdb[today_dt]['is_limit_up']:
-        return None, None
-
-    t1 = pdb[today_dt]
-    cons = t1['cons_lu_before']
-    score = 0.0
-
-    # Volume (v2.2: 6-tier data-driven, 44,590 samples/3yr)
-    # 连板≥2用5日均量, 否则20日 (5日区分度-16.7% vs 20日-11.4%)
-    if cons >= 2:
-        vr = t1['vol_ratio5']
-    else:
-        vr = t1['vol_ratio20']
-
-    if vr < 0.3: score += 37       # 极度缩量: 连板率71.0%, n=1,259
-    elif vr < 0.5: score += 19      # 缩量: 48.0%, n=1,322
-    elif vr < 0.7: score += 7       # 偏缩量: 33.2%, n=1,861
-    elif vr < 1.0: score -= 1       # 正常偏低: 22.8%, n=4,155
-    elif vr < 3.0: score -= 3       # 正常~放量: 20.8%, n=26,961(合并)
-    else: score += 0                # 巨量: 24.0%, n=9,032(不扣不加)
-
-    # Board strength (v2.2: 6-tier data-driven, 44,590 samples/3,284 stocks/3yr)
-    g = t1['gap_open_pct']
-    if g >= 9: score += 20       # 极强: 连板率49.0%, n=6,479
-    elif g >= 7: score += 6      # 强: 32.3%, n=1,445
-    elif g >= 3: score += 1      # 偏强: 25.0%, n=6,699
-    elif g >= -1: score -= 5     # 死亡区[-1%,3%): 17.8%, n=25,471
-    elif g >= -3: score -= 3     # 微低开: 21.0%, n=3,483
-    else: score += 2             # 深低开<-3%反转: 27.3%, n=1,013
-
-    # Board seal quality (v2.2: 区分一字板 vs T字板)
-    if t1.get('is_one_line', False):
-        if abs(t1['high'] - t1['low']) < 0.001:
-            score += 20       # 真一字板: 全天封死, 连板率46.4%
-        else:
-            score += 10       # T字板: 炸板回封, 连板率22.6%(暂定, 待快照校准)
-
-    # Consecutive boards (v2.2: 2板15%<基线, 3-4甜蜜区29%, 5板+36%高回撤)
-    if cons == 0: score -= 4        # 2板: 连板率15.0%, n=32,237
-    elif cons <= 2: score += 10     # 3-4板甜蜜区: 28.9%, n=8,078
-    else: score += 15               # 5板+: 36.4%, 但日内亏损-5.5%
-
-    # Day-of-week
-    tomorrow = datetime.strptime(today_dt, '%Y-%m-%d') + timedelta(days=1)
-    while tomorrow.weekday() >= 5:
-        tomorrow = tomorrow + timedelta(days=1)
-    dow = tomorrow.weekday()
-    if dow == 0: score += 2       # v2.2: 周一连板率26.3%(+2.0%), n=8,492
-    elif dow == 4: score -= 1      # v2.2: 周五22.9%(-1.4%), n=8,252
-
-    # T-2 LU: removed (redundant with 连板数, already captured)
-    t2_lu = False  # kept for details dict
-
-    # Seal time factor
-    if details_raw is None:
-        details_raw = {}
-    seal_time = details_raw.get('seal_time', '1459')
-    if seal_time and seal_time != '?':
-        try:
-            st = int(seal_time[:4])
-            if st <= 930: score += 12
-            elif st <= 1000: score += 8
-            elif st <= 1030: score += 4
-            elif st <= 1100: score += 0
-            elif st <= 1400: score -= 5
-            else: score -= 10
-        except: pass
-
-    # 炸板 factor
-    zhaban = details_raw.get('zhaban', 0)
-    final_seal = details_raw.get('final_seal_time', seal_time)
-    if zhaban > 0:
-        try:
-            fst = int(final_seal[:4]) if final_seal and final_seal != '?' else 1500
-            vr20_val = t1.get('vol_ratio20', 2)
-            if fst <= 1000:
-                score -= zhaban * 2
-            elif fst <= 1400:
-                score -= zhaban * 6
-            else:
-                if vr20_val < 1.5:
-                    score -= zhaban * 3
-                elif vr20_val < 3.0:
-                    score -= zhaban * 8
-                else:
-                    score -= zhaban * 15
-        except:
-            score -= zhaban * 5
-
-    # Sector resonance
-    sector_count = details_raw.get('sector_count', 1)
-    if sector_count >= 5: score += 12
-    elif sector_count >= 3: score += 6
-    elif sector_count >= 2: score += 2
-
-    return score, {
-        'vr20': vr,
-        'gap': t1['gap_open_pct'],
-        'cons': cons + 1,
-        'one_line': t1.get('is_one_line', False),
-        'true_one_line': abs(t1['high'] - t1['low']) < 0.001,  # true one-line (h=l)
-        'open': t1['open'],
-        'close': t1['close'],
-        't2_lu': t2_lu,
-        'tomorrow_dow': dow,
-    }
+    """V2评分 — 委托给 scoring.score_v2, 向后兼容"""
+    return score_v2(code, klines, details_raw)
 
 def main():
     today = get_today()
