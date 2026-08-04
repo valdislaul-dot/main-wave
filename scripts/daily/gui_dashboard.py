@@ -28,20 +28,30 @@ h3{font-size:1rem!important}
 @media(max-width:768px){html{font-size:12px}.stMetric [data-testid="stMetricValue"]{font-size:.9rem!important}}
 </style>""", unsafe_allow_html=True)
 
-# ── 云端初始化: 解压K线包 ──
+# ── 云端初始化: 按需解压(只解压涨停池标的, 快6倍) ──
 KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json'))) if os.path.exists(KLINE_DIR) else 0
-if KLINE_COUNT < 200:
+if KLINE_COUNT < 30 and not os.path.exists(os.path.join(KLINE_DIR, '_extracted')):
+    # 先读涨停池(如果有)
+    ztp = os.path.join(BASE, 'data', 'zt_pool_state.json')
+    pool_set = set()
+    if os.path.exists(ztp):
+        with open(ztp, encoding='utf-8') as f:
+            pool_set = {s['code'] for s in json.load(f).get('stocks', [])}
+    # 解压K线包
     tgz = os.path.join(BASE, 'kline_data.tar.gz')
-    if os.path.exists(tgz):
-        with st.spinner('解压K线数据包...'):
+    if os.path.exists(tgz) and pool_set:
+        with st.spinner(f'解压涨停池K线({len(pool_set)}只)...'):
             os.makedirs(KLINE_DIR, exist_ok=True)
             with tarfile.open(tgz, 'r:gz') as tar:
                 for m in tar.getmembers():
-                    if m.name.endswith('.json'):
+                    code = m.name.replace('backtest_kline/', '').replace('.json', '')
+                    if code in pool_set:
                         m.name = os.path.basename(m.name)
                         tar.extract(m, KLINE_DIR)
+            # 标记已解压, 避免重复
+            with open(os.path.join(KLINE_DIR, '_extracted'), 'w') as f: f.write('ok')
             KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json')))
-        if KLINE_COUNT >= 200:
+        if KLINE_COUNT >= 30:
             st.success(f'K线就绪({KLINE_COUNT}只)')
             st.rerun()
 
