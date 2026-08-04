@@ -67,10 +67,12 @@ def _load_kline(code, name):
     return None
 
 # ── 标题栏 ──
-c1, c2 = st.columns([4, 1])
+now = datetime.now()
+c1, c2, c3 = st.columns([4, 1, 1])
 c1.title("📈 主升浪 V3.0")
 cfg = load_config()
 c2.caption(f"✅ V3 | 门槛≥{cfg['score_min']} | 止损-10%")
+c3.markdown(f"<div style='text-align:right;font-size:1.2rem;font-weight:bold;margin-top:10px'>{now.strftime('%H:%M:%S')}</div><div style='text-align:right;font-size:0.7rem;color:#888'>{now.strftime('%Y-%m-%d')} UTC+8</div>", unsafe_allow_html=True)
 
 # ══════ 持仓 ══════
 portfolio_path = os.path.join(BASE, 'logs', 'portfolio.json')
@@ -262,7 +264,8 @@ if os.path.exists(journal_path):
 
 # ── 侧边栏 ──
 with st.sidebar:
-    st.caption(f"⏰ {datetime.now().strftime('%m-%d %H:%M')}")
+    now = datetime.now()
+    st.caption(f"⏰ {now.strftime('%m-%d %H:%M:%S')} (UTC+8)")
     if st.button("🔄 刷新涨停池", use_container_width=True):
         with st.spinner("拉取涨停数据+评分..."):
             # 只做轻量操作: 拉涨停池 + 更新状态 (跳过K线下载/T字板分钟数据)
