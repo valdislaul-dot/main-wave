@@ -263,10 +263,16 @@ if os.path.exists(journal_path):
 # ── 侧边栏 ──
 with st.sidebar:
     st.caption(f"⏰ {datetime.now().strftime('%m-%d %H:%M')}")
-    if st.button("🔄 运行流水线", use_container_width=True):
-        with st.spinner("运行中..."):
-            r = subprocess.run([sys.executable, os.path.join(BASE, 'scripts', 'daily', 'run_pipeline.py')],
-                             cwd=BASE, capture_output=True, text=True, timeout=300)
-            st.success("完成!")
+    if st.button("🔄 刷新涨停池", use_container_width=True):
+        with st.spinner("拉取涨停数据+评分..."):
+            # 只做轻量操作: 拉涨停池 + 更新状态 (跳过K线下载/T字板分钟数据)
+            r = subprocess.run([
+                sys.executable, '-c', '''
+import sys; sys.path.insert(0, "scripts/daily")
+from zt_pool import update_zt_pool
+update_zt_pool()
+'''], cwd=BASE, capture_output=True, text=True, timeout=60)
+            st.success("完成! 刷新页面查看")
+            st.rerun()
     st.divider()
     st.caption("主升浪 V3.0 | 3年回测+2,734%")
