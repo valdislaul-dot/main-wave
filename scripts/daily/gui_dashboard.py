@@ -265,16 +265,42 @@ if os.path.exists(journal_path):
 
 # ── 侧边栏 ──
 with st.sidebar:
-    if st.button("🔄 刷新涨停池", use_container_width=True):
-        with st.spinner("拉取涨停数据+评分..."):
-            # 只做轻量操作: 拉涨停池 + 更新状态 (跳过K线下载/T字板分钟数据)
-            r = subprocess.run([
-                sys.executable, '-c', '''
-import sys; sys.path.insert(0, "scripts/daily")
-from zt_pool import update_zt_pool
-update_zt_pool()
-'''], cwd=BASE, capture_output=True, text=True, timeout=60)
-            st.success("完成! 刷新页面查看")
+    if st.button("🔄 刷新涨停池+补K线", use_container_width=True):
+        with st.spinner("更新涨停池+补下载缺失K线..."):
+            # 1. 更新涨停池
+            r = subprocess.run([sys.executable, '-c',
+                'import sys; sys.path.insert(0,"scripts/daily"); '
+                'from zt_pool import update_zt_pool; update_zt_pool()'],
+                cwd=BASE, capture_output=True, text=True, timeout=60)
+            # 2. 补下载池中缺失的K线 (逐只, 每只3-5秒)
+            zt_path = os.path.join(BASE, 'data', 'zt_pool_state.json')
+            if os.path.exists(zt_path):
+                with open(zt_path, 'r', encoding='utf-8') as f:
+                    pool_codes = [s['code'] for s in json.load(f).get('stocks', [])]
+                missing = [c for c in pool_codes
+                          if not os.path.exists(os.path.join(KLINE_DIR, f'{c}.json'))]
+                if missing:
+                    st.info(f'补下载 {len(missing)} 只K线...')
+                    # 批量下载(一次baostock login, 逐只query)
+                    r = subprocess.run([sys.executable, '-c', f'''
+import baostock as bs, json, os
+bs.login()
+codes = {repr(missing)}
+out_dir = r"{KLINE_DIR}"
+os.makedirs(out_dir, exist_ok=True)
+for c in codes:
+    bc = "sh."+c if c.startswith("6") else "sz."+c
+    rs = bs.query_history_k_data_plus(bc, "date,open,high,low,close,volume",
+        start_date="2023-08-04", end_date="2026-08-04", frequency="d", adjustflag="2")
+    rows=[]
+    while rs.next():
+        r2=rs.get_row_data()
+        if r2[0]: rows.append({{"date":r2[0],"open":round(float(r2[1]),2),"high":round(float(r2[2]),2),"low":round(float(r2[3]),2),"close":round(float(r2[4]),2),"volume":float(r2[5]) if r2[5] else 0}})
+    if rows:
+        json.dump(rows, open(os.path.join(out_dir, f"{{c}}.json"), "w"), ensure_ascii=False)
+bs.logout()
+'''], cwd=BASE, capture_output=True, text=True, timeout=300)
+            st.success("完成! 刷新页面")
             st.rerun()
     st.divider()
     st.caption("主升浪 V3.0 | 3年回测+2,734%")
