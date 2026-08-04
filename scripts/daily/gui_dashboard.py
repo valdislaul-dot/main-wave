@@ -174,10 +174,14 @@ for s in stocks:
     }
     try:
         score, det = compute_score(code, kls, details_raw, 'v3', cfg)
-    except Exception:
+    except Exception as e:
+        if score_fail < 3:
+            st.caption(f"ERR {code}: {e}")
         score_fail += 1
         continue
     if score is None:
+        if score_fail < 3:
+            st.caption(f"NONE {code}: last_date={kls[-1].get('date','')} close={kls[-1].get('close',0)} prev={kls[-2].get('close',0) if len(kls)>1 else 0}")
         score_fail += 1
         continue
 
