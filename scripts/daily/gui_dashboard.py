@@ -135,6 +135,15 @@ for s in stocks:
     kls = _load_kline(code, name)
     if not kls or len(kls) < 25: continue
 
+    # 补上今天的涨停数据(compute_score要求最后一天是涨停日)
+    price = s.get('price', 0)
+    today = state.get('as_of_date', '2026-08-04')
+    if kls[-1].get('date','') != today:
+        prev_c = kls[-1].get('close', price * 0.9)
+        kls = kls + [{'date': today, 'open': price, 'high': price,
+                       'low': price * 0.99, 'close': price,
+                       'volume': s.get('amount', 1e8)}]
+
     ft = s.get('first_seal','')
     lt = s.get('last_seal', ft)
     details_raw = {
