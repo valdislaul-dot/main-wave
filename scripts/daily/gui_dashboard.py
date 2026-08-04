@@ -3,7 +3,7 @@
 用法: streamlit run scripts/daily/gui_dashboard.py
 """
 import streamlit as st
-import json, os, sys, tarfile, glob, subprocess as sp
+import json, os, sys, glob, subprocess as sp
 from datetime import datetime
 from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -28,26 +28,8 @@ h3{font-size:1rem!important}
 @media(max-width:768px){html{font-size:12px}.stMetric [data-testid="stMetricValue"]{font-size:.9rem!important}}
 </style>""", unsafe_allow_html=True)
 
-# ── 云端初始化: 解压全部K线(10秒) ──
+# ── K线直接从repo加载, 无需解压 ──
 KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json'))) if os.path.exists(KLINE_DIR) else 0
-tgz = os.path.join(BASE, 'kline_data.tar.gz')
-if KLINE_COUNT < 100 and os.path.exists(tgz):
-    with st.spinner(f'解压K线包(786只, 约10秒)... 当前{KLINE_COUNT}只'):
-        os.makedirs(KLINE_DIR, exist_ok=True)
-        with tarfile.open(tgz, 'r:gz') as tar:
-            for m in tar.getmembers():
-                if m.name.endswith('.json'):
-                    m.name = os.path.basename(m.name)
-                    tar.extract(m, KLINE_DIR)
-        KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json')))
-    if KLINE_COUNT >= 200:
-        st.success(f'K线就绪({KLINE_COUNT}只)')
-        st.rerun()
-    else:
-        st.warning(f'解压异常: 仅{KLINE_COUNT}只')
-
-if KLINE_COUNT < 30 and not os.path.exists(tgz):
-    st.warning('K线数据缺失，点刷新补下载')
 
 @st.cache_data(ttl=3600)
 def _load_kline(code, name):
