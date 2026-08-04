@@ -17,7 +17,8 @@ from trading_journal import print_status, record_buy, record_sell, record_hold_v
 
 
 def main():
-    if len(sys.argv) > 1:
+    fast_mode = '--fast' in sys.argv
+    if len(sys.argv) > 1 and sys.argv[1] != '--fast':
         cmd = sys.argv[1]
         if cmd == '--status':
             print_status()
@@ -58,58 +59,49 @@ def main():
         else:
             print('Usage: python run_pipeline.py [--status|--buy|--sell|--value]')
     else:
-        # Default: update data + ZT pool + screen candidates
         print('=' * 60)
         print('  每日选股流水线')
         print('=' * 60)
 
-        # Step 1: Update data
-        print('\n[Step 1/6] 更新K线数据...')
-        try:
-            update_data()
-        except Exception as e:
-            print(f'[Warning] Data update failed: {e}')
-
-        # Step 2: Update ZT pool (NEW v3)
-        print('\n[Step 2/6] 更新涨停池...')
+        # Step 1: Update ZT pool (拉今日涨停池 + 只下载池中标的K线)
+        print('\n[Step 1/4] 更新涨停池...')
         try:
             from zt_pool import update_zt_pool
             update_zt_pool()
         except Exception as e:
             print(f'[Warning] ZT pool update failed: {e}')
 
-        # Step 3: Screen candidates
-        print('\n[Step 3/6] 筛选候选标的...')
+        # Step 2: Screen candidates (V3评分)
+        print('\n[Step 2/4] V3评分选股...')
         try:
             screen_candidates()
         except Exception as e:
             print(f'[Error] Screening failed: {e}')
 
-        # Step 4: DT/Block factor (experimental)
-        print('\n[Step 4/6] 龙虎榜+大宗因子 (实验)...')
-        try:
-            from dt_block_factor import run as run_dt_factor
-            run_dt_factor()
-        except Exception as e:
-            print(f'[Warning] DT factor failed: {e}')
-
-        # Step 5: Generate report
-        print('\n[Step 5/6] 生成每日报告...')
+        # Step 3: Generate report
+        print('\n[Step 3/4] 生成每日报告...')
         try:
             from generate_report import generate
             generate()
         except Exception as e:
             print(f'[Warning] Report generation failed: {e}')
 
-        # Step 6: Capture T-board minute data
-        print('\n[Step 6/6] 捕获T字板分钟K线...')
-        try:
-            from capture_tboard_minute import main as capture_tboard
-            capture_tboard()
-        except Exception as e:
-            print(f'[Warning] T-board capture failed: {e}')
+        # Step 4: Full update (only with --full flag)
+        if '--full' in sys.argv:
+            print('\n[Step 4/4] 完整更新(K线+LHB+T字板)...')
+            try: update_data()
+            except: pass
+            try:
+                from dt_block_factor import run as run_dt_factor
+                run_dt_factor()
+            except: pass
+            try:
+                from capture_tboard_minute import main as capture_tboard
+                capture_tboard()
+            except: pass
+        else:
+            print('\n[Step 4/4] 完成 (K线批量更新用 --full)')
 
-        # Show status
         print_status()
         print('流水线完成。报告已保存到 logs/daily_report.md')
 
