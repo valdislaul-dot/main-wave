@@ -156,13 +156,16 @@ for s in stocks:
         no_kline += 1
         continue
 
-    # 确保最后一天是涨停日: K线可能在池子日期之前截止
+    # 确保K线包含池子日期 (baostock可能还没更新到今天)
     pool_date = state.get('as_of_date', '')
-    if kls[-1].get('date', '') < pool_date:
-        price = s.get('price', 0) or kls[-1].get('close', 10)
-        kls.append({'date': pool_date, 'open': price, 'high': price,
-                     'low': round(price*0.99,2), 'close': price,
-                     'volume': s.get('amount', 1e8)})
+    if kls[-1].get('date', '') < pool_date and len(kls) >= 2:
+        # 用前一日收盘价估算真实O/H/L/C
+        prev_c = kls[-1].get('close', 0)
+        lp = 0.2 if code.startswith(('30','688')) else 0.1
+        lu_price = round(prev_c * (1 + lp), 2)
+        kls.append({'date': pool_date, 'open': lu_price, 'high': lu_price,
+                     'low': round(prev_c * 0.99, 2), 'close': lu_price,
+                     'volume': kls[-1].get('volume', 1e8)})
 
     ft = s.get('first_seal','')
     lt = s.get('last_seal', ft)
