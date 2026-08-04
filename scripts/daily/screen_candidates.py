@@ -100,8 +100,10 @@ def load_kline(name, code):
     return None
 
 def compute_v2_score(code, klines, details_raw=None):
-    """V2评分 — 委托给 scoring.score_v2, 向后兼容"""
-    return score_v2(code, klines, details_raw)
+    """V3评分 — 委托给 scoring.score_v3, 使用活跃配置"""
+    cfg = load_scoring_config()
+    version = cfg.get('active', 'v3')
+    return score_v3(code, klines, details_raw) if version == 'v3' else score_v2(code, klines, details_raw)
 
 def main():
     today = get_today()
