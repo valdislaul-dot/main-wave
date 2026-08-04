@@ -1,12 +1,13 @@
 """
-全市场回测: V2基线 vs V2+龙虎榜增强
+全市场回测: V3评分 + 龙虎榜增强
 区间: 2026-03-03 → 2026-07-24 (5个月)
-数据: kline_data/ (3180只全市场) + dt_block/ (龙虎榜+大宗)
+数据: kline_data/ + backtest_kline/ + dt_block/
 """
-
 import json, os, sys, glob, math
 from datetime import datetime, timedelta
 from functools import lru_cache
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from scoring import score_v3, load_config
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -93,81 +94,12 @@ def load_dt_all():
 
 # ── V2评分 ──
 def v2_score_simple(klines, idx, code):
-    """V2.2简化评分 (不含封板时间/炸板/板块)"""
-    t = klines[idx]
-    pc = klines[idx-1]['close']
-    c = t['close']; o = t['open']; h = t['high']; l = t['low']
-    v = t['volume']
-    lpct = get_lp(code)
-
-    if not is_lu(c, pc, lpct):
+    """委托给 scoring.score_v3, 保持向后兼容签名"""
+    sub_klines = klines[:idx+1]
+    score, details = score_v3(code, sub_klines, {})
+    if score is None:
         return None, None, None
-
-    gap = round((o - pc) / pc * 100, 2) if pc > 0 else 0
-
-    # 量比
-    ma5 = sum(klines[j]['volume'] for j in range(max(0, idx-4), idx+1)) / min(idx+1, 5)
-    ma20 = sum(klines[j]['volume'] for j in range(max(0, idx-19), idx+1)) / min(idx+1, 20)
-
-    # 连板
-    cons = 0
-    for j in range(idx-1, max(idx-10, -1), -1):
-        if j <= 0: break
-        if is_lu(klines[j]['close'], klines[j-1]['close'], lpct):
-            cons += 1
-        else: break
-
-    vr = (v / ma5) if (cons >= 2 and ma5 > 0) else (v / ma20 if ma20 > 0 else 1)
-
-    # 一字板
-    true_ol = False; is_ol = False
-    if h > 0 and l > 0:
-        if abs(h - l) < 0.001:
-            true_ol = is_ol = True
-        elif h > l:
-            us = (h - max(o, c)) / (h - l)
-            body = abs(c - o) / (h - l)
-            is_ol = (us < 0.1 and body < 0.1)
-
-    score = 0.0
-
-    # 量比6档
-    if vr < 0.3: score += 37
-    elif vr < 0.5: score += 19
-    elif vr < 0.7: score += 7
-    elif vr < 1.0: score -= 1
-    elif vr < 3.0: score -= 3
-
-    # gap6档
-    if gap >= 9: score += 20
-    elif gap >= 7: score += 6
-    elif gap >= 3: score += 1
-    elif gap >= -1: score -= 5
-    elif gap >= -3: score -= 3
-    else: score += 2
-
-    # 一字板
-    if true_ol: score += 20
-    elif is_ol: score += 10
-
-    # 连板
-    if cons == 0: score -= 4
-    elif cons <= 2: score += 10
-    else: score += 15
-
-    # 周几
-    dt_str = t.get('day', t.get('date', ''))
-    if dt_str:
-        try:
-            nd = datetime.strptime(dt_str, '%Y-%m-%d') + timedelta(days=1)
-            while nd.weekday() >= 5: nd += timedelta(days=1)
-            if nd.weekday() == 0: score += 2
-            elif nd.weekday() == 4: score -= 1
-        except: pass
-
-    return score, {'vr': vr, 'gap': gap, 'cons': cons+1,
-                   'one_line': is_ol, 'true_one_line': true_ol,
-                   'close': c, 'open': o}, code
+    return score, details, code
 
 
 def dt_adjust(code, t_minus_1_date, dt_all):

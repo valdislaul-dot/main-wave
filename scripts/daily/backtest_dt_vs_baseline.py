@@ -8,6 +8,8 @@ import json, os, sys, glob
 from datetime import datetime, timedelta
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from scoring import score_v3
 
 # ── 加载 ──
 def load_all():
@@ -52,93 +54,12 @@ def lp(code):
 
 
 def v2_score(code, klines, idx):
-    """V2.2 评分"""
-    if idx < 25:
+    """委托给 scoring.score_v3"""
+    sub_klines = klines[:idx+1]
+    score, details = score_v3(code, sub_klines, {})
+    if score is None:
         return None, None
-
-    t = klines[idx]
-    pc = float(klines[idx-1]['close'])
-    c = float(t['close'])
-    o = float(t['open'])
-    h = float(t['high'])
-    l = float(t['low'])
-    v = float(t['volume'])
-
-    if not is_lu(c, pc, lp(code)):
-        return None, None
-
-    gap = round((o - pc) / pc * 100, 2) if pc > 0 else 0
-
-    # 量比
-    if idx >= 5:
-        ma5 = sum(float(klines[j]['volume']) for j in range(idx-4, idx+1)) / 5
-    else:
-        ma5 = v
-    if idx >= 20:
-        ma20 = sum(float(klines[j]['volume']) for j in range(idx-19, idx+1)) / 20
-    else:
-        ma20 = v
-
-    # 连板
-    cons = 0
-    for j in range(idx-1, max(idx-10, -1), -1):
-        cj = float(klines[j]['close'])
-        pj = float(klines[j-1]['close']) if j > 0 else 0
-        if is_lu(cj, pj, lp(code)):
-            cons += 1
-        else:
-            break
-
-    vr = (v / ma5) if (cons >= 2 and ma5 > 0) else (v / ma20 if ma20 > 0 else 1)
-
-    # 一字板
-    is_ol = False
-    true_ol = False
-    if h > 0 and l > 0:
-        if abs(h - l) < 0.001:
-            true_ol = is_ol = True
-        elif h > l:
-            us = (h - max(o, c)) / (h - l)
-            body = abs(c - o) / (h - l)
-            is_ol = (us < 0.1 and body < 0.1)
-
-    score = 0.0
-
-    # 量比6档
-    if vr < 0.3: score += 37
-    elif vr < 0.5: score += 19
-    elif vr < 0.7: score += 7
-    elif vr < 1.0: score -= 1
-    elif vr < 3.0: score -= 3
-
-    # gap6档
-    if gap >= 9: score += 20
-    elif gap >= 7: score += 6
-    elif gap >= 3: score += 1
-    elif gap >= -1: score -= 5
-    elif gap >= -3: score -= 3
-    else: score += 2
-
-    # 一字板
-    if true_ol: score += 20
-    elif is_ol: score += 10
-
-    # 连板
-    if cons == 0: score -= 4
-    elif cons <= 2: score += 10
-    else: score += 15
-
-    # 周几
-    dt_str = t.get('day', '')
-    if dt_str:
-        dt = datetime.strptime(dt_str, '%Y-%m-%d') + timedelta(days=1)
-        while dt.weekday() >= 5: dt += timedelta(days=1)
-        if dt.weekday() == 0: score += 2
-        elif dt.weekday() == 4: score -= 1
-
-    details = {'vr': round(vr, 2), 'gap': gap, 'cons': cons+1,
-               'one_line': is_ol, 'true_one_line': true_ol,
-               'close': c, 'open': o}
+    return score, details
 
     return score, details
 
