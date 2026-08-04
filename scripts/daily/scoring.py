@@ -214,7 +214,7 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         config = load_config()
 
     result = precompute_klines(code, klines)
-    if result is None:
+    if result is None or result[0] is None:
         return None, None
     pdb, today_dt = result
 
