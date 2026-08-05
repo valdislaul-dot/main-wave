@@ -138,6 +138,17 @@ def main():
         else:
             print(f'\n  >>> 无非一字板候选，今日不买')
 
+    # ==== 一字板隔日关注 ====
+    one_line_watch = data.get('one_line_watch', [])
+    if one_line_watch:
+        print(f'\n  ═══ ⚡ 一字板隔日关注（昨一字板, 今68%可交易, 连板率60.5%） ═══')
+        for r in one_line_watch[:5]:
+            ref = r['close']
+            lo = ref * 1.04; hi = ref * 1.08
+            cons = r.get('cons', 1)
+            warn = '⚠高危' if cons >= 4 else '★优先'
+            print(f'  {r["name"]}({r["code"]}) {cons}板 {warn}  竞价目标: {lo:.2f}-{hi:.2f}')
+
     print(f'\n  --- 操作步骤 ---')
     print(f'  9:25 竞价结束 → 判断持仓:')
     print(f'    昨涨停? → 是→不低开→持 | 否→断板→gap<4%→卖')

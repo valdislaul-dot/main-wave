@@ -1,175 +1,194 @@
 """
-每日K线数据更新
-盘后运行：下载今日全市场涨停股的K线数据，更新本地数据库
+每日K线数据更新 — V3.1
+盘后运行：只更新当日涨停池标的的K线
+- 已有K线文件 → 追加最新一天
+- 无K线文件 → 下载近3年全量
+数据源: baostock
 """
 import baostock as bs
-import os
-BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import akshare as ak
-import json, os, time
+import json, os, glob, sys, time
 from datetime import datetime, timedelta
+from collections import Counter
 
-# BASE auto-detected below
-DAILY_DIR = os.path.join(BASE, '每日收盘数据')
+# BASE auto-detected
+BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
-INDEX_FILE = os.path.join(DAILY_DIR, 'stock_index.json')
-WATCH_FILE = os.path.join(BASE, 'logs', 'watchlist.json')
+ZT_STATE_PATH = os.path.join(BASE, 'data', 'zt_pool_state.json')
 
-os.makedirs(DAILY_DIR, exist_ok=True)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from zt_pool import fetch_zt_pool_raw
+
 os.makedirs(KLINE_DIR, exist_ok=True)
-os.makedirs(os.path.join(BASE, 'logs'), exist_ok=True)
+
 
 def get_today():
-    """Get the most recent trading day (skip weekends)"""
     today = datetime.now()
-    if today.hour < 15:  # Before market close, use previous day
+    if today.hour < 15:
         today = today - timedelta(days=1)
-    # Skip to Friday if weekend
     while today.weekday() >= 5:
         today = today - timedelta(days=1)
     return today.strftime('%Y-%m-%d')
 
+
 def code_to_bs(code):
     return f'sh.{code}' if code.startswith('6') else f'sz.{code}'
 
-def load_watchlist():
-    """Load/watchlist of stocks to track (from index + manual additions)"""
-    stocks = {}
-    # Load base index
-    if os.path.exists(INDEX_FILE):
-        with open(INDEX_FILE, 'r', encoding='utf-8') as f:
-            stocks = json.load(f)
-    # Merge with watchlist
-    if os.path.exists(WATCH_FILE):
-        with open(WATCH_FILE, 'r', encoding='utf-8') as f:
-            wl = json.load(f)
-            stocks.update(wl)
-    return stocks
 
-def save_watchlist(stocks):
-    with open(WATCH_FILE, 'w', encoding='utf-8') as f:
-        json.dump(stocks, f, ensure_ascii=False, indent=2)
+def find_kline_path(code):
+    """在K线目录中查找已有文件"""
+    # 精确匹配: name_code.json
+    for fp in glob.glob(os.path.join(KLINE_DIR, f'*_{code}.json')):
+        return fp
+    # 精确匹配: code.json
+    fp = os.path.join(KLINE_DIR, f'{code}.json')
+    if os.path.exists(fp):
+        return fp
+    # 模糊匹配: _code.json (旧格式)
+    fp = os.path.join(KLINE_DIR, f'_{code}.json')
+    if os.path.exists(fp):
+        return fp
+    return None
 
-def update_stock_kline(name, code, bs_code, start_date, end_date):
-    """Download K-line for a single stock"""
+
+def download_full(code, name, end_date):
+    """下载完整K线（新浪API，快）"""
+    import urllib.request
+    sym = f'sz{code}' if code.startswith(('0', '3')) else f'sh{code}'
+    url = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+           f"CN_MarketData.getKLineData?symbol={sym}&scale=240&ma=no&datalen=5000")
+    req = urllib.request.Request(url)
+    req.add_header('User-Agent', 'Mozilla/5.0')
+    req.add_header('Referer', 'https://finance.sina.com.cn/')
+    try:
+        resp = urllib.request.urlopen(req, timeout=15)
+        raw = resp.read().decode('gbk')
+        data = json.loads(raw)
+    except Exception as e:
+        return None, str(e)
+
+    if not data:
+        return None, 'no data'
+    rows = []
+    for d in data:
+        rows.append({
+            'date': d['day'],
+            'open': round(float(d['open']), 2),
+            'high': round(float(d['high']), 2),
+            'low': round(float(d['low']), 2),
+            'close': round(float(d['close']), 2),
+            'volume': float(d['volume']),
+        })
+    return rows, None
+
+
+def append_latest(code, existing_path, end_date):
+    """追加最新一天到已有K线文件"""
+    with open(existing_path, encoding='utf-8') as f:
+        klines = json.load(f)
+
+    last_date = klines[-1]['date'] if klines else '2023-01-01'
+    if last_date >= end_date:
+        return 0  # 已是最新
+
+    bs_code = code_to_bs(code)
     rs = bs.query_history_k_data_plus(bs_code,
         'date,open,high,low,close,volume',
-        start_date=start_date, end_date=end_date,
+        start_date=last_date, end_date=end_date,
         frequency='d', adjustflag='2')
     if rs.error_code != '0':
-        return None, rs.error_msg
+        return -1
 
-    rows = []
+    new_rows = []
     while rs.next():
-        row = rs.get_row_data()
-        rows.append(row)
-    return rows, None
+        r = rs.get_row_data()
+        if r[0] and r[0] > last_date:
+            new_rows.append({
+                'date': r[0],
+                'open': round(float(r[1]), 2),
+                'high': round(float(r[2]), 2),
+                'low': round(float(r[3]), 2),
+                'close': round(float(r[4]), 2),
+                'volume': float(r[5]) if r[5] else 0,
+            })
+
+    if new_rows:
+        klines.extend(new_rows)
+        with open(existing_path, 'w', encoding='utf-8') as f:
+            json.dump(klines, f, ensure_ascii=False)
+    return len(new_rows)
+
 
 def main():
     today = get_today()
-    print(f'[Update] Target date: {today}')
+    print(f'[K线更新] 目标日期: {today}')
 
-    # Check if today's data already exists
-    today_dir = os.path.join(DAILY_DIR, today)
-    if os.path.exists(today_dir):
-        print(f'[Update] {today} data already exists, updating...')
+    # 1. 拉取当日涨停池
+    print('[K线更新] 拉取当日涨停池...')
+    zt_pool = fetch_zt_pool_raw(today)
+    if not zt_pool:
+        print('[K线更新] 未获取到涨停数据，尝试从状态文件读取')
+        if os.path.exists(ZT_STATE_PATH):
+            with open(ZT_STATE_PATH, encoding='utf-8') as f:
+                state = json.load(f)
+            zt_pool = state.get('stocks', [])
+        if not zt_pool:
+            print('[K线更新] 无数据，退出')
+            return
 
-    # Login
+    # 去重
+    seen = set()
+    unique = []
+    for s in zt_pool:
+        code = s['code']
+        if code not in seen:
+            seen.add(code)
+            unique.append(s)
+    zt_pool = unique
+    print(f'[K线更新] 涨停池: {len(zt_pool)}只')
+
+    # 2. 统计: 哪些已有K线, 哪些是新标的
+    existing = []
+    new_stocks = []
+    for s in zt_pool:
+        fpath = find_kline_path(s['code'])
+        if fpath:
+            existing.append((s, fpath))
+        else:
+            new_stocks.append(s)
+
+    print(f'[K线更新] 已有K线: {len(existing)}只 | 新标的: {len(new_stocks)}只')
+
+    # 3. 登录
     bs.login()
 
-    # Load stock list
-    stocks = load_watchlist()
-    print(f'[Update] Tracking {len(stocks)} stocks')
-
-    # Also find today's LU stocks via akshare (new stocks to track)
-    try:
-        today_yyyymmdd = today.replace('-', '')
-        df = ak.stock_zt_pool_em(date=today_yyyymmdd)
-        # Filter out 创业板/科创板
-        def allowed(code):
-            return not (code.startswith('300') or code.startswith('301') or code.startswith('688'))
-        df = df[df['代码'].apply(allowed)]
-
-        new_count = 0
-        for _, row in df.iterrows():
-            code = str(row['代码'])
-            name = str(row['名称'])
-            if name not in stocks:
-                stocks[name] = code
-                new_count += 1
-
-        if new_count > 0:
-            print(f'[Update] Added {new_count} new stocks from today\'s LU pool')
-            save_watchlist(stocks)
-    except Exception as e:
-        print(f'[Update] Warning: Could not fetch LU pool: {e}')
-
-    # Download/update K-line for all tracked stocks
-    # Get data from 90 days ago to ensure 20+ trading days
-    start_date = (datetime.now() - timedelta(days=120)).strftime('%Y-%m-%d')
-    end_date = today
-
-    success = 0
-    errors = 0
-    daily_data = {}
-
-    for name, code in stocks.items():
-        try:
-            bs_code = code_to_bs(code)
-            rows, err = update_stock_kline(name, code, bs_code, start_date, end_date)
-
-            if err:
-                errors += 1
-                if errors <= 3:
-                    print(f'  Error {name}({code}): {err}')
-                continue
-
-            if not rows or len(rows) < 5:
-                continue
-
-            # Save per-stock file
-            key = f'{name}_{code}'
-            kline_data = []
-            for r in rows:
-                def sf(s): return float(s) if s and s != '' else 0.0
-                d = {
-                    'date': r[0], 'open': sf(r[1]), 'high': sf(r[2]),
-                    'low': sf(r[3]), 'close': sf(r[4]), 'volume': sf(r[5])
-                }
-                kline_data.append(d)
-                # Also collect daily snapshot
-                if r[0] not in daily_data:
-                    daily_data[r[0]] = {}
-                daily_data[r[0]][code] = {
-                    'name': name, 'open': d['open'], 'high': d['high'],
-                    'low': d['low'], 'close': d['close'], 'volume': d['volume']
-                }
-
-            fpath = os.path.join(KLINE_DIR, f'{key}.json')
+    # 4. 新标的: 下载完整历史
+    new_success = 0
+    for s in new_stocks:
+        rows, err = download_full(s['code'], s['name'], today)
+        if err:
+            print(f'  [ERROR] {s["name"]}({s["code"]}): {err}')
+            continue
+        if rows:
+            fpath = os.path.join(KLINE_DIR, f'{s["name"]}_{s["code"]}.json')
             with open(fpath, 'w', encoding='utf-8') as f:
-                json.dump(kline_data, f, ensure_ascii=False)
-            success += 1
+                json.dump(rows, f, ensure_ascii=False)
+            new_success += 1
+        time.sleep(0.05)
 
-        except Exception as e:
-            errors += 1
+    # 5. 已有标的: 追加最新一天
+    append_count = 0
+    for s, fpath in existing:
+        n = append_latest(s['code'], fpath, today)
+        if n > 0:
+            append_count += 1
+        time.sleep(0.03)
 
     bs.logout()
 
-    # Save daily snapshots
-    for dt, data in daily_data.items():
-        date_dir = os.path.join(DAILY_DIR, dt)
-        os.makedirs(date_dir, exist_ok=True)
-        fpath = os.path.join(date_dir, 'daily_data.json')
-        with open(fpath, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False)
+    print(f'[K线更新] 新标的全量: {new_success}/{len(new_stocks)} | 追加最新: {append_count}/{len(existing)}')
+    print(f'[K线更新] K线库总量: {len(glob.glob(os.path.join(KLINE_DIR, "*.json")))}只')
+    print(f'[K线更新] 完成!')
 
-    # Save updated index
-    with open(INDEX_FILE, 'w', encoding='utf-8') as f:
-        json.dump(stocks, f, ensure_ascii=False, indent=2)
-
-    print(f'[Update] Success: {success} stocks, Errors: {errors}')
-    print(f'[Update] Daily snapshots: {len(daily_data)} dates (including today: {today})')
-    print(f'[Update] Done!')
 
 if __name__ == '__main__':
     main()
