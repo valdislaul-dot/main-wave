@@ -174,24 +174,34 @@ def record_hold_valuation(current_price):
 
 
 def get_status():
-    """Get current portfolio status for display"""
+    """Get current portfolio status for display (兼容新旧格式)"""
     pf = load_portfolio()
-    positions = pf.get('positions', [])
-    closed = pf.get('closed', [])
     pos_info = None
 
+    # 新格式: positions数组
+    positions = pf.get('positions', [])
     if positions:
         p = positions[0]
-        pos_info = {
-            'name': p['name'], 'code': p['code'],
+        pos_info = {'name': p['name'], 'code': p['code'],
             'buy_date': p.get('buy_date', '?'), 'buy_price': p['buy_price'],
-            'shares': p['shares'],
-        }
+            'shares': p['shares']}
+    # 旧格式: position单对象
+    elif pf.get('position'):
+        p = pf['position']
+        pos_info = {'name': p['name'], 'code': p['code'],
+            'buy_date': p.get('buy_date', '?'), 'buy_price': p['buy_price'],
+            'shares': p['shares']}
 
-    # Calculate stats from closed trades
-    total_trades = len(closed)
-    winning_trades = sum(1 for t in closed if t.get('pnl', 0) > 0)
-    total_pnl = sum(t.get('pnl', 0) for t in closed)
+    # 统计: 优先用closed列表(新), 否则用旧字段
+    closed = pf.get('closed', [])
+    if closed:
+        total_trades = len(closed)
+        winning_trades = sum(1 for t in closed if t.get('pnl', 0) > 0)
+        total_pnl = sum(t.get('pnl', 0) for t in closed)
+    else:
+        total_trades = pf.get('total_trades', 0)
+        winning_trades = pf.get('winning_trades', 0)
+        total_pnl = pf.get('total_pnl', 0)
     win_rate = winning_trades / total_trades * 100 if total_trades > 0 else 0
 
     return {
