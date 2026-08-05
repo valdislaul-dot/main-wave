@@ -176,25 +176,31 @@ def record_hold_valuation(current_price):
 def get_status():
     """Get current portfolio status for display"""
     pf = load_portfolio()
-    pos = pf['position']
-    total_value = pf['cash']
+    positions = pf.get('positions', [])
+    closed = pf.get('closed', [])
     pos_info = None
 
-    if pos:
+    if positions:
+        p = positions[0]
         pos_info = {
-            'name': pos['name'], 'code': pos['code'],
-            'buy_date': pos['buy_date'], 'buy_price': pos['buy_price'],
-            'shares': pos['shares'],
+            'name': p['name'], 'code': p['code'],
+            'buy_date': p.get('buy_date', '?'), 'buy_price': p['buy_price'],
+            'shares': p['shares'],
         }
 
-    win_rate = pf['winning_trades'] / pf['total_trades'] * 100 if pf['total_trades'] > 0 else 0
+    # Calculate stats from closed trades
+    total_trades = len(closed)
+    winning_trades = sum(1 for t in closed if t.get('pnl', 0) > 0)
+    total_pnl = sum(t.get('pnl', 0) for t in closed)
+    win_rate = winning_trades / total_trades * 100 if total_trades > 0 else 0
+
     return {
-        'cash': pf['cash'],
+        'cash': pf.get('cash', 0),
         'position': pos_info,
-        'total_trades': pf['total_trades'],
-        'winning_trades': pf['winning_trades'],
+        'total_trades': total_trades,
+        'winning_trades': winning_trades,
         'win_rate': round(win_rate, 1),
-        'total_pnl': pf['total_pnl'],
+        'total_pnl': round(total_pnl, 2),
     }
 
 

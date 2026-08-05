@@ -404,11 +404,121 @@ def pool_summary(state=None):
     return "\n".join(lines)
 
 
-if __name__ == '__main__':
-    print("=== 涨停池管理器 ===\n")
-    state = load_state()
-    print(pool_summary(state))
+# ============================================================
+# 历史活跃度统计
+# ============================================================
 
-    # 测试: 更新到今天
-    print("\n尝试更新...")
-    update_zt_pool(verbose=True)
+def activity_report(top_n=30):
+    """
+    统计历史活跃度 = 涨停出现天数 + 离池次数
+    数据来源: ZT池快照 + 当前池 + 离池日志
+    """
+    activity = {}  # code -> {name, total_days, pool_entries, last_date, max_cons, industry}
+
+    # 1. 每日涨停池快照
+    if os.path.exists(POOL_DIR):
+        for fn in sorted(os.listdir(POOL_DIR)):
+            if not fn.endswith('.json'):
+                continue
+            date_str = fn.replace('.json', '')
+            fpath = os.path.join(POOL_DIR, fn)
+            try:
+                with open(fpath, encoding='utf-8') as f:
+                    pool = json.load(f)
+            except:
+                with open(fpath, encoding='gbk') as f:
+                    pool = json.load(f)
+            if not isinstance(pool, list):
+                continue
+
+            for s in pool:
+                code = s['code']
+                if code not in activity:
+                    activity[code] = {
+                        'name': s.get('name', ''), 'total_days': 0,
+                        'pool_entries': 0, 'last_date': '', 'max_cons': 0,
+                        'industry': s.get('industry', ''),
+                    }
+                activity[code]['total_days'] += 1
+                activity[code]['last_date'] = max(activity[code]['last_date'], date_str)
+                ld = s.get('limit_days', 1)
+                activity[code]['max_cons'] = max(activity[code]['max_cons'], ld)
+
+    # 2. 当前涨停池（可能含快照没有的日期）
+    state = load_state()
+    pool_date = state.get('as_of_date', '')
+    for s in state.get('stocks', []):
+        code = s['code']
+        if code not in activity:
+            activity[code] = {
+                'name': s.get('name', ''), 'total_days': 0,
+                'pool_entries': 0, 'last_date': '', 'max_cons': 0,
+                'industry': s.get('industry', ''),
+            }
+        if pool_date and pool_date > activity[code]['last_date']:
+            activity[code]['total_days'] += 1
+            activity[code]['last_date'] = pool_date
+        activity[code]['max_cons'] = max(activity[code]['max_cons'],
+                                          s.get('limit_days', 1))
+
+    # 3. 离池记录（补入池次数）
+    if os.path.exists(EXIT_LOG_PATH):
+        with open(EXIT_LOG_PATH, encoding='utf-8') as f:
+            exits = json.load(f)
+        for e in exits:
+            code = e['code']
+            if code in activity:
+                activity[code]['pool_entries'] += 1
+                activity[code]['max_cons'] = max(activity[code]['max_cons'],
+                                                  e.get('limit_days', 1))
+
+    # 4. 当前池中的每只也算一次进入
+    for s in state.get('stocks', []):
+        code = s['code']
+        if code in activity:
+            activity[code]['pool_entries'] = max(1, activity[code]['pool_entries'])
+
+    # 排序：按出现天数降序
+    ranked = sorted(activity.items(),
+                    key=lambda x: (x[1]['total_days'], x[1]['pool_entries']),
+                    reverse=True)
+
+    return ranked, len(activity)
+
+
+def print_activity(top_n=30):
+    ranked, total = activity_report(top_n)
+    print(f"\n{'='*70}")
+    print(f"  历史活跃度排名 (共{total}只上过涨停池)")
+    print(f"{'='*70}")
+    print(f"{'#':<4} {'代码':<8} {'名称':<8} {'出现':>5} {'入池':>4} {'最大连板':>6} {'最近':>10} {'行业':<10}")
+    print(f"{'-'*70}")
+
+    for i, (code, a) in enumerate(ranked[:top_n]):
+        print(f"{i+1:<4} {code:<8} {a['name']:<8} {a['total_days']:>4}天 "
+              f"{a['pool_entries']:>3}次 {a['max_cons']:>4}连板 "
+              f"{a['last_date']:>10} {a['industry']:<10}")
+
+    # 行业活跃度
+    industry_freq = Counter()
+    for code, a in ranked:
+        if a['industry']:
+            industry_freq[a['industry']] += a['total_days']
+    print(f"\n热门行业（按出现天数）: "
+          + ", ".join(f"{k}({v}天)" for k, v in industry_freq.most_common(8)))
+
+
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == '--activity':
+        n = int(sys.argv[2]) if len(sys.argv) > 2 else 30
+        print_activity(n)
+    elif len(sys.argv) > 1 and sys.argv[1] == '--summary':
+        state = load_state()
+        print(pool_summary(state))
+    elif len(sys.argv) > 1 and sys.argv[1] == '--update':
+        update_zt_pool(verbose=True)
+    else:
+        state = load_state()
+        print(pool_summary(state))
+        print("\n活跃度: python zt_pool.py --activity")
