@@ -32,7 +32,13 @@ def main():
 
     # --- 持仓 ---
     if pf:
-        pos = pf.get('position')
+        # 兼容新旧格式: position(单对象) 或 positions(数组)
+        pos_list = pf.get('positions', [])
+        if not pos_list:
+            pos_single = pf.get('position')
+            if pos_single:
+                pos_list = [pos_single]
+        pos = pos_list[0] if pos_list else None
         if pos:
             name = pos['name']; code = pos['code']
             cost = pos['buy_price']; shares = pos['shares']
@@ -141,63 +147,12 @@ def main():
     print(f'  14:45 限价单未成交→市价兜底')
     print(f'=' * 65)
 
-    # ====== 保存今日竞价快照 ======
+    # ====== 保存今日竞价快照（全量涨停池+候选） ======
     try:
-        import urllib.request
-        today_str = datetime.now().strftime('%Y-%m-%d')
-        auction_dir = os.path.join(BASE, 'data', 'auction')
-        os.makedirs(auction_dir, exist_ok=True)
-
-        # Get real-time open prices from 腾讯 for all candidates
-        codes_for_quote = []
-        for c in data['candidates'][:15]:
-            pre = 'sh' if c['code'].startswith('6') else 'sz'
-            codes_for_quote.append(f'{pre}{c["code"]}')
-
-        quotes = {}
-        if codes_for_quote:
-            url = f'https://qt.gtimg.cn/q={",".join(codes_for_quote)}'
-            req = urllib.request.Request(url)
-            req.add_header('User-Agent', 'Mozilla/5.0')
-            resp = urllib.request.urlopen(req, timeout=10)
-            raw = resp.read().decode('gbk')
-            for line in raw.strip().split(';'):
-                if '"' not in line: continue
-                v = line.split('"')[1].split('~')
-                if len(v) < 48: continue
-                code = v[2]
-                quotes[code] = {
-                    'name': v[1], 'open': float(v[5]), 'prev_close': float(v[4]),
-                    'gap_pct': round((float(v[5])-float(v[4]))/float(v[4])*100, 2),
-                    'price': float(v[3]), 'high': float(v[33]), 'low': float(v[34]),
-                    'volume': float(v[6]), 'limit_up': float(v[47])
-                }
-
-        # Merge with candidate data
-        auction_data = {
-            'date': today_str,
-            'captured': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'candidates': []
-        }
-        for c in data['candidates']:  # save ALL candidates
-            q = quotes.get(c['code'], {})
-            buyable = 4.0 <= q.get('gap_pct', 0) <= 8.0 if q else False
-            auction_data['candidates'].append({
-                'code': c['code'], 'name': c['name'],
-                'score': c['score'], 'vr20': c.get('vr20', 0),
-                'prev_close': q.get('prev_close', 0),
-                'open': q.get('open', 0),
-                'gap_pct': q.get('gap_pct', 0),
-                'buyable': buyable and not c.get('one_line', False),
-                'one_line': c.get('one_line', False)
-            })
-
-        fpath = os.path.join(auction_dir, f'{today_str}.json')
-        with open(fpath, 'w', encoding='utf-8') as f:
-            json.dump(auction_data, f, ensure_ascii=False, indent=2)
-        print(f'\n竞价快照已保存: data/auction/{today_str}.json')
+        from auction_pool import capture_auction
+        capture_auction()
     except Exception as e:
-        print(f'\n[WARN] 竞价快照保存失败: {e}')
+        print(f'\n[WARN] 竞价池采集失败: {e}')
 
 if __name__ == '__main__':
     main()
