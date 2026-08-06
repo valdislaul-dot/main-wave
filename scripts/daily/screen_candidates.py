@@ -1,7 +1,11 @@
 """
 盘后选股: 东财直连涨停池 → V2/V3评分(配置驱动) → 输出明日候选清单
 """
-import json, os, time, random, requests
+import json, os, sys, time, random, requests
+# 强制utf-8输出, 避免Windows gbk崩溃
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 from datetime import datetime, timedelta
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -156,6 +160,26 @@ def main():
 
     results.sort(key=lambda x: x['score'], reverse=True)
 
+    # ⚡ 先保存JSON, 再打印(避免gbk编码崩溃导致文件丢失)
+    one_line_today = [r for r in results if r.get('true_one_line', False)]
+    preferred_pick_temp = None
+    safe_temp = [r for r in results if not r.get('true_one_line', False)]
+    safe_temp = [r for r in safe_temp if not (r.get('one_line') and r.get('cons', 1) >= 4)]
+    non_one_temp = [r for r in safe_temp if not r['one_line']]
+    if non_one_temp: preferred_pick_temp = non_one_temp[0]
+
+    output = {
+        'date': today, 'version': version,
+        'generated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'total_candidates': len(results),
+        'top_pick': preferred_pick_temp,
+        'candidates': results,
+        'one_line_watch': one_line_today[:10] if one_line_today else [],
+    }
+    fpath = os.path.join(LOG_DIR, f'candidates_{today}.json')
+    with open(fpath, 'w', encoding='utf-8') as f:
+        json.dump(output, f, ensure_ascii=False, indent=2)
+
     # Filter
     safe = [r for r in results if not r.get('true_one_line', False)]
     safe = [r for r in safe if not (r.get('one_line') and r.get('cons', 1) >= 4)]
@@ -214,7 +238,7 @@ def main():
             cons = r.get('cons', 1)
             ref = r['close']
             lo = round(ref * 1.04, 2); hi = round(ref * 1.08, 2)
-            warn = '⚠ 高危' if cons >= 4 else '★ 优先'
+            warn = '[!]高危' if cons >= 4 else '[*]优先'
             print(f'{r["code"]:<8} {r["name"]:<8} {cons:>3}板 {r["turnover"]:>5.1f}% {r["industry"]:<10} {warn} 区间{lo}-{hi}')
         print(f'{"="*85}')
 
@@ -222,18 +246,6 @@ def main():
     filtered_count = sum(1 for r in results if r['score'] >= min_score)
     print(f'\n[Screen] 评分≥{min_score}: {filtered_count}/{len(results)}只 | 缺K线/评分失败: {score_fail}只')
 
-    output = {
-        'date': today, 'version': version,
-        'generated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'total_candidates': len(results),
-        'top_pick': preferred_pick if preferred_pick else None,
-        'candidates': results,
-        'one_line_watch': one_line_today[:10] if one_line_today else [],
-    }
-    fpath = os.path.join(LOG_DIR, f'candidates_{today}.json')
-    with open(fpath, 'w', encoding='utf-8') as f:
-        json.dump(output, f, ensure_ascii=False, indent=2)
-    print(f'[Screen] Results saved: {fpath}')
 
 
 if __name__ == '__main__':
