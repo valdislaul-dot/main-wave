@@ -167,7 +167,8 @@ def main():
         top3_by_score = sorted(safe, key=lambda x: x['score'], reverse=True)[:3]
     else:
         top3_by_score = sorted(results, key=lambda x: x['score'], reverse=True)[:3]
-    top3_for_pick = sorted(top3_by_score, key=lambda x: x['vr20'])
+    # V3.1: 直接选最高分 (回测验证 +11.2pp vs Top3最小量比)
+    preferred_pick = top3_by_score[0] if top3_by_score else None
 
     # Output
     print(f'\n{"="*85}')
@@ -177,15 +178,15 @@ def main():
     print(f'{"#":<3} {"代码":<8} {"名称":<8} {"评分":>5} {"量比":>5} {"gap":>6} {"板":>3} {"一":>3} {"换手":>5} {"首封":>8} {"回封":>5}分 {"炸":>2}次 {"末封":>8} {"行业":<8}')
     print(f'{"-"*100}')
     for i, r in enumerate(results[:15]):
-        flag = ' <<<' if r == top3_for_pick else (' ◄' if r in top3_for_pick else '')
+        flag = ' <<<' if r == preferred_pick else (' <-' if r in top3_by_score else '')
         dur = f'{r.get("seal_dur",0)}' if r.get('seal_dur',0) > 0 else '-'
         brk = r.get('break_n', 0)
         lseal = r.get('last_seal', '?')
         print(f'{i+1:<3} {r["code"]:<8} {r["name"]:<8} {r["score"]:>5.0f} {r["vr20"]:>4.1f}x {r["gap"]:>+5.1f}% {r["cons"]:>3} {"Y" if r["one_line"] else "N":>3} {r["turnover"]:>4.1f}% {str(r["seal_time"]):>8} {dur:>5} {brk:>3} {str(lseal):>8} {r["industry"]:<8}{flag}')
     print(f'{"="*85}')
 
-    if top3_for_pick:
-        preferred = top3_for_pick[0]
+    if preferred_pick:
+        preferred = preferred_pick
         sc = preferred['score']
         prob = score_to_prob(sc)
         pos = score_to_position(sc)
@@ -193,8 +194,8 @@ def main():
         print(f'\n>> 首选: {preferred["name"]}({preferred["code"]}) 评分{sc:.0f} 量比{preferred["vr20"]:.1f}x')
         print(f'>> 连板概率≈{prob}% | 建议仓位: {pos}%')
         print(f'>> 买入区间: {lo:.2f} - {hi:.2f} (竞价涨幅4%-8%)')
-        if len(top3_for_pick) > 1:
-            print(f'>> 备选: {top3_for_pick[1]["name"]}({top3_for_pick[1]["code"]}) | {top3_for_pick[2]["name"]}({top3_for_pick[2]["code"]})')
+        if len(top3_by_score) > 1:
+            print(f'>> 备选: {top3_by_score[1]["name"]}({top3_by_score[1]["code"]}) | {top3_by_score[2]["name"]}({top3_by_score[2]["code"]})')
         risky_ol = [r for r in results if r.get('one_line') and r.get('cons', 1) >= 4]
         if risky_ol:
             names = ','.join(r['name'] for r in risky_ol[:3])
@@ -204,7 +205,7 @@ def main():
     one_line_today = [r for r in results if r.get('true_one_line', False)]
     if one_line_today:
         print(f'\n{"="*85}')
-        print(f' ⚡ 一字板隔日关注 | 今日一字板({len(one_line_today)}只) → 次日68%可交易, 连板率60.5%')
+        print(f' [!] 一字板隔日关注 | 今日一字板({len(one_line_today)}只) -> 次日68%可交易, 连板率60.5%')
         print(f' 次日若竞价落入4-8%区间, 是重要加分项')
         print(f'{"="*85}')
         print(f'{"代码":<8} {"名称":<8} {"连板":>4} {"换手":>6} {"行业":<10} {"次日关注点"}')
@@ -225,7 +226,7 @@ def main():
         'date': today, 'version': version,
         'generated': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'total_candidates': len(results),
-        'top_pick': top3_for_pick[0] if top3_for_pick else None,
+        'top_pick': preferred_pick if preferred_pick else None,
         'candidates': results,
         'one_line_watch': one_line_today[:10] if one_line_today else [],
     }
