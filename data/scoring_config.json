@@ -1,5 +1,5 @@
 {
-  "version": "2.0",
+  "version": "3.1",
   "active": "v3",
   "tables": {
     "v2": {
@@ -152,9 +152,12 @@
     "t_board": 10
   },
   "cons_score": {
-    "first": -4,
-    "sweet_2_3": 10,
-    "high_4plus": 15
+    "first": -2,
+    "2": 6,
+    "3": 14,
+    "4": 22,
+    "5": 26,
+    "6plus": 30
   },
   "dow_score": {
     "monday": 2,

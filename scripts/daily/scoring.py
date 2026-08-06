@@ -90,7 +90,7 @@ def default_scoring_config():
             }
         },
         "one_line_score":      {"true_one": 20, "t_board": 10},
-        "cons_score":          {"first": -4, "sweet_2_3": 10, "high_4plus": 15},
+        "cons_score":          {"first": -2, "2": 6, "3": 14, "4": 22, "5": 26, "6plus": 30},
         "dow_score":           {"monday": 2, "friday": -1},
         "seal_time_tiers":     [[5, 14], [10, 6], [15, 4], [20, 7], [25, 2],
                                  [30, 1], [40, -5], [50, 2], [60, -3], [120, -10], [240, -9]],
@@ -274,12 +274,19 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
             score += config['one_line_score']['t_board']
 
     # -------- 连板 --------
+    # 按具体连板数给分
     if cons == 0:
         score += config['cons_score']['first']
-    elif cons <= 2:
-        score += config['cons_score']['sweet_2_3']
+    elif cons == 1:
+        score += config['cons_score']['2']
+    elif cons == 2:
+        score += config['cons_score']['3']
+    elif cons == 3:
+        score += config['cons_score']['4']
+    elif cons == 4:
+        score += config['cons_score']['5']
     else:
-        score += config['cons_score']['high_4plus']
+        score += config['cons_score']['6plus']
 
     # -------- 周几 --------
     tomorrow = datetime.strptime(today_dt, '%Y-%m-%d') + timedelta(days=1)
