@@ -16,13 +16,14 @@ START = '2023-08-04'
 END = '2026-08-04'
 STOP_LOSS = -0.10
 MIN_LU_HISTORY = 2
+USE_AMP = '--amp' in sys.argv
 
 
 def load_all_klines():
-    """一次性加载所有K线到内存"""
+    """一次性加载所有K线到内存 (兼容新旧格式+多编码)"""
     kline_dirs = [
-        os.path.join(BASE, 'data', 'backtest_kline'),
         os.path.join(BASE, 'data', 'kline_data'),
+        os.path.join(BASE, 'data', 'backtest_kline'),
     ]
     all_data = {}  # code -> (name, klines_list)
     t0 = _time.time()
@@ -32,7 +33,12 @@ def load_all_klines():
         for fn in os.listdir(kd):
             if not fn.endswith('.json'): continue
             if '_' in fn:
-                name, code = fn.replace('.json', '').rsplit('_', 1)
+                parts = fn.replace('.json', '').rsplit('_', 1)
+                if len(parts) == 2 and parts[0] and parts[1]:
+                    name, code = parts
+                else:
+                    code = fn.replace('.json', '')
+                    name = code
             else:
                 code = fn.replace('.json', '')
                 name = code
@@ -40,17 +46,38 @@ def load_all_klines():
             if code in all_data: continue
             if code.startswith(('300', '301', '688')): continue
 
-            try:
-                with open(os.path.join(kd, fn), 'r', encoding='utf-8') as f:
-                    kls = json.load(f)
-                for k in kls:
-                    for field in ['open', 'close', 'high', 'low', 'volume']:
-                        try: k[field] = round(float(k[field]), 2)
-                        except: k[field] = 0.0
-                if len(kls) >= 25:
-                    all_data[code] = (name, kls)
-            except:
-                pass
+            # 尝试多编码加载
+            kls = None
+            for enc in ['utf-8', 'gbk']:
+                try:
+                    with open(os.path.join(kd, fn), 'r', encoding=enc) as f:
+                        raw = json.load(f)
+                    # 新搜狐格式: dict with 'data'
+                    if isinstance(raw, dict) and 'data' in raw:
+                        kls = raw['data']
+                    else:
+                        kls = raw
+                    break
+                except: pass
+            if kls is None or not isinstance(kls, list) or len(kls) == 0: continue
+
+            # 格式统一: 处理各种格式差异
+            if isinstance(kls[0], dict):
+                # volume_lots → volume (搜狐格式)
+                if 'volume_lots' in kls[0] and 'volume' not in kls[0]:
+                    for k in kls: k['volume'] = k.get('volume_lots', 0) * 100
+            elif isinstance(kls[0], list):
+                # [date, close] 格式 → 跳过(缺少OHLCV)
+                continue
+
+            # 价格round
+            for k in kls:
+                for field in ['open', 'close', 'high', 'low', 'volume']:
+                    try: k[field] = round(float(k[field]), 2)
+                    except: k[field] = 0.0
+
+            if len(kls) >= 25:
+                all_data[code] = (name, kls)
 
     print('  加载 {} 只股票 K线 ({:.1f}s)'.format(len(all_data), _time.time() - t0))
     return all_data
@@ -110,6 +137,12 @@ def run_3y_sim(all_klines, trading_days, cfg, score_min, lu_freq):
 
             score, details = score_v3(code, kls[:day_idx+1], {}, cfg)
             if score is None or score < score_min: continue
+
+            # 振幅因子(可选)
+            pc = kls[day_idx-1]['close']; h = kls[day_idx]['high']; l = kls[day_idx]['low']
+            amp = (h-l)/pc*100 if pc>0 else 0
+            amp_sc = 3 if amp<2 else (-5 if amp<6 else (2 if amp<10 else 5))
+            if USE_AMP: score += amp_sc
             if details.get('true_one_line'): continue
             if details.get('one_line') and details.get('cons', 1) >= 4: continue
 

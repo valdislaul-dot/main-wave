@@ -12,7 +12,7 @@ KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
 sys.path.insert(0, os.path.join(BASE, 'scripts', 'daily'))
 from scoring import load_config, is_limit_up, get_lp, step_score_asc, step_score_desc
 
-CUTOFF = '2020-01-01'  # 6年
+CUTOFF = '2016-01-01'  # 12年
 
 
 def is_one_line(k):

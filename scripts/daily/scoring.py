@@ -138,7 +138,16 @@ def save_config(cfg):
 
 def precompute_klines(code, klines):
     """返回 pdb: {date: {open,close,high,low,volume,is_limit_up,prev_close,gap_open_pct,
-                         vol_ma5,vol_ma20,vol_ratio5,vol_ratio20,is_one_line,cons_lu_before}}"""
+                         vol_ma5,vol_ma20,vol_ratio5,vol_ratio20,is_one_line,cons_lu_before}}
+    兼容旧格式(baostock前复权)和新格式(搜狐财经不复权)"""
+    # ── 新格式检测与转换 ──
+    if isinstance(klines, dict) and 'data' in klines:
+        klines = klines['data']
+    # 搜狐新格式: volume_lots(手) → volume(股)
+    if klines and 'volume_lots' in klines[0] and 'volume' not in klines[0]:
+        for k in klines:
+            k['volume'] = k.get('volume_lots', 0) * 100
+
     if len(klines) < 25:
         return None, None
 

@@ -37,7 +37,7 @@ def main():
                     with open(candidates_file, 'r', encoding='utf-8') as cf:
                         data = json.load(cf)
                         for c in data.get('candidates',[]):
-                            if c['code'] == code: pos_pct = 1.0 if c['score'] >= 30 else 0.5; break
+                            if c['code'] == code: pos_pct = 0.5; break
                 deploy = pf['cash'] * pos_pct
                 shares = int(deploy / price / 100) * 100
             cost = shares * price

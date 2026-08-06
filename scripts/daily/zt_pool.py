@@ -134,31 +134,38 @@ def prune_stale(state, days=10):
 # ============================================================
 
 def _load_klines(code, name=None):
-    """加载K线: backtest_kline/ > kline_data/ (优先完整历史)"""
+    """加载K线: 兼容新旧两种格式"""
     search_dirs = [
+        os.path.join(BASE, 'data', 'kline_data'),
         os.path.join(BASE, 'data', 'backtest_kline'),
-        KLINE_DIR,
     ]
 
     for sdir in search_dirs:
         if not os.path.exists(sdir):
             continue
-        # 精确文件
+        # {code}.json (新搜狐格式 或 backtest_kline格式)
+        fpath = os.path.join(sdir, f'{code}.json')
+        if os.path.exists(fpath):
+            for enc in ['utf-8', 'gbk']:
+                try:
+                    with open(fpath, 'r', encoding=enc) as f:
+                        data = json.load(f)
+                    # 新格式: dict with 'data' key
+                    if isinstance(data, dict) and 'data' in data:
+                        return data['data']
+                    # 旧格式: list
+                    return data
+                except: pass
+        # {name}_{code}.json (旧kline_data格式)
         if name:
             fpath = os.path.join(sdir, f'{name}_{code}.json')
             if os.path.exists(fpath):
-                with open(fpath, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-        # {code}.json (backtest_kline格式)
-        fpath = os.path.join(sdir, f'{code}.json')
-        if os.path.exists(fpath):
-            with open(fpath, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        # {name}_{code}.json (kline_data格式)
-        for fn in os.listdir(sdir):
-            if fn.endswith(f'_{code}.json'):
-                with open(os.path.join(sdir, fn), 'r', encoding='utf-8') as f:
-                    return json.load(f)
+                for enc in ['utf-8', 'gbk']:
+                    try:
+                        with open(fpath, 'r', encoding=enc) as f:
+                            data = json.load(f)
+                        return data
+                    except: pass
 
     return None
 
