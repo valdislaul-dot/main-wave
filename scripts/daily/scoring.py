@@ -70,7 +70,7 @@ def step_score_desc(x, tiers):
 def default_scoring_config():
     """默认配置: v2(当前陡峭) + v3(平滑)"""
     return {
-        "version": "2.0",
+        "version": "3.1",
         "active": "v3",
         "tables": {
             "v2": {
@@ -235,6 +235,15 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
 
     t1 = pdb[today_dt]
     cons = t1['cons_lu_before']
+
+    # -------- v3.1: 近1年活跃度过滤 --------
+    from datetime import timedelta
+    cutoff = (datetime.strptime(today_dt, '%Y-%m-%d') - timedelta(days=365)).strftime('%Y-%m-%d')
+    recent_lu = sum(1 for dt, entry in pdb.items()
+                    if dt >= cutoff and dt != today_dt and entry['is_limit_up'])
+    if recent_lu < 2:
+        return None, None  # 近1年涨停<2次, 不纳入候选
+
     score = 0.0
     tables = config['tables'][version]
 
