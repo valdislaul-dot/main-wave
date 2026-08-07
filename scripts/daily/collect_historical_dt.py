@@ -103,7 +103,7 @@ def main():
     block_days = 0
 
     for i, date in enumerate(days):
-        # 跳过已收集的
+        # 跳过已收集的 (新格式: 顶层有 dragon_tiger/block_trades 字段)
         save_file = os.path.join(DATA_DIR, f'{date}.json')
         if os.path.exists(save_file):
             for enc in ['utf-8', 'gbk']:
@@ -113,11 +113,17 @@ def main():
                     break
                 except (UnicodeDecodeError, json.JSONDecodeError):
                     continue
-            dt_all[date] = prev.get('dragon_tiger', [])
-            block_all[date] = prev.get('block_trades', [])
-            if dt_all[date]: dt_days += 1
-            if block_all[date]: block_days += 1
-            continue
+            # 检查是否为新格式 (有 dragon_tiger 或 block_trades 顶层字段)
+            is_new_format = ('dragon_tiger' in prev) or ('block_trades' in prev)
+            if is_new_format:
+                dt_all[date] = prev.get('dragon_tiger', [])
+                block_all[date] = prev.get('block_trades', [])
+                if dt_all[date]: dt_days += 1
+                if block_all[date]: block_days += 1
+                continue
+            # 旧格式 (有 results 字段) → 删除并重新拉取
+            print(f"  [{i+1}/{len(days)}] {date}: 旧格式, 重新拉取...")
+            os.remove(save_file)
 
         dt_list = []
         block_list = []

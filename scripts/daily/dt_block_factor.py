@@ -102,37 +102,37 @@ def fetch_block_trades(code, date):
 
 
 def compute_factor(dt, blocks):
-    """计算调整分"""
+    """计算调整分 (V3.2 反转: 回测验证机构大买次日弱, 净卖出封板次日强)"""
     score = 0
 
     if dt:
-        # 机构买入
+        # 机构买入 → 次日动能不足 (反转!)
         ip = dt['inst_buy_pct']
-        if ip >= 30: score += 8
-        elif ip >= 15: score += 4
-        elif ip <= -30: score -= 8
-        elif ip <= -15: score -= 4
+        if ip >= 30: score -= 8     # 原+8, 反转
+        elif ip >= 15: score -= 4   # 原+4
+        elif ip <= -30: score += 8  # 原-8, 机构大卖封板次日强
+        elif ip <= -15: score += 4  # 原-4
 
-        # 拉萨散户席
+        # 拉萨散户席 → 散户接力不利
         if dt['lhasa_flag']:
             score -= 5
 
-        # 买一集中度
+        # 买一集中度 → 独食难持续
         if dt['top1_pct'] > 25: score -= 3
         elif dt['top1_pct'] > 15: score -= 1
 
-        # 净买额
-        if dt['net_buy_wan'] > 10000: score += 3
-        elif dt['net_buy_wan'] < -5000: score -= 4
+        # 净买额 → 买越多次日越弱 (反转!)
+        if dt['net_buy_wan'] > 10000: score -= 4    # 原+3
+        elif dt['net_buy_wan'] < -5000: score += 3  # 原-4, 净卖出封板次日强
 
     if blocks:
         disc = sum(b['amount_wan'] for b in blocks if b['premium_pct'] < -5)
         prem = sum(b['amount_wan'] for b in blocks if b['premium_pct'] > 2)
-        if disc > 1000: score -= 5
-        elif disc > 500: score -= 3
-        elif disc > 100: score -= 1
-        if prem > 500: score += 4
-        elif prem > 100: score += 2
+        if disc > 1000: score += 5     # 原-5, 折价大宗=利空出尽
+        elif disc > 500: score += 3    # 原-3
+        elif disc > 100: score += 1    # 原-1
+        if prem > 500: score -= 4      # 原+4, 溢价大宗=追高陷阱
+        elif prem > 100: score -= 2    # 原+2
 
     return score
 

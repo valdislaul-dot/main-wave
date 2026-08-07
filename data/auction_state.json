@@ -1,89 +1,89 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 2,
+  "total_sessions": 3,
   "current": {
-    "date": "2026-08-06",
-    "captured": "2026-08-06 09:25:26",
-    "total": 94,
+    "date": "2026-08-07",
+    "captured": "2026-08-07 09:26:26",
+    "total": 70,
     "buyable": 10,
     "gap_distribution": {
-      "0-2%": 30,
-      "9%+": 9,
-      "5-9%": 9,
-      "-3-0%": 29,
-      "2-5%": 15,
-      "<-3%": 2
+      "2-5%": 11,
+      "-3-0%": 14,
+      "<-3%": 7,
+      "5-9%": 15,
+      "0-2%": 21,
+      "9%+": 2
     },
     "buyable_stocks": [
       {
-        "code": "002428",
-        "name": "云南锗业",
-        "gap_pct": 7.6,
-        "score": 31.0,
+        "code": "603773",
+        "name": "沃格光电",
+        "gap_pct": 7.67,
+        "score": 24.0,
         "limit_days": 3
       },
       {
         "code": "600397",
         "name": "江钨装备",
-        "gap_pct": 7.49,
-        "score": -22.0,
+        "gap_pct": 7.28,
+        "score": 19.0,
         "limit_days": 3
       },
       {
-        "code": "000657",
-        "name": "中钨高新",
-        "gap_pct": 7.0,
-        "score": 0,
+        "code": "002963",
+        "name": "豪尔赛",
+        "gap_pct": 6.77,
+        "score": 38.0,
+        "limit_days": 5
+      },
+      {
+        "code": "002971",
+        "name": "和远气体",
+        "gap_pct": 6.64,
+        "score": 9.0,
         "limit_days": 2
       },
       {
-        "code": "002355",
-        "name": "兴民智通",
-        "gap_pct": 6.68,
+        "code": "601101",
+        "name": "昊华能源",
+        "gap_pct": 5.74,
         "score": 0,
+        "limit_days": 1
+      },
+      {
+        "code": "001267",
+        "name": "汇绿生态",
+        "gap_pct": 5.67,
+        "score": 1.0,
         "limit_days": 3
       },
       {
-        "code": "603988",
-        "name": "中电电机",
-        "gap_pct": 6.54,
+        "code": "600326",
+        "name": "西藏天路",
+        "gap_pct": 5.32,
         "score": 0,
+        "limit_days": 1
+      },
+      {
+        "code": "603078",
+        "name": "江化微",
+        "gap_pct": 5.29,
+        "score": 22.0,
         "limit_days": 2
       },
       {
-        "code": "001337",
-        "name": "四川黄金",
-        "gap_pct": 6.31,
-        "score": 0,
+        "code": "600206",
+        "name": "有研新材",
+        "gap_pct": 5.05,
+        "score": -24.0,
         "limit_days": 2
       },
       {
-        "code": "001210",
-        "name": "金房能源",
-        "gap_pct": 5.24,
-        "score": 0,
-        "limit_days": 2
-      },
-      {
-        "code": "002649",
-        "name": "博彦科技",
-        "gap_pct": 5.07,
-        "score": 0,
-        "limit_days": 2
-      },
-      {
-        "code": "603823",
-        "name": "百合花",
-        "gap_pct": 4.46,
-        "score": 0,
-        "limit_days": 2
-      },
-      {
-        "code": "002842",
-        "name": "翔鹭钨业",
-        "gap_pct": 4.17,
-        "score": 0,
-        "limit_days": 2
+        "code": "000692",
+        "name": "惠天热电",
+        "gap_pct": 4.72,
+        "score": 18.0,
+        "limit_days": 3
       }
     ]
   },
@@ -113,7 +113,20 @@
         "2-5%": 15,
         "<-3%": 2
       }
+    },
+    {
+      "date": "2026-08-07",
+      "total": 70,
+      "buyable": 10,
+      "gap_distribution": {
+        "2-5%": 11,
+        "-3-0%": 14,
+        "<-3%": 7,
+        "5-9%": 15,
+        "0-2%": 21,
+        "9%+": 2
+      }
     }
   ],
-  "last_update": "2026-08-06"
+  "last_update": "2026-08-07"
 }

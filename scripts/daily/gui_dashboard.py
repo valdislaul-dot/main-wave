@@ -54,7 +54,7 @@ def _load_kline(code, name):
 now = datetime.now()
 wd = ['周一','周二','周三','周四','周五','周六','周日'][now.weekday()]
 c1, c2, c3 = st.columns([3, 1, 1])
-c1.title("📈 主升浪 V3.0")
+c1.title("📈 主升浪 V3.2")
 cfg = load_config()
 c2.markdown(f"<div style='text-align:center;font-size:1.4rem;font-weight:bold;margin-top:15px'>"
             f"{now.strftime('%m月%d日')} {wd}</div>", unsafe_allow_html=True)
