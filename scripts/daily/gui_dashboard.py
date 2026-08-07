@@ -74,6 +74,15 @@ if c3.button("🔄 刷新数据", use_container_width=True):
             with open(ztp, encoding='utf-8') as f:
                 codes = [s['code'] for s in json.load(f).get('stocks', [])]
         if codes:
+            # 0. 先从 kline_data/ 同步已有K线到 backtest_kline (Win端本地)
+            kd = os.path.join(BASE, 'data', 'kline_data')
+            if os.path.exists(kd):
+                for c in codes:
+                    src = os.path.join(kd, f'{c}.json')
+                    dst = os.path.join(KLINE_DIR, f'{c}.json')
+                    if os.path.exists(src) and not os.path.exists(dst):
+                        import shutil
+                        shutil.copy2(src, dst)
             # 区分新标的(无文件) vs 已有标的(只追加最后一天)
             new_codes = [c for c in codes if not os.path.exists(os.path.join(KLINE_DIR, f'{c}.json'))]
             old_codes = [c for c in codes if c not in new_codes]
