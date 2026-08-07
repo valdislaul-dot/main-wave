@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from scoring import load_config, compute_score
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
+KLINE_DIR = os.path.join(BASE, 'data', 'backtest_kline')
 
 st.set_page_config(page_title="主升浪 V3.0", page_icon="📈", layout="wide")
 
