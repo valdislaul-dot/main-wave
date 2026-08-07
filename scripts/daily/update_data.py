@@ -82,39 +82,57 @@ def download_full(code, name, end_date):
 
 
 def append_latest(code, existing_path, end_date):
-    """追加最新一天到已有K线文件"""
+    """追加最新一天到已有K线文件 (baostock优先, 新浪兜底)"""
     with open(existing_path, encoding='utf-8') as f:
-        klines = json.load(f)
+        raw = json.load(f)
+    # 兼容两种格式: dict {metadata, data} 或 list
+    klines = raw.get('data', raw) if isinstance(raw, dict) else raw
+    is_dict_fmt = isinstance(raw, dict) and 'data' in raw
 
     last_date = klines[-1]['date'] if klines else '2023-01-01'
     if last_date >= end_date:
         return 0  # 已是最新
 
+    new_rows = None
+
+    # 1. 尝试baostock
+    import baostock as bs
     bs_code = code_to_bs(code)
     rs = bs.query_history_k_data_plus(bs_code,
         'date,open,high,low,close,volume',
         start_date=last_date, end_date=end_date,
         frequency='d', adjustflag='2')
-    if rs.error_code != '0':
-        return -1
+    if rs.error_code == '0':
+        new_rows = []
+        while rs.next():
+            r = rs.get_row_data()
+            if r[0] and r[0] > last_date:
+                new_rows.append({
+                    'date': r[0],
+                    'open': round(float(r[1]), 2),
+                    'high': round(float(r[2]), 2),
+                    'low': round(float(r[3]), 2),
+                    'close': round(float(r[4]), 2),
+                    'volume': float(r[5]) if r[5] else 0,
+                })
 
-    new_rows = []
-    while rs.next():
-        r = rs.get_row_data()
-        if r[0] and r[0] > last_date:
-            new_rows.append({
-                'date': r[0],
-                'open': round(float(r[1]), 2),
-                'high': round(float(r[2]), 2),
-                'low': round(float(r[3]), 2),
-                'close': round(float(r[4]), 2),
-                'volume': float(r[5]) if r[5] else 0,
-            })
+    # 2. baostock失败 → 新浪兜底
+    if new_rows is None:
+        full_rows, err = download_full(code, '', end_date)
+        if full_rows:
+            new_rows = [r for r in full_rows if r['date'] > last_date]
+        else:
+            return -1
 
     if new_rows:
         klines.extend(new_rows)
-        with open(existing_path, 'w', encoding='utf-8') as f:
-            json.dump(klines, f, ensure_ascii=False)
+        if is_dict_fmt:
+            raw['data'] = klines
+            with open(existing_path, 'w', encoding='utf-8') as f:
+                json.dump(raw, f, ensure_ascii=False)
+        else:
+            with open(existing_path, 'w', encoding='utf-8') as f:
+                json.dump(klines, f, ensure_ascii=False)
     return len(new_rows)
 
 

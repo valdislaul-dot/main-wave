@@ -309,9 +309,13 @@ def update_zt_pool(date_str=None, verbose=True):
 
         # 用K线精确计算连板数
         cons = 0
+        kline_fresh = False
         if kls and len(kls) >= 2:
             lpct = get_lp(code)
-            # 从最后一天(K线可能含今天也可能不含)向前数连续涨停
+            # 检查K线是否包含今天(或昨天)
+            last_date = kls[-1].get('date', '')
+            kline_fresh = (last_date == date_str)
+            # 从最后一天向前数连续涨停
             for i in range(len(kls) - 1, max(len(kls) - 13, -1), -1):
                 if i <= 0: break
                 if is_limit_up(float(kls[i].get('close', 0)),
@@ -319,8 +323,11 @@ def update_zt_pool(date_str=None, verbose=True):
                     cons += 1
                 else:
                     break
-        else:
-            # 无K线时用东财数据 (可能有误)
+        # K线未更新时, 用东财连板数兜底 (避免因baostock失败导致连板数为0)
+        if not kline_fresh:
+            em_cons = s.get('limit_days', 1) - 1
+            cons = max(cons, em_cons)
+        if cons == 0 and not kls:
             cons = s.get('limit_days', 1) - 1
 
         # 构建池条目
