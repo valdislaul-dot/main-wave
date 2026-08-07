@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from scoring import load_config, compute_score
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-KLINE_DIR = os.path.join(BASE, 'data', 'backtest_kline')
+KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
 
 st.set_page_config(page_title="主升浪 V3.0", page_icon="📈", layout="wide")
 
@@ -40,10 +40,14 @@ def _load_kline(code, name):
         for fn in [f'{code}.json', f'{name}_{code}.json']:
             fp = os.path.join(d, fn)
             if os.path.exists(fp):
-                with open(fp, encoding='utf-8') as f: return json.load(f)
+                with open(fp, encoding='utf-8') as f:
+                    raw = json.load(f)
+                    return raw.get('data', raw) if isinstance(raw, dict) else raw
         for fn in os.listdir(d):
             if fn.endswith(f'_{code}.json'):
-                with open(os.path.join(d, fn), encoding='utf-8') as f: return json.load(f)
+                with open(os.path.join(d, fn), encoding='utf-8') as f:
+                    raw = json.load(f)
+                    return raw.get('data', raw) if isinstance(raw, dict) else raw
     return None
 
 # ══════ 标题栏 ══════
