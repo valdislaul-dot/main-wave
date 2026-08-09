@@ -84,22 +84,15 @@ def main():
             print(f'[Error] Screening failed: {e}')
 
         if not fast_mode:
-            # Step 5: DT/Block factor
-            print('\n[Step 5/7] 龙虎榜+大宗因子...')
-            try:
-                from dt_block_factor import run as run_dt_factor
-                run_dt_factor()
-            except: pass
-
-            # Step 6: Generate report
-            print('\n[Step 6/7] 生成每日报告...')
+            # Step 5: Generate report
+            print('\n[Step 5/6] 生成每日报告...')
             try:
                 from generate_report import generate
                 generate()
             except: pass
 
-            # Step 7: T-board minute
-            print('\n[Step 7/7] 捕获T字板分钟K线...')
+            # Step 6: T-board minute
+            print('\n[Step 6/6] 捕获T字板分钟K线...')
             try:
                 from capture_tboard_minute import main as capture_tboard
                 capture_tboard()

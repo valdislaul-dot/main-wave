@@ -1,6 +1,6 @@
 """
 数据备份打包 — Win端→Mac端
-打包: K线数据 + 龙虎榜/大宗历史 + 涨停池快照
+打包: K线数据 + 涨停池快照
 输出: 桌面/main-wave-data-YYYYMMDD.zip (跨平台兼容)
 """
 
@@ -19,7 +19,6 @@ def make_backup():
     # ── 要打包的项目 ──
     items = [
         # (源路径, zip内名称, 说明)
-        ('data/dt_block', 'dt_block', '龙虎榜+大宗交易历史'),
         ('data/zt_pool', 'zt_pool', '涨停池快照'),
         ('data/stock_data.json', 'stock_data.json', '核心K线(baostock 72只)'),
         ('data/kline_data', 'kline_data', 'K线数据(3180只)'),
@@ -70,12 +69,9 @@ def make_backup():
     print(f"[Backup] 完成: {out_path}")
     print(f"[Backup] {total_files}个文件, {size_mb:.1f}MB")
 
-    # 统计数
-    dt_dir = os.path.join(BASE, 'data', 'dt_block')
-    dt_files = len(os.listdir(dt_dir)) if os.path.exists(dt_dir) else 0
     zt_dir = os.path.join(BASE, 'data', 'zt_pool')
     zt_files = len(os.listdir(zt_dir)) if os.path.exists(zt_dir) else 0
-    print(f"[Backup] 内含: DT{dt_files}天 ZT{zt_files}天")
+    print(f"[Backup] 内含: ZT{zt_files}天")
 
     return out_path
 
