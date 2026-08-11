@@ -221,11 +221,11 @@ def capture_auction():
         'total': len(snapshot),
         'buyable': buyable_count,
         'gap_distribution': dict(gap_dist),
-        'buyable_stocks': [
+        'buyable_stocks': sorted([
             {'code': s['code'], 'name': s['name'], 'gap_pct': s['gap_pct'],
              'score': s['score'], 'limit_days': s['limit_days']}
             for s in snapshot if s['buyable']
-        ][:10],  # top 10
+        ], key=lambda x: x['score'], reverse=True)[:10],  # top 10 by score
     }
 
     # 历史记录（保留最近60天）
@@ -243,10 +243,11 @@ def capture_auction():
     save_auction_state(state)
     print(f'[Auction Pool] 可买标的: {buyable_count}只')
     if buyable_count > 0:
-        for s in snapshot:
-            if s['buyable']:
-                print(f'  {s["name"]}({s["code"]}) gap={s["gap_pct"]:+.1f}% '
-                      f'score={s["score"]:.0f} {s["limit_days"]}板')
+        buyable_stocks = [s for s in snapshot if s['buyable']]
+        buyable_stocks.sort(key=lambda x: x['score'], reverse=True)
+        for s in buyable_stocks:
+            print(f'  {s["name"]}({s["code"]}) score={s["score"]:.0f} '
+                  f'gap={s["gap_pct"]:+.1f}% {s["limit_days"]}板')
 
 
 def load_auction_state():

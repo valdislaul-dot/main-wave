@@ -136,9 +136,64 @@ def save_config(cfg):
 # 预处理K线 (各处复用的逻辑)
 # ============================================================
 
+def classify_volume(vol, klines, date_idx, heavy=2.0, shrink=0.5):
+    """量能分类 — A体系，77笔实盘数据驱动
+    比较基准: 近5日涨停日的量（打板策略，太久无参考性）
+    heavy(爆量): 是近期涨停中最大量 AND vs涨停日均量>=2x
+    shrink(缩量): vs近期涨停最大量<0.5x
+    normal(正常): 其余
+    首板(无前序涨停): 退化为 vs 5日MA"""
+    # 近5日内涨停日的量
+    start = max(0, date_idx - 5)
+    lu_vols = []
+    for j in range(start, date_idx):
+        if j > 0:
+            prev_c = klines[j - 1].get('close', 0)
+            curr_c = klines[j].get('close', 0)
+            if prev_c > 0 and (curr_c - prev_c) / prev_c >= 0.098:
+                v = klines[j].get('volume', 0)
+                if v > 0:
+                    lu_vols.append(v)
+
+    if lu_vols:
+        lu_max = max(lu_vols)
+        lu_avg = sum(lu_vols) / len(lu_vols)
+        vr_avg = vol / lu_avg if lu_avg > 0 else 1.0
+        vr_max = vol / lu_max if lu_max > 0 else 1.0
+        if vol >= lu_max and vr_avg >= heavy:
+            return 'heavy'
+        if vr_max < shrink:
+            return 'shrink'
+        return 'normal'
+
+    # 首板: 退化为 vs 5日MA
+    start_ma = max(0, date_idx - 5)
+    vols = [klines[j].get('volume', 0) for j in range(start_ma, date_idx + 1)]
+    vols = [v for v in vols if v > 0]
+    if not vols:
+        return 'normal'
+    ma20 = sum(vols) / len(vols)
+    vr_ma20 = vol / ma20 if ma20 > 0 else 1.0
+    if vr_ma20 >= heavy:
+        return 'heavy'
+    if vr_ma20 < shrink:
+        return 'shrink'
+    return 'normal'
+
+
+def classify_seal_quality(seal_minutes, zhaban_count, strong_max=30, weak_min=60):
+    """封板质量
+    strong: 封板<=30min 且 0炸板
+    weak: 封板>60min 或 炸板>0"""
+    if seal_minutes is not None and seal_minutes <= strong_max and zhaban_count == 0:
+        return 'strong'
+    return 'weak'
+
+
 def precompute_klines(code, klines):
     """返回 pdb: {date: {open,close,high,low,volume,is_limit_up,prev_close,gap_open_pct,
-                         vol_ma5,vol_ma20,vol_ratio5,vol_ratio20,is_one_line,cons_lu_before}}
+                         vol_ma5,vol_ma20,vol_ratio5,vol_ratio20,is_one_line,cons_lu_before,
+                         vol_class}}
     兼容旧格式(baostock前复权)和新格式(搜狐财经不复权)"""
     # ── 新格式检测与转换 ──
     if isinstance(klines, dict) and 'data' in klines:
@@ -204,6 +259,7 @@ def precompute_klines(code, klines):
             else:
                 break
         entry['cons_lu_before'] = cons
+        entry['vol_class'] = classify_volume(v, klines, i)
         pdb[dt] = entry
         prev_close = c
 

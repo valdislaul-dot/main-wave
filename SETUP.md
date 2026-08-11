@@ -1,4 +1,4 @@
-# 主升浪 V3.0 — 完整使用说明
+# 主升浪 V4.0 — 完整使用说明
 
 ---
 
@@ -16,7 +16,7 @@ pip install -r requirements.txt
 
 ```bash
 # 1. 把项目 push 到 GitHub
-git init && git add . && git commit -m "v3.0"
+git init && git add . && git commit -m "v4.0"
 git remote add origin https://github.com/你的用户名/main-wave.git
 git push -u origin main
 
@@ -97,7 +97,7 @@ crontab -e
 
 ---
 
-## 六、V3.0 评分模型
+## 六、V4.0 双引擎模型（评分V3 + A卖点体系）
 
 | 因子 | 档数 | 说明 |
 |------|------|------|

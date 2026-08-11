@@ -5,7 +5,7 @@
 import json, os, time, random, math, requests
 from datetime import datetime, timedelta
 
-BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_DIR = os.path.join(BASE, 'logs')
 os.makedirs(LOG_DIR, exist_ok=True)
 
@@ -74,10 +74,21 @@ def is_limit_up(close, prev_close, lpct):
     return close >= round(prev_close * (1 + lpct), 2) - 0.005
 
 def load_kline(name, code):
+    # Try name_code format first, then code-only
     fpath = os.path.join(BASE, 'data', 'kline_data', f'{name}_{code}.json')
+    if not os.path.exists(fpath):
+        fpath = os.path.join(BASE, 'data', 'kline_data', f'{code}.json')
     if os.path.exists(fpath):
         with open(fpath, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            data = json.load(f)
+        # Unwrap dict format: {'metadata':..., 'data':[...]} -> list
+        if isinstance(data, dict) and 'data' in data:
+            data = data['data']
+        # Normalize field names (old format uses volume_lots, new uses volume)
+        for k in data:
+            if 'volume' not in k and 'volume_lots' in k:
+                k['volume'] = k['volume_lots'] * 100  # lots → shares
+        return data
     return None
 
 def sigmoid(x, k=0.1, x0=50):
@@ -293,9 +304,11 @@ def main():
     non_one_line = [r for r in results if not r['one_line']]
     if len(non_one_line) >= 3:
         top3 = sorted(non_one_line, key=lambda x: x['prob'], reverse=True)[:3]
-    else:
+    elif results:
         top3 = sorted(results, key=lambda x: x['prob'], reverse=True)[:3]
-    top3_pick = sorted(top3, key=lambda x: x['vr20'])[0]
+    else:
+        top3 = []
+    top3_pick = sorted(top3, key=lambda x: x['vr20'])[0] if top3 else None
 
     print(f'\n{"="*110}')
     print(f' V3.0 候选清单 | {today} | 六维动态权重 + Sigmoid概率 | 首板/连板分别加权')

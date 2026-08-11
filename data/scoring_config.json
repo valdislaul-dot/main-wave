@@ -1,5 +1,5 @@
 {
-  "version": "3.1",
+  "version": "4.0",
   "active": "v3",
   "tables": {
     "v2": {
@@ -296,5 +296,47 @@
   "filters": {
     "true_one_line_skip": true,
     "board4_one_line_skip": true
+  },
+  "sell": {
+    "_comment": "卖点引擎 — 交易员A体系 (2026-08-10纳入)",
+    "volume": {
+      "heavy_threshold": 2.0,
+      "_heavy_note": "vs近5日涨停日均量>=2x, 且是涨停中最大量 = 爆量(A体系, 77笔数据驱动)",
+      "shrink_threshold": 0.5,
+      "_shrink_note": "vs近5日涨停最大量<0.5x = 缩量(A体系, 3笔全盈+16.3%)"
+    },
+    "weak_to_strong": {
+      "surge_pct": 7.0,
+      "_surge_note": "高开后拉升破7% = 弱转强确认信号, 吸引短线客+量化打板",
+      "vwap_stop": true,
+      "_vwap_note": "分时黄线止损: 弱转强后跌破分时均线=多数人S点"
+    },
+    "gap": {
+      "strong_high_open": 5.0,
+      "_strong_high_note": "竞价>=5%高开 = 强势, 缩量加速预期达标; 不达标=半仓减",
+      "weak_low_open": -3.0,
+      "deep_low_open": -5.0,
+      "_deep_low_note": "竞价<-5%深水大低开(仅3板内等自救, 高位不适用)"
+    },
+    "break_even_line": 0.0,
+    "_break_even_note": "破0%(红盘) = 弱转强失败底线, 无条件走",
+    "seal_quality": {
+      "strong_max_min": 30,
+      "_strong_note": "封板时间<=30min 且 炸板=0 = 强势封板",
+      "weak_min_min": 60,
+      "_weak_note": "封板时间>60min 或 炸板>0 = 弱势/烂板"
+    },
+    "loss_feedback": {
+      "soft_stop_pct": -5.0,
+      "_soft_note": "昨浮亏-5%~0% = 小亏(软止损), 竞价低开直接走, 防扩大亏损",
+      "hard_stop_pct": -10.0,
+      "_hard_note": "日内浮亏<=-10% = 硬止损, 无条件卖出(V3.2保留)"
+    },
+    "execution": {
+      "limit_up_day": "涨停价",
+      "non_limit_up_day": "70%(H+O)/2 + 30%收盘价",
+      "auction_half": "竞价半仓卖出=竞价价",
+      "deadline": "14:45市价兜底"
+    }
   }
 }
