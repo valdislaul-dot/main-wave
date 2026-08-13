@@ -1,0 +1,585 @@
+{
+  "trader": "交易员A",
+  "created": "2026-08-10",
+  "source": "副本主升浪.xlsx + 策略分析完整报告",
+  "period": "2026-03-03 ~ 2026-07-23",
+  "strategy_notes": {
+    "style": "T-1涨停板次日接力，开盘价买入",
+    "selection": "偏好极度缩量涨停(<0.5x 20日均量)，回避巨量涨停(>5x)",
+    "hold_time": "基本T+1（隔日卖），少数持有2-3天",
+    "position": "~55%仓位滚动",
+    "sell_rule": "开盘涨幅<阈值(6%)即卖 (简化版)",
+    "sell_system": {
+      "_source": "资料/干货合集-卖点.docx (2026-08-10纳入)",
+      "_note": "仅适用连板模式",
+      "volume_classification": {
+        "heavy": "vol_ratio20 >= 2.0 → 爆量, 次日分歧预期",
+        "shrink": "vol_ratio20 < 0.5 → 缩量, 次日加速预期",
+        "normal": "其余 → 正常量"
+      },
+      "category_1_limit_up": {
+        "title": "今日做对了 — 成功连板",
+        "strong_seal": {
+          "condition": "封板<=30min 且 0炸板",
+          "prev_heavy_today_shrink": {
+            "expectation": "次日高开+缩量加速上板",
+            "sell": "竞价<5%高开→半仓出; 开盘拉升量能逼近爆量日→清; 破5%→清"
+          },
+          "prev_normal_today_normal": {
+            "expectation": "次日爆量分歧日",
+            "sell": "大高开=第一卖点(通常大下杀); 杀回>开盘+回封→格局; 否则走"
+          },
+          "low_open": "竞价低开=第一卖点, 少亏当赚"
+        },
+        "weak_seal": {
+          "condition": "封板>60min 或 炸板>0 (烂板/分歧日)",
+          "high_open_surge": "高开+开盘拉升>7%=弱转强确认→格局(量<烂板日→加速); 连续两日爆量→板砸",
+          "high_open_drop": "高开+开盘下杀→0%底线走",
+          "low_open": "竞价低开=第一卖点"
+        }
+      },
+      "category_2_break": {
+        "title": "今日做错了 — 断板处理",
+        "weak_to_strong": {
+          "genuine": "高开+开盘5min内拉升>7% → 真反包弱转强→格局; 破分时黄线(VWAP)→走; 收盘未反包→走",
+          "fake": "高开+开盘下砸 → 0%底线, 破就走; 收盘未反包也走"
+        },
+        "low_open": {
+          "minor_loss_small_low": "小亏(<5%)+小低开 → 竞价第一卖点",
+          "severe_loss_small_low": "大亏(>=5%)+小低开 → 等盘中冲高自救减亏",
+          "deep_low_3board": "深水大低开(<-5%)+3板内 → 等分时冲高(资金自救预期)",
+          "deep_low_high_board": "深水大低开+高位板(>3板) → 不适用自救逻辑"
+        }
+      },
+      "execution": {
+        "limit_up_day": "涨停价限价单",
+        "non_limit_up_day": "70%(H+O)/2 + 30%收盘价",
+        "auction_half": "竞价半仓=竞价价出50%",
+        "deadline": "14:45限价单未成交→市价兜底"
+      },
+      "key_insights": [
+        "量能组合判断是核心: 爆量+缩量=加速预期, 正常+正常=分歧预期",
+        "7%是弱转强确认的关键阈值(短线客+量化打板入场线)",
+        "分时黄线(VWAP)=弱转强格局的生命线, 跌破即走",
+        "低开无论何种情况都是危险信号, 优先考虑卖出",
+        "高位板(>3板)深水低开不适用自救逻辑"
+      ]
+    }
+  },
+  "performance_summary": {
+    "initial_capital": 200000,
+    "final_asset": 1022000,
+    "return": "+411%",
+    "months": 5,
+    "total_trades": 77,
+    "known_pnl_trades": 30,
+    "estimated_win_rate": "53% (24亏损/51笔有数据)",
+    "best_month": "2026-04 (+101.5%)",
+    "worst_month": "2026-06 (-8.1%)"
+  },
+  "monthly_breakdown": {
+    "2026-03": {
+      "trades": 14,
+      "return": "+17.7%",
+      "asset": 235360
+    },
+    "2026-04": {
+      "trades": 11,
+      "return": "+101.5%",
+      "asset": 474367
+    },
+    "2026-05": {
+      "trades": 11,
+      "return": "+19.1%",
+      "asset": 565208
+    },
+    "2026-06": {
+      "trades": 16,
+      "return": "-8.1%",
+      "asset": 519334
+    },
+    "2026-07": {
+      "trades": 7,
+      "return": "+77.3%",
+      "asset": 920714
+    }
+  },
+  "current_position": null,
+  "last_trade": {
+    "code": "600721",
+    "name": "百花医药",
+    "buy_date": "2026-08-07",
+    "buy_price": 10.2,
+    "sell_date": "2026-08-13",
+    "sell_price": 14.49,
+    "shares": 55800,
+    "pnl_amt": 239382.0,
+    "pnl_pct": 42.06
+  },
+  "trade_history": [
+    {
+      "buy_date": "2026-03-03",
+      "sell_date": "2026-03-04",
+      "name": "赤天化",
+      "pnl_pct": -2.0
+    },
+    {
+      "buy_date": "2026-03-05",
+      "sell_date": "2026-03-06",
+      "name": "亚盛集团",
+      "pnl_pct": -2.5
+    },
+    {
+      "buy_date": "2026-03-06",
+      "sell_date": "2026-03-09",
+      "name": "国星光电",
+      "pnl_pct": -7.7
+    },
+    {
+      "buy_date": "2026-03-10",
+      "sell_date": "2026-03-11",
+      "name": "美利云",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-03-11",
+      "sell_date": "2026-03-12",
+      "name": "宇环数控",
+      "pnl_pct": -8.4
+    },
+    {
+      "buy_date": "2026-03-12",
+      "sell_date": "2026-03-13",
+      "name": "金浦钛业",
+      "pnl_pct": -0.5
+    },
+    {
+      "buy_date": "2026-03-13",
+      "sell_date": "2026-03-16",
+      "name": "郑州煤电",
+      "pnl_pct": -4.2
+    },
+    {
+      "buy_date": "2026-03-16",
+      "sell_date": "2026-03-17",
+      "name": "金正大",
+      "pnl_pct": 4.3
+    },
+    {
+      "buy_date": "2026-03-17",
+      "sell_date": "2026-03-18",
+      "name": "京投发展",
+      "pnl_pct": -1.5
+    },
+    {
+      "buy_date": "2026-03-18",
+      "sell_date": "2026-03-19",
+      "name": "正泰电源",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-03-19",
+      "sell_date": "2026-03-20",
+      "name": "基蛋生物",
+      "pnl_pct": -8.9
+    },
+    {
+      "buy_date": "2026-03-20",
+      "sell_date": "2026-03-23",
+      "name": "华电辽能",
+      "pnl_pct": 24.3
+    },
+    {
+      "buy_date": "2026-03-24",
+      "sell_date": "2026-03-25",
+      "name": "新日股份",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-03-26",
+      "sell_date": "2026-03-27",
+      "name": "舒华体育",
+      "pnl_pct": 0.8
+    },
+    {
+      "buy_date": "2026-03-27",
+      "sell_date": "2026-03-30",
+      "name": "新能泰山",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-03-30",
+      "sell_date": "2026-03-31",
+      "name": "美诺华",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-03-31",
+      "sell_date": "2026-04-01",
+      "name": "津药药业",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-01",
+      "sell_date": "2026-04-02",
+      "name": "安徽建工",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-02",
+      "sell_date": "2026-04-03",
+      "name": "力诺药包",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-03",
+      "sell_date": "2026-04-07",
+      "name": "星辉环材",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-09",
+      "sell_date": "2026-04-10",
+      "name": "中工国际",
+      "pnl_pct": -7.0
+    },
+    {
+      "buy_date": "2026-04-10",
+      "sell_date": "2026-04-13",
+      "name": "美诺华",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-13",
+      "sell_date": "2026-04-14",
+      "name": "康盛股份",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-14",
+      "sell_date": "2026-04-15",
+      "name": "新朋股份",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-15",
+      "sell_date": "2026-04-16",
+      "name": "圣阳股份",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-16",
+      "sell_date": "2026-04-17",
+      "name": "康恩贝",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-20",
+      "sell_date": "2026-04-21",
+      "name": "昂利康",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-21",
+      "sell_date": "2026-04-22",
+      "name": "蜀道装备",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-22",
+      "sell_date": "2026-04-23",
+      "name": "圣龙股份",
+      "pnl_pct": -8.3
+    },
+    {
+      "buy_date": "2026-04-23",
+      "sell_date": "2026-04-24",
+      "name": "九鼎新材",
+      "pnl_pct": -4.4
+    },
+    {
+      "buy_date": "2026-04-24",
+      "sell_date": "2026-04-27",
+      "name": "东望时代",
+      "pnl_pct": -8.4
+    },
+    {
+      "buy_date": "2026-04-27",
+      "sell_date": "2026-04-28",
+      "name": "水发燃气",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-28",
+      "sell_date": "2026-04-29",
+      "name": "飞南资源",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-04-29",
+      "sell_date": "2026-04-30",
+      "name": "宝光股份",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-05-07",
+      "sell_date": "2026-05-08",
+      "name": "金螳螂",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-05-08",
+      "sell_date": "2026-05-11",
+      "name": "波导股份",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-05-12",
+      "sell_date": "2026-05-13",
+      "name": "深圳华强",
+      "pnl_pct": -6.8
+    },
+    {
+      "buy_date": "2026-05-13",
+      "sell_date": "2026-05-14",
+      "name": "大唐发电",
+      "pnl_pct": 10.9
+    },
+    {
+      "buy_date": "2026-05-14",
+      "sell_date": "2026-05-15",
+      "name": "蒙娜丽莎",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-05-18",
+      "sell_date": "2026-05-19",
+      "name": "滨化股份",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-05-19",
+      "sell_date": "2026-05-20",
+      "name": "合肥城建",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-05-20",
+      "sell_date": "2026-05-21",
+      "name": "华能蒙电",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-05-21",
+      "sell_date": "2026-05-22",
+      "name": "达实智能",
+      "pnl_pct": -0.5
+    },
+    {
+      "buy_date": "2026-05-22",
+      "sell_date": "2026-05-25",
+      "name": "合百集团",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-05-26",
+      "sell_date": "2026-05-27",
+      "name": "安德利",
+      "pnl_pct": -6.0
+    },
+    {
+      "buy_date": "2026-05-27",
+      "sell_date": "2026-05-28",
+      "name": "肯特股份",
+      "pnl_pct": -11.2
+    },
+    {
+      "buy_date": "2026-05-28",
+      "sell_date": "2026-05-29",
+      "name": "香江控股",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-01",
+      "sell_date": "2026-06-02",
+      "name": "泓淋电力",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-03",
+      "sell_date": "2026-06-04",
+      "name": "方大集团",
+      "pnl_pct": -10.8
+    },
+    {
+      "buy_date": "2026-06-04",
+      "sell_date": "2026-06-05",
+      "name": "广西能源",
+      "pnl_pct": -4.9
+    },
+    {
+      "buy_date": "2026-06-05",
+      "sell_date": "2026-06-08",
+      "name": "天洋新材",
+      "pnl_pct": -19.1
+    },
+    {
+      "buy_date": "2026-06-09",
+      "sell_date": "2026-06-10",
+      "name": "龙源技术",
+      "pnl_pct": -6.5
+    },
+    {
+      "buy_date": "2026-06-10",
+      "sell_date": "2026-06-11",
+      "name": "金安国纪",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-11",
+      "sell_date": "2026-06-12",
+      "name": "天地源",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-12",
+      "sell_date": "2026-06-15",
+      "name": "翔鹭钨业",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-15",
+      "sell_date": "2026-06-16",
+      "name": "金钼股份",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-17",
+      "sell_date": "2026-06-18",
+      "name": "盛龙股份",
+      "pnl_pct": -4.7
+    },
+    {
+      "buy_date": "2026-06-18",
+      "sell_date": "2026-06-22",
+      "name": "立航科技",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-23",
+      "sell_date": "2026-06-24",
+      "name": "黄河旋风",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-24",
+      "sell_date": "2026-06-25",
+      "name": "世名科技",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-25",
+      "sell_date": "2026-06-26",
+      "name": "长裕集团",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-26",
+      "sell_date": "2026-06-29",
+      "name": "宏柏新材",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-06-29",
+      "sell_date": "2026-06-30",
+      "name": "兴业科技",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-07-01",
+      "sell_date": "2026-07-02",
+      "name": "蜀道装备",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-07-02",
+      "sell_date": "2026-07-03",
+      "name": "安洁科技",
+      "pnl_pct": -1.6
+    },
+    {
+      "buy_date": "2026-07-03",
+      "sell_date": "2026-07-06",
+      "name": "蜀道装备",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-07-06",
+      "sell_date": "2026-07-07",
+      "name": "雷赛智能",
+      "pnl_pct": -2.0
+    },
+    {
+      "buy_date": "2026-07-08",
+      "sell_date": "2026-07-09",
+      "name": "先锋新材",
+      "pnl_pct": -12.6
+    },
+    {
+      "buy_date": "2026-07-09",
+      "sell_date": "2026-07-10",
+      "name": "恒尚节能",
+      "pnl_pct": 21.6
+    },
+    {
+      "buy_date": "2026-07-10",
+      "sell_date": "2026-07-13",
+      "name": "同兴达",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-07-13",
+      "sell_date": "2026-07-14",
+      "name": "立方制药",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-07-14",
+      "sell_date": "2026-07-15",
+      "name": "恒尚节能",
+      "pnl_pct": 21.6
+    },
+    {
+      "buy_date": "2026-07-16",
+      "sell_date": "2026-07-17",
+      "name": "香江控股",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-07-17",
+      "sell_date": "2026-07-20",
+      "name": "哈药股份",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-07-20",
+      "sell_date": "2026-07-21",
+      "name": "立新能源",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-07-22",
+      "sell_date": "2026-07-23",
+      "name": "长缆科技",
+      "pnl_pct": null
+    },
+    {
+      "buy_date": "2026-08-07",
+      "sell_date": "2026-08-13",
+      "name": "百花医药",
+      "pnl_pct": 42.06,
+      "pnl_amt": 239382.0,
+      "sell_price": 14.49
+    }
+  ]
+}

@@ -65,11 +65,20 @@ def record_buy(name, code, price, shares, cost, note=''):
     journal = load_journal()
 
     pf['cash'] -= cost
-    pf['position'] = {
+    pos = {
         'name': name, 'code': code,
         'buy_date': datetime.now().strftime('%Y-%m-%d'),
         'buy_price': price, 'shares': shares
     }
+    positions = pf.get('positions')
+    if positions is not None:
+        positions.append(pos)
+    elif pf.get('position'):
+        positions = [pf['position'], pos]
+        pf['positions'] = positions
+    else:
+        pf['positions'] = [pos]
+    pf['position'] = positions[0]  # 主持仓=第一只(兼容旧读取方)
 
     entry = {
         'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -92,10 +101,24 @@ def record_sell(name, code, price, note=''):
     pf = load_portfolio()
     journal = load_journal()
 
-    pos = pf['position']
-    if pos is None or pos['name'] != name:
-        print(f'[Journal] WARNING: No position in {name}')
-        return pf
+    positions = pf.get('positions')
+    pos = None
+    if positions:
+        for p in positions:
+            if p['name'] == name or p['code'] == code:
+                pos = p
+                break
+        if pos is None:
+            print(f'[Journal] WARNING: No position in {name}')
+            return pf
+        positions.remove(pos)
+        pf['position'] = positions[0] if positions else None
+    else:
+        pos = pf['position']
+        if pos is None or (pos['name'] != name and pos['code'] != code):
+            print(f'[Journal] WARNING: No position in {name}')
+            return pf
+        pf['position'] = None
 
     proceeds = price * pos['shares']
     pnl = (price - pos['buy_price']) / pos['buy_price'] * 100
@@ -176,21 +199,21 @@ def record_hold_valuation(current_price):
 def get_status():
     """Get current portfolio status for display (兼容新旧格式)"""
     pf = load_portfolio()
-    pos_info = None
+    pos_list = []
 
     # 新格式: positions数组
     positions = pf.get('positions', [])
     if positions:
-        p = positions[0]
-        pos_info = {'name': p['name'], 'code': p['code'],
-            'buy_date': p.get('buy_date', '?'), 'buy_price': p['buy_price'],
-            'shares': p['shares']}
+        for p in positions:
+            pos_list.append({'name': p['name'], 'code': p['code'],
+                'buy_date': p.get('buy_date', '?'), 'buy_price': p['buy_price'],
+                'shares': p['shares']})
     # 旧格式: position单对象
     elif pf.get('position'):
         p = pf['position']
-        pos_info = {'name': p['name'], 'code': p['code'],
+        pos_list.append({'name': p['name'], 'code': p['code'],
             'buy_date': p.get('buy_date', '?'), 'buy_price': p['buy_price'],
-            'shares': p['shares']}
+            'shares': p['shares']})
 
     # 统计: 优先用closed列表(新), 否则用旧字段
     closed = pf.get('closed', [])
@@ -206,7 +229,8 @@ def get_status():
 
     return {
         'cash': pf.get('cash', 0),
-        'position': pos_info,
+        'positions': pos_list,
+        'position': pos_list[0] if pos_list else None,
         'total_trades': total_trades,
         'winning_trades': winning_trades,
         'win_rate': round(win_rate, 1),
@@ -220,10 +244,10 @@ def print_status():
     print(f'  当前持仓状态')
     print(f'{"="*50}')
     print(f'  现金: {s["cash"]:,.0f}')
-    if s['position']:
-        p = s['position']
-        print(f'  持仓: {p["name"]}({p["code"]})')
-        print(f'  买入日: {p["buy_date"]} | 成本: {p["buy_price"]:.2f} | 股数: {p["shares"]}')
+    if s['positions']:
+        for p in s['positions']:
+            print(f'  持仓: {p["name"]}({p["code"]})')
+            print(f'  买入日: {p["buy_date"]} | 成本: {p["buy_price"]:.2f} | 股数: {p["shares"]}')
     else:
         print(f'  持仓: 空仓')
     print(f'  已完成交易: {s["total_trades"]}笔 | 胜率: {s["win_rate"]}%')

@@ -164,6 +164,17 @@ def main():
     zt_pool = unique
     print(f'[K线更新] 涨停池: {len(zt_pool)}只')
 
+    # 1.5 持仓标的也纳入更新 (卖点引擎依赖K线判断昨涨停/断板)
+    pf_path = os.path.join(BASE, 'logs', 'portfolio.json')
+    if os.path.exists(pf_path):
+        with open(pf_path, encoding='utf-8') as f:
+            pf = json.load(f)
+        pool_codes = {s['code'] for s in zt_pool}
+        for p in pf.get('positions') or []:
+            if p.get('code') and p['code'] not in pool_codes:
+                zt_pool.append({'code': p['code'], 'name': p.get('name', '')})
+                print(f'[K线更新] 加入持仓标的: {p.get("name")}({p["code"]})')
+
     # 2. 统计: 哪些已有K线, 哪些是新标的
     existing = []
     new_stocks = []

@@ -1,0 +1,37 @@
+{
+  "cash": 26.53,
+  "position": {
+    "name": "华正新材",
+    "code": "603186",
+    "buy_price": 162.363,
+    "shares": 400,
+    "buy_date": "2026-08-13"
+  },
+  "positions": [
+    {
+      "name": "华正新材",
+      "code": "603186",
+      "buy_price": 162.363,
+      "shares": 400,
+      "buy_date": "2026-08-13"
+    },
+    {
+      "name": "一鸣食品",
+      "code": "605179",
+      "buy_price": 31.9848,
+      "shares": 500,
+      "buy_date": "2026-08-13"
+    }
+  ],
+  "total_trades": 9,
+  "winning_trades": 8,
+  "total_pnl": 68286.6,
+  "model_trades": 8,
+  "model_wins": 8,
+  "model_pnl": 70705.6,
+  "subjective_trades": 1,
+  "subjective_wins": 0,
+  "subjective_pnl": -2419.0,
+  "created": "2026-07-25 16:12:18",
+  "updated": "2026-08-13"
+}

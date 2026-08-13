@@ -473,7 +473,7 @@ def sell_execution_price(signal, today_quote, position):
     """
     action = signal['action']
     o = today_quote.get('open', 0)
-    h = today_quote.get('high', h)
+    h = today_quote.get('high', 0)
     c = today_quote.get('close', 0)
     lu = today_quote.get('limit_up_price', 0)
     buy_price = position.get('buy_price', 0)

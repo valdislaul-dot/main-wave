@@ -5,7 +5,7 @@ data/dt_block/
 data/minute_kline/
 # auction 纳入版本管理(校准用)
 data/stock_db.json
-logs/
+logs/*
 results/
 每日收盘数据/
 __pycache__/
@@ -20,3 +20,5 @@ data/副本主升浪.xlsx
 logs/*.log
 !logs/portfolio.json
 !logs/trading_journal.json
+!logs/trader_a.json
+!logs/recommendation_review.json

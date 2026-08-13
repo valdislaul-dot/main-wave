@@ -2,15 +2,18 @@
 集成A的卖点引擎: 量能三态 + 封板质量 + 弱转强
 """
 import json, os, sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LOG_DIR = os.path.join(BASE, 'logs')
 
 
 def load_latest_candidates():
-    files = sorted([f for f in os.listdir(LOG_DIR) if f.startswith('candidates_')])
+    files = [f for f in os.listdir(LOG_DIR)
+             if f.startswith('candidates_') and not f.startswith('candidates_v')]
     if not files: return None
+    # 按文件名中日期排序(格式: candidates_YYYY-MM-DD.json)
+    files.sort(key=lambda f: f.split('_')[1].replace('.json',''))
     with open(os.path.join(LOG_DIR, files[-1]), 'r', encoding='utf-8') as f:
         return json.load(f)
 
@@ -65,9 +68,7 @@ def main():
             pos_single = pf.get('position')
             if pos_single:
                 pos_list = [pos_single]
-        pos = pos_list[0] if pos_list else None
-
-        if pos:
+        for pos in pos_list:
             name = pos['name']; code = pos['code']
             cost = pos['buy_price']; shares = pos['shares']
             buy_date = pos.get('buy_date', '?')
@@ -80,6 +81,19 @@ def main():
             quote = fetch_live_quote(code)
             if quote:
                 gap_pct = round((quote['open'] - quote['prev_close']) / quote['prev_close'] * 100, 2)
+
+                # ── K线新鲜度检查 (滞后→昨涨停/断板判断会失真) ──
+                try:
+                    _kp = os.path.join(BASE, 'data', 'kline_data', f'{code}.json')
+                    if os.path.exists(_kp):
+                        with open(_kp, 'r', encoding='utf-8') as _f:
+                            _raw = json.load(_f)
+                        _kl = _raw.get('data', _raw) if isinstance(_raw, dict) else _raw
+                        _last = _kl[-1]['date'] if _kl else '?'
+                        if _last < (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'):
+                            print(f'  ║  ⚠ K线滞后(最新{_last}), 昨涨停/断板判断可能失真')
+                except Exception:
+                    pass
 
                 # 调用卖点引擎
                 try:
@@ -148,67 +162,83 @@ def main():
                     break
 
             print(f'  ╚══════════════════════════════════════════╝')
-        else:
+        if not pos_list:
             print(f'\n  --- 空仓 ---')
 
-    # ── 候选标的 (盘后筛选, 仅作参考) ──
+    # ── 加载今日竞价数据 ──
+    today_auction_file = os.path.join(BASE, 'data', 'auction',
+                                       f'{datetime.now().strftime("%Y-%m-%d")}.json')
+    auction_stocks = []
+    if os.path.exists(today_auction_file):
+        with open(today_auction_file, 'r', encoding='utf-8') as f:
+            auc_data = json.load(f)
+        auction_stocks = auc_data.get('stocks', [])
+
+    # ── 构建候选评分查找表 ──
+    candidate_scores = {}
     if data:
-        print(f'\n  --- 候选标的 (T-1={data["date"]}涨停股筛选, 仅供参考) ---')
-        print(f'  规则: V2评分≥30 | 剔除300/301/688 | 一字板跳过')
-        print(f'  买入区间: 竞价涨幅 4%-8%')
-        print()
+        for c in data.get('candidates', []):
+            candidate_scores[c['code']] = c
 
-        for i, c in enumerate(data['candidates'][:8]):
-            ref = c['close']
-            lo = ref * 1.04; hi = ref * 1.08
-            score = c['score']
-            vr20 = c.get('vr20', 1)
-            cons = c.get('cons', 1)
-            one_line = c.get('one_line', False)
-            turnover = c.get('turnover', 0)
-            code = c['code']
-            t1_gap = c.get('gap', 0)
+    # ── 今日竞价池买入候选（优先） ──
+    buyable = []
+    for s in auction_stocks:
+        code = s.get('code', '')
+        gap = s.get('gap_pct', 0)
+        is_one_line = s.get('one_line', False)
+        is_300 = code.startswith(('300', '301', '688'))
 
-            pos_type = '全仓' if score >= 30 else '半仓'
-            mark = '[一字板 跳过]' if one_line else f'竞价目标: {lo:.2f}-{hi:.2f}'
+        if is_300 or is_one_line:
+            continue
+        if 4.0 <= gap <= 8.0:
+            # 交叉候选评分（竞价池实时评分优先，无则用候选评分）
+            cand = candidate_scores.get(code, {})
+            auction_score = s.get('score', 0)
+            cand_score = cand.get('score', 0)
+            final_score = auction_score if auction_score > 0 else cand_score
+            buyable.append({
+                'code': code, 'name': s.get('name', ''),
+                'gap': gap, 'score': final_score,
+                'limit_days': s.get('limit_days', cand.get('cons', 1)),
+                'vr20': cand.get('vr20', 0), 'turnover': cand.get('turnover', 0),
+                'in_candidates': code in candidate_scores
+            })
 
-            print(f'  #{i+1} {c["name"]}({code})  {score:.0f}分  '
-                  f'量比{vr20:.1f}x  {cons}板  T-1gap{t1_gap:+.1f}%  换手{turnover:.1f}%  '
-                  f'{pos_type}  {mark}')
+    buyable.sort(key=lambda x: x['score'], reverse=True)
 
-        # Top pick
+    print(f'\n  ═══ 📊 今日竞价池 (gap 4%-8%, 非一字/非300) ═══')
+    if buyable:
+        for i, b in enumerate(buyable[:10]):
+            score_str = f'{b["score"]:.0f}分' if b['score'] > 0 else '—'
+            cand_mark = '★' if b['in_candidates'] else ' '
+            print(f'  {cand_mark} {b["name"]}({b["code"]})  '
+                  f'gap={b["gap"]:+.1f}%  {b["limit_days"]}板  '
+                  f'score={score_str}')
+    else:
+        print(f'  (无符合条件的标的)')
+
+    # ── 昨日候选（参考） ──
+    if data:
+        print(f'\n  --- 昨日候选参考 (T-1={data["date"]}, 已评分) ---')
         non_one_line = [c for c in data['candidates'][:15] if not c.get('one_line', False)]
-        if non_one_line:
-            top3 = sorted(non_one_line, key=lambda x: x['score'], reverse=True)[:3]
-            best = min(top3, key=lambda x: x.get('vr20', 99))
-            bl = best['close'] * 1.04; bh = best['close'] * 1.08
-            print(f'\n  >>> 首选: {best["name"]}({best["code"]}) '
-                  f'评分{best["score"]:.0f}  量比{best.get("vr20",0):.1f}x  '
-                  f'竞价目标: {bl:.2f}-{bh:.2f} (4%-8%)')
-            for c2 in top3:
-                if c2 != best:
-                    bl2 = c2['close'] * 1.04; bh2 = c2['close'] * 1.08
-                    print(f'  >>> 备选: {c2["name"]}({c2["code"]}) '
-                          f'评分{c2["score"]:.0f}  量比{c2.get("vr20",0):.1f}x  '
-                          f'竞价: {bl2:.2f}-{bh2:.2f}')
-        else:
-            print(f'\n  >>> 无非一字板候选，今日不买')
+        for i, c in enumerate(non_one_line[:5]):
+            in_auction = any(a['code'] == c['code'] for a in buyable)
+            mark = ' ← 今日竞价池内' if in_auction else ''
+            print(f'  #{i+1} {c["name"]}({c["code"]})  {c["score"]:.0f}分  '
+                  f'{c.get("cons",1)}板  T-1gap{c.get("gap",0):+.1f}%{mark}')
 
     # ── 一字板隔日关注 ──
     one_line_watch = data.get('one_line_watch', []) if data else []
     if one_line_watch:
         print(f'\n  ═══ ⚡ 一字板隔日关注 ═══')
         for r in one_line_watch[:5]:
-            ref = r['close']
-            lo = ref * 1.04; hi = ref * 1.08
             cons = r.get('cons', 1)
             warn = '⚠高危' if cons >= 4 else '★优先'
-            print(f'  {r["name"]}({r["code"]}) {cons}板 {warn}  竞价目标: {lo:.2f}-{hi:.2f}')
+            print(f'  {r["name"]}({r["code"]}) {cons}板 {warn}')
 
     print(f'\n  --- 操作步骤 ---')
-    print(f'  9:25 竞价结束 → 看卖点判断执行')
-    print(f'  9:30: 涨停日→挂涨停价 | 不涨停日→70%(H+O)/2+30%收')
-    print(f'  买入: 候选竞价4%-8%区间, 一字板跳过')
+    print(f'  卖出: 看上方持仓判断')
+    print(f'  买入: 从今日竞价池选, gap 4%-8%, 一字板跳过')
     print(f'  14:45 限价单未成交→市价兜底')
     print(f'=' * 65)
 
@@ -218,6 +248,30 @@ def main():
         capture_auction()
     except Exception as e:
         print(f'\n[WARN] 竞价池采集失败: {e}')
+
+    # ── 每日推荐记录（无论是否交易） ──
+    try:
+        today_str = datetime.now().strftime('%Y-%m-%d')
+        rec_dir = os.path.join(BASE, 'logs', 'daily_recommendations')
+        os.makedirs(rec_dir, exist_ok=True)
+        rec_file = os.path.join(rec_dir, f'{today_str}.json')
+
+        rec = {
+            'date': today_str,
+            'generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+            'total_in_pool': len(auction_stocks),
+            'buyable_count': len(buyable),
+            'top_pick': buyable[0] if buyable else None,
+            'buyable': buyable,
+            'position_status': (', '.join(p.get('name', '?') for p in pf.get('positions', [])) if pf and pf.get('positions') else (pf.get('position', {}).get('name', '空仓') if pf and pf.get('position') else '空仓')),
+            'action_taken': None
+        }
+        # 每次运行覆盖写入(竞价9:25后才完整, 避免首次运行过早留下空数据)
+        if datetime.now().strftime('%H:%M') >= '09:25' and buyable:
+            with open(rec_file, 'w', encoding='utf-8') as f:
+                json.dump(rec, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass  # 静默失败，不影响主流程
 
 
 if __name__ == '__main__':

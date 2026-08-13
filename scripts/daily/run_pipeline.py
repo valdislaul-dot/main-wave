@@ -85,14 +85,22 @@ def main():
 
         if not fast_mode:
             # Step 5: Generate report
-            print('\n[Step 5/6] 生成每日报告...')
+            print('\n[Step 5/7] 生成每日报告...')
             try:
                 from generate_report import generate
                 generate()
             except: pass
 
-            # Step 6: T-board minute
-            print('\n[Step 6/6] 捕获T字板分钟K线...')
+            # Step 6: Review yesterday's top-3 recommendations
+            print('\n[Step 6/7] 回看昨日推荐前三...')
+            try:
+                from review_recommendations import review_previous_day
+                review_previous_day()
+            except Exception as e:
+                print(f'[Warning] 推荐回看失败: {e}')
+
+            # Step 7: T-board minute
+            print('\n[Step 7/7] 捕获T字板分钟K线...')
             try:
                 from capture_tboard_minute import main as capture_tboard
                 capture_tboard()

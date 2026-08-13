@@ -146,6 +146,13 @@ def capture_auction():
     quotes = fetch_quotes(all_codes)
     print(f'[Auction Pool] 获取行情: {len(quotes)}只')
 
+    # 2.5 9:25前竞价未撮合(open=0) → 不覆盖快照
+    if quotes:
+        zero_opens = sum(1 for q in quotes.values() if q.get('open', 0) == 0)
+        if zero_opens > len(quotes) * 0.5:
+            print(f'[Auction Pool] ⚠ 竞价未结束({zero_opens}/{len(quotes)} open=0), 9:25后重跑')
+            return None
+
     # 3. 构建快照
     snapshot = []
     buyable_count = 0
