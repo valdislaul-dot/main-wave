@@ -1,13 +1,13 @@
-# 主升浪项目 — V4.0 (2026-08-10 Win端)
+# 主升浪项目 — V4.1 (2026-08-13 Win端)
 
 ## ⚠️ 时间判断规则
 - **任何操作前必须先执行 `date +"%H:%M"` 获取当前时间**
 - 禁止使用记忆/缓存中的时间
 
 ## 持仓
-- 云南锗业(002428) 600股@90.096, 现金29,868
-- 8胜1负 | 累计 +63,514
-- A: 百花药业(600721) @10.20, 55800股
+- 华正新材(603186) 400股@162.363 | 一鸣食品(605179) 500股@31.985, 现金26.53
+- 8胜1负 | 累计 +68,287（08-13盈利转出约7,708）
+- A: 空仓（百花医药 08-13 收盘14.49清仓, +42.1%/+239,382）
 
 ## 数据源
 - **baostock** — K线（backtest_kline/ 786只 + kline_data/ 3558只）
@@ -88,6 +88,12 @@ T日断板 + T+1 gap<4% → 卖出
 | 连板 | 首板-2 / 2板+6 / 3板+14 / 4板+22 / 5板+26 / 6板+30 |
 | 周几 | 周一+2 / 周五-1 |
 
+### 分歧质量因子（2026-08-13新增）
+- 爆量+烂板回封(炸板≥1或封板>60min)+收盘涨停+量≥1.5x前日 → **+15分**
+- 板块涨停≥2只给满额，无板块只+4（预期差逻辑：烂板出妖，修正烂板一味扣分）
+- 配置: `data/scoring_config.json` → divergence 段
+- 回测: `scripts/daily/backtest_divergence.py` — 高开≥4%+缩量组 4笔100%胜 均+10.0%
+
 ### 过滤规则
 - 真一字板 → 跳过（买不到）
 - 4板+一字/T字板 → 过滤（高危回撤）
@@ -125,18 +131,33 @@ T日断板 + T+1 gap<4% → 卖出
   - `capture_auction()` — 9:25采集全市场竞价（腾讯API批量）
   - `--summary` — 查看最新竞价摘要
   - `--history` — 查看历史竞价统计
+- ⚠️ 9:25前采集(open=0超半数)自动拒绝写入，防止垃圾快照
+
+### 🐉 分歧弱转强候选（2026-08-13新增，半自动提示）
+- 条件: T-1爆量+烂板涨停(板块≥2只) + T日竞价高开（≥4%可关注, ≥6%★大高开）
+- 面板确认清单: ①分时直冲/杀后立拉 ②板上缩量(vs T-1) ③板块领涨
+- 否定条件: 二次爆量→不进/走 | 板块<2只→降级 | 低开→弱转强失败
+- 来源: `资料/干货_怎么选.doc`，**只提示不自动交易**
 
 ## 盘后规则（2026-08-12修正）
 - 盘后流水线正常评分，全市场涨停股打分存档
 - **次日竞价以当日实时竞价池为准**，不以前日候选为唯一依据
 - 候选榜单作为参考，竞价池实时gap+评分排序为买入决策
 
-## 5步流水线（run_pipeline.py）
-1. 更新K线数据（baostock增量）
-2. 更新涨停池（东财push2ex）
-3. 筛选候选+评分
-4. 生成每日报告
-5. 捕获T字板分钟K线
+## 推荐回看（2026-08-13新增）
+- 盘后流水线Step6: 结算前一日竞价池可买前三名的模拟收益
+- 判定: T日开盘买入 → T+1按V4.0规则卖出 → 模拟盈亏>0=推荐正确
+- 数据: `logs/recommendation_review.json`（累计统计+分名次）
+- 手动: `python scripts/daily/review_recommendations.py [--date YYYY-MM-DD] [--history N]`
+
+## 7步流水线（run_pipeline.py）
+1. 更新涨停池（东财push2ex）
+2. 更新K线数据（baostock增量，**含持仓标的**）
+3. 更新历史涨停池
+4. 筛选候选+评分
+5. 生成每日报告
+6. 回看昨日推荐前三（新增）
+7. 捕获T字板分钟K线
 
 ## Streamlit GUI 面板
 ```bash
@@ -150,17 +171,21 @@ streamlit run scripts/daily/gui_dashboard.py
 
 ## 关键文件
 ```
-data/scoring_config.json    ← 评分配置（v2+v3双表）
+data/scoring_config.json    ← 评分配置（v2+v3双表+divergence分歧段）
 data/kline_data/            ← 3,558只K线（baostock，gitignored）
 data/backtest_kline/        ← 回测K线
 data/zt_pool/               ← 涨停池快照（每日保存）
 data/zt_pool_state.json     ← 活跃涨停池状态
 data/auction/               ← 竞价快照
-logs/portfolio.json         ← 持仓+已平仓记录
+logs/portfolio.json         ← 持仓(positions多持仓列表)+已平仓记录
 logs/trading_journal.json   ← 交易日志
-scripts/daily/scoring.py    ← 统一评分模块（配置驱动）
+logs/trader_a.json          ← 交易员A持仓+交易记录
+logs/recommendation_review.json ← 推荐回看累计统计
+scripts/daily/scoring.py    ← 统一评分模块（配置驱动，含分歧质量因子）
 scripts/daily/sell_engine.py ← V4.0统一卖点引擎（V3.2+A体系）
-scripts/daily/morning_check.py ← 竞价观察+卖点集成
+scripts/daily/morning_check.py ← 竞价观察+卖点集成（多持仓+🐉分歧标签）
+scripts/daily/review_recommendations.py ← 推荐回看（盘后结算前三模拟收益）
+scripts/daily/backtest_divergence.py ← 分歧弱转强模式回测
 scripts/daily/zt_pool.py    ← 涨停池管理器
 scripts/daily/gui_dashboard.py ← Streamlit GUI
 scripts/screen_candidates_v3.py ← V3六维Sigmoid版（独立脚本）
