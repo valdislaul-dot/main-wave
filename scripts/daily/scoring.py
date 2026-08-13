@@ -106,6 +106,13 @@ def default_scoring_config():
             "fallback":       5
         },
         "sector_tiers":        [[5, 12], [3, 6], [2, 2]],
+        "divergence": {
+            "enabled": True,
+            "prev_day_vol_min": 1.5,
+            "bonus": 15,
+            "no_sector_bonus": 4,
+            "_note": "分歧质量(烂板出妖): 爆量+烂板回封+收盘涨停=大分歧日加分; 板块>=2只给满额"
+        },
         "mapping": {
             "prob":     [[75, 40], [55, 33], [35, 30], [20, 25], [10, 20], [-99, 14]],
             "position": [[40, 100], [20, 50], [-99, 33]]
@@ -398,6 +405,27 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
             score += val
             break
 
+    # -------- 分歧质量 (2026-08-13新增: 烂板出妖/预期差) --------
+    # 爆量+烂板(炸板回封或封板>60min)+收盘涨停 = 大分歧日 → 加分, 修正"烂板一味扣分"
+    div_cfg = config.get('divergence', {})
+    div_bonus = 0
+    if div_cfg.get('enabled', True):
+        seal_mins = None
+        if seal_time and seal_time != '?':
+            try:
+                st_clean = seal_time.replace(':', '')
+                seal_mins = max(0, (int(st_clean[:2]) - 9) * 60 + int(st_clean[2:4]) - 30)
+            except Exception:
+                pass
+        seal_weak = zhaban > 0 or (seal_mins is not None and seal_mins > 60)
+        pdb_keys = list(pdb.keys())
+        prev_entry = pdb[pdb_keys[-2]] if len(pdb_keys) >= 2 else None
+        prev_vol_ratio = (t1['volume'] / prev_entry['volume']) if (prev_entry and prev_entry.get('volume', 0) > 0) else 1.0
+        if seal_weak and t1.get('vol_class') == 'heavy' and prev_vol_ratio >= div_cfg.get('prev_day_vol_min', 1.5):
+            # 板块效应=必要条件: 有板块给满额, 无板块只给象征分
+            div_bonus = div_cfg.get('bonus', 15) if sector_count >= 2 else div_cfg.get('no_sector_bonus', 4)
+            score += div_bonus
+
     score = round(score, 2)
 
     details = {
@@ -409,7 +437,9 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         'open': t1['open'],
         'close': t1['close'],
         't2_lu': False,
-        'tomorrow_dow': dow
+        'tomorrow_dow': dow,
+        'divergence': div_bonus,
+        'vol_class': t1.get('vol_class', 'normal')
     }
 
     return score, details

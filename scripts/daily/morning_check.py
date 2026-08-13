@@ -51,6 +51,88 @@ def fetch_live_quote(code):
         return None
 
 
+def find_divergence_candidates():
+    """🐉分歧弱转强候选 (2026-08-13新增, 半自动提示)
+    T-1爆量+烂板涨停(大分歧日, 板块>=2只) → T日竞价高开 → 弱转强观察名单
+    只提示不自动交易 (来源: 干货_怎么选.doc)"""
+    today_str = datetime.now().strftime('%Y-%m-%d')
+    zt_dir = os.path.join(BASE, 'data', 'zt_pool')
+    prev_files = sorted(f for f in os.listdir(zt_dir)
+                        if f.endswith('.json') and f[:-5] < today_str.replace('-', ''))
+    if not prev_files:
+        return None
+    prev_date = prev_files[-1][:-5]
+    prev_date_fmt = f'{prev_date[:4]}-{prev_date[4:6]}-{prev_date[6:8]}'
+
+    try:
+        with open(os.path.join(zt_dir, prev_files[-1]), encoding='utf-8') as f:
+            pool = json.load(f)
+    except UnicodeDecodeError:
+        with open(os.path.join(zt_dir, prev_files[-1]), encoding='gbk') as f:
+            pool = json.load(f)
+    stocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
+
+    from collections import Counter
+    sector_cnt = Counter(str(s.get('industry', '')) for s in stocks)
+
+    auc = {}
+    af = os.path.join(BASE, 'data', 'auction', f'{today_str}.json')
+    if os.path.exists(af):
+        with open(af, encoding='utf-8') as f:
+            ad = json.load(f)
+        alist = ad if isinstance(ad, list) else ad.get('stocks', ad.get('data', []))
+        for a in alist:
+            if isinstance(a, dict):
+                auc[str(a.get('code', ''))] = a
+
+    from scoring import classify_volume as cv
+    cands = []
+    for s in stocks:
+        code = str(s.get('code', '')).replace('sh', '').replace('sz', '')
+        if not code or code.startswith(('300', '301', '688')):
+            continue
+        # 烂板: 炸板>=1 或 封板>60min
+        zhaban = int(s.get('break_times', 0) or 0)
+        seal = str(s.get('first_seal', ''))
+        seal_mins = None
+        if seal and seal != '?':
+            try:
+                st = seal.replace(':', '')
+                seal_mins = max(0, (int(st[:2]) - 9) * 60 + int(st[2:4]) - 30)
+            except Exception:
+                pass
+        if zhaban == 0 and (seal_mins is None or seal_mins <= 60):
+            continue
+        # 爆量: heavy 且 vol >= 1.5x前日
+        kp = os.path.join(BASE, 'data', 'kline_data', f'{code}.json')
+        if not os.path.exists(kp):
+            continue
+        try:
+            with open(kp, encoding='utf-8') as f:
+                raw = json.load(f)
+        except UnicodeDecodeError:
+            with open(kp, encoding='gbk') as f:
+                raw = json.load(f)
+        kl = raw.get('data', raw) if isinstance(raw, dict) else raw
+        idx = next((i for i, x in enumerate(kl) if str(x.get('date')) == prev_date_fmt), None)
+        if idx is None or idx < 1:
+            continue
+        vol = kl[idx].get('volume', 0)
+        prev_v = kl[idx - 1].get('volume', 0)
+        if not (cv(vol, kl, idx) == 'heavy' and prev_v > 0 and vol >= prev_v * 1.5):
+            continue
+        # 今日竞价高开
+        a = auc.get(code)
+        if not a or not a.get('gap_pct') or a['gap_pct'] <= 0:
+            continue
+        cands.append({
+            'code': code, 'name': s.get('name', '?'), 'gap': a['gap_pct'],
+            'zhaban': zhaban, 'cons': s.get('limit_days', s.get('cons', '?')),
+            'industry': s.get('industry', ''), 'sector': sector_cnt.get(s.get('industry', ''), 0),
+        })
+    return cands
+
+
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
     data = load_latest_candidates()
@@ -235,6 +317,20 @@ def main():
             cons = r.get('cons', 1)
             warn = '⚠高危' if cons >= 4 else '★优先'
             print(f'  {r["name"]}({r["code"]}) {cons}板 {warn}')
+
+    # ── 🐉 分歧弱转强候选 (半自动提示) ──
+    try:
+        div_cands = find_divergence_candidates()
+        if div_cands:
+            print(f'\n  ═══ 🐉 分歧弱转强候选 (T-1爆量烂板 + 今日高开) ═══')
+            for c in sorted(div_cands, key=lambda x: -x['gap']):
+                star = '★大高开' if c['gap'] >= 6 else ('可关注' if c['gap'] >= 4 else '观察')
+                print(f'  {c["name"]}({c["code"]}) 竞价{c["gap"]:+.1f}% {star} | '
+                      f'T-1烂板炸{c["zhaban"]}次 {c["cons"]}板 板块:{c["industry"]}{c["sector"]}只')
+            print(f'  确认清单: ①分时开盘直冲/杀后立拉 ②板上缩量(vs T-1) ③板块领涨')
+            print(f'  否定条件: 二次爆量→不进/走 | 板块<2只→降级 | 低开→弱转强失败')
+    except Exception as e:
+        print(f'  [WARN] 分歧候选计算失败: {e}')
 
     print(f'\n  --- 操作步骤 ---')
     print(f'  卖出: 看上方持仓判断')

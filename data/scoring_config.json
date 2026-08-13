@@ -232,6 +232,13 @@
     ],
     "fallback": 5
   },
+  "divergence": {
+    "enabled": true,
+    "prev_day_vol_min": 1.5,
+    "bonus": 15,
+    "no_sector_bonus": 4,
+    "_note": "分歧质量(烂板出妖): 爆量+烂板回封+收盘涨停=大分歧日加分; 板块>=2只给满额"
+  },
   "sector_tiers": [
     [
       5,
