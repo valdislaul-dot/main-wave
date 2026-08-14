@@ -118,11 +118,13 @@ def main():
 
     results = []
     score_fail = 0
+    fail_reasons = {}  # 评分失败原因统计 (2026-08-14新增, 便于定位根因)
     for s in pool:
         code = s['code']; name = s['name']
         klines = load_kline(name, code)
         if klines is None:
             score_fail += 1
+            fail_reasons['无K线文件'] = fail_reasons.get('无K线文件', 0) + 1
             continue
 
         details_raw = {
@@ -136,6 +138,15 @@ def main():
         score, details = score_fn(code, klines, details_raw)
         if score is None:
             score_fail += 1
+            kl = klines.get('data', klines) if isinstance(klines, dict) else klines
+            if not kl or len(kl) < 25:
+                reason = 'K线<25根'
+            elif len(kl) >= 2 and kl[-2].get('close', 0) > 0 and \
+                    (kl[-1].get('close', 0) - kl[-2]['close']) / kl[-2]['close'] < 0.098:
+                reason = '末日非涨停(K线滞后)'
+            else:
+                reason = '活跃度过滤(近1年涨停<2)'
+            fail_reasons[reason] = fail_reasons.get(reason, 0) + 1
             continue
 
         seal_duration = 0
@@ -245,6 +256,8 @@ def main():
     min_score = get_score_min()
     filtered_count = sum(1 for r in results if r['score'] >= min_score)
     print(f'\n[Screen] 评分≥{min_score}: {filtered_count}/{len(results)}只 | 缺K线/评分失败: {score_fail}只')
+    if fail_reasons:
+        print(f'[Screen] 评分失败原因: {fail_reasons}')
 
 
 

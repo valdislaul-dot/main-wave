@@ -168,6 +168,15 @@ def capture_auction():
         _pstocks = _pp if isinstance(_pp, list) else _pp.get('stocks', _pp.get('data', []))
         file_cons = {str(x.get('code', '')).replace('sh', '').replace('sz', ''): int(x.get('limit_days', 1) or 1)
                      for x in _pstocks if isinstance(x, dict)}
+        # 连板数一致性校验: state vs 池文件, 不一致立即警告(池文件为准)
+        _mismatch = []
+        for _s in zt_state.get('stocks', []):
+            _c = str(_s.get('code', '')).replace('sh', '').replace('sz', '')
+            _st = int(_s.get('limit_days', 1) or 1)
+            if _c in file_cons and _st != file_cons[_c]:
+                _mismatch.append(f'{_s.get("name")}({_c}) state{_st}板vs池文件{file_cons[_c]}板')
+        if _mismatch:
+            print(f'[Auction Pool] ⚠ 连板数不一致({len(_mismatch)}只), 已取池文件值: {"; ".join(_mismatch[:6])}')
 
     # 3. 构建快照
     snapshot = []
