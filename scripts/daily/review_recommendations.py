@@ -1,6 +1,9 @@
 """
-推荐回看 — 盘后结算前一交易日竞价池「可买前三名」的模拟收益
-判定标准: T日开盘买入 → T+1按V4.0卖点规则卖出 → 模拟盈亏>0 = 推荐正确
+推荐回看 — 盘后结算前一交易日竞价池「可买前三名」的收益
+判定标准:
+  - 有实际交易: 按交易日志真实买卖价统计(部分卖出按已实现+剩余按T+1收盘估值)
+  - 无实际交易: T日开盘模拟买入 → T+1按V4.0卖点规则模拟卖出
+  - 盈亏>0 = 推荐正确
 用法:
   python review_recommendations.py              # 结算上一交易日
   python review_recommendations.py --date 2026-08-13
@@ -118,6 +121,29 @@ def simulate(buy, t_limit_up, t_close, t1):
     return round(t1['open'], 3), f'断板gap{gap1:+.2f}%<4%→开盘卖'
 
 
+def _find_trades(code):
+    """交易日志中该股票的实际买卖 → (buys, sells), 每条含date/price/shares"""
+    jp = os.path.join(LOG_DIR, 'trading_journal.json')
+    if not os.path.exists(jp):
+        return [], []
+    with open(jp, 'r', encoding='utf-8') as f:
+        journal = json.load(f)
+    buys, sells = [], []
+    for e in journal:
+        if not isinstance(e, dict) or str(e.get('code', '')) != code:
+            continue
+        a = str(e.get('action', ''))
+        price, shares = float(e.get('price', 0) or 0), int(e.get('shares', 0) or 0)
+        if price <= 0 or shares <= 0:
+            continue
+        d = str(e.get('date', ''))[:10]
+        if a == 'BUY' or '买入' in a:
+            buys.append({'date': d, 'price': price, 'shares': shares})
+        elif a == 'SELL' or '卖出' in a:
+            sells.append({'date': d, 'price': price, 'shares': shares})
+    return buys, sells
+
+
 # ── 结算 ──
 def review_date(date_str, verbose=True):
     today_str = datetime.now().strftime('%Y-%m-%d')
@@ -149,15 +175,49 @@ def review_date(date_str, verbose=True):
             continue
         pct_t = (t_bar['close'] - prev_close) / prev_close * 100
         t_limit = pct_t >= 9.9
+        gap1 = round((t1_bar['open'] - t_bar['close']) / t_bar['close'] * 100, 2)
+        t1_limit = t1_bar['close'] >= t_bar['close'] * 1.099
+
+        # ── 有实际交易 → 按真实买卖价统计; 无实际交易 → 模型模拟 ──
+        buys, sells = _find_trades(st['code'])
+        act_buys = [b for b in buys if b['date'] == date_str]
+        act_sells = [s for s in sells if s['date'] <= t1_str]
+        if act_buys:
+            total_cost = sum(b['price'] * b['shares'] for b in act_buys)
+            total_sh = sum(b['shares'] for b in act_buys)
+            avg_buy = round(total_cost / total_sh, 3) if total_sh else 0
+            realized = sum(s['price'] * s['shares'] for s in act_sells)
+            sold_sh = sum(s['shares'] for s in act_sells)
+            remain_sh = total_sh - sold_sh
+            value = realized + remain_sh * t1_bar['close']
+            pnl = round((value - total_cost) / total_cost * 100, 2)
+            if sold_sh > 0 and remain_sh > 0:
+                note = (f'实际: 买{total_sh}股@{avg_buy:.2f} → 卖{sold_sh}股@{round(realized / sold_sh, 2):.2f}'
+                        f' + 持{remain_sh}股按T+1收盘{t1_bar["close"]:.2f}估值')
+            elif sold_sh > 0:
+                note = f'实际: 买{total_sh}股@{avg_buy:.2f} → 全卖@{round(realized / sold_sh, 2):.2f}'
+            else:
+                note = f'实际: 买{total_sh}股@{avg_buy:.2f} → 未卖, 按T+1收盘{t1_bar["close"]:.2f}估值'
+            results.append({
+                'rank': len(results) + 1, 'code': st['code'], 'name': st['name'], 'score': st['score'],
+                'rec_gap': st['gap'],
+                'T': {'open': avg_buy, 'close': t_bar['close'], 'limit_up': t_limit, 'pct': round(pct_t, 2)},
+                'T1': {'gap': gap1, 'close': t1_bar['close'], 'limit_up': t1_limit},
+                'sell': round(realized / sold_sh, 2) if sold_sh else t1_bar['close'],
+                'note': note, 'pnl_pct': pnl, 'actual': True,
+                'verdict': '✅推荐正确' if pnl > 0 else '❌推荐错误',
+            })
+            continue
+
+        # 无实际交易 → V4.0模型模拟
         buy = t_bar['open']
         sell, note = simulate(buy, t_limit, t_bar['close'], t1_bar)
         pnl = round((sell - buy) / buy * 100, 2)
-        gap1 = round((t1_bar['open'] - t_bar['close']) / t_bar['close'] * 100, 2)
         results.append({
             'rank': len(results) + 1, 'code': st['code'], 'name': st['name'], 'score': st['score'],
             'rec_gap': st['gap'],
             'T': {'open': buy, 'close': t_bar['close'], 'limit_up': t_limit, 'pct': round(pct_t, 2)},
-            'T1': {'gap': gap1, 'close': t1_bar['close'], 'limit_up': t1_bar['close'] >= t_bar['close'] * 1.099},
+            'T1': {'gap': gap1, 'close': t1_bar['close'], 'limit_up': t1_limit},
             'sell': sell, 'note': note, 'pnl_pct': pnl,
             'verdict': '✅推荐正确' if pnl > 0 else '❌推荐错误',
         })
