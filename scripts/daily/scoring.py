@@ -381,7 +381,7 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
     final_seal = details_raw.get('final_seal_time', seal_time)
     if zhaban > 0:
         try:
-            fst = int(final_seal[:4]) if final_seal and final_seal != '?' else 1500
+            fst = int(final_seal.replace(':', '')[:4]) if final_seal and final_seal != '?' else 1500
             vr20_val = t1.get('vol_ratio20', 2)
             zb_cfg = config['zhaban']
             if fst <= zb_cfg['early_reseal'][0]:
@@ -491,6 +491,103 @@ def should_filter(one_line, true_one_line, cons, config=None):
     if filters.get('board4_one_line_skip') and one_line and cons >= 4:
         return True, "4板+一字/T字(高危)"
     return False, ""
+
+
+# ============================================================
+# 逐因子得分明细 (竞价面板表2用)
+# ============================================================
+
+def full_breakdown(code, klines, details_raw=None, version='v3', config=None):
+    """返回 (total, [(因子, 数值说明, 得分), ...]), 与compute_score同口径"""
+    if config is None:
+        config = load_config()
+    result = precompute_klines(code, klines)
+    if result is None or result[0] is None:
+        return None
+    pdb, today_dt = result
+    t1 = pdb[today_dt]
+    cons = t1['cons_lu_before']
+    tables = config['tables'][version]
+    if details_raw is None:
+        details_raw = {}
+    vr = t1['vol_ratio5'] if cons >= 2 else t1['vol_ratio20']
+    g = t1['gap_open_pct']
+    items = []
+    if tables.get('vr_mode') == 'linear':
+        items.append(('量比', f'vr={vr:.2f}', piecewise_linear(vr, tables.get('vr_anchors', []))))
+    else:
+        items.append(('量比', f'vr={vr:.2f}', step_score_asc(vr, tables['vr_tiers'])))
+    if tables.get('gap_mode') == 'linear':
+        items.append(('T-1日gap', f'{g:+.1f}%', piecewise_linear(g, tables.get('gap_anchors', []))))
+    else:
+        items.append(('T-1日gap', f'{g:+.1f}%', step_score_desc(g, tables['gap_tiers'])))
+    if t1.get('is_one_line', False):
+        true_one = abs(t1['high'] - t1['low']) < 0.001
+        items.append(('一字/T字', '真一字' if true_one else 'T字',
+                      config['one_line_score']['true_one'] if true_one else config['one_line_score']['t_board']))
+    else:
+        items.append(('一字/T字', '否', 0))
+    items.append(('连板', f'{cons + 1}板', config['cons_score'][{0: 'first', 1: '2', 2: '3', 3: '4', 4: '5'}.get(cons, '6plus')]))
+    tmrw = datetime.strptime(today_dt, '%Y-%m-%d') + timedelta(days=1)
+    while tmrw.weekday() >= 5:
+        tmrw += timedelta(days=1)
+    dow = tmrw.weekday()
+    dow_v = config['dow_score']['monday'] if dow == 0 else (config['dow_score']['friday'] if dow == 4 else 0)
+    items.append(('周几', '周一' if dow == 0 else ('周五' if dow == 4 else '其他'), dow_v))
+    seal_time = details_raw.get('seal_time', '1459')
+    seal_v, seal_disp = 0, '?'
+    if seal_time and seal_time != '?':
+        try:
+            st_clean = str(seal_time).replace(':', '')
+            mins = max(0, (int(st_clean[:2]) - 9) * 60 + int(st_clean[2:4]) - 30)
+            seal_disp = f'{mins}min'
+            seal_v = step_score_asc(mins, config['seal_time_tiers'])
+        except Exception:
+            pass
+    items.append(('封板时间', seal_disp, seal_v))
+    zhaban = int(details_raw.get('zhaban', 0) or 0)
+    final_seal = str(details_raw.get('final_seal_time', seal_time))
+    zb_pen = 0
+    if zhaban > 0:
+        try:
+            fst = int(final_seal.replace(':', '')[:4]) if final_seal and final_seal != '?' else 1500
+            vr20_val = t1.get('vol_ratio20', 2)
+            zb_cfg = config['zhaban']
+            if fst <= zb_cfg['early_reseal'][0]:
+                zb_pen = zhaban * zb_cfg['early_reseal'][1]
+            elif fst <= zb_cfg['mid_reseal'][0]:
+                zb_pen = zhaban * zb_cfg['mid_reseal'][1]
+            else:
+                if vr20_val < zb_cfg['late_vol_low'][0]:
+                    zb_pen = zhaban * zb_cfg['late_vol_low'][1]
+                elif vr20_val < zb_cfg['late_vol_mid'][0]:
+                    zb_pen = zhaban * zb_cfg['late_vol_mid'][1]
+                else:
+                    zb_pen = zhaban * zb_cfg['late_vol_high'][1]
+        except Exception:
+            zb_pen = zhaban * config['zhaban']['fallback']
+    items.append(('炸板扣分', f'炸{zhaban}次', -zb_pen))
+    sector_count = int(details_raw.get('sector_count', 1) or 1)
+    items.append(('板块共振', f'{sector_count}只', next((v for th, v in config['sector_tiers'] if sector_count >= th), 0)))
+    div_cfg = config.get('divergence', {})
+    div_v = 0
+    if div_cfg.get('enabled', True):
+        seal_mins2 = None
+        if seal_time and seal_time != '?':
+            try:
+                st_clean = str(seal_time).replace(':', '')
+                seal_mins2 = max(0, (int(st_clean[:2]) - 9) * 60 + int(st_clean[2:4]) - 30)
+            except Exception:
+                pass
+        seal_weak = zhaban > 0 or (seal_mins2 is not None and seal_mins2 > 60)
+        pdb_keys = list(pdb.keys())
+        prev_entry = pdb[pdb_keys[-2]] if len(pdb_keys) >= 2 else None
+        prev_vol_ratio = (t1['volume'] / prev_entry['volume']) if (prev_entry and prev_entry.get('volume', 0) > 0) else 1.0
+        if seal_weak and t1.get('vol_class') == 'heavy' and prev_vol_ratio >= div_cfg.get('prev_day_vol_min', 1.5):
+            div_v = div_cfg.get('bonus', 15) if sector_count >= 2 else div_cfg.get('no_sector_bonus', 4)
+    items.append(('分歧质量', '是' if div_v else '否', div_v))
+    total = round(sum(v for _, _, v in items), 2)
+    return total, items
 
 
 # ============================================================

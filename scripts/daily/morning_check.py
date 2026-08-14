@@ -133,6 +133,72 @@ def find_divergence_candidates():
     return cands
 
 
+_prev_pool_cache = None
+
+
+def _load_prev_pool():
+    """上一交易日涨停池文件 → (stocks, sector_cnt), 带缓存"""
+    global _prev_pool_cache
+    if _prev_pool_cache is not None:
+        return _prev_pool_cache
+    zt_dir = os.path.join(BASE, 'data', 'zt_pool')
+    today_yyyymmdd = datetime.now().strftime('%Y%m%d')
+    files = sorted(f for f in os.listdir(zt_dir) if f.endswith('.json') and f[:-5] < today_yyyymmdd)
+    if not files:
+        _prev_pool_cache = None
+        return None
+    try:
+        with open(os.path.join(zt_dir, files[-1]), encoding='utf-8') as f:
+            pool = json.load(f)
+    except UnicodeDecodeError:
+        with open(os.path.join(zt_dir, files[-1]), encoding='gbk') as f:
+            pool = json.load(f)
+    stocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
+    from collections import Counter
+    sector_cnt = Counter(str(x.get('industry', '')) for x in stocks)
+    _prev_pool_cache = (stocks, sector_cnt)
+    return _prev_pool_cache
+
+
+_meta_cache = {}
+
+
+def stock_scoring_meta(code):
+    """按评分表现场打分 + T-1池明细 → {score, industry, sector, cons, klines, detail}
+    (解决流水线评分盲区: 无分股票现场补打分)"""
+    if code in _meta_cache:
+        return _meta_cache[code]
+    meta = {'score': None, 'industry': '', 'sector': 1, 'cons': '?', 'klines': None, 'detail': {}}
+    try:
+        kp = os.path.join(BASE, 'data', 'kline_data', f'{code}.json')
+        if os.path.exists(kp):
+            with open(kp, encoding='utf-8') as f:
+                raw = json.load(f)
+            meta['klines'] = raw.get('data', raw) if isinstance(raw, dict) else raw
+        pp = _load_prev_pool()
+        if pp:
+            stocks, sector_cnt = pp
+            p = next((x for x in stocks if str(x.get('code', '')).replace('sh', '').replace('sz', '') == code), None)
+            if p:
+                meta['industry'] = p.get('industry', '')
+                meta['sector'] = sector_cnt.get(p.get('industry', ''), 1)
+                meta['cons'] = p.get('limit_days', '?')
+                meta['detail'] = {
+                    'seal_time': str(p.get('first_seal', '')).replace(':', ''),
+                    'final_seal_time': str(p.get('last_seal', '')).replace(':', ''),
+                    'zhaban': int(p.get('break_times', 0) or 0),
+                    'sector_count': meta['sector'],
+                }
+        if meta['klines'] and meta['detail']:
+            from scoring import compute_score
+            sc, _ = compute_score(code, meta['klines'], meta['detail'], 'v3')
+            meta['score'] = sc
+    except Exception:
+        pass
+    _meta_cache[code] = meta
+    return meta
+
+
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
     data = load_latest_candidates()
@@ -143,6 +209,13 @@ def main():
     print(f'  日期: {datetime.now().strftime("%Y-%m-%d %H:%M")}')
     print('=' * 65)
 
+    # ── 竞价池采集 (先采集, 面板用最新快照) ──
+    try:
+        from auction_pool import capture_auction
+        capture_auction()
+    except Exception as e:
+        print(f'\n[WARN] 竞价池采集失败: {e}')
+
     # ── 持仓 + 卖点判断 ──
     if pf:
         pos_list = pf.get('positions', [])
@@ -150,6 +223,7 @@ def main():
             pos_single = pf.get('position')
             if pos_single:
                 pos_list = [pos_single]
+        pos_advice = []
         for pos in pos_list:
             name = pos['name']; code = pos['code']
             cost = pos['buy_price']; shares = pos['shares']
@@ -195,6 +269,14 @@ def main():
                     }, pos)
 
                     urgency_mark = {'urgent': '🔴', 'normal': '🟡', 'now': '🔴'}.get(signal['urgency'], '⚪')
+
+                    pos_advice.append({
+                        'name': name, 'code': code, 'cost': cost, 'shares': shares,
+                        'gap': gap_pct, 'current': quote['current'],
+                        'pnl_pct': round((quote['current'] - cost) / cost * 100, 2),
+                        'reason': signal['reason'],
+                        'exec_note': exec_info['note'] if signal['action'] in ('sell', 'sell_half') else '',
+                    })
 
                     print(f'  ║')
                     print(f'  ║  今开: {quote["open"]:.2f} | 昨收: {quote["prev_close"]:.2f} | Gap: {gap_pct:+.2f}%')
@@ -247,6 +329,18 @@ def main():
         if not pos_list:
             print(f'\n  --- 空仓 ---')
 
+        # ── 📊 表3: 持仓交易建议 ──
+        if pos_advice:
+            print(f'\n{"=" * 65}')
+            print(f'  📊 表3: 持仓交易建议')
+            print(f'{"=" * 65}')
+            for p in pos_advice:
+                print(f'  {p["name"]}({p["code"]}) 成本{p["cost"]:.2f} 现价{p["current"]:.2f}({p["pnl_pct"]:+.1f}%) '
+                      f'竞价gap{p["gap"]:+.1f}%')
+                print(f'    建议: {p["reason"]}')
+                if p['exec_note']:
+                    print(f'    执行: {p["exec_note"]}')
+
     # ── 加载今日竞价数据 ──
     today_auction_file = os.path.join(BASE, 'data', 'auction',
                                        f'{datetime.now().strftime("%Y-%m-%d")}.json')
@@ -262,7 +356,7 @@ def main():
         for c in data.get('candidates', []):
             candidate_scores[c['code']] = c
 
-    # ── 今日竞价池买入候选（优先） ──
+    # ── 今日竞价池买入候选（现场打分, 解决流水线评分盲区） ──
     buyable = []
     for s in auction_stocks:
         code = s.get('code', '')
@@ -273,31 +367,52 @@ def main():
         if is_300 or is_one_line or s.get('high_risk', False):
             continue
         if 4.0 <= gap <= 8.0:
-            # 交叉候选评分（竞价池实时评分优先，无则用候选评分）
             cand = candidate_scores.get(code, {})
+            meta = stock_scoring_meta(code)
             auction_score = s.get('score', 0)
             cand_score = cand.get('score', 0)
-            final_score = auction_score if auction_score > 0 else cand_score
+            # 现场评分优先(与表2细则同源), 失败则退回快照分/候选分
+            final_score = meta['score'] if meta['score'] is not None else \
+                (auction_score if auction_score > 0 else cand_score)
             buyable.append({
                 'code': code, 'name': s.get('name', ''),
                 'gap': gap, 'score': final_score,
-                'limit_days': s.get('limit_days', cand.get('cons', 1)),
+                'limit_days': meta['cons'] if meta['cons'] != '?' else s.get('limit_days', cand.get('cons', 1)),
+                'industry': meta['industry'] or cand.get('industry', ''),
+                'sector': meta['sector'],
                 'vr20': cand.get('vr20', 0), 'turnover': cand.get('turnover', 0),
                 'in_candidates': code in candidate_scores
             })
 
     buyable.sort(key=lambda x: x['score'], reverse=True)
 
-    print(f'\n  ═══ 📊 今日竞价池 (gap 4%-8%, 非一字/非300) ═══')
-    if buyable:
-        for i, b in enumerate(buyable[:10]):
-            score_str = f'{b["score"]:.0f}分' if b['score'] > 0 else '—'
-            cand_mark = '★' if b['in_candidates'] else ' '
-            print(f'  {cand_mark} {b["name"]}({b["code"]})  '
-                  f'gap={b["gap"]:+.1f}%  {b["limit_days"]}板  '
-                  f'score={score_str}')
+    # ── 📊 表1: 当日可买前三 ──
+    top3 = [b for b in buyable if b['score'] >= 10][:3]
+    print(f'\n{"=" * 65}')
+    print(f'  📊 表1: 当日可买前三 (评分≥10, 竞价4-8%, 已过滤一字/4板+一字/300·688)')
+    print(f'{"=" * 65}')
+    if top3:
+        print(f'  {"#":<3}{"标的":<14}{"评分":>6}{"竞价gap":>8}{"连板":>5}{"板块":>9}')
+        for i, b in enumerate(top3, 1):
+            print(f'  {i:<3}{b["name"]}({b["code"]}){b["score"]:>8.0f}{b["gap"]:>+7.1f}%'
+                  f'{str(b["limit_days"]) + "板":>6}{str(b["sector"]) + "只":>6}')
     else:
-        print(f'  (无符合条件的标的)')
+        print(f'  (无评分≥10的可买标的)')
+
+    # ── 📊 表2: 前三名得分细则 ──
+    if top3:
+        print(f'\n{"=" * 65}')
+        print(f'  📊 表2: 前三名得分细则 (V3评分表逐因子)')
+        print(f'{"=" * 65}')
+        from scoring import full_breakdown
+        for b in top3:
+            meta = stock_scoring_meta(b['code'])
+            if meta['klines'] and meta['detail']:
+                r = full_breakdown(b['code'], meta['klines'], meta['detail'], 'v3')
+                if r:
+                    total, items = r
+                    print(f'  {b["name"]}({b["code"]})  {total:.0f}分')
+                    print(f'    ' + '  '.join(f'{f}({v}){s:+}' for f, v, s in items))
 
     # ── 昨日候选（参考） ──
     if data:
@@ -313,8 +428,13 @@ def main():
     one_line_watch = data.get('one_line_watch', []) if data else []
     if one_line_watch:
         print(f'\n  ═══ ⚡ 一字板隔日关注 ═══')
+        pp = _load_prev_pool()
+        file_cons = {}
+        if pp:
+            file_cons = {str(x.get('code', '')).replace('sh', '').replace('sz', ''): int(x.get('limit_days', 1) or 1)
+                         for x in pp[0]}
         for r in one_line_watch[:5]:
-            cons = r.get('cons', 1)
+            cons = max(int(r.get('cons', 1) or 1), file_cons.get(str(r.get('code', '')), 1))
             warn = '⚠高危' if cons >= 4 else '★优先'
             print(f'  {r["name"]}({r["code"]}) {cons}板 {warn}')
 
@@ -337,13 +457,6 @@ def main():
     print(f'  买入: 从今日竞价池选, gap 4%-8%, 一字板跳过')
     print(f'  14:45 限价单未成交→市价兜底')
     print(f'=' * 65)
-
-    # ── 竞价池采集 ──
-    try:
-        from auction_pool import capture_auction
-        capture_auction()
-    except Exception as e:
-        print(f'\n[WARN] 竞价池采集失败: {e}')
 
     # ── 每日推荐记录（无论是否交易） ──
     try:

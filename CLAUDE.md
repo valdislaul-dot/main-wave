@@ -118,11 +118,18 @@ T日断板 + T+1 gap<4% → 卖出
 ## 实盘操作
 ```
 盘后: streamlit run scripts/daily/gui_dashboard.py  （GUI面板，一键刷新）
-  或: python scripts/daily/run_pipeline.py            （命令行6步流水线）
+  或: python scripts/daily/run_pipeline.py            （命令行7步流水线）
 9:25: python scripts/daily/morning_check.py           （竞价观察+卖出判断+竞价池采集）
 9:30: 执行买卖
 14:45: 限价单未成交→市价兜底
 ```
+
+### 竞价面板输出（2026-08-14起，三张表）
+- **表1**: 当日可买前三（评分≥10，竞价4-8%，过滤一字/4板+一字/300·688；现场按评分表打分，无分盲区已消除）
+- **表2**: 前三名得分细则（V3九因子逐项拆解）
+- **表3**: 持仓交易建议（成本/现价/浮盈/竞价gap/卖点判断/执行价）
+- 采集在面板构建**之前**执行，面板始终用当日最新快照
+- 连板数一致性校验：state与池文件不一致当场警告并取池文件值
 
 ### 竞价池
 - **data/auction/YYYY-MM-DD.json** — 每日全量竞价快照（涨停池+候选标的）
