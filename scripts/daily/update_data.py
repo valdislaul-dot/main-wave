@@ -50,6 +50,32 @@ def find_kline_path(code):
     return None
 
 
+def _tencent_latest(code, last_date, end_date):
+    """腾讯qfq日K → 最近bar (baostock未就绪时兜底), volume手→股"""
+    try:
+        import urllib.request
+        mkt = 'sz' if code.startswith(('0', '3', '1')) else 'sh'
+        url = f'http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={mkt}{code},day,,,10,qfq'
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        d = json.loads(urllib.request.urlopen(req, timeout=10).read().decode('utf-8'))
+        rows = (d.get('data', {}).get(f'{mkt}{code}', {}) or {}).get('qfqday') or []
+        out = []
+        for r in rows:
+            if r[0] > last_date and r[0] <= end_date:
+                # 腾讯格式: [date, open, close, high, low, volume(手)]
+                out.append({
+                    'date': r[0],
+                    'open': round(float(r[1]), 2),
+                    'high': round(float(r[3]), 2),
+                    'low': round(float(r[4]), 2),
+                    'close': round(float(r[2]), 2),
+                    'volume': round(float(r[5]) * 100, 2),
+                })
+        return out or None
+    except Exception:
+        return None
+
+
 def download_full(code, name, end_date):
     """下载完整K线（新浪API，快）"""
     import urllib.request
@@ -82,7 +108,7 @@ def download_full(code, name, end_date):
 
 
 def append_latest(code, existing_path, end_date):
-    """追加最新一天到已有K线文件 (baostock优先, 新浪兜底)"""
+    """追加最新一天到已有K线文件 (baostock优先, 腾讯兜底, 新浪末选)"""
     with open(existing_path, encoding='utf-8') as f:
         raw = json.load(f)
     # 兼容两种格式: dict {metadata, data} 或 list
@@ -116,8 +142,12 @@ def append_latest(code, existing_path, end_date):
                     'volume': float(r[5]) if r[5] else 0,
                 })
 
-    # 2. baostock失败 → 新浪兜底
-    if new_rows is None:
+    # 2. baostock无当日数据(通常17:30后才就绪) → 腾讯日K兜底 (2026-08-14新增)
+    if not new_rows:
+        new_rows = _tencent_latest(code, last_date, end_date)
+
+    # 3. 腾讯也失败 → 新浪兜底
+    if not new_rows:
         full_rows, err = download_full(code, '', end_date)
         if full_rows:
             new_rows = [r for r in full_rows if r['date'] > last_date]
