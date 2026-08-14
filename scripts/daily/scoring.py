@@ -205,10 +205,11 @@ def precompute_klines(code, klines):
     # ── 新格式检测与转换 ──
     if isinstance(klines, dict) and 'data' in klines:
         klines = klines['data']
-    # 搜狐新格式: volume_lots(手) → volume(股)
-    if klines and 'volume_lots' in klines[0] and 'volume' not in klines[0]:
-        for k in klines:
-            k['volume'] = k.get('volume_lots', 0) * 100
+    # 混合格式兼容(2026-08-14修复): 旧搜狐行只有volume_lots(手), baostock追加行只有volume(股)
+    # 逐行转换: 仅当该行没有有效volume时才用volume_lots×100, 绝不覆盖已有真实量能
+    for k in klines:
+        if k.get('volume') in (None, 0) and k.get('volume_lots'):
+            k['volume'] = k['volume_lots'] * 100
 
     if len(klines) < 25:
         return None, None
