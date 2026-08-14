@@ -154,6 +154,21 @@ def capture_auction():
             print(f'[Auction Pool] ⚠ 竞价未结束({zero_opens}/{len(quotes)} open=0), 9:25后重跑')
             return None
 
+    # 2.7 昨日涨停池文件连板数(最准) → 修正state连板数少算问题
+    file_cons = {}
+    zt_files = sorted(f for f in os.listdir(os.path.join(BASE, 'data', 'zt_pool'))
+                      if f.endswith('.json') and f[:-5] < datetime.now().strftime('%Y%m%d'))
+    if zt_files:
+        try:
+            with open(os.path.join(BASE, 'data', 'zt_pool', zt_files[-1]), encoding='utf-8') as f:
+                _pp = json.load(f)
+        except UnicodeDecodeError:
+            with open(os.path.join(BASE, 'data', 'zt_pool', zt_files[-1]), encoding='gbk') as f:
+                _pp = json.load(f)
+        _pstocks = _pp if isinstance(_pp, list) else _pp.get('stocks', _pp.get('data', []))
+        file_cons = {str(x.get('code', '')).replace('sh', '').replace('sz', ''): int(x.get('limit_days', 1) or 1)
+                     for x in _pstocks if isinstance(x, dict)}
+
     # 3. 构建快照
     snapshot = []
     buyable_count = 0
@@ -164,12 +179,15 @@ def capture_auction():
         q = quotes.get(code, {})
 
         gap = q.get('gap_pct', 0)
-        # 一字判定用今日竞价gap(≈10%即一字买不到); 昨日一字(候选one_line)不影响今日可买性
+        # 连板数取多源最大(state可能少算, 昨日池文件最准)
+        limit_days = max(int(info.get('limit_days', 1) or 1), file_cons.get(code, 1))
+        # 一字判定: 今日竞价gap≈10%=今日一字买不到; 昨日一字(候选one_line)用于4板+一字高危过滤
+        one_line_prev = info.get('one_line', False)
         is_one_line = gap >= 9.5
-        is_true_one = info.get('true_one_line', False)
-        buyable = 4.0 <= gap <= 8.0 and not is_one_line
+        high_risk = limit_days >= 4 and one_line_prev
+        buyable = 4.0 <= gap <= 8.0 and not is_one_line and not high_risk
 
-        if 4.0 <= gap <= 8.0 and not is_one_line:
+        if buyable:
             buyable_count += 1
 
         # gap分布
@@ -193,8 +211,9 @@ def capture_auction():
             'in_zt_pool': info.get('in_zt_pool', False),
             'is_candidate': info.get('is_candidate', False),
             'score': info.get('score', 0),
-            'limit_days': info.get('limit_days', 1),
+            'limit_days': limit_days,
             'one_line': is_one_line,
+            'high_risk': high_risk,
             'buyable': buyable,
         }
         snapshot.append(entry)

@@ -1,11 +1,11 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 22,
+  "total_sessions": 23,
   "current": {
     "date": "2026-08-14",
-    "captured": "2026-08-14 09:30:51",
+    "captured": "2026-08-14 09:44:29",
     "total": 50,
-    "buyable": 7,
+    "buyable": 6,
     "gap_distribution": {
       "-3-0%": 13,
       "<-3%": 3,
@@ -16,25 +16,18 @@
     },
     "buyable_stocks": [
       {
-        "code": "605286",
-        "name": "同力天启",
-        "gap_pct": 4.99,
-        "score": 71.0,
-        "limit_days": 3
-      },
-      {
         "code": "000692",
         "name": "惠天热电",
         "gap_pct": 4.92,
         "score": 45.0,
-        "limit_days": 1
+        "limit_days": 2
       },
       {
         "code": "002437",
         "name": "誉衡药业",
         "gap_pct": 4.24,
         "score": 39.0,
-        "limit_days": 1
+        "limit_days": 2
       },
       {
         "code": "600800",
@@ -62,7 +55,7 @@
         "name": "天洋新材",
         "gap_pct": 4.94,
         "score": -7.0,
-        "limit_days": 1
+        "limit_days": 2
       }
     ]
   },
@@ -340,6 +333,19 @@
       "date": "2026-08-14",
       "total": 50,
       "buyable": 7,
+      "gap_distribution": {
+        "-3-0%": 13,
+        "<-3%": 3,
+        "2-5%": 15,
+        "9%+": 7,
+        "0-2%": 10,
+        "5-9%": 2
+      }
+    },
+    {
+      "date": "2026-08-14",
+      "total": 50,
+      "buyable": 6,
       "gap_distribution": {
         "-3-0%": 13,
         "<-3%": 3,

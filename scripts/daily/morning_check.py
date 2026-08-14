@@ -270,7 +270,7 @@ def main():
         is_one_line = s.get('one_line', False)
         is_300 = code.startswith(('300', '301', '688'))
 
-        if is_300 or is_one_line:
+        if is_300 or is_one_line or s.get('high_risk', False):
             continue
         if 4.0 <= gap <= 8.0:
             # 交叉候选评分（竞价池实时评分优先，无则用候选评分）

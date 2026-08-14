@@ -170,6 +170,19 @@ def _load_klines(code, name=None):
     return None
 
 
+def _fetch_close_tencent(code):
+    """腾讯实时 → 当前价 (15:00后=收盘价), 用于K线未更新时补判今日涨停"""
+    try:
+        import urllib.request
+        mkt = 'sz' if code.startswith(('0', '3', '1')) else 'sh'
+        url = f'http://qt.gtimg.cn/q={mkt}{code}'
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        f = urllib.request.urlopen(req, timeout=10).read().decode('gbk').split('~')
+        return float(f[3]) if len(f) > 3 and f[3] else 0.0
+    except Exception:
+        return 0.0
+
+
 # ============================================================
 # 核心: 涨停池更新 (T日15:00后运行)
 # ============================================================
@@ -307,7 +320,7 @@ def update_zt_pool(date_str=None, verbose=True):
         name = s.get('name', '')
         kls = _load_klines(code, name)
 
-        # 用K线精确计算连板数
+        # 用K线精确计算连板数 (本地K线缺今日时用腾讯收盘价补判今日涨停)
         cons = 0
         kline_fresh = False
         if kls and len(kls) >= 2:
@@ -315,7 +328,13 @@ def update_zt_pool(date_str=None, verbose=True):
             # 检查K线是否包含今天(或昨天)
             last_date = kls[-1].get('date', '')
             kline_fresh = (last_date == date_str)
-            # 从最后一天向前数连续涨停
+            # 今日K线缺失 → 腾讯收盘价判今日是否涨停(流水线中池更新先于K线更新)
+            if not kline_fresh:
+                t_close = _fetch_close_tencent(code)
+                if t_close and t_close > 0 and \
+                        is_limit_up(t_close, float(kls[-1].get('close', 0)), lpct):
+                    cons += 1
+            # 从K线最后一天向前数连续涨停
             for i in range(len(kls) - 1, max(len(kls) - 13, -1), -1):
                 if i <= 0: break
                 if is_limit_up(float(kls[i].get('close', 0)),
@@ -323,7 +342,7 @@ def update_zt_pool(date_str=None, verbose=True):
                     cons += 1
                 else:
                     break
-        # K线未更新时, 用东财连板数兜底 (避免因baostock失败导致连板数为0)
+        # K线+腾讯都拿不到时, 用东财连板数兜底 (避免因baostock失败导致连板数为0)
         if not kline_fresh:
             em_cons = s.get('limit_days', 1) - 1
             cons = max(cons, em_cons)
