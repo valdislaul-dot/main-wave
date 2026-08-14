@@ -72,7 +72,8 @@ def get_top3(date_str):
         code = s.get('code', '')
         if code.startswith(('300', '301', '688')):
             continue
-        score = s.get('score', 0) or cand_scores.get(code, 0)
+        # 优先用当日候选文件分(快照分曾被candidates_v过期文件污染, 2026-08-14修复)
+        score = cand_scores.get(code, 0) or s.get('score', 0)
         buyable.append({
             'code': code, 'name': s.get('name', '?'),
             'score': score, 'gap': s.get('gap_pct'),

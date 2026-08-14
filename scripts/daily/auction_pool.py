@@ -33,8 +33,9 @@ def load_zt_pool_state():
 
 
 def load_latest_candidates():
-    """加载最新候选清单"""
-    files = sorted([f for f in os.listdir(LOG_DIR) if f.startswith('candidates_')])
+    """加载最新候选清单 (排除candidates_v*旧格式, 否则字母序会选中过期文件)"""
+    files = sorted([f for f in os.listdir(LOG_DIR)
+                    if f.startswith('candidates_') and not f.startswith('candidates_v')])
     if not files:
         return None
     with open(os.path.join(LOG_DIR, files[-1]), 'r', encoding='utf-8') as f:
@@ -163,7 +164,8 @@ def capture_auction():
         q = quotes.get(code, {})
 
         gap = q.get('gap_pct', 0)
-        is_one_line = info.get('one_line', False)
+        # 一字判定用今日竞价gap(≈10%即一字买不到); 昨日一字(候选one_line)不影响今日可买性
+        is_one_line = gap >= 9.5
         is_true_one = info.get('true_one_line', False)
         buyable = 4.0 <= gap <= 8.0 and not is_one_line
 
