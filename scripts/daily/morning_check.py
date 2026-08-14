@@ -89,7 +89,7 @@ def find_divergence_candidates():
     cands = []
     for s in stocks:
         code = str(s.get('code', '')).replace('sh', '').replace('sz', '')
-        if not code or code.startswith(('300', '301', '688')):
+        if not code or code.startswith(('300', '301', '688', '8', '9')):
             continue
         # 烂板: 炸板>=1 或 封板>60min
         zhaban = int(s.get('break_times', 0) or 0)
@@ -362,7 +362,7 @@ def main():
         code = s.get('code', '')
         gap = s.get('gap_pct', 0)
         is_one_line = s.get('one_line', False)
-        is_300 = code.startswith(('300', '301', '688'))
+        is_300 = code.startswith(('300', '301', '688', '8', '9'))
 
         if is_300 or is_one_line or s.get('high_risk', False):
             continue

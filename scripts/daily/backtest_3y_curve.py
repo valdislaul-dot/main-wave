@@ -44,7 +44,7 @@ def load_all_klines():
                 name = code
 
             if code in all_data: continue
-            if code.startswith(('300', '301', '688')): continue
+            if code.startswith(('300', '301', '688', '8', '9')): continue
 
             # 尝试多编码加载
             kls = None

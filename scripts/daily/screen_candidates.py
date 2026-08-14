@@ -55,7 +55,7 @@ def fetch_zt_pool(date_yyyymmdd):
     result = []
     for p in pool:
         code = p["c"]
-        if code.startswith(('300', '301', '688')):
+        if code.startswith(('300', '301', '688', '8', '9')):
             continue
         result.append({
             'code': code, 'name': p["n"],

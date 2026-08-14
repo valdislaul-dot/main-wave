@@ -86,7 +86,7 @@ def main():
         stocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
         for s in stocks:
             code = str(s.get('code', '')).replace('sh', '').replace('sz', '')
-            if not code or code.startswith(('300', '301', '688')):
+            if not code or code.startswith(('300', '301', '688', '8', '9')):
                 continue
             if not is_weak(s.get('first_seal', ''), int(s.get('break_times', 0) or 0)):
                 continue

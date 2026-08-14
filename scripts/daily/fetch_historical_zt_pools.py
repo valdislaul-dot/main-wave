@@ -67,7 +67,7 @@ def fetch_day(date_yyyymmdd):
                 'industry': p.get("hybk", ""),
                 'amount': p.get("amount", 0),
                 'float_cap': p.get("f20", 0),
-                'excluded': code.startswith(('300', '301', '688')),
+                'excluded': code.startswith(('300', '301', '688', '8', '9')),
             })
         return result
     except Exception as e:

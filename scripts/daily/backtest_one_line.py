@@ -26,7 +26,7 @@ def load_curated_klines():
             if not fn.endswith('.json'): continue
             code = fn.replace('.json', '').rsplit('_', 1)[-1] if '_' in fn else fn.replace('.json', '')
             if code not in pool or code in all_data: continue
-            if code.startswith(('300', '301', '688')): continue
+            if code.startswith(('300', '301', '688', '8', '9')): continue
             kls = None
             for enc in ['utf-8', 'gbk']:
                 try:

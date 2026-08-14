@@ -41,7 +41,7 @@ def get_today_zt_pool(date_str=None):
     for p in pool:
         code = p["c"]
         # 排除300/301/688
-        if code.startswith(('300', '301', '688')):
+        if code.startswith(('300', '301', '688', '8', '9')):
             continue
         fbt = p.get("fbt", 0)
         lbt = p.get("lbt", 0)

@@ -115,7 +115,7 @@ def score_stock(code, klines, idx, scorer, cfg):
 def scan_limit_ups(stock_files, date_range, target_date, scorer, cfg, lu_freq=None):
     lu_stocks = []
     for code, (name, fpath) in stock_files.items():
-        if code.startswith(('300', '301', '688')): continue
+        if code.startswith(('300', '301', '688', '8', '9')): continue
         # 质量过滤: 标的必须至少出现过MIN_LU_HISTORY次涨停
         if lu_freq and lu_freq.get(code, 0) < MIN_LU_HISTORY: continue
         dr = date_range.get(code)
@@ -331,7 +331,7 @@ def precompute_lu_freq(stock_files, date_range):
     print('  预计算涨停频次...')
     lu_freq = {}
     for code, (name, fpath) in stock_files.items():
-        if code.startswith(('300', '301', '688')): continue
+        if code.startswith(('300', '301', '688', '8', '9')): continue
         try:
             kls = load_klines(fpath)
             count = 0

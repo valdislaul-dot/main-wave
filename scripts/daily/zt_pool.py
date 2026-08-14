@@ -228,7 +228,7 @@ def fetch_zt_pool_raw(date_str):
         result = []
         for p in pool_data:
             code = p.get("c", "")
-            if not code or code.startswith(('300', '301', '688')):
+            if not code or code.startswith(('300', '301', '688', '8', '9')):
                 continue
             ft = p.get("fbt", 0)
             lt = p.get("lbt", 0)
@@ -259,7 +259,7 @@ def fetch_zt_pool_raw(date_str):
                 pool = []
                 for _, row in df.iterrows():
                     code = str(row.get('代码', '')).zfill(6)
-                    if code.startswith(('300', '301', '688')):
+                    if code.startswith(('300', '301', '688', '8', '9')):
                         continue
                     pool.append({
                         'code': code, 'name': str(row.get('名称', '')),
