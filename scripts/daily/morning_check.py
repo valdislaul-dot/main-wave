@@ -386,6 +386,23 @@ def main():
 
     buyable.sort(key=lambda x: x['score'], reverse=True)
 
+    # ── 🌡️ 市场环境评级 (2026-08-15新增) ──
+    try:
+        _pp = _load_prev_pool()
+        if _pp:
+            _stocks, _ = _pp
+            _zt_n = len(_stocks)
+            _max_cons = max((int(x.get('limit_days', 1) or 1) for x in _stocks), default=1)
+            if _zt_n < 40 or _max_cons <= 2:
+                _env, _advice = '🌡️ 弱市', '建议观望或1/3仓'
+            elif _zt_n >= 70 and _max_cons >= 5:
+                _env, _advice = '🌡️ 强势', '可积极(按评分仓位映射)'
+            else:
+                _env, _advice = '🌡️ 正常', '常规仓位'
+            print(f'\n  {_env}: 昨日涨停{_zt_n}只, 最高{_max_cons}板 → {_advice}')
+    except Exception:
+        pass
+
     # ── 📊 表1: 当日可买前三 ──
     top3 = [b for b in buyable if b['score'] >= 10][:3]
     print(f'\n{"=" * 65}')

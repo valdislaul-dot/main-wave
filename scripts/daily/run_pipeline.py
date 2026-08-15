@@ -100,11 +100,19 @@ def main():
                 print(f'[Warning] 推荐回看失败: {e}')
 
             # Step 7: T-board minute
-            print('\n[Step 7/7] 捕获T字板分钟K线...')
+            print('\n[Step 7/8] 捕获T字板分钟K线...')
             try:
                 from capture_tboard_minute import main as capture_tboard
                 capture_tboard()
             except: pass
+
+            # Step 8: Data health check
+            print('\n[Step 8/8] 数据体检...')
+            try:
+                from data_health_check import main as health_check
+                health_check()
+            except Exception as e:
+                print(f'[Warning] 数据体检失败: {e}')
         else:
             print('\n[轻量模式] 跳过LHB/报告/T字板')
 

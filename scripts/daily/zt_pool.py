@@ -320,30 +320,36 @@ def update_zt_pool(date_str=None, verbose=True):
         name = s.get('name', '')
         kls = _load_klines(code, name)
 
-        # 用K线精确计算连板数 (本地K线缺今日时用腾讯收盘价补判今日涨停)
+        # 用K线精确计算连板数 (cons=前序连续涨停数不含今日; limit_days=cons+1)
+        # 本地K线缺今日时用腾讯收盘价补判今日是否涨停(流水线中池更新先于K线更新)
         cons = 0
         kline_fresh = False
+        today_lu = False
         if kls and len(kls) >= 2:
             lpct = get_lp(code)
             # 检查K线是否包含今天(或昨天)
             last_date = kls[-1].get('date', '')
             kline_fresh = (last_date == date_str)
-            # 今日K线缺失 → 腾讯收盘价判今日是否涨停(流水线中池更新先于K线更新)
-            if not kline_fresh:
+            if kline_fresh:
+                # K线含今日: 今日是涨停(在当日池内), 前序从倒数第二根向前数
+                start_i = len(kls) - 2
+            else:
+                # 今日K线缺失 → 腾讯收盘价判今日是否涨停
                 t_close = _fetch_close_tencent(code)
-                if t_close and t_close > 0 and \
-                        is_limit_up(t_close, float(kls[-1].get('close', 0)), lpct):
-                    cons += 1
-            # 从K线最后一天向前数连续涨停
-            for i in range(len(kls) - 1, max(len(kls) - 13, -1), -1):
-                if i <= 0: break
+                today_lu = bool(t_close and t_close > 0 and
+                                is_limit_up(t_close, float(kls[-1].get('close', 0)), lpct))
+                start_i = len(kls) - 1
+            # 从start_i向前数连续涨停(不含今日)
+            for i in range(start_i, max(start_i - 13, -1), -1):
+                if i <= 0:
+                    break
                 if is_limit_up(float(kls[i].get('close', 0)),
                                float(kls[i-1].get('close', 0)), lpct):
                     cons += 1
                 else:
                     break
-        # K线+腾讯都拿不到时, 用东财连板数兜底 (避免因baostock失败导致连板数为0)
-        if not kline_fresh:
+        # K线+腾讯都拿不到今日涨停判定时, 用东财连板数兜底
+        if not kline_fresh and not today_lu:
             em_cons = s.get('limit_days', 1) - 1
             cons = max(cons, em_cons)
         if cons == 0 and not kls:
