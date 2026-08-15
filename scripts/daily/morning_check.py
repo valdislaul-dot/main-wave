@@ -121,14 +121,16 @@ def find_divergence_candidates():
         prev_v = kl[idx - 1].get('volume', 0)
         if not (cv(vol, kl, idx) == 'heavy' and prev_v > 0 and vol >= prev_v * 1.5):
             continue
-        # 今日竞价高开
+        # 今日竞价 (低开也收录→REJECT, 高开→WATCH)
         a = auc.get(code)
-        if not a or not a.get('gap_pct') or a['gap_pct'] <= 0:
+        if not a or a.get('gap_pct') is None:
             continue
+        gap = a['gap_pct']
         cands.append({
-            'code': code, 'name': s.get('name', '?'), 'gap': a['gap_pct'],
+            'code': code, 'name': s.get('name', '?'), 'gap': gap,
             'zhaban': zhaban, 'cons': s.get('limit_days', s.get('cons', '?')),
             'industry': s.get('industry', ''), 'sector': sector_cnt.get(s.get('industry', ''), 0),
+            'grade': 'WATCH' if gap > 0 else 'REJECT',
         })
     return cands
 
@@ -455,17 +457,21 @@ def main():
             warn = '⚠高危' if cons >= 4 else '★优先'
             print(f'  {r["name"]}({r["code"]}) {cons}板 {warn}')
 
-    # ── 🐉 分歧弱转强候选 (半自动提示) ──
+    # ── 🐉 分歧弱转强候选 (半自动提示, 三级分级) ──
     try:
         div_cands = find_divergence_candidates()
         if div_cands:
-            print(f'\n  ═══ 🐉 分歧弱转强候选 (T-1爆量烂板 + 今日高开) ═══')
-            for c in sorted(div_cands, key=lambda x: -x['gap']):
-                star = '★大高开' if c['gap'] >= 6 else ('可关注' if c['gap'] >= 4 else '观察')
-                print(f'  {c["name"]}({c["code"]}) 竞价{c["gap"]:+.1f}% {star} | '
-                      f'T-1烂板炸{c["zhaban"]}次 {c["cons"]}板 板块:{c["industry"]}{c["sector"]}只')
-            print(f'  确认清单: ①分时开盘直冲/杀后立拉 ②板上缩量(vs T-1) ③板块领涨')
-            print(f'  否定条件: 二次爆量→不进/走 | 板块<2只→降级 | 低开→弱转强失败')
+            print(f'\n  ═══ 🐉 分歧弱转强候选 (T-1爆量烂板, CONFIRMED/WATCH/REJECT) ═══')
+            for c in sorted(div_cands, key=lambda x: (x['grade'] == 'REJECT', -x['gap'])):
+                if c['grade'] == 'WATCH':
+                    star = '★大高开' if c['gap'] >= 6 else ('可关注' if c['gap'] >= 4 else '观察')
+                    sec_warn = ' ⚠板块弱' if c['sector'] < 2 else ''
+                    print(f'  WATCH   {c["name"]}({c["code"]}) 竞价{c["gap"]:+.1f}% {star} | '
+                          f'T-1烂板炸{c["zhaban"]}次 {c["cons"]}板 板块:{c["industry"]}{c["sector"]}只{sec_warn}')
+                else:
+                    print(f'  REJECT  {c["name"]}({c["code"]}) 竞价{c["gap"]:+.1f}% 低开→弱转强失败')
+            print(f'  盘中确认→CONFIRMED: ①开盘立即拉升/杀后立拉 ②封板缩量(vs T-1) ③板块领涨')
+            print(f'  否定→REJECT: 二次爆量 | 高开后持续下杀 | 破0% | 收盘前未反包')
     except Exception as e:
         print(f'  [WARN] 分歧候选计算失败: {e}')
 
