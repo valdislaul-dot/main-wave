@@ -38,6 +38,30 @@ def fetch_quote(code):
         return None
 
 
+def _log_result(today, warnings):
+    """体检结果落库 → logs/data_quality_log.json (追加, 保留最近90天, 失真可追溯)"""
+    log_path = os.path.join(LOG_DIR, 'data_quality_log.json')
+    records = []
+    if os.path.exists(log_path):
+        try:
+            with open(log_path, encoding='utf-8') as f:
+                records = json.load(f)
+        except Exception:
+            records = []
+    records.append({
+        'date': today,
+        'checked_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'warnings': len(warnings),
+        'details': warnings,
+    })
+    records = records[-90:]
+    try:
+        with open(log_path, 'w', encoding='utf-8') as f:
+            json.dump(records, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f'体检日志写入失败: {e}')
+
+
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
     args = sys.argv[1:]
@@ -165,6 +189,25 @@ def main():
             print(f'  ✓ K线日期抽查: {len(sample)}只均为最新')
     else:
         print(f'  - 池文件缺失, 跳过K线校验')
+
+    # ── 6. 竞价快照质量 ──
+    auction_path = os.path.join(BASE, 'data', 'auction', f'{today}.json')
+    if os.path.exists(auction_path):
+        au = load_json(auction_path)
+        astocks = au.get('stocks', []) if isinstance(au, dict) else au
+        if astocks:
+            zero_open = sum(1 for s in astocks if (s.get('open', 0) or 0) == 0)
+            ratio = zero_open / len(astocks)
+            if ratio > 0.3:
+                warnings.append(f'竞价快照open=0占比{ratio*100:.0f}% (疑似采集过早)')
+                print(f'  ⚠ {warnings[-1]}')
+            else:
+                print(f'  ✓ 竞价快照: {len(astocks)}只, open=0占{ratio*100:.0f}%')
+    else:
+        print(f'  - 竞价快照缺失, 跳过竞价质量校验')
+
+    # ── 落库 ──
+    _log_result(today, warnings)
 
     print('-' * 60)
     if warnings:

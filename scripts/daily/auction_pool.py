@@ -10,7 +10,7 @@
   data/auction_state.json       — 竞价池状态（当前+历史汇总）
 """
 import json, os, sys, urllib.request, time, random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time as clock_time
 from collections import defaultdict
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -22,6 +22,18 @@ LOG_DIR = os.path.join(BASE, 'logs')
 os.makedirs(AUCTION_DIR, exist_ok=True)
 
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+RAW_DIR = os.path.join(BASE, 'data', 'raw')
+
+
+def _save_raw(date_str, name, content):
+    """原始报文存档 → data/raw/YYYY-MM-DD/name (失真时回溯「源错了」还是「解析错了」)"""
+    d = os.path.join(RAW_DIR, date_str)
+    os.makedirs(d, exist_ok=True)
+    try:
+        with open(os.path.join(d, name), 'w', encoding='utf-8') as f:
+            f.write(content)
+    except Exception as e:
+        print(f'[Auction] raw存档失败 {name}: {e}')
 
 
 def load_zt_pool_state():
@@ -49,6 +61,7 @@ def fetch_quotes(codes):
     返回: {code: {name, open, prev_close, price, high, low, volume, limit_up, gap_pct}}
     """
     quotes = {}
+    raw_parts = []
     # 分批，每批最多50只
     for i in range(0, len(codes), 50):
         batch = codes[i:i+50]
@@ -63,6 +76,7 @@ def fetch_quotes(codes):
         try:
             resp = urllib.request.urlopen(req, timeout=10)
             raw = resp.read().decode('gbk')
+            raw_parts.append(raw)
             for line in raw.strip().split(';'):
                 if '"' not in line:
                     continue
@@ -87,13 +101,70 @@ def fetch_quotes(codes):
         except Exception as e:
             print(f'[Auction] Quote fetch error: {e}')
         time.sleep(0.1 + random.uniform(0, 0.05))
+    if raw_parts:
+        _save_raw(datetime.now().strftime('%Y-%m-%d'), 'auction_tencent.txt',
+                  '\n\n'.join(raw_parts))
     return quotes
 
 
-def capture_auction():
-    """T日9:25调用：采集竞价数据"""
-    today = datetime.now().strftime('%Y-%m-%d')
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+def fetch_sina_quotes(codes):
+    """
+    新浪行情 → {code: {open, prev_close, gap_pct}}
+    用于与腾讯交叉验证竞价 gap / 昨收 (除权检测)
+    """
+    quotes = {}
+    raw_parts = []
+    for i in range(0, len(codes), 60):
+        batch = codes[i:i+60]
+        pre = [('sh' if c.startswith(('6', '9')) else 'sz') + c for c in batch]
+        url = f'https://hq.sinajs.cn/list={",".join(pre)}'
+        req = urllib.request.Request(url)
+        req.add_header('User-Agent', UA)
+        req.add_header('Referer', 'https://finance.sina.com.cn/')
+        try:
+            resp = urllib.request.urlopen(req, timeout=10)
+            raw = resp.read().decode('gbk')
+            raw_parts.append(raw)
+            for line in raw.strip().split(';'):
+                if '="' not in line:
+                    continue
+                code_full = line.split('=')[0].replace('var hq_str_', '').strip()
+                fields = line.split('"')[1].split(',')
+                if len(fields) < 3 or not fields[1]:
+                    continue
+                code = code_full[2:] if code_full.startswith(('sh', 'sz')) else code_full
+                open_p = float(fields[1]) if fields[1] else 0
+                prev_close = float(fields[2]) if fields[2] else 0
+                gap = round((open_p - prev_close) / prev_close * 100, 2) if prev_close > 0 else 0
+                quotes[code] = {'open': open_p, 'prev_close': prev_close, 'gap_pct': gap}
+        except Exception as e:
+            print(f'[Auction] Sina quote fetch error: {e}')
+        time.sleep(0.1)
+    if raw_parts:
+        _save_raw(datetime.now().strftime('%Y-%m-%d'), 'auction_sina.txt',
+                  '\n\n'.join(raw_parts))
+    return quotes
+
+
+def capture_auction(force=False):
+    """T日9:25调用：采集竞价数据 (force=True 跳过交易日/时钟守卫, 用于手动补采)"""
+    now = datetime.now()
+    today = now.strftime('%Y-%m-%d')
+    ts = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    # ── 采集守卫: 交易日 + 9:25~9:30窗口 ──
+    if not force:
+        from trading_calendar import is_trading_day
+        if not is_trading_day(now.date()):
+            print(f'[Auction Pool] ⚠ 今日({today})非交易日, 跳过竞价采集 (--force可强制)')
+            return None
+        t = now.time()
+        if t < clock_time(9, 25):
+            print(f'[Auction Pool] ⚠ 未到9:25({t.strftime("%H:%M:%S")}), 竞价未撮合, 拒绝采集')
+            return None
+        if t > clock_time(9, 30):
+            print(f'[Auction Pool] ⚠ 已过9:30({t.strftime("%H:%M:%S")}), 竞价价已失效, 拒绝采集 (--force可强制)')
+            return None
 
     print(f'[Auction Pool] 采集竞价数据 → {today} {ts}')
 
@@ -146,6 +217,23 @@ def capture_auction():
     all_codes = sorted(target_codes)
     quotes = fetch_quotes(all_codes)
     print(f'[Auction Pool] 获取行情: {len(quotes)}只')
+
+    # 2.4 双源交叉: 新浪 vs 腾讯 (gap 偏差>0.3% 或 昨收不一致=疑似除权 → 告警)
+    sina_quotes = fetch_sina_quotes(all_codes)
+    if sina_quotes:
+        cross_warn = []
+        for code, q in quotes.items():
+            sq = sina_quotes.get(code)
+            if not sq or not q.get('prev_close') or not sq.get('prev_close'):
+                continue
+            if abs(q['prev_close'] - sq['prev_close']) / q['prev_close'] > 0.001:
+                cross_warn.append(f'{q.get("name")}({code})昨收 腾讯{q["prev_close"]}vs新浪{sq["prev_close"]}(疑似除权)')
+            elif abs(q['gap_pct'] - sq['gap_pct']) > 0.3:
+                cross_warn.append(f'{q.get("name")}({code})gap 腾讯{q["gap_pct"]}vs新浪{sq["gap_pct"]}')
+        if cross_warn:
+            print(f'[Auction Pool] ⚠ 双源交叉异常({len(cross_warn)}只): {"; ".join(cross_warn[:8])}')
+        else:
+            print(f'[Auction Pool] ✓ 双源交叉: 腾讯vs新浪 gap一致')
 
     # 2.5 9:25前竞价未撮合(open=0) → 不覆盖快照
     if quotes:
@@ -230,12 +318,12 @@ def capture_auction():
     # 按gap降序排列
     snapshot.sort(key=lambda x: x['gap_pct'], reverse=True)
 
-    # 4. 保存快照
-    today_yyyymmdd = today.replace('-', '')
+    # 4. 保存快照 (原子写入: 先tmp再rename; 已有快照且非force不覆盖)
     fpath = os.path.join(AUCTION_DIR, f'{today}.json')
-    # 也保存一份按代码索引的版本
-    with open(fpath, 'w', encoding='utf-8') as f:
-        json.dump({
+    if os.path.exists(fpath) and not force:
+        print(f'[Auction Pool] 快照已存在({fpath}), 跳过覆盖 (--force可覆盖)')
+    else:
+        payload = {
             'date': today,
             'captured': ts,
             'total_stocks': len(snapshot),
@@ -243,8 +331,12 @@ def capture_auction():
             'buyable_count': buyable_count,
             'gap_distribution': dict(gap_dist),
             'stocks': snapshot,
-        }, f, ensure_ascii=False, indent=2)
-    print(f'[Auction Pool] 快照保存: {fpath} ({len(snapshot)}只)')
+        }
+        tmp_path = fpath + '.tmp'
+        with open(tmp_path, 'w', encoding='utf-8') as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        os.replace(tmp_path, fpath)
+        print(f'[Auction Pool] 快照保存: {fpath} ({len(snapshot)}只)')
 
     # 5. 更新状态文件
     state = load_auction_state()
@@ -368,4 +460,4 @@ if __name__ == '__main__':
         for h in state.get('history', []):
             print(f"  {h['date']} | {h['total']}只 | 可买{h['buyable']}只 | {h['gap_distribution']}")
     else:
-        capture_auction()
+        capture_auction(force='--force' in sys.argv)

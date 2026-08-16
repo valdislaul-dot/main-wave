@@ -19,6 +19,18 @@ STATE_PATH = os.path.join(BASE, 'data', 'zt_pool_state.json')
 EXIT_LOG_PATH = os.path.join(BASE, 'data', 'zt_pool_exit_log.json')
 POOL_DIR = os.path.join(BASE, 'data', 'zt_pool')
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
+RAW_DIR = os.path.join(BASE, 'data', 'raw')
+
+
+def _save_raw(date_str, name, content):
+    """原始报文存档 → data/raw/YYYY-MM-DD/name (失真时回溯「源错了」还是「解析错了」)"""
+    d = os.path.join(RAW_DIR, date_str)
+    os.makedirs(d, exist_ok=True)
+    try:
+        with open(os.path.join(d, name), 'w', encoding='utf-8') as f:
+            f.write(content)
+    except Exception as e:
+        print(f'[ZT Pool] raw存档失败 {name}: {e}')
 
 
 # ============================================================
@@ -44,8 +56,10 @@ def _empty_state():
 def save_state(state):
     os.makedirs(os.path.dirname(STATE_PATH), exist_ok=True)
     state['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    with open(STATE_PATH, 'w', encoding='utf-8') as f:
+    tmp = STATE_PATH + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, STATE_PATH)
 
 
 def get_pool(state=None):
@@ -183,6 +197,34 @@ def _fetch_close_tencent(code):
         return 0.0
 
 
+def _fetch_tencent_batch(codes):
+    """腾讯批量 → {code: {close, prev_close}}, 用于三方确认收盘涨停 + 除权检测"""
+    quotes = {}
+    for i in range(0, len(codes), 50):
+        batch = codes[i:i+50]
+        pre = [('sh' if c.startswith(('6', '9')) else 'sz') + c for c in batch]
+        url = f'http://qt.gtimg.cn/q={",".join(pre)}'
+        try:
+            import urllib.request
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            raw = urllib.request.urlopen(req, timeout=10).read().decode('gbk')
+            for line in raw.strip().split(';'):
+                if '"' not in line:
+                    continue
+                v = line.split('"')[1].split('~')
+                if len(v) < 5:
+                    continue
+                code = v[2]
+                quotes[code] = {
+                    'close': float(v[3]) if v[3] else 0,
+                    'prev_close': float(v[4]) if v[4] else 0,
+                }
+        except Exception:
+            pass
+        _time.sleep(0.1)
+    return quotes
+
+
 # ============================================================
 # 核心: 涨停池更新 (T日15:00后运行)
 # ============================================================
@@ -222,6 +264,7 @@ def fetch_zt_pool_raw(date_str):
 
     try:
         r = _zt_get(url, params=params, headers=headers, timeout=15)
+        _save_raw(date_str, 'zt_pool_eastmoney.json', r.text)
         data = r.json()
         pool_data = (data.get("data") or {}).get("pool") or []
 
@@ -315,6 +358,9 @@ def update_zt_pool(date_str=None, verbose=True):
     added = 0
     updated = 0
 
+    # 3.1 腾讯批量行情 (三方确认收盘涨停 + 除权检测)
+    tencent_q = _fetch_tencent_batch([s['code'] for s in raw])
+
     for s in raw:
         code = s['code']
         name = s.get('name', '')
@@ -392,6 +438,20 @@ def update_zt_pool(date_str=None, verbose=True):
             'close': close_price,
             'cons': cons + 1,
         })
+
+        # ── 三方确认 + 除权检测 ──
+        tq = tencent_q.get(code)
+        # 东财收盘 vs 腾讯收盘: 偏差>2% → 疑似尾盘炸板/池滞后
+        if tq and tq.get('close') and close_price:
+            if abs(tq['close'] - close_price) / close_price > 0.02:
+                print(f'[ZT Pool] ⚠ {name}({code}) 东财收{close_price} vs 腾讯{tq["close"]} (疑似尾盘炸板/池滞后)')
+        # 腾讯昨收 vs K线昨收: 偏差>1% → 疑似除权
+        if tq and tq.get('prev_close') and kls and len(kls) >= 1:
+            k_idx = len(kls) - 2 if kline_fresh else len(kls) - 1
+            if k_idx >= 0:
+                k_prev = float(kls[k_idx].get('close', 0) or 0)
+                if k_prev > 0 and abs(tq['prev_close'] - k_prev) / k_prev > 0.01:
+                    print(f'[ZT Pool] ⚠ {name}({code}) 昨收 腾讯{tq["prev_close"]} vs K线{k_prev} (疑似除权)')
 
         new_members.append(entry)
 
