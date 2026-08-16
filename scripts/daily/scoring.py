@@ -21,13 +21,11 @@ def get_lp(code):
 def is_limit_up(close, prev_close, lpct):
     if prev_close is None or prev_close <= 0:
         return False
-    # 正常涨停: close >= 昨收*(1+涨跌幅)
-    if close >= round(prev_close * (1 + lpct), 2) - 0.005:
-        return True
-    # 连续一字板: close ≈ prev_close (涨停价未变)
-    if abs(close - prev_close) < 0.01:
-        return True
-    return False
+    # 涨停价 = round(昨收*(1+涨跌幅), 2)，收盘价达到涨停价(容差0.005)才算涨停
+    # 注: 旧版用 abs(close-prev_close)<0.01 判"一字板"是错的——
+    #     平盘(涨幅0%)/停牌/数据未更新(close==prev_close)都会被误判成涨停, 污染涨停池
+    limit_price = round(prev_close * (1 + lpct), 2)
+    return close >= limit_price - 0.005
 
 
 def piecewise_linear(x, anchors):
