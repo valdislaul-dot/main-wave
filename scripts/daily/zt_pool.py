@@ -184,19 +184,6 @@ def _load_klines(code, name=None):
     return None
 
 
-def _fetch_close_tencent(code):
-    """腾讯实时 → 当前价 (15:00后=收盘价), 用于K线未更新时补判今日涨停"""
-    try:
-        import urllib.request
-        mkt = 'sz' if code.startswith(('0', '3', '1')) else 'sh'
-        url = f'http://qt.gtimg.cn/q={mkt}{code}'
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        f = urllib.request.urlopen(req, timeout=10).read().decode('gbk').split('~')
-        return float(f[3]) if len(f) > 3 and f[3] else 0.0
-    except Exception:
-        return 0.0
-
-
 def _fetch_tencent_batch(codes):
     """腾讯批量 → {code: {close, prev_close}}, 用于三方确认收盘涨停 + 除权检测"""
     import time
@@ -381,8 +368,9 @@ def update_zt_pool(date_str=None, verbose=True):
                 # K线含今日: 今日是涨停(在当日池内), 前序从倒数第二根向前数
                 start_i = len(kls) - 2
             else:
-                # 今日K线缺失 → 腾讯收盘价判今日是否涨停
-                t_close = _fetch_close_tencent(code)
+                # 今日K线缺失 → 用批量腾讯收盘价判今日是否涨停(复用tencent_q, 不重复请求)
+                tq_ = tencent_q.get(code) or {}
+                t_close = tq_.get('close', 0)
                 today_lu = bool(t_close and t_close > 0 and
                                 is_limit_up(t_close, float(kls[-1].get('close', 0)), lpct))
                 start_i = len(kls) - 1
