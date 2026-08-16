@@ -1,0 +1,58 @@
+{
+  "date": "2026-08-15",
+  "generated": "2026-08-15 22:07",
+  "total_in_pool": 52,
+  "buyable_count": 3,
+  "top_pick": {
+    "code": "603330",
+    "name": "天洋新材",
+    "gap": 4.94,
+    "score": 36.0,
+    "limit_days": 3,
+    "industry": "塑料",
+    "sector": 1,
+    "vr20": 0.82,
+    "turnover": 6.24,
+    "in_candidates": true
+  },
+  "buyable": [
+    {
+      "code": "603330",
+      "name": "天洋新材",
+      "gap": 4.94,
+      "score": 36.0,
+      "limit_days": 3,
+      "industry": "塑料",
+      "sector": 1,
+      "vr20": 0.82,
+      "turnover": 6.24,
+      "in_candidates": true
+    },
+    {
+      "code": "002322",
+      "name": "理工能科",
+      "gap": 4.47,
+      "score": 36.0,
+      "limit_days": 2,
+      "industry": "软件开发",
+      "sector": 2,
+      "vr20": 5.21,
+      "turnover": 7.15,
+      "in_candidates": true
+    },
+    {
+      "code": "603025",
+      "name": "大豪科技",
+      "gap": 6.52,
+      "score": 17.0,
+      "limit_days": 1,
+      "industry": "自动化设",
+      "sector": 1,
+      "vr20": 2.34,
+      "turnover": 1.88,
+      "in_candidates": true
+    }
+  ],
+  "position_status": "华正新材, 兴业科技",
+  "action_taken": null
+}
