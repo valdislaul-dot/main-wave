@@ -162,8 +162,8 @@ def capture_auction(force=False):
         if t < clock_time(9, 25):
             print(f'[Auction Pool] ⚠ 未到9:25({t.strftime("%H:%M:%S")}), 竞价未撮合, 拒绝采集')
             return None
-        if t > clock_time(9, 30):
-            print(f'[Auction Pool] ⚠ 已过9:30({t.strftime("%H:%M:%S")}), 竞价价已失效, 拒绝采集 (--force可强制)')
+        if t >= clock_time(9, 30):
+            print(f'[Auction Pool] ⚠ 已到9:30({t.strftime("%H:%M:%S")}), 竞价价已失效, 拒绝采集 (--force可强制)')
             return None
 
     print(f'[Auction Pool] 采集竞价数据 → {today} {ts}')

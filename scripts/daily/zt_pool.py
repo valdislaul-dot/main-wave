@@ -199,6 +199,7 @@ def _fetch_close_tencent(code):
 
 def _fetch_tencent_batch(codes):
     """腾讯批量 → {code: {close, prev_close}}, 用于三方确认收盘涨停 + 除权检测"""
+    import time
     quotes = {}
     for i in range(0, len(codes), 50):
         batch = codes[i:i+50]
@@ -221,7 +222,7 @@ def _fetch_tencent_batch(codes):
                 }
         except Exception:
             pass
-        _time.sleep(0.1)
+        time.sleep(0.1)
     return quotes
 
 
