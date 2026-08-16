@@ -1,266 +1,280 @@
 """
-主升浪 V3.0 — GUI交易面板
+主升浪 V4.1 — GUI 交易面板 (本地完整版)
 用法: streamlit run scripts/daily/gui_dashboard.py
+
+本地版能力:
+  - 实时评分(读 data/kline_data)
+  - 一键刷新(跑 run_pipeline --fast)
+  - 多持仓 + 竞价决策 + 涨停池 + 交易记录
 """
 import streamlit as st
-import json, os, sys, glob, subprocess as sp
+import json, os, sys, glob, subprocess
 from datetime import datetime
 from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import morning_check as mc
 from scoring import load_config, compute_score
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-KLINE_DIR = os.path.join(BASE, 'data', 'backtest_kline')
+KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
+DATA_DIR = os.path.join(BASE, 'data')
+LOG_DIR = os.path.join(BASE, 'logs')
 
-st.set_page_config(page_title="主升浪 V3.0", page_icon="📈", layout="wide")
+st.set_page_config(page_title="主升浪 V4.1", page_icon="📈", layout="wide")
 
-# ── CSS ──
+# ── CSS (移动端适配) ──
 st.markdown("""<style>
 html{font-size:14px}
 .stMetric label{font-size:.75rem!important}
 .stMetric [data-testid="stMetricValue"]{font-size:1rem!important}
-h1{font-size:1.5rem!important}
-h2{font-size:1.2rem!important}
+h1{font-size:1.4rem!important}
+h2{font-size:1.15rem!important}
 h3{font-size:1rem!important}
 .stDataFrame{font-size:.8rem!important}
-[data-testid="stSidebar"]{display:none!important}
-@media(max-width:768px){html{font-size:12px}.stMetric [data-testid="stMetricValue"]{font-size:.9rem!important}}
+@media(max-width:768px){html{font-size:12px}}
 </style>""", unsafe_allow_html=True)
 
-# ── K线直接从repo加载 ──
-KLINE_COUNT = len(glob.glob(os.path.join(KLINE_DIR, '*.json'))) if os.path.exists(KLINE_DIR) else 0
-# 临时debug
-st.caption(f"DEBUG: BASE={BASE} | KLINE_DIR有{KLINE_COUNT}个文件")
 
-@st.cache_data(ttl=3600)
-def _load_kline(code, name):
-    for d in [KLINE_DIR, os.path.join(BASE, 'data', 'kline_data')]:
-        if not os.path.exists(d): continue
-        for fn in [f'{code}.json', f'{name}_{code}.json']:
-            fp = os.path.join(d, fn)
-            if os.path.exists(fp):
-                with open(fp, encoding='utf-8') as f:
-                    raw = json.load(f)
-                    return raw.get('data', raw) if isinstance(raw, dict) else raw
-        for fn in os.listdir(d):
-            if fn.endswith(f'_{code}.json'):
-                with open(os.path.join(d, fn), encoding='utf-8') as f:
-                    raw = json.load(f)
-                    return raw.get('data', raw) if isinstance(raw, dict) else raw
+# ══════ 数据加载 ══════
+@st.cache_data(ttl=300)
+def _load_json(p):
+    try:
+        with open(p, encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def _load_klines(code, name):
+    """K线: 优先 {code}.json, 回退 {name}_{code}.json"""
+    for fn in [f'{code}.json', f'{name}_{code}.json']:
+        fp = os.path.join(KLINE_DIR, fn)
+        if os.path.exists(fp):
+            raw = _load_json(fp)
+            if raw is not None:
+                return raw.get('data', raw) if isinstance(raw, dict) else raw
+    # 回退: 扫 {name}_{code}.json
+    for fn in glob.glob(os.path.join(KLINE_DIR, f'*_{code}.json')):
+        raw = _load_json(fn)
+        if raw is not None:
+            return raw.get('data', raw) if isinstance(raw, dict) else raw
     return None
+
+
+def _auction_snapshot():
+    """最新竞价快照 → dict 或 None"""
+    today = datetime.now().strftime('%Y-%m-%d')
+    fp = os.path.join(DATA_DIR, 'auction', f'{today}.json')
+    if os.path.exists(fp):
+        return _load_json(fp)
+    files = sorted(glob.glob(os.path.join(DATA_DIR, 'auction', '*.json')))
+    return _load_json(files[-1]) if files else None
+
 
 # ══════ 标题栏 ══════
 now = datetime.now()
-wd = ['周一','周二','周三','周四','周五','周六','周日'][now.weekday()]
-c1, c2, c3 = st.columns([3, 1, 1])
-c1.title("📈 主升浪 V3.2")
+wd = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][now.weekday()]
 cfg = load_config()
-c2.markdown(f"<div style='text-align:center;font-size:1.4rem;font-weight:bold;margin-top:15px'>"
+
+c1, c2, c3 = st.columns([3, 1.2, 1])
+c1.title("📈 主升浪 V4.1")
+c2.markdown(f"<div style='text-align:center;font-size:1.3rem;font-weight:bold;margin-top:14px'>"
             f"{now.strftime('%m月%d日')} {wd}</div>", unsafe_allow_html=True)
-c2.caption(f"V3 | >= {cfg['score_min']} |  -10%")
+c2.caption(f"V3评分 | ≥{cfg['score_min']}分 | 竞价4-8%")
 
-if c3.button("🔄 刷新数据", use_container_width=True):
-    with st.spinner("拉涨停池+更新K线(仅最新日)..."):
-        today = datetime.now().strftime('%Y-%m-%d')
-        # 1. 拉涨停池
-        sp.run([sys.executable, '-c',
-            'import sys; sys.path.insert(0,"scripts/daily"); from zt_pool import update_zt_pool; update_zt_pool()'],
-            cwd=BASE, capture_output=True, text=True, timeout=60)
-        # 2. 对新标的下载完整K线, 已有标的只追加最新日
-        ztp = os.path.join(BASE, 'data', 'zt_pool_state.json')
-        codes = []
-        if os.path.exists(ztp):
-            with open(ztp, encoding='utf-8') as f:
-                codes = [s['code'] for s in json.load(f).get('stocks', [])]
-        if codes:
-            # 0. 先从 kline_data/ 同步已有K线到 backtest_kline (Win端本地)
-            kd = os.path.join(BASE, 'data', 'kline_data')
-            if os.path.exists(kd):
-                for c in codes:
-                    src = os.path.join(kd, f'{c}.json')
-                    dst = os.path.join(KLINE_DIR, f'{c}.json')
-                    if os.path.exists(src) and not os.path.exists(dst):
-                        import shutil
-                        shutil.copy2(src, dst)
-            # 区分新标的(无文件) vs 已有标的(只追加最后一天)
-            new_codes = [c for c in codes if not os.path.exists(os.path.join(KLINE_DIR, f'{c}.json'))]
-            old_codes = [c for c in codes if c not in new_codes]
-            msg = f'新{len(new_codes)}只+更新{len(old_codes)}只...'
-            st.info(msg)
-            sp.run([sys.executable, '-c', f'''
-import baostock as bs, json, os
-bs.login()
-new_codes = {repr(new_codes)}
-old_codes = {repr(old_codes)}
-today = "{today}"
-out_dir = r"{KLINE_DIR}"
-os.makedirs(out_dir, exist_ok=True)
+if c3.button("🔄 刷新数据", width='stretch'):
+    with st.spinner("拉涨停池+评分(轻量)..."):
+        r = subprocess.run(
+            [sys.executable, 'scripts/daily/run_pipeline.py', '--fast'],
+            cwd=BASE, capture_output=True, text=True, timeout=180)
+        st.success("完成!" if r.returncode == 0 else f"部分失败(见日志)")
+    st.rerun()
 
-# 新标的: 下载完整3年K线
-for c in new_codes:
-    bc = "sh."+c if c.startswith("6") else "sz."+c
-    rs = bs.query_history_k_data_plus(bc, "date,open,high,low,close,volume",
-        start_date="2023-08-04", end_date=today, frequency="d", adjustflag="2")
-    rows = []
-    while rs.next():
-        r2 = rs.get_row_data()
-        if r2[0]: rows.append({{"date":r2[0],"open":round(float(r2[1]),2),"high":round(float(r2[2]),2),"low":round(float(r2[3]),2),"close":round(float(r2[4]),2),"volume":float(r2[5]) if r2[5] else 0}})
-    if rows: json.dump(rows, open(os.path.join(out_dir, f"{{c}}.json"), "w"), ensure_ascii=False)
+# ══════ 持仓 (多持仓) ══════
+pf = _load_json(os.path.join(LOG_DIR, 'portfolio.json'))
+if pf:
+    positions = pf.get('positions', [])
+    if not positions and pf.get('position'):
+        positions = [pf['position']]
+    cash = pf.get('cash', 0)
+    pos_val = sum(p['shares'] * p['buy_price'] for p in positions)
+    total = cash + pos_val
+    win_rate = (pf.get('winning_trades', 0) / pf.get('total_trades', 1) * 100
+                if pf.get('total_trades') else 0)
 
-# 已有标的: 只更新最近7天(快速追加)
-for c in old_codes:
-    old_path = os.path.join(out_dir, f"{{c}}.json")
-    old_data = json.load(open(old_path)) if os.path.exists(old_path) else []
-    last_date = old_data[-1]["date"] if old_data else "2023-08-04"
-    bc = "sh."+c if c.startswith("6") else "sz."+c
-    rs = bs.query_history_k_data_plus(bc, "date,open,high,low,close,volume",
-        start_date=last_date, end_date=today, frequency="d", adjustflag="2")
-    new_rows = []
-    while rs.next():
-        r2 = rs.get_row_data()
-        if r2[0] and r2[0] > last_date:
-            new_rows.append({{"date":r2[0],"open":round(float(r2[1]),2),"high":round(float(r2[2]),2),"low":round(float(r2[3]),2),"close":round(float(r2[4]),2),"volume":float(r2[5]) if r2[5] else 0}})
-    if new_rows:
-        json.dump(old_data + new_rows, open(old_path, "w"), ensure_ascii=False)
-bs.logout()
-'''], cwd=BASE, capture_output=True, text=True, timeout=120)
-        st.success("完成!")
-        st.rerun()
+    m = st.columns(4)
+    m[0].metric("💰总资产", f"{total:,.0f}")
+    m[1].metric("💵现金", f"{cash:,.0f}")
+    m[2].metric("📊胜率", f"{win_rate:.0f}%")
+    m[3].metric("累计盈亏", f"{pf.get('total_pnl', 0):+,.0f}")
 
-# ══════ 持仓 ══════
-pfp = os.path.join(BASE, 'logs', 'portfolio.json')
-if os.path.exists(pfp):
-    with open(pfp, encoding='utf-8') as f: pf = json.load(f)
-    cash = pf.get('cash', 0); pos = pf.get('position')
-    if pos:
-        tv = cash + pos['shares'] * pos.get('buy_price', 0)
-        ms = [("💰总资产", f"{tv:,.0f}"), ("📦持仓", f"{pos['name']}({pos['code']})"),
-              ("💵现金", f"{cash:,.0f}"),
-              ("📊胜率", f"{pf.get('winning_trades',0)/pf.get('total_trades',1)*100:.0f}%")]
-    else:
-        ms = [("💰总资产", f"{cash:,.0f}"), ("📦持仓", "空仓")]
-    for i, (l, v) in enumerate(ms):
-        st.columns(len(ms))[i].metric(l, v)
+    if positions:
+        st.markdown("**📦 持仓**")
+        rows = [{'代码': p['code'], '名称': p['name'], '成本': f"{p['buy_price']:.3f}",
+                 '股数': p['shares'], '买入日': p.get('buy_date', '?')}
+                for p in positions]
+        st.dataframe(rows, width='stretch', hide_index=True)
+else:
+    st.info("无持仓数据")
 
-# ══════ 涨停池 ══════
 st.divider()
-st.subheader("🔴 涨停池")
 
-ztp = os.path.join(BASE, 'data', 'zt_pool_state.json')
-if not os.path.exists(ztp):
-    st.warning("无涨停池数据，请点刷新")
-    st.stop()
+# ══════ 市场环境评级 ══════
+ztp = os.path.join(DATA_DIR, 'zt_pool_state.json')
+zt_state = _load_json(ztp)
+zt_stocks = zt_state.get('stocks', []) if zt_state else []
 
-with open(ztp, encoding='utf-8') as f: state = json.load(f)
-stocks = state.get('stocks', [])
-n1 = sum(1 for s in stocks if s.get('limit_days',1)==1)
-n2 = sum(1 for s in stocks if s.get('limit_days',1)==2)
-n3 = sum(1 for s in stocks if s.get('limit_days',1)>=3)
-st.caption(f"截至{state.get('as_of_date','?')} | {len(stocks)}只 | 1板:{n1} 2板:{n2} 3+:{n3}")
-
-industries = Counter(s.get('industry','') for s in stocks)
-scored = []
-no_kline = 0; score_fail = 0
-for s in stocks:
-    code, name = s['code'], s['name']
-    kls = _load_kline(code, name)
-    if not kls or len(kls) < 25:
-        no_kline += 1
-        continue
-
-    # 确保K线包含池子日期 (baostock可能还没更新到今天)
-    pool_date = state.get('as_of_date', '')
-    if kls[-1].get('date', '') < pool_date and len(kls) >= 2:
-        # 用前一日收盘价估算真实O/H/L/C
-        prev_c = kls[-1].get('close', 0)
-        lp = 0.2 if code.startswith(('30','688')) else 0.1
-        lu_price = round(prev_c * (1 + lp), 2)
-        kls.append({'date': pool_date, 'open': lu_price, 'high': lu_price,
-                     'low': round(prev_c * 0.99, 2), 'close': lu_price,
-                     'volume': kls[-1].get('volume', 1e8)})
-
-    ft = s.get('first_seal','')
-    lt = s.get('last_seal', ft)
-    details_raw = {
-        'seal_time': ft.replace(':','') if ft else '1459',
-        'final_seal_time': lt.replace(':','') if lt else '1459',
-        'zhaban': s.get('break_times', 0),
-        'sector_count': industries.get(s.get('industry',''), 1),
-    }
-    try:
-        score, det = compute_score(code, kls, details_raw, 'v3', cfg)
-    except Exception as e:
-        if score_fail < 3:
-            st.caption(f"ERR {code}: {e}")
-        score_fail += 1
-        continue
-    if score is None:
-        if score_fail < 3:
-            st.caption(f"NONE {code}: last_date={kls[-1].get('date','')} close={kls[-1].get('close',0)} prev={kls[-2].get('close',0) if len(kls)>1 else 0}")
-        score_fail += 1
-        continue
-
-    scored.append({
-        'code': code, 'name': name, 'score': score,
-        'ft': ft, 'industry': s.get('industry',''),
-        'limit_days': det.get('cons',1),
-        'breaks': s.get('break_times',0),
-        'true_one': det.get('true_one_line',False),
-        'one_line': det.get('one_line',False),
-        'vr_val': det.get('vr20',1),
-        'gap_val': det.get('gap',0),
-    })
-
-st.caption(f"DEBUG: 池{len(stocks)}只 | 有K线{len(stocks)-no_kline}只 | 缺K线{no_kline}只 | 评分失败{score_fail}只")
-scored.sort(key=lambda x: x['score'], reverse=True)
-filtered = [r for r in scored if not r['true_one']
-    and not (r['one_line'] and r['limit_days']>=4)
-    and r['score'] >= cfg['score_min']]
-
-tab1, tab2 = st.tabs([f"✅ 可买({len(filtered)})", f"📋 全部({len(scored)})"])
-
-with tab1:
-    if filtered:
-        rows = []
-        for i, r in enumerate(filtered[:30]):
-            m = "⭐" if i==0 else ("🥈" if i==1 else ("🥉" if i==2 else str(i+1)))
-            fg = ""
-            if r['limit_days']>=4: fg += "⚠4板"
-            if r['breaks']>=5: fg += f"💥{r['breaks']}炸"
-            rows.append({'':m, '代码':r['code'], '名称':r['name'], '评分':f"{r['score']:.0f}",
-                '量比':f"{r['vr_val']:.1f}x", 'Gap':f"{r['gap_val']:.1f}%",
-                '连板':r['limit_days'], '封板':r['ft'][:5], '行业':r['industry'][:6], '⚠':fg})
-        st.dataframe(rows, use_container_width=True, height=min(len(rows)*38+38, 500))
+if zt_stocks:
+    zt_n = len(zt_stocks)
+    max_cons = max((int(s.get('limit_days', 1) or 1) for s in zt_stocks), default=1)
+    if zt_n < 40 or max_cons <= 2:
+        env, advice = '🌡️ 弱市', '观望/1-3仓'
+    elif zt_n >= 70 and max_cons >= 5:
+        env, advice = '🌡️ 强势', '按评分仓位映射'
     else:
-        st.warning("无符合条件候选")
+        env, advice = '🌡️ 正常', '常规仓位'
+    st.markdown(f"**{env}**：昨日涨停 {zt_n} 只，最高 {max_cons} 板 → {advice}")
+else:
+    st.caption("暂无涨停池数据，点🔄刷新")
 
-with tab2:
-    rows = []
-    for r in scored:
-        fl = '⛔一字' if r['true_one'] else ('⚠4板+' if r['one_line'] and r['limit_days']>=4 else '')
-        rows.append({'代码':r['code'], '名称':r['name'], '评分':f"{r['score']:.0f}",
-            '量比':f"{r['vr_val']:.1f}x", 'Gap':f"{r['gap_val']:.1f}%",
-            '连板':r['limit_days'], '封板':r['ft'][:5], '行业':r['industry'][:6], '风控':fl})
-    st.dataframe(rows, use_container_width=True, height=400)
+# ══════ 竞价决策区 ══════
+auc = _auction_snapshot()
+if auc:
+    st.subheader("🎯 竞价决策")
+    astocks = auc.get('stocks', [])
+    captured = auc.get('captured', '?')
+
+    # 可买前三 (评分≥10, 竞价4-8%, 已过滤一字/4板+一字/300·688)
+    buyable = []
+    for s in astocks:
+        code = s.get('code', '')
+        gap = s.get('gap_pct', 0)
+        if code.startswith(('300', '301', '688', '8', '9')):
+            continue
+        if s.get('one_line') or s.get('high_risk'):
+            continue
+        if not (4.0 <= gap <= 8.0):
+            continue
+        # 现场评分(复用morning_check, 消除盲区), 失败退回快照分
+        score = s.get('score', 0)
+        try:
+            meta = mc.stock_scoring_meta(code)
+            if meta.get('score') is not None:
+                score = meta['score']
+        except Exception:
+            pass
+        if score < cfg['score_min']:
+            continue
+        buyable.append({'code': code, 'name': s.get('name', ''), 'gap': gap,
+                        'score': score, 'limit_days': s.get('limit_days', '?')})
+    buyable.sort(key=lambda x: x['score'], reverse=True)
+
+    c1, c2 = st.columns([2, 1])
+    with c1:
+        if buyable:
+            top3 = buyable[:3]
+            st.markdown(f"**可买前三**（采集 {captured}，评分≥{cfg['score_min']}）")
+            rows = [{'#': i + 1, '名称': b['name'], '代码': b['code'],
+                     '评分': f"{b['score']:.0f}", '竞价gap': f"{b['gap']:+.1f}%",
+                     '连板': b['limit_days']}
+                    for i, b in enumerate(top3)]
+            st.dataframe(rows, width='stretch', hide_index=True)
+        else:
+            st.caption("无可买标的（评分≥10 且竞价4-8%）")
+    with c2:
+        st.markdown("**盘中买点参考**")
+        st.caption("半路: 拉升破7%才追\n\n低吸①: 开盘价-7%急跌\n\n低吸②: 较开盘-10%\n\n⚠9:25后挂单受价格笼子(卖一×102%)")
+else:
+    st.caption("暂无竞价快照")
+
+st.divider()
+
+# ══════ 涨停池 (实时评分) ══════
+st.subheader("🔴 涨停池")
+if zt_stocks:
+    industries = Counter(s.get('industry', '') for s in zt_stocks)
+    scored = []
+    no_kline = 0
+    for s in zt_stocks:
+        code, name = s['code'], s['name']
+        kls = _load_klines(code, name)
+        if not kls or len(kls) < 25:
+            no_kline += 1
+            continue
+        pool_date = zt_state.get('as_of_date', '')
+        if kls[-1].get('date', '') < pool_date and len(kls) >= 2:
+            prev_c = kls[-1].get('close', 0)
+            lp = 0.2 if code.startswith(('30', '688')) else 0.1
+            lu_price = round(prev_c * (1 + lp), 2)
+            kls.append({'date': pool_date, 'open': lu_price, 'high': lu_price,
+                        'low': round(prev_c * 0.99, 2), 'close': lu_price,
+                        'volume': kls[-1].get('volume', 1e8)})
+        ft = s.get('first_seal', '')
+        details = {
+            'seal_time': ft.replace(':', '') if ft else '1459',
+            'final_seal_time': (s.get('last_seal', ft) or ft).replace(':', ''),
+            'zhaban': s.get('break_times', 0),
+            'sector_count': industries.get(s.get('industry', ''), 1),
+        }
+        try:
+            score, det = compute_score(code, kls, details, 'v3', cfg)
+        except Exception:
+            continue
+        if score is None:
+            continue
+        scored.append({'code': code, 'name': name, 'score': score, 'ft': ft,
+                       'industry': s.get('industry', ''), 'limit_days': det.get('cons', 1),
+                       'breaks': s.get('break_times', 0),
+                       'true_one': det.get('true_one_line', False),
+                       'one_line': det.get('one_line', False),
+                       'vr': det.get('vr20', 1), 'gap': det.get('gap', 0),
+                       'turnover': s.get('turnover', 0)})
+
+    scored.sort(key=lambda x: x['score'], reverse=True)
+    filtered = [r for r in scored if not r['true_one']
+                and not (r['one_line'] and r['limit_days'] >= 4)
+                and r['score'] >= cfg['score_min']]
+
+    st.caption(f"池 {len(zt_stocks)} 只 | 有K线 {len(scored)} 只 | 缺K线 {no_kline} 只")
+    tab1, tab2 = st.tabs([f"✅ 可买({len(filtered)})", f"📋 全部({len(scored)})"])
+    with tab1:
+        if filtered:
+            rows = [{'名称': r['name'], '代码': r['code'], '评分': f"{r['score']:.0f}",
+                     '量比': f"{r['vr']:.1f}x", 'Gap': f"{r['gap']:.1f}%",
+                     '连板': r['limit_days'], '封板': r['ft'][:5],
+                     '换手': f"{r['turnover']:.1f}%", '行业': r['industry'][:6]}
+                    for r in filtered[:40]]
+            st.dataframe(rows, width='stretch', hide_index=True)
+        else:
+            st.warning("无符合条件候选")
+    with tab2:
+        rows = [{'名称': r['name'], '代码': r['code'], '评分': f"{r['score']:.0f}",
+                 '量比': f"{r['vr']:.1f}x", 'Gap': f"{r['gap']:.1f}%",
+                 '连板': r['limit_days'], '封板': r['ft'][:5], '行业': r['industry'][:6],
+                 '风控': '⛔一字' if r['true_one'] else ('⚠4板+' if r['one_line'] and r['limit_days'] >= 4 else '')}
+                for r in scored]
+        st.dataframe(rows, width='stretch', hide_index=True)
+else:
+    st.info("无涨停池数据，点🔄刷新")
+
+st.divider()
 
 # ══════ 交易记录 ══════
-st.divider()
 st.subheader("📝 交易记录")
-jfp = os.path.join(BASE, 'logs', 'trading_journal.json')
-if os.path.exists(jfp):
-    with open(jfp, encoding='utf-8') as f: jn = json.load(f)
-    if jn:
-        trades, bm = [], {}
-        for e in jn:
-            if e.get('action')=='BUY': bm[e['code']]=e
-            elif e.get('action')=='SELL':
-                b = bm.get(e['code'],{})
-                trades.append({'买入':b.get('date',''),'卖出':e.get('date',''),
-                    '代码':e.get('code',''),'名称':e.get('name',''),
-                    '买价':b.get('price',0),'卖价':e.get('price',0),
-                    '盈亏':f"{e.get('pnl_pct',0):+.1f}%"})
-        if trades:
-            st.dataframe(trades, use_container_width=True)
-            tp = sum(j.get('pnl_amt',0) for j in jn if j.get('action')=='SELL')
-            st.caption(f"累计盈亏: **{tp:+,.0f}**")
+jn = _load_json(os.path.join(LOG_DIR, 'trading_journal.json'))
+if jn:
+    trades, bm = [], {}
+    for e in jn:
+        if e.get('action') == 'BUY':
+            bm[e['code']] = e
+        elif e.get('action') == 'SELL':
+            b = bm.get(e['code'], {})
+            trades.append({'买入': b.get('date', ''), '卖出': e.get('date', ''),
+                           '代码': e.get('code', ''), '名称': e.get('name', ''),
+                           '买价': b.get('price', 0), '卖价': e.get('price', 0),
+                           '盈亏': f"{e.get('pnl_pct', 0):+.1f}%"})
+    if trades:
+        st.dataframe(trades, width='stretch', hide_index=True)
+        tp = sum(j.get('pnl_amt', 0) for j in jn if j.get('action') == 'SELL')
+        st.caption(f"累计盈亏: **{tp:+,.0f}**")

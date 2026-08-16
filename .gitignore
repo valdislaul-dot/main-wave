@@ -18,9 +18,12 @@ data/industry_map.json
 data/zhaban_map.json
 data/副本主升浪.xlsx
 
-# 排除大日志, 保留持仓和交易记录
+# 排除大日志, 保留持仓/交易/候选/推荐(上云用)
 logs/*.log
 !logs/portfolio.json
 !logs/trading_journal.json
 !logs/trader_a.json
 !logs/recommendation_review.json
+!logs/candidates_*.json
+logs/candidates_v*.json
+!logs/daily_recommendations/

@@ -113,6 +113,14 @@ def main():
                 health_check()
             except Exception as e:
                 print(f'[Warning] 数据体检失败: {e}')
+
+            # Step 9: 数据上云同步 (2026-08-16新增, 自动push关键快照到GitHub)
+            print('\n[Step 9] 数据上云同步...')
+            try:
+                from sync_cloud import sync
+                sync()
+            except Exception as e:
+                print(f'[Warning] 数据上云失败: {e}')
         else:
             print('\n[轻量模式] 跳过LHB/报告/T字板')
 
