@@ -71,6 +71,16 @@ def _tencent_latest(code, last_date, end_date):
         return None
 
 
+def _tushare_latest(code, last_date, end_date):
+    """Tushare daily → 最近bar (增量备源, 不复权与主库同口径), volume手→股"""
+    from kline_source import fetch_tushare_daily
+    rows = fetch_tushare_daily(code, last_date, end_date)
+    if not rows:
+        return None
+    out = [r for r in rows if r['date'] > last_date and r['date'] <= end_date]
+    return out or None
+
+
 def download_full(code, name, end_date):
     """下载完整K线（新浪API，快）"""
     import urllib.request
@@ -127,12 +137,18 @@ def append_latest(code, existing_path, end_date):
     new_rows = None
     source = None
 
-    # 1. 腾讯fqkline前复权主源 (收盘后即有当日数据)
+    # 1. 腾讯fqkline前复权主源 (当日实时)
     candidate = _tencent_latest(code, last_date, end_date)
     if candidate and not _corporate_action_suspect(code, klines, candidate):
         new_rows, source = candidate, 'tencent'
 
-    # 2. 腾讯失败/疑似窗口内除权 → 新浪不复权兜底 (与主库同口径)
+    # 2. Tushare daily不复权备源 (权威, 当日更新及时, 与主库同口径)
+    if not new_rows:
+        candidate = _tushare_latest(code, last_date, end_date)
+        if candidate:
+            new_rows, source = candidate, 'tushare'
+
+    # 3. 前两源失败 → 新浪不复权兜底 (与主库同口径)
     if not new_rows:
         full_rows, err = download_full(code, '', end_date)
         if full_rows:
@@ -148,7 +164,7 @@ def append_latest(code, existing_path, end_date):
             raw['data'] = klines
             md = raw.get('metadata') or {}
             md['adjustment'] = 'mixed(qfq_append)'
-            md['source'] = 'Sohu+Tencent'
+            md['source'] = 'Sohu+EM/Tencent/Sina'
             md['last_append_source'] = source
             raw['metadata'] = md
             with open(existing_path, 'w', encoding='utf-8') as f:
@@ -236,6 +252,38 @@ def main():
 
     print(f'[K线更新] 新标的全量: {new_success}/{len(new_stocks)} | 追加最新: {append_count}/{len(existing)}')
     print(f'[K线更新] K线库总量: {len(glob.glob(os.path.join(KLINE_DIR, "*.json")))}只')
+
+    # 6. Tushare权威校准 (可选, 抽查涨停池当日收盘价 vs 本地K线)
+    try:
+        from kline_source import fetch_tushare_daily, _load_tushare_token
+        print('\n[K线更新] Tushare权威校准(抽查)...')
+        if not _load_tushare_token():
+            print('  [跳过] 未配置Tushare token (环境变量TUSHARE_TOKEN 或 data/tushare_token.txt)')
+        else:
+            checked = 0
+            for s in zt_pool[:3]:
+                rows = fetch_tushare_daily(s['code'], today, today)
+                if not rows:
+                    continue
+                ts_close = rows[-1]['close']
+                fpath = find_kline_path(s['code'])
+                local_close = None
+                if fpath:
+                    with open(fpath, encoding='utf-8') as f:
+                        raw = json.load(f)
+                    kl = raw.get('data', raw) if isinstance(raw, dict) else raw
+                    if kl:
+                        local_close = kl[-1].get('close')
+                if local_close and ts_close:
+                    diff = abs(local_close - ts_close) / ts_close
+                    flag = '✓' if diff <= 0.02 else '⚠'
+                    print(f'  {flag} {s["name"]}({s["code"]}) 本地{local_close} vs Tushare{ts_close} (偏差{diff*100:.2f}%)')
+                    checked += 1
+            if checked == 0:
+                print('  [跳过] Tushare当日数据未就绪(收盘后稍晚更新)')
+    except Exception as e:
+        print(f'  [警告] Tushare校准失败: {e}')
+
     print(f'[K线更新] 完成!')
 
 
