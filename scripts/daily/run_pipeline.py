@@ -61,7 +61,7 @@ def main():
         except Exception as e:
             print(f'[Warning] ZT pool update failed: {e}')
 
-        # Step 2: Update K-line (only ZT pool stocks, Sina API fast)
+        # Step 2: Update K-line (only ZT pool stocks, Tencent fqkline + Sina fallback)
         print('\n[Step 2/7] 更新K线数据(涨停池标的)...')
         try:
             update_data()

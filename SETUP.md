@@ -37,7 +37,7 @@ git push -u origin main
 ```bash
 cd scripts/daily
 
-# 1. 下载K线（一次性，~15分钟）
+# 1. 下载K线（一次性，~15分钟，腾讯fqkline前复权）
 python fetch_backtest_klines.py
 
 # 2. 运行流水线

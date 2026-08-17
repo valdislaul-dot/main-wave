@@ -10,10 +10,12 @@
 - A: 空仓（百花医药 08-13 收盘14.49清仓, +42.1%/+239,382）
 
 ## 数据源
-- **baostock** — K线（backtest_kline/ 786只 + kline_data/ 3558只）
+- **腾讯 fqkline** — K线增量追加主源（前复权，收盘后即有当日数据，必须带UA+count-only形态）
+- **新浪 CN_MarketData** — K线全量+兜底（不复权，与主库同口径）
+- **搜狐 hisHq** — 历史主库（kline_data/ 3048只 + backtest_kline/ 70只，不复权）
 - **东财 push2ex** — 涨停池实时
 - **腾讯 qt.gtimg.cn** — 竞价行情
-- **mootdx 禁用**
+- **mootdx 禁用** | **baostock 已移除**(2026-08-17, 当日数据延迟反复出错)
 
 ## V4.0 卖点引擎（2026-08-10，仅此模块升级）
 - **V3.2 + A体系合二为一**，择优保留
@@ -191,7 +193,7 @@ T日断板 + T+1 gap<4% → 卖出
 
 ## 7步流水线（run_pipeline.py）
 1. 更新涨停池（东财push2ex）
-2. 更新K线数据（baostock增量，**含持仓标的**）
+2. 更新K线数据（腾讯fqkline增量+新浪兜底，**含持仓标的**）
 3. 更新历史涨停池
 4. 筛选候选+评分
 5. 生成每日报告
@@ -211,7 +213,7 @@ streamlit run scripts/daily/gui_dashboard.py
 ## 关键文件
 ```
 data/scoring_config.json    ← 评分配置（v2+v3双表+divergence分歧段）
-data/kline_data/            ← 3,558只K线（baostock，gitignored）
+data/kline_data/            ← 3,048只K线（搜狐不复权+腾讯/新浪增量追加，gitignored）
 data/backtest_kline/        ← 回测K线
 data/zt_pool/               ← 涨停池快照（每日保存）
 data/zt_pool_state.json     ← 活跃涨停池状态

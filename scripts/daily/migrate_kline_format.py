@@ -1,6 +1,6 @@
 """
 K线格式统一迁移 (2026-08-14)
-历史遗留: 搜狐volume_lots(手) + 新浪/baostock volume(股) 混合格式
+历史遗留: 搜狐volume_lots(手) + 新浪/腾讯 volume(股) 混合格式
 统一为: 每行都有 volume(股), volume_lots 保留(真VWAP计算仍用)
 - 逐行: volume缺失/为0时用 volume_lots×100 补填
 - 幂等: 已统一的文件重跑无副作用

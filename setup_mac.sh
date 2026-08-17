@@ -3,7 +3,7 @@
 echo "=== 主升浪 Mac Setup ==="
 
 # Install Python dependencies
-pip3 install akshare baostock openpyxl -q
+pip3 install akshare openpyxl -q
 
 # Add cc alias
 if ! grep -q "alias cc=" ~/.zshrc 2>/dev/null; then

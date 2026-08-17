@@ -199,11 +199,11 @@ def precompute_klines(code, klines):
     """返回 pdb: {date: {open,close,high,low,volume,is_limit_up,prev_close,gap_open_pct,
                          vol_ma5,vol_ma20,vol_ratio5,vol_ratio20,is_one_line,cons_lu_before,
                          vol_class}}
-    兼容旧格式(baostock前复权)和新格式(搜狐财经不复权)"""
+    兼容旧格式(腾讯qfq前复权)和新格式(搜狐财经不复权)"""
     # ── 新格式检测与转换 ──
     if isinstance(klines, dict) and 'data' in klines:
         klines = klines['data']
-    # 混合格式兼容(2026-08-14修复): 旧搜狐行只有volume_lots(手), baostock追加行只有volume(股)
+    # 混合格式兼容(2026-08-14修复): 旧搜狐行只有volume_lots(手), 腾讯/新浪追加行只有volume(股)
     # 逐行转换: 仅当该行没有有效volume时才用volume_lots×100, 绝不覆盖已有真实量能
     for k in klines:
         if k.get('volume') in (None, 0) and k.get('volume_lots'):

@@ -20,7 +20,7 @@ def make_backup():
     items = [
         # (源路径, zip内名称, 说明)
         ('data/zt_pool', 'zt_pool', '涨停池快照'),
-        ('data/stock_data.json', 'stock_data.json', '核心K线(baostock 72只)'),
+        ('data/stock_data.json', 'stock_data.json', '核心K线(静态历史)'),
         ('data/kline_data', 'kline_data', 'K线数据(3180只)'),
         ('data/auction', 'auction', '竞价快照'),
         ('data/industry_map.json', 'industry_map.json', '行业映射'),

@@ -3,9 +3,8 @@
 盘后运行：只更新当日涨停池标的的K线
 - 已有K线文件 → 追加最新一天
 - 无K线文件 → 下载近3年全量
-数据源: baostock
+数据源: 腾讯fqkline前复权(主源) + 新浪不复权(兜底)
 """
-import baostock as bs
 import json, os, glob, sys, time
 from datetime import datetime, timedelta
 from collections import Counter
@@ -30,10 +29,6 @@ def get_today():
     return today.strftime('%Y-%m-%d')
 
 
-def code_to_bs(code):
-    return f'sh.{code}' if code.startswith('6') else f'sz.{code}'
-
-
 def find_kline_path(code):
     """在K线目录中查找已有文件"""
     # 精确匹配: name_code.json
@@ -51,11 +46,11 @@ def find_kline_path(code):
 
 
 def _tencent_latest(code, last_date, end_date):
-    """腾讯qfq日K → 最近bar (baostock未就绪时兜底), volume手→股"""
+    """腾讯qfq日K → 最近bar (主源), volume手→股"""
     try:
         import urllib.request
         mkt = 'sz' if code.startswith(('0', '3', '1')) else 'sh'
-        url = f'http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={mkt}{code},day,,,10,qfq'
+        url = f'http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={mkt}{code},day,,,100,qfq'
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         d = json.loads(urllib.request.urlopen(req, timeout=10).read().decode('utf-8'))
         rows = (d.get('data', {}).get(f'{mkt}{code}', {}) or {}).get('qfqday') or []
@@ -107,8 +102,18 @@ def download_full(code, name, end_date):
     return rows, None
 
 
+def _corporate_action_suspect(code, klines, new_rows):
+    """除权边界守卫: 腾讯qfq首条新行open与存量末行close偏离超涨跌幅上限 → 疑似窗口内除权, 弃用qfq行"""
+    prev_close = klines[-1].get('close')
+    first_open = new_rows[0].get('open')
+    if not prev_close or not first_open:
+        return True
+    limit = 0.205 if code.startswith(('3', '68')) else 0.105
+    return abs(first_open - prev_close) / prev_close > limit + 0.01
+
+
 def append_latest(code, existing_path, end_date):
-    """追加最新一天到已有K线文件 (baostock优先, 腾讯兜底, 新浪末选)"""
+    """追加最新一天到已有K线文件 (腾讯fqkline主源, 新浪兜底)"""
     with open(existing_path, encoding='utf-8') as f:
         raw = json.load(f)
     # 兼容两种格式: dict {metadata, data} 或 list
@@ -120,37 +125,20 @@ def append_latest(code, existing_path, end_date):
         return 0  # 已是最新
 
     new_rows = None
+    source = None
 
-    # 1. 尝试baostock
-    import baostock as bs
-    bs_code = code_to_bs(code)
-    rs = bs.query_history_k_data_plus(bs_code,
-        'date,open,high,low,close,volume',
-        start_date=last_date, end_date=end_date,
-        frequency='d', adjustflag='2')
-    if rs.error_code == '0':
-        new_rows = []
-        while rs.next():
-            r = rs.get_row_data()
-            if r[0] and r[0] > last_date:
-                new_rows.append({
-                    'date': r[0],
-                    'open': round(float(r[1]), 2),
-                    'high': round(float(r[2]), 2),
-                    'low': round(float(r[3]), 2),
-                    'close': round(float(r[4]), 2),
-                    'volume': float(r[5]) if r[5] else 0,
-                })
+    # 1. 腾讯fqkline前复权主源 (收盘后即有当日数据)
+    candidate = _tencent_latest(code, last_date, end_date)
+    if candidate and not _corporate_action_suspect(code, klines, candidate):
+        new_rows, source = candidate, 'tencent'
 
-    # 2. baostock无当日数据(通常17:30后才就绪) → 腾讯日K兜底 (2026-08-14新增)
-    if not new_rows:
-        new_rows = _tencent_latest(code, last_date, end_date)
-
-    # 3. 腾讯也失败 → 新浪兜底
+    # 2. 腾讯失败/疑似窗口内除权 → 新浪不复权兜底 (与主库同口径)
     if not new_rows:
         full_rows, err = download_full(code, '', end_date)
         if full_rows:
             new_rows = [r for r in full_rows if r['date'] > last_date]
+            if new_rows:
+                source = 'sina'
         else:
             return -1
 
@@ -158,11 +146,18 @@ def append_latest(code, existing_path, end_date):
         klines.extend(new_rows)
         if is_dict_fmt:
             raw['data'] = klines
+            md = raw.get('metadata') or {}
+            md['adjustment'] = 'mixed(qfq_append)'
+            md['source'] = 'Sohu+Tencent'
+            md['last_append_source'] = source
+            raw['metadata'] = md
             with open(existing_path, 'w', encoding='utf-8') as f:
                 json.dump(raw, f, ensure_ascii=False)
         else:
             with open(existing_path, 'w', encoding='utf-8') as f:
                 json.dump(klines, f, ensure_ascii=False)
+        if klines[-1]['date'] < end_date:
+            print(f'  [警告] {code} 追加后尾行 {klines[-1]["date"]} 仍落后 {end_date} (停牌或数据缺口)')
     return len(new_rows)
 
 
@@ -217,10 +212,7 @@ def main():
 
     print(f'[K线更新] 已有K线: {len(existing)}只 | 新标的: {len(new_stocks)}只')
 
-    # 3. 登录
-    bs.login()
-
-    # 4. 新标的: 下载完整历史
+    # 3. 新标的: 下载完整历史
     new_success = 0
     for s in new_stocks:
         rows, err = download_full(s['code'], s['name'], today)
@@ -241,8 +233,6 @@ def main():
         if n > 0:
             append_count += 1
         time.sleep(0.03)
-
-    bs.logout()
 
     print(f'[K线更新] 新标的全量: {new_success}/{len(new_stocks)} | 追加最新: {append_count}/{len(existing)}')
     print(f'[K线更新] K线库总量: {len(glob.glob(os.path.join(KLINE_DIR, "*.json")))}只')
