@@ -301,41 +301,103 @@
         }
       ]
     },
-    "2026-08-15": {
-      "date": "2026-08-15",
+    "2026-08-14": {
+      "date": "2026-08-14",
       "settled_on": "2026-08-17",
-      "total": 0,
-      "wins": 0,
-      "avg_pnl": 0,
-      "stocks": [],
-      "missing": [
-        "天洋新材",
-        "理工能科",
-        "大豪科技"
+      "total": 3,
+      "wins": 1,
+      "avg_pnl": -5.61,
+      "stocks": [
+        {
+          "rank": 1,
+          "code": "000692",
+          "name": "惠天热电",
+          "score": 45.0,
+          "rec_gap": 4.92,
+          "T": {
+            "open": 5.12,
+            "close": 4.58,
+            "limit_up": false,
+            "pct": -6.15
+          },
+          "T1": {
+            "gap": 1.09,
+            "close": 4.63,
+            "limit_up": false
+          },
+          "sell": 4.608,
+          "note": "硬止损-10%",
+          "pnl_pct": -10.0,
+          "verdict": "❌推荐错误"
+        },
+        {
+          "rank": 2,
+          "code": "002437",
+          "name": "誉衡药业",
+          "score": 39.0,
+          "rec_gap": 4.24,
+          "T": {
+            "open": 4.43,
+            "close": 4.53,
+            "limit_up": false,
+            "pct": 6.59
+          },
+          "T1": {
+            "gap": 0.88,
+            "close": 4.98,
+            "limit_up": true
+          },
+          "sell": 4.57,
+          "note": "断板gap+0.88%<4%→开盘卖",
+          "pnl_pct": 3.16,
+          "verdict": "✅推荐正确"
+        },
+        {
+          "rank": 3,
+          "code": "600800",
+          "name": "渤海化学",
+          "score": 0,
+          "rec_gap": 6.68,
+          "T": {
+            "open": 3.99,
+            "close": 3.59,
+            "limit_up": false,
+            "pct": -4.01
+          },
+          "T1": {
+            "gap": -4.18,
+            "close": 3.52,
+            "limit_up": false
+          },
+          "sell": 3.591,
+          "note": "硬止损-10%",
+          "pnl_pct": -10.0,
+          "verdict": "❌推荐错误"
+        }
       ]
     }
   },
   "stats": {
-    "total": 12,
-    "wins": 5,
-    "avg_pnl": -1.8,
+    "total": 15,
+    "wins": 6,
+    "avg_pnl": -2.57,
     "by_rank": {
       "1": {
-        "n": 4,
+        "n": 5,
         "wins": 3,
-        "avg_pnl": 1.91
+        "avg_pnl": -0.47
       },
       "2": {
-        "n": 4,
-        "wins": 1,
-        "avg_pnl": -4.57
+        "n": 5,
+        "wins": 2,
+        "avg_pnl": -3.03
       },
       "3": {
-        "n": 4,
+        "n": 5,
         "wins": 1,
-        "avg_pnl": -2.75
+        "avg_pnl": -4.2
       }
     },
-    "win_rate": 41.7
+    "win_rate": 40.0
   }
 }

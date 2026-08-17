@@ -22,10 +22,10 @@ REVIEW_FILE = os.path.join(LOG_DIR, 'recommendation_review.json')
 
 # ── 日期工具 ──
 def _walk_dates(start, step):
-    """从start按step天步进, 返回有竞价快照的日期列表"""
+    """从start按step天步进, 返回有竞价快照的日期列表 (跳过周末, 防止周六脏快照被当作交易日)"""
     out, d = [], start
     for _ in range(8):
-        if os.path.exists(os.path.join(AUCTION_DIR, f'{d.strftime("%Y-%m-%d")}.json')):
+        if d.weekday() < 5 and os.path.exists(os.path.join(AUCTION_DIR, f'{d.strftime("%Y-%m-%d")}.json')):
             out.append(d.strftime('%Y-%m-%d'))
         d += timedelta(days=step)
     return out
