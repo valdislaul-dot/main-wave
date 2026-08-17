@@ -64,7 +64,24 @@ def load_candidate_scores(date_str):
 
 
 def get_top3(date_str):
-    """竞价池可买标的按评分排序取前三 (与morning_check同逻辑: 快照分>0用快照, 否则用前日候选分)"""
+    """推荐前三 (morning_check面板正式输出优先, 无推荐文件则用竞价快照重建)"""
+    # 1. 优先: 当日推荐文件 (morning_check面板正式输出, 现场评分, buyable已按分数排序)
+    rec_file = os.path.join(LOG_DIR, 'daily_recommendations', f'{date_str}.json')
+    if os.path.exists(rec_file):
+        with open(rec_file, encoding='utf-8') as f:
+            rec = json.load(f)
+        out = []
+        for s in rec.get('buyable') or []:
+            code = s.get('code', '')
+            if code.startswith(('300', '301', '688', '8', '9')):
+                continue
+            out.append({
+                'code': code, 'name': s.get('name', '?'),
+                'score': s.get('score', 0), 'gap': s.get('gap'),
+            })
+        return out[:3]
+
+    # 2. 兜底: 竞价快照重建 (快照分>0用快照分, 否则退回前日候选分)
     stocks = load_auction(date_str)
     prev_d = prev_trading_day(date_str)
     cand_scores = load_candidate_scores(prev_d) if prev_d else {}
@@ -75,8 +92,7 @@ def get_top3(date_str):
         code = s.get('code', '')
         if code.startswith(('300', '301', '688', '8', '9')):
             continue
-        # 优先用当日候选文件分(快照分曾被candidates_v过期文件污染, 2026-08-14修复)
-        score = cand_scores.get(code, 0) or s.get('score', 0)
+        score = s.get('score', 0) or cand_scores.get(code, 0)
         buyable.append({
             'code': code, 'name': s.get('name', '?'),
             'score': score, 'gap': s.get('gap_pct'),
