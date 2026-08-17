@@ -1,0 +1,130 @@
+{
+  "date": "2026-08-17",
+  "generated": "2026-08-17 09:27",
+  "total_in_pool": 52,
+  "buyable_count": 9,
+  "top_pick": {
+    "code": "600613",
+    "name": "神奇制药",
+    "gap": 7.64,
+    "score": 56.0,
+    "limit_days": 2,
+    "industry": "化学制药",
+    "sector": 1,
+    "vr20": 1.22,
+    "turnover": 2.61,
+    "in_candidates": true
+  },
+  "buyable": [
+    {
+      "code": "600613",
+      "name": "神奇制药",
+      "gap": 7.64,
+      "score": 56.0,
+      "limit_days": 2,
+      "industry": "化学制药",
+      "sector": 1,
+      "vr20": 1.22,
+      "turnover": 2.61,
+      "in_candidates": true
+    },
+    {
+      "code": "002322",
+      "name": "理工能科",
+      "gap": 4.67,
+      "score": 36.0,
+      "limit_days": 2,
+      "industry": "软件开发",
+      "sector": 2,
+      "vr20": 5.21,
+      "turnover": 7.15,
+      "in_candidates": true
+    },
+    {
+      "code": "603089",
+      "name": "正裕工业",
+      "gap": 5.54,
+      "score": 11.0,
+      "limit_days": 1,
+      "industry": "汽车零部",
+      "sector": 3,
+      "vr20": 2.6,
+      "turnover": 2.58,
+      "in_candidates": true
+    },
+    {
+      "code": "002951",
+      "name": "金时科技",
+      "gap": 4.13,
+      "score": 3.0,
+      "limit_days": 1,
+      "industry": "其他电源",
+      "sector": 1,
+      "vr20": 1.68,
+      "turnover": 4.06,
+      "in_candidates": true
+    },
+    {
+      "code": "003031",
+      "name": "中瓷电子",
+      "gap": 4.01,
+      "score": 1.0,
+      "limit_days": 1,
+      "industry": "通信设备",
+      "sector": 5,
+      "vr20": 1.16,
+      "turnover": 3.84,
+      "in_candidates": true
+    },
+    {
+      "code": "600829",
+      "name": "人民同泰",
+      "gap": 4.31,
+      "score": -10.0,
+      "limit_days": 1,
+      "industry": "医药商业",
+      "sector": 3,
+      "vr20": 1.58,
+      "turnover": 8.79,
+      "in_candidates": true
+    },
+    {
+      "code": "000620",
+      "name": "盈新发展",
+      "gap": 4.95,
+      "score": -11.0,
+      "limit_days": 1,
+      "industry": "房地产开",
+      "sector": 1,
+      "vr20": 2.55,
+      "turnover": 11.62,
+      "in_candidates": true
+    },
+    {
+      "code": "600353",
+      "name": "旭光电子",
+      "gap": 6.35,
+      "score": -12.0,
+      "limit_days": 1,
+      "industry": "其他电子",
+      "sector": 1,
+      "vr20": 1.29,
+      "turnover": 8.37,
+      "in_candidates": true
+    },
+    {
+      "code": "600186",
+      "name": "莲花控股",
+      "gap": 4.99,
+      "score": -24.0,
+      "limit_days": 1,
+      "industry": "调味发酵",
+      "sector": 1,
+      "vr20": 1.37,
+      "turnover": 16.88,
+      "in_candidates": true
+    }
+  ],
+  "position_status": "华正新材, 兴业科技",
+  "action_taken": null
+}

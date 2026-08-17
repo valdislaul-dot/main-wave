@@ -5299,5 +5299,347 @@
     "days_in_pool": 1,
     "last_lu_date": "2026-08-13",
     "limit_days": 1
+  },
+  {
+    "code": "000936",
+    "name": "华西股份",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 3,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 3
+  },
+  {
+    "code": "001260",
+    "name": "坤泰股份",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 3,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 3
+  },
+  {
+    "code": "002724",
+    "name": "海洋王",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 2,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 2
+  },
+  {
+    "code": "600645",
+    "name": "中源协和",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603025",
+    "name": "大豪科技",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002418",
+    "name": "康盛股份",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002322",
+    "name": "理工能科",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 2,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 2
+  },
+  {
+    "code": "002951",
+    "name": "金时科技",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603725",
+    "name": "天安新材",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603989",
+    "name": "艾华集团",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "600198",
+    "name": "大唐电信",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002774",
+    "name": "快意电梯",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "600288",
+    "name": "大恒科技",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "600272",
+    "name": "开开实业",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603382",
+    "name": "海阳科技",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "000950",
+    "name": "重药控股",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "601609",
+    "name": "金田股份",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "000831",
+    "name": "中国稀土",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "600186",
+    "name": "莲花控股",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002811",
+    "name": "郑中设计",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002658",
+    "name": "雪迪龙",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603618",
+    "name": "杭电股份",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603083",
+    "name": "剑桥科技",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603177",
+    "name": "德创环保",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002766",
+    "name": "索菱股份",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "000620",
+    "name": "盈新发展",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603881",
+    "name": "数据港",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "600769",
+    "name": "祥龙电业",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "920083",
+    "name": "金戈新材",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002989",
+    "name": "中天精装",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002645",
+    "name": "华宏科技",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "600487",
+    "name": "亨通光电",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603629",
+    "name": "利通电子",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "600815",
+    "name": "厦工股份",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002628",
+    "name": "成都路桥",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "603115",
+    "name": "海星股份",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "002988",
+    "name": "豪美新材",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
+  },
+  {
+    "code": "600829",
+    "name": "人民同泰",
+    "exit_date": "2026-08-17",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-08-14",
+    "limit_days": 1
   }
 ]

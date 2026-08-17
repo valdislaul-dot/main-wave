@@ -1,38 +1,81 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 28,
+  "total_sessions": 29,
   "current": {
-    "date": "2026-08-15",
-    "captured": "2026-08-15 22:07:52",
+    "date": "2026-08-17",
+    "captured": "2026-08-17 09:27:18",
     "total": 52,
-    "buyable": 3,
+    "buyable": 9,
     "gap_distribution": {
-      "0-2%": 27,
-      "9%+": 8,
-      "2-5%": 6,
-      "-3-0%": 10,
-      "5-9%": 1
+      "2-5%": 16,
+      "-3-0%": 12,
+      "<-3%": 2,
+      "0-2%": 13,
+      "9%+": 6,
+      "5-9%": 3
     },
     "buyable_stocks": [
       {
-        "code": "603330",
-        "name": "天洋新材",
-        "gap_pct": 4.94,
-        "score": 36.0,
-        "limit_days": 3
+        "code": "600613",
+        "name": "神奇制药",
+        "gap_pct": 7.64,
+        "score": 56.0,
+        "limit_days": 2
       },
       {
         "code": "002322",
         "name": "理工能科",
-        "gap_pct": 4.47,
+        "gap_pct": 4.67,
         "score": 36.0,
         "limit_days": 2
       },
       {
-        "code": "603025",
-        "name": "大豪科技",
-        "gap_pct": 6.52,
-        "score": 17.0,
+        "code": "603089",
+        "name": "正裕工业",
+        "gap_pct": 5.54,
+        "score": 11.0,
+        "limit_days": 1
+      },
+      {
+        "code": "002951",
+        "name": "金时科技",
+        "gap_pct": 4.13,
+        "score": 3.0,
+        "limit_days": 1
+      },
+      {
+        "code": "003031",
+        "name": "中瓷电子",
+        "gap_pct": 4.01,
+        "score": 1.0,
+        "limit_days": 1
+      },
+      {
+        "code": "600829",
+        "name": "人民同泰",
+        "gap_pct": 4.31,
+        "score": -10.0,
+        "limit_days": 1
+      },
+      {
+        "code": "000620",
+        "name": "盈新发展",
+        "gap_pct": 4.95,
+        "score": -11.0,
+        "limit_days": 1
+      },
+      {
+        "code": "600353",
+        "name": "旭光电子",
+        "gap_pct": 6.35,
+        "score": -12.0,
+        "limit_days": 1
+      },
+      {
+        "code": "600186",
+        "name": "莲花控股",
+        "gap_pct": 4.99,
+        "score": -24.0,
         "limit_days": 1
       }
     ]
@@ -396,7 +439,20 @@
         "-3-0%": 10,
         "5-9%": 1
       }
+    },
+    {
+      "date": "2026-08-17",
+      "total": 52,
+      "buyable": 9,
+      "gap_distribution": {
+        "2-5%": 16,
+        "-3-0%": 12,
+        "<-3%": 2,
+        "0-2%": 13,
+        "9%+": 6,
+        "5-9%": 3
+      }
     }
   ],
-  "last_update": "2026-08-15"
+  "last_update": "2026-08-17"
 }
