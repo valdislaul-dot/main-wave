@@ -90,6 +90,24 @@ def load_kline(name, code):
             return json.load(f)
     return None
 
+def merge_recalced_seal(pool):
+    """封板质量修正: recalc_seal的分钟线重算值(seal_recalced=True)覆盖东财派生字段"""
+    state_path = os.path.join(BASE, 'data', 'zt_pool_state.json')
+    if not os.path.exists(state_path):
+        return
+    with open(state_path, encoding='utf-8') as f:
+        st = json.load(f)
+    recalced = {s['code']: s for s in st.get('stocks', []) if s.get('seal_recalced')}
+    if not recalced:
+        return
+    for s in pool:
+        r = recalced.get(s['code'])
+        if r:
+            s['first_seal'] = r.get('first_seal') or s['first_seal']
+            s['last_seal'] = r.get('last_seal') or s['last_seal']
+            s['break_times'] = r.get('break_times', s['break_times'])
+
+
 def main():
     today = get_today()
     print(f'[Screen] Target date: {today}')
@@ -99,6 +117,8 @@ def main():
     if not pool:
         print('[Screen] No LU stocks found')
         return
+
+    merge_recalced_seal(pool)
 
     # Save snapshot
     snap_dir = os.path.join(BASE, 'data', 'zt_pool')
