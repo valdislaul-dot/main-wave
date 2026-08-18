@@ -91,7 +91,7 @@ def load_kline(name, code):
     return None
 
 def merge_recalced_seal(pool):
-    """封板质量修正: recalc_seal的分钟线重算值(seal_recalced=True)覆盖东财派生字段"""
+    """封板质量修正: recalc_seal的分钟线重算值(seal_recalced=True)覆盖东财派生字段; 顺带合并资金流观察字段"""
     state_path = os.path.join(BASE, 'data', 'zt_pool_state.json')
     if not os.path.exists(state_path):
         return
@@ -106,6 +106,8 @@ def merge_recalced_seal(pool):
             s['first_seal'] = r.get('first_seal') or s['first_seal']
             s['last_seal'] = r.get('last_seal') or s['last_seal']
             s['break_times'] = r.get('break_times', s['break_times'])
+            if r.get('money_flow'):
+                s['money_flow'] = r['money_flow']
 
 
 def main():

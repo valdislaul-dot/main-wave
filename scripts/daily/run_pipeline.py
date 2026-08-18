@@ -69,6 +69,14 @@ def main():
         except Exception as e:
             print(f'[Warning] 封板重算失败: {e}')
 
+        # Step 1.6: 资金流采集 (新浪日频, 观察数据不进评分, 待N≥50回看检验)
+        print('\n[Step 1.6] 采集涨停池资金流...')
+        try:
+            from capture_money_flow import main as capture_money_flow
+            capture_money_flow()
+        except Exception as e:
+            print(f'[Warning] 资金流采集失败: {e}')
+
         # Step 2: Update K-line (only ZT pool stocks, Tencent fqkline + Sina fallback)
         print('\n[Step 2/7] 更新K线数据(涨停池标的)...')
         try:
@@ -90,6 +98,14 @@ def main():
             screen_candidates()
         except Exception as e:
             print(f'[Error] Screening failed: {e}')
+
+        # Step 4.5: 妖股观察 (强连板指纹层, 只提示不自动交易)
+        print('\n[Step 4.5] 妖股观察(2板指纹筛选)...')
+        try:
+            from yao_watch import main as yao_watch
+            yao_watch()
+        except Exception as e:
+            print(f'[Warning] 妖股观察失败: {e}')
 
         if not fast_mode:
             # Step 5: Generate report

@@ -16,6 +16,7 @@
 - **搜狐 hisHq** — 历史主库（kline_data/ 3048只 + backtest_kline/ 70只，不复权）
 - **东财 push2ex** — 涨停池实时（akshare 东财K线接口已失效弃用，见 akshare issue#5820）
 - **腾讯 qt.gtimg.cn** — 竞价行情
+- **新浪 MoneyFlow** — 资金流日频（主力/超大单净流入，观察数据不进评分，支持翻历史页）
 - **mootdx 禁用** | **baostock 已移除**(2026-08-17, 当日数据延迟反复出错)
 
 ## V4.0 卖点引擎（2026-08-10，仅此模块升级）
@@ -159,6 +160,12 @@ T日断板 + T+1 gap<4% → 卖出
 - 否定→REJECT: 二次爆量 | 高开后持续下杀 | 破0% | 收盘前未反包
 - 来源: `资料/连板模式_选股与卖点逻辑_Claude_Code知识库.md` §4，**只提示不自动交易**
 
+### 🐲 妖股观察（2026-08-18新增，强连板指纹，只提示不自动交易）
+- 来源: `资料/妖股研究_强连板发现体系.md`（research_streaks.py 回测 255个7板+事件 vs 67018短命板）
+- 指纹层(盘后Step4.5): 2板股筛 ①2板量比<0.8x ②启动价<30元 ③前20日+3~8% ④板块≥2只
+- 晋级层(次日9:25): `python yao_watch.py --next` 验证竞价gap 4-8%
+- 核心数据: 断板放量≥2x=出货走 | 断板收红+缩量<1.5x=唯一格局 | 2板极度缩量成妖率3倍 | >50元零成妖
+
 ### 连板模式知识库（2026-08-15，权威知识源）
 - `资料/连板模式_选股与卖点逻辑_Claude_Code知识库.md` — 选股+卖点逻辑的权威归纳（源自干货_怎么选.doc + 干货合集-卖点.docx）
 - 使用原则: 先判场景再调用阈值；来源未明确参数保持可配置，不硬编码
@@ -195,9 +202,11 @@ T日断板 + T+1 gap<4% → 卖出
 ## 7步流水线（run_pipeline.py）
 1. 更新涨停池（东财push2ex）
 1.5. 重算封板质量（分钟K线重算炸板/封板，替代东财失真派生字段 zbc/fbt）
+1.6. 资金流采集（新浪日频，**观察数据不进评分**，待推荐回看N≥50后检验独立预测力再走解冻流程）
 2. 更新K线数据（腾讯qfq增量主源+Tushare备源+新浪兜底，**含持仓标的**）
 3. 更新历史涨停池
 4. 筛选候选+评分
+4.5. 妖股观察（2板指纹筛选，只提示）
 5. 生成每日报告
 6. 回看昨日推荐前三（新增）
 7. 捕获T字板分钟K线
@@ -228,6 +237,7 @@ scripts/daily/scoring.py    ← 统一评分模块（配置驱动，含分歧质
 scripts/daily/sell_engine.py ← V4.0统一卖点引擎（V3.2+A体系）
 scripts/daily/morning_check.py ← 竞价观察+卖点集成（多持仓+🐉分歧标签）
 scripts/daily/review_recommendations.py ← 推荐回看（盘后结算前三模拟收益）
+scripts/daily/capture_money_flow.py ← 资金流采集（观察数据，不进评分）
 scripts/daily/backtest_divergence.py ← 分歧弱转强模式回测
 scripts/daily/zt_pool.py    ← 涨停池管理器
 scripts/daily/gui_dashboard.py ← Streamlit GUI

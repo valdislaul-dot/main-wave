@@ -26,7 +26,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 28725870.4,
+        "ratioamount": 0.4091,
+        "r0_net": -10569496.8,
+        "r0_ratio": -0.1505,
+        "r0x_ratio": -56.27,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000526",
@@ -52,7 +61,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 81770432.0,
+        "ratioamount": 0.7191,
+        "r0_net": 39907866.0,
+        "r0_ratio": 0.3509,
+        "r0x_ratio": 74.1,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000620",
@@ -78,7 +96,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 693086034.45,
+        "ratioamount": 0.5732,
+        "r0_net": 487428825.33,
+        "r0_ratio": 0.4031,
+        "r0x_ratio": 76.07,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002820",
@@ -124,7 +151,16 @@
           "cons": 3
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 29755608.9,
+        "ratioamount": 0.6016,
+        "r0_net": 6713530.5,
+        "r0_ratio": 0.1357,
+        "r0x_ratio": 53.5,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002953",
@@ -150,7 +186,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 25338574.82,
+        "ratioamount": 0.4037,
+        "r0_net": -1478467.38,
+        "r0_ratio": -0.0236,
+        "r0x_ratio": -13.24,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603089",
@@ -196,7 +241,16 @@
           "cons": 3
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 22069717.0,
+        "ratioamount": 0.3894,
+        "r0_net": 893260.0,
+        "r0_ratio": 0.0158,
+        "r0x_ratio": 8.98,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603958",
@@ -237,7 +291,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 10367136.0,
+        "ratioamount": 0.5126,
+        "r0_net": -2198586.0,
+        "r0_ratio": -0.1087,
+        "r0x_ratio": -47.36,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600613",
@@ -288,7 +351,16 @@
           "cons": 4
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 510151800.8,
+        "ratioamount": 0.9123,
+        "r0_net": 326333549.36,
+        "r0_ratio": 0.5836,
+        "r0x_ratio": 80.21,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002515",
@@ -314,7 +386,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 527191084.17,
+        "ratioamount": 0.4272,
+        "r0_net": 408208220.24,
+        "r0_ratio": 0.3308,
+        "r0x_ratio": 73.22,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002284",
@@ -340,7 +421,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 221163580.44,
+        "ratioamount": 0.4198,
+        "r0_net": 174174159.64,
+        "r0_ratio": 0.3306,
+        "r0x_ratio": 73.15,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603395",
@@ -381,7 +471,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 71623129.72,
+        "ratioamount": 0.5606,
+        "r0_net": 43242451.2,
+        "r0_ratio": 0.3385,
+        "r0x_ratio": 73.52,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600127",
@@ -422,7 +521,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 214036348.06,
+        "ratioamount": 0.5583,
+        "r0_net": 131648696.92,
+        "r0_ratio": 0.3434,
+        "r0x_ratio": 73.67,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603936",
@@ -463,7 +571,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 1324988935.75,
+        "ratioamount": 0.7083,
+        "r0_net": 1080215699.99,
+        "r0_ratio": 0.5774,
+        "r0x_ratio": 80.16,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "001229",
@@ -504,7 +621,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 190753896.71,
+        "ratioamount": 0.7165,
+        "r0_net": 104711096.8,
+        "r0_ratio": 0.3933,
+        "r0x_ratio": 75.74,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002743",
@@ -530,7 +656,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 44879152.0,
+        "ratioamount": 0.7171,
+        "r0_net": 17699726.0,
+        "r0_ratio": 0.2828,
+        "r0x_ratio": 70.35,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600371",
@@ -556,7 +691,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 72223489.16,
+        "ratioamount": 0.8292,
+        "r0_net": 28179836.0,
+        "r0_ratio": 0.3235,
+        "r0x_ratio": 72.82,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002365",
@@ -582,7 +726,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 265048230.0,
+        "ratioamount": 0.7804,
+        "r0_net": 157160123.0,
+        "r0_ratio": 0.4628,
+        "r0x_ratio": 77.84,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603708",
@@ -608,7 +761,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 162696503.46,
+        "ratioamount": 0.7784,
+        "r0_net": 109649702.12,
+        "r0_ratio": 0.5246,
+        "r0x_ratio": 79.25,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600367",
@@ -634,7 +796,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 682872386.89,
+        "ratioamount": 0.324,
+        "r0_net": 429556153.24,
+        "r0_ratio": 0.2038,
+        "r0x_ratio": 63.83,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600353",
@@ -680,7 +851,16 @@
           "cons": 3
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 1211444638.95,
+        "ratioamount": 0.4994,
+        "r0_net": 1037976806.79,
+        "r0_ratio": 0.4279,
+        "r0x_ratio": 76.86,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603071",
@@ -706,7 +886,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 79145810.64,
+        "ratioamount": 0.5685,
+        "r0_net": 41473597.0,
+        "r0_ratio": 0.2979,
+        "r0x_ratio": 71.44,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603580",
@@ -747,7 +936,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 271950612.0,
+        "ratioamount": 0.5719,
+        "r0_net": 188228219.0,
+        "r0_ratio": 0.3958,
+        "r0x_ratio": 75.82,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002124",
@@ -773,7 +971,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 180562596.5,
+        "ratioamount": 0.7001,
+        "r0_net": 86773153.0,
+        "r0_ratio": 0.3364,
+        "r0x_ratio": 73.24,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603823",
@@ -814,7 +1021,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 656922824.32,
+        "ratioamount": 0.5866,
+        "r0_net": 476265928.42,
+        "r0_ratio": 0.4253,
+        "r0x_ratio": 76.77,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600108",
@@ -840,7 +1056,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 171564134.96,
+        "ratioamount": 0.581,
+        "r0_net": 102630399.0,
+        "r0_ratio": 0.3476,
+        "r0x_ratio": 74.14,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600707",
@@ -866,7 +1091,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 1128011564.55,
+        "ratioamount": 0.3177,
+        "r0_net": 749031702.89,
+        "r0_ratio": 0.211,
+        "r0x_ratio": 64.69,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600227",
@@ -892,7 +1126,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 501208165.25,
+        "ratioamount": 0.7268,
+        "r0_net": 242916814.75,
+        "r0_ratio": 0.3522,
+        "r0x_ratio": 74.2,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600313",
@@ -933,7 +1176,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 361435090.48,
+        "ratioamount": 0.5763,
+        "r0_net": 287719371.58,
+        "r0_ratio": 0.4588,
+        "r0x_ratio": 77.63,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603065",
@@ -959,7 +1211,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 355985683.0,
+        "ratioamount": 0.3183,
+        "r0_net": 244983452.0,
+        "r0_ratio": 0.219,
+        "r0x_ratio": 65.41,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603406",
@@ -985,7 +1246,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 90417895.9,
+        "ratioamount": 0.6795,
+        "r0_net": 46200424.04,
+        "r0_ratio": 0.3472,
+        "r0x_ratio": 73.92,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002638",
@@ -1011,7 +1281,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 65962606.86,
+        "ratioamount": 0.7203,
+        "r0_net": 18402516.0,
+        "r0_ratio": 0.2009,
+        "r0x_ratio": 63.54,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603221",
@@ -1037,7 +1316,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 90504876.31,
+        "ratioamount": 0.0963,
+        "r0_net": 31799063.62,
+        "r0_ratio": 0.0338,
+        "r0x_ratio": 18.68,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000735",
@@ -1078,7 +1366,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 247046170.22,
+        "ratioamount": 0.3497,
+        "r0_net": 169910470.84,
+        "r0_ratio": 0.2405,
+        "r0x_ratio": 67.49,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "605577",
@@ -1104,7 +1401,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 76988352.0,
+        "ratioamount": 0.6484,
+        "r0_net": 37477750.0,
+        "r0_ratio": 0.3156,
+        "r0x_ratio": 72.39,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000852",
@@ -1130,7 +1436,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 105466039.06,
+        "ratioamount": 0.6497,
+        "r0_net": 57755831.68,
+        "r0_ratio": 0.3558,
+        "r0x_ratio": 74.19,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "601116",
@@ -1156,7 +1471,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 132114008.68,
+        "ratioamount": 0.4749,
+        "r0_net": 64130904.79,
+        "r0_ratio": 0.2305,
+        "r0x_ratio": 66.55,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603739",
@@ -1182,7 +1506,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 74041157.0,
+        "ratioamount": 0.5708,
+        "r0_net": 27096988.0,
+        "r0_ratio": 0.2089,
+        "r0x_ratio": 64.33,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002041",
@@ -1208,7 +1541,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 218295235.49,
+        "ratioamount": 0.4877,
+        "r0_net": 101816333.89,
+        "r0_ratio": 0.2275,
+        "r0x_ratio": 66.29,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "001366",
@@ -1234,7 +1576,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 45801308.52,
+        "ratioamount": 0.7652,
+        "r0_net": 19199015.0,
+        "r0_ratio": 0.3208,
+        "r0x_ratio": 72.63,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600722",
@@ -1260,7 +1611,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 611641056.05,
+        "ratioamount": 0.3836,
+        "r0_net": 455862073.78,
+        "r0_ratio": 0.2859,
+        "r0x_ratio": 70.78,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000019",
@@ -1286,7 +1646,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 213736356.48,
+        "ratioamount": 0.5774,
+        "r0_net": 91396592.83,
+        "r0_ratio": 0.2469,
+        "r0x_ratio": 68.05,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603400",
@@ -1312,7 +1681,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 230954916.42,
+        "ratioamount": 0.6796,
+        "r0_net": 127996021.66,
+        "r0_ratio": 0.3766,
+        "r0x_ratio": 75.12,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000716",
@@ -1338,7 +1716,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 251742278.25,
+        "ratioamount": 0.4389,
+        "r0_net": 169688030.17,
+        "r0_ratio": 0.2958,
+        "r0x_ratio": 71.26,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000020",
@@ -1364,7 +1751,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 56459276.79,
+        "ratioamount": 0.6977,
+        "r0_net": 33549948.0,
+        "r0_ratio": 0.4146,
+        "r0x_ratio": 76.38,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000505",
@@ -1405,7 +1801,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 219870338.67,
+        "ratioamount": 0.4327,
+        "r0_net": 88920780.23,
+        "r0_ratio": 0.175,
+        "r0x_ratio": 60.14,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600598",
@@ -1431,7 +1836,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 449042097.7,
+        "ratioamount": 0.3339,
+        "r0_net": 330375002.45,
+        "r0_ratio": 0.2457,
+        "r0x_ratio": 67.92,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "605268",
@@ -1457,7 +1871,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 48284006.5,
+        "ratioamount": 0.5937,
+        "r0_net": 22312802.0,
+        "r0_ratio": 0.2744,
+        "r0x_ratio": 70.05,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000678",
@@ -1483,7 +1906,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 196075584.5,
+        "ratioamount": 0.4329,
+        "r0_net": 120664543.16,
+        "r0_ratio": 0.2664,
+        "r0x_ratio": 69.33,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603280",
@@ -1509,7 +1941,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 83742613.09,
+        "ratioamount": 0.5231,
+        "r0_net": 38474541.78,
+        "r0_ratio": 0.2404,
+        "r0x_ratio": 67.38,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002553",
@@ -1535,7 +1976,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 180444227.08,
+        "ratioamount": 0.4258,
+        "r0_net": 107786606.31,
+        "r0_ratio": 0.2543,
+        "r0x_ratio": 68.56,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000597",
@@ -1561,7 +2011,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 245512232.3,
+        "ratioamount": 0.5576,
+        "r0_net": 179383924.96,
+        "r0_ratio": 0.4074,
+        "r0x_ratio": 76.23,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000007",
@@ -1587,7 +2046,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 52944855.31,
+        "ratioamount": 0.4175,
+        "r0_net": 25769533.0,
+        "r0_ratio": 0.2032,
+        "r0x_ratio": 63.86,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600737",
@@ -1613,7 +2081,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 696573520.44,
+        "ratioamount": 0.4333,
+        "r0_net": 423341397.64,
+        "r0_ratio": 0.2634,
+        "r0x_ratio": 69.22,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "603112",
@@ -1639,7 +2116,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 118530151.69,
+        "ratioamount": 0.3775,
+        "r0_net": 87293413.38,
+        "r0_ratio": 0.278,
+        "r0x_ratio": 70.19,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600113",
@@ -1665,7 +2151,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 78072833.16,
+        "ratioamount": 0.2177,
+        "r0_net": 50284828.36,
+        "r0_ratio": 0.1402,
+        "r0x_ratio": 54.5,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "605333",
@@ -1691,7 +2186,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 46537124.0,
+        "ratioamount": 0.4639,
+        "r0_net": 11433732.0,
+        "r0_ratio": 0.114,
+        "r0x_ratio": 48.67,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "003043",
@@ -1717,7 +2221,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 151874879.28,
+        "ratioamount": 0.2337,
+        "r0_net": 124761181.36,
+        "r0_ratio": 0.192,
+        "r0x_ratio": 62.48,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600536",
@@ -1743,7 +2256,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 665533216.17,
+        "ratioamount": 0.4033,
+        "r0_net": 510657681.44,
+        "r0_ratio": 0.3094,
+        "r0x_ratio": 72.1,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600354",
@@ -1769,7 +2291,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 236821294.91,
+        "ratioamount": 0.2857,
+        "r0_net": 115134963.2,
+        "r0_ratio": 0.1389,
+        "r0x_ratio": 54.04,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600359",
@@ -1795,7 +2326,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 71225054.65,
+        "ratioamount": 0.29,
+        "r0_net": 28225826.0,
+        "r0_ratio": 0.1149,
+        "r0x_ratio": 48.97,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "601702",
@@ -1821,7 +2361,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 171765897.65,
+        "ratioamount": 0.4203,
+        "r0_net": 89491838.0,
+        "r0_ratio": 0.219,
+        "r0x_ratio": 65.43,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002025",
@@ -1847,7 +2396,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 281202688.83,
+        "ratioamount": 0.1441,
+        "r0_net": 218186927.41,
+        "r0_ratio": 0.1118,
+        "r0x_ratio": 48.17,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002819",
@@ -1873,7 +2431,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 45660836.81,
+        "ratioamount": 0.2482,
+        "r0_net": 20895479.78,
+        "r0_ratio": 0.1136,
+        "r0x_ratio": 48.65,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000998",
@@ -1899,7 +2466,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 323518838.75,
+        "ratioamount": 0.3176,
+        "r0_net": 156664797.65,
+        "r0_ratio": 0.1538,
+        "r0x_ratio": 56.91,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "601952",
@@ -1925,7 +2501,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 146599763.7,
+        "ratioamount": 0.264,
+        "r0_net": 36256044.0,
+        "r0_ratio": 0.0653,
+        "r0x_ratio": 33.24,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "600272",
@@ -1951,7 +2536,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 105129689.07,
+        "ratioamount": 0.0932,
+        "r0_net": 85857928.91,
+        "r0_ratio": 0.0762,
+        "r0x_ratio": 37.33,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002385",
@@ -1977,7 +2571,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 408532601.0,
+        "ratioamount": 0.3919,
+        "r0_net": 202436138.47,
+        "r0_ratio": 0.1942,
+        "r0x_ratio": 62.53,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "000713",
@@ -2003,7 +2606,16 @@
           "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 109405198.98,
+        "ratioamount": 0.3832,
+        "r0_net": 46056387.74,
+        "r0_ratio": 0.1613,
+        "r0x_ratio": 58.25,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "605179",
@@ -2044,7 +2656,16 @@
           "cons": 2
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-18",
+        "netamount": 163069211.0,
+        "ratioamount": 0.1063,
+        "r0_net": 56499108.16,
+        "r0_ratio": 0.0368,
+        "r0x_ratio": 20.22,
+        "source": "sina_moneyflow"
+      }
     }
   ]
 }
