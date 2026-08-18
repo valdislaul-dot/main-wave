@@ -1,37 +1,30 @@
 {
-  "cash": 0,
+  "cash": 3256.0,
   "position": {
-    "name": "华正新材",
-    "code": "603186",
-    "buy_price": 162.363,
-    "shares": 200,
-    "buy_date": "2026-08-13"
+    "name": "旭光电子",
+    "code": "600353",
+    "buy_price": 36.75,
+    "shares": 2200,
+    "buy_date": "2026-08-18"
   },
   "positions": [
     {
-      "name": "华正新材",
-      "code": "603186",
-      "buy_price": 162.363,
-      "shares": 200,
-      "buy_date": "2026-08-13"
-    },
-    {
-      "name": "鸿博股份",
-      "code": "002229",
-      "buy_price": 13.567,
-      "shares": 3400,
-      "buy_date": "2026-08-17"
+      "name": "旭光电子",
+      "code": "600353",
+      "buy_price": 36.75,
+      "shares": 2200,
+      "buy_date": "2026-08-18"
     }
   ],
-  "total_trades": 11,
-  "winning_trades": 9,
-  "total_pnl": 68266.7,
-  "model_trades": 9,
-  "model_wins": 9,
-  "model_pnl": 70978.2,
-  "subjective_trades": 2,
+  "total_trades": 13,
+  "winning_trades": 10,
+  "total_pnl": 73772.3,
+  "model_trades": 10,
+  "model_wins": 10,
+  "model_pnl": 76507.6,
+  "subjective_trades": 3,
   "subjective_wins": 0,
-  "subjective_pnl": -2711.5,
+  "subjective_pnl": -2735.3,
   "created": "2026-07-25 16:12:18",
-  "updated": "2026-08-17"
+  "updated": "2026-08-18"
 }

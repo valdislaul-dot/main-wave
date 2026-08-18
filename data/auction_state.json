@@ -1,81 +1,88 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 29,
+  "total_sessions": 30,
   "current": {
-    "date": "2026-08-17",
-    "captured": "2026-08-17 09:27:18",
-    "total": 52,
-    "buyable": 9,
+    "date": "2026-08-18",
+    "captured": "2026-08-18 09:25:22",
+    "total": 92,
+    "buyable": 11,
     "gap_distribution": {
-      "2-5%": 16,
-      "-3-0%": 12,
-      "<-3%": 2,
-      "0-2%": 13,
-      "9%+": 6,
-      "5-9%": 3
+      "0-2%": 37,
+      "-3-0%": 18,
+      "<-3%": 5,
+      "2-5%": 12,
+      "5-9%": 10,
+      "9%+": 10
     },
     "buyable_stocks": [
       {
-        "code": "600613",
-        "name": "神奇制药",
-        "gap_pct": 7.64,
-        "score": 56.0,
+        "code": "600353",
+        "name": "旭光电子",
+        "gap_pct": 5.48,
+        "score": 33.0,
         "limit_days": 2
       },
       {
-        "code": "002322",
-        "name": "理工能科",
-        "gap_pct": 4.67,
-        "score": 36.0,
-        "limit_days": 2
-      },
-      {
-        "code": "603089",
-        "name": "正裕工业",
-        "gap_pct": 5.54,
-        "score": 11.0,
+        "code": "600127",
+        "name": "金健米业",
+        "gap_pct": 6.04,
+        "score": 23.0,
         "limit_days": 1
       },
       {
-        "code": "002951",
-        "name": "金时科技",
-        "gap_pct": 4.13,
+        "code": "603929",
+        "name": "亚翔集成",
+        "gap_pct": 5.05,
+        "score": 23.0,
+        "limit_days": 1
+      },
+      {
+        "code": "603118",
+        "name": "共进股份",
+        "gap_pct": 4.3,
+        "score": 23.0,
+        "limit_days": 3
+      },
+      {
+        "code": "600206",
+        "name": "有研新材",
+        "gap_pct": 7.0,
+        "score": 10.0,
+        "limit_days": 1
+      },
+      {
+        "code": "603936",
+        "name": "博敏电子",
+        "gap_pct": 6.96,
+        "score": 6.0,
+        "limit_days": 1
+      },
+      {
+        "code": "603002",
+        "name": "宏昌电子",
+        "gap_pct": 5.4,
+        "score": 5.0,
+        "limit_days": 1
+      },
+      {
+        "code": "001229",
+        "name": "魅视科技",
+        "gap_pct": 6.29,
         "score": 3.0,
         "limit_days": 1
       },
       {
-        "code": "003031",
-        "name": "中瓷电子",
-        "gap_pct": 4.01,
-        "score": 1.0,
+        "code": "603823",
+        "name": "百合花",
+        "gap_pct": 4.88,
+        "score": -6.0,
         "limit_days": 1
       },
       {
-        "code": "600829",
-        "name": "人民同泰",
-        "gap_pct": 4.31,
-        "score": -10.0,
-        "limit_days": 1
-      },
-      {
-        "code": "000620",
-        "name": "盈新发展",
-        "gap_pct": 4.95,
-        "score": -11.0,
-        "limit_days": 1
-      },
-      {
-        "code": "600353",
-        "name": "旭光电子",
-        "gap_pct": 6.35,
-        "score": -12.0,
-        "limit_days": 1
-      },
-      {
-        "code": "600186",
-        "name": "莲花控股",
-        "gap_pct": 4.99,
-        "score": -24.0,
+        "code": "601700",
+        "name": "风范股份",
+        "gap_pct": 4.57,
+        "score": -16.0,
         "limit_days": 1
       }
     ]
@@ -452,7 +459,20 @@
         "9%+": 6,
         "5-9%": 3
       }
+    },
+    {
+      "date": "2026-08-18",
+      "total": 92,
+      "buyable": 11,
+      "gap_distribution": {
+        "0-2%": 37,
+        "-3-0%": 18,
+        "<-3%": 5,
+        "2-5%": 12,
+        "5-9%": 10,
+        "9%+": 10
+      }
     }
   ],
-  "last_update": "2026-08-17"
+  "last_update": "2026-08-18"
 }

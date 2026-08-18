@@ -105,16 +105,25 @@
     }
   },
   "current_position": null,
+  "current_positions": [
+    {
+      "code": "002907",
+      "name": "华森制药",
+      "buy_date": "2026-08-18",
+      "buy_price": 17.19,
+      "shares": null,
+      "note": "开盘价买入(已确认): 08-18开盘17.19, 竞价gap+2.38%(昨收16.79)"
+    }
+  ],
   "last_trade": {
-    "code": "600721",
-    "name": "百花医药",
-    "buy_date": "2026-08-07",
-    "buy_price": 10.2,
-    "sell_date": "2026-08-13",
-    "sell_price": 14.49,
-    "shares": 55800,
-    "pnl_amt": 239382.0,
-    "pnl_pct": 42.06
+    "code": "002081",
+    "name": "金螳螂",
+    "buy_date": "2026-08-17",
+    "buy_price": 5.5,
+    "sell_date": "2026-08-18",
+    "sell_price": 5.9,
+    "shares": null,
+    "pnl_pct": 7.3
   },
   "trade_history": [
     {
@@ -580,6 +589,12 @@
       "pnl_pct": 42.06,
       "pnl_amt": 239382.0,
       "sell_price": 14.49
+    },
+    {
+      "buy_date": "2026-08-17",
+      "sell_date": "2026-08-18",
+      "name": "金螳螂",
+      "pnl_pct": 7.3
     }
   ]
 }
