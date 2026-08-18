@@ -206,6 +206,23 @@ def main():
     else:
         print(f'  - 竞价快照缺失, 跳过竞价质量校验')
 
+    # ── 7. 炸板次数异常校验 (东财zbc派生字段对烂板股失真, >5次告警) ──
+    if os.path.exists(state_path):
+        state = load_json(state_path)
+        sstocks = state.get('stocks', []) if isinstance(state, dict) else []
+        odd = []
+        for s in sstocks:
+            bt = int(s.get('break_times', 0) or 0)
+            if bt > 5:
+                odd.append(f'{s.get("name")}(炸{bt}次)')
+        if odd:
+            warnings.append(f'炸板次数异常{len(odd)}只(>5次, 疑似东财失真): {"; ".join(odd[:5])}')
+            print(f'  ⚠ {warnings[-1]}')
+        else:
+            print(f'  ✓ 炸板次数: {len(sstocks)}只均在合理范围')
+    else:
+        print(f'  - 池文件缺失, 跳过炸板校验')
+
     # ── 落库 ──
     _log_result(today, warnings)
 

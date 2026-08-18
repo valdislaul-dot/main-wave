@@ -61,6 +61,14 @@ def main():
         except Exception as e:
             print(f'[Warning] ZT pool update failed: {e}')
 
+        # Step 1.5: 重算封板质量 (分钟K线重算炸板/封板, 替代东财失真派生字段)
+        print('\n[Step 1.5] 重算封板质量(分钟K线)...')
+        try:
+            from recalc_seal import main as recalc_seal
+            recalc_seal()
+        except Exception as e:
+            print(f'[Warning] 封板重算失败: {e}')
+
         # Step 2: Update K-line (only ZT pool stocks, Tencent fqkline + Sina fallback)
         print('\n[Step 2/7] 更新K线数据(涨停池标的)...')
         try:

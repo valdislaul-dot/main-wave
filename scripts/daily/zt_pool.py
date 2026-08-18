@@ -269,7 +269,7 @@ def fetch_zt_pool_raw(date_str):
                 'price': p.get("p", 0) / 1000 if p.get("p", 0) > 100 else p.get("p", 0),
                 'pct': round(p.get("zdp", 0), 2),
                 'turnover': round(p.get("hs", 0), 2),
-                'limit_days': p.get("days", 1),
+                'limit_days': p.get("lbc", 1) or (p.get("zttj") or {}).get("days", 1),
                 'first_seal': f"{str(ft).zfill(6)[:2]}:{str(ft).zfill(6)[2:4]}:{str(ft).zfill(6)[4:6]}",
                 'last_seal': f"{str(lt).zfill(6)[:2]}:{str(lt).zfill(6)[2:4]}:{str(lt).zfill(6)[4:6]}",
                 'seal_fund': p.get("fund", 0),

@@ -11,8 +11,8 @@
       "limit_days": 1,
       "close": 6.68,
       "prev_close": 5.51,
-      "first_seal": "09:25:00",
-      "last_seal": "09:25:00",
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
       "seal_fund": 109721939,
       "break_times": 0,
       "industry": "化学制药",
@@ -25,7 +25,8 @@
           "close": 6.68,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000526",
@@ -36,8 +37,8 @@
       "limit_days": 1,
       "close": 35.54,
       "prev_close": 35.5,
-      "first_seal": "09:25:00",
-      "last_seal": "09:25:00",
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
       "seal_fund": 329441584,
       "break_times": 0,
       "industry": "教育",
@@ -50,7 +51,8 @@
           "close": 35.54,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000620",
@@ -61,8 +63,8 @@
       "limit_days": 2,
       "close": 3.41,
       "prev_close": 3.03,
-      "first_seal": "09:25:00",
-      "last_seal": "09:32:21",
+      "first_seal": "09:30:00",
+      "last_seal": "09:33:00",
       "seal_fund": 184542611,
       "break_times": 1,
       "industry": "房地产开",
@@ -75,7 +77,8 @@
           "close": 3.41,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002820",
@@ -86,8 +89,8 @@
       "limit_days": 3,
       "close": 12.27,
       "prev_close": 11.15,
-      "first_seal": "09:25:00",
-      "last_seal": "09:25:00",
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
       "seal_fund": 150905417,
       "break_times": 0,
       "industry": "休闲食品",
@@ -120,7 +123,8 @@
           "close": 12.27,
           "cons": 3
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002953",
@@ -131,8 +135,8 @@
       "limit_days": 1,
       "close": 10.66,
       "prev_close": 9.71,
-      "first_seal": "09:25:00",
-      "last_seal": "09:25:00",
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
       "seal_fund": 112156386,
       "break_times": 0,
       "industry": "电网设备",
@@ -145,7 +149,8 @@
           "close": 10.66,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603089",
@@ -156,8 +161,8 @@
       "limit_days": 3,
       "close": 11.8,
       "prev_close": 10.73,
-      "first_seal": "09:25:00",
-      "last_seal": "09:25:00",
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
       "seal_fund": 4141800,
       "break_times": 0,
       "industry": "汽车零部",
@@ -190,7 +195,8 @@
           "close": 11.8,
           "cons": 3
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603958",
@@ -201,8 +207,8 @@
       "limit_days": 2,
       "close": 18.46,
       "prev_close": 16.78,
-      "first_seal": "09:25:01",
-      "last_seal": "09:25:01",
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
       "seal_fund": 2859454,
       "break_times": 0,
       "industry": "服装家纺",
@@ -230,7 +236,8 @@
           "close": 18.46,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600613",
@@ -241,10 +248,10 @@
       "limit_days": 4,
       "close": 7.76,
       "prev_close": 7.05,
-      "first_seal": "09:25:02",
-      "last_seal": "10:49:23",
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
       "seal_fund": 7372776,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "化学制药",
       "turnover": 15.08,
       "amount": 560836352,
@@ -280,7 +287,8 @@
           "close": 7.76,
           "cons": 4
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002515",
@@ -291,8 +299,8 @@
       "limit_days": 1,
       "close": 8.71,
       "prev_close": 6.91,
-      "first_seal": "09:30:03",
-      "last_seal": "11:23:54",
+      "first_seal": "09:31:00",
+      "last_seal": "11:24:00",
       "seal_fund": 203600605,
       "break_times": 1,
       "industry": "食品加工",
@@ -305,7 +313,8 @@
           "close": 8.71,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002284",
@@ -316,10 +325,10 @@
       "limit_days": 1,
       "close": 10.22,
       "prev_close": 9.7,
-      "first_seal": "09:30:09",
-      "last_seal": "10:17:57",
+      "first_seal": "10:18:00",
+      "last_seal": "10:18:00",
       "seal_fund": 84447860,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "汽车零部",
       "turnover": 7.21,
       "amount": 527236384,
@@ -330,7 +339,8 @@
           "close": 10.22,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603395",
@@ -341,8 +351,8 @@
       "limit_days": 2,
       "close": 26.36,
       "prev_close": 23.96,
-      "first_seal": "09:30:11",
-      "last_seal": "09:30:11",
+      "first_seal": "09:31:00",
+      "last_seal": "09:31:00",
       "seal_fund": 4270320,
       "break_times": 0,
       "industry": "农化制品",
@@ -370,7 +380,8 @@
           "close": 26.36,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600127",
@@ -381,8 +392,8 @@
       "limit_days": 2,
       "close": 7.11,
       "prev_close": 6.46,
-      "first_seal": "09:30:57",
-      "last_seal": "09:30:57",
+      "first_seal": "09:31:00",
+      "last_seal": "09:31:00",
       "seal_fund": 29748240,
       "break_times": 0,
       "industry": "农产品加",
@@ -410,7 +421,8 @@
           "close": 7.11,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603936",
@@ -421,10 +433,10 @@
       "limit_days": 2,
       "close": 19.12,
       "prev_close": 17.38,
-      "first_seal": "09:31:04",
-      "last_seal": "14:28:40",
+      "first_seal": "09:33:00",
+      "last_seal": "13:16:00",
       "seal_fund": 2435888,
-      "break_times": 16,
+      "break_times": 4,
       "industry": "元件",
       "turnover": 15.59,
       "amount": 1871916320,
@@ -450,7 +462,8 @@
           "close": 19.12,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "001229",
@@ -461,10 +474,10 @@
       "limit_days": 2,
       "close": 50.19,
       "prev_close": 45.63,
-      "first_seal": "09:31:09",
-      "last_seal": "11:10:00",
+      "first_seal": "09:32:00",
+      "last_seal": "11:06:00",
       "seal_fund": 30539611,
-      "break_times": 6,
+      "break_times": 1,
       "industry": "计算机设",
       "turnover": 7.24,
       "amount": 266312190,
@@ -490,7 +503,8 @@
           "close": 50.19,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002743",
@@ -501,8 +515,8 @@
       "limit_days": 1,
       "close": 4.47,
       "prev_close": 3.84,
-      "first_seal": "09:31:42",
-      "last_seal": "09:31:42",
+      "first_seal": "09:32:00",
+      "last_seal": "09:32:00",
       "seal_fund": 19471767,
       "break_times": 0,
       "industry": "专业工程",
@@ -515,7 +529,8 @@
           "close": 4.47,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600371",
@@ -526,10 +541,10 @@
       "limit_days": 1,
       "close": 8.14,
       "prev_close": 6.91,
-      "first_seal": "09:32:12",
-      "last_seal": "09:33:33",
+      "first_seal": "09:34:00",
+      "last_seal": "09:34:00",
       "seal_fund": 1262514,
-      "break_times": 2,
+      "break_times": 0,
       "industry": "种植业",
       "turnover": 3.7,
       "amount": 87294607,
@@ -540,7 +555,8 @@
           "close": 8.14,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002365",
@@ -551,8 +567,8 @@
       "limit_days": 1,
       "close": 15.55,
       "prev_close": 12.75,
-      "first_seal": "09:32:21",
-      "last_seal": "09:32:21",
+      "first_seal": "09:33:00",
+      "last_seal": "09:33:00",
       "seal_fund": 164733590,
       "break_times": 0,
       "industry": "化学制药",
@@ -565,7 +581,8 @@
           "close": 15.55,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603708",
@@ -576,10 +593,10 @@
       "limit_days": 1,
       "close": 10.27,
       "prev_close": 9.45,
-      "first_seal": "09:32:59",
-      "last_seal": "09:46:02",
+      "first_seal": "09:33:00",
+      "last_seal": "09:47:00",
       "seal_fund": 960245,
-      "break_times": 3,
+      "break_times": 1,
       "industry": "一般零售",
       "turnover": 3.22,
       "amount": 209247176,
@@ -590,7 +607,8 @@
           "close": 10.27,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600367",
@@ -601,10 +619,10 @@
       "limit_days": 2,
       "close": 38.23,
       "prev_close": 29.92,
-      "first_seal": "09:33:02",
-      "last_seal": "13:05:56",
+      "first_seal": "09:34:00",
+      "last_seal": "13:06:00",
       "seal_fund": 8769962,
-      "break_times": 5,
+      "break_times": 3,
       "industry": "化学原料",
       "turnover": 17.51,
       "amount": 2109353040,
@@ -615,7 +633,8 @@
           "close": 38.23,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600353",
@@ -626,10 +645,10 @@
       "limit_days": 3,
       "close": 37.54,
       "prev_close": 34.13,
-      "first_seal": "09:33:05",
-      "last_seal": "13:30:20",
+      "first_seal": "09:34:00",
+      "last_seal": "10:31:00",
       "seal_fund": 6265426,
-      "break_times": 10,
+      "break_times": 2,
       "industry": "其他电子",
       "turnover": 7.85,
       "amount": 2426645584,
@@ -660,7 +679,8 @@
           "close": 37.54,
           "cons": 3
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603071",
@@ -671,10 +691,10 @@
       "limit_days": 1,
       "close": 13.2,
       "prev_close": 11.98,
-      "first_seal": "09:35:26",
-      "last_seal": "09:41:20",
+      "first_seal": "09:42:00",
+      "last_seal": "09:42:00",
       "seal_fund": 1587960,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "贸易Ⅱ",
       "turnover": 1.92,
       "amount": 139507729,
@@ -685,7 +705,8 @@
           "close": 13.2,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603580",
@@ -696,10 +717,10 @@
       "limit_days": 2,
       "close": 64.02,
       "prev_close": 58.2,
-      "first_seal": "09:35:35",
-      "last_seal": "09:46:05",
+      "first_seal": "09:36:00",
+      "last_seal": "09:47:00",
       "seal_fund": 2695242,
-      "break_times": 3,
+      "break_times": 1,
       "industry": "塑料",
       "turnover": 5.78,
       "amount": 476193664,
@@ -725,7 +746,8 @@
           "close": 64.02,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002124",
@@ -736,8 +758,8 @@
       "limit_days": 1,
       "close": 2.5,
       "prev_close": 2.26,
-      "first_seal": "09:35:36",
-      "last_seal": "09:35:36",
+      "first_seal": "09:36:00",
+      "last_seal": "09:36:00",
       "seal_fund": 51139997,
       "break_times": 0,
       "industry": "养殖业",
@@ -750,7 +772,8 @@
           "close": 2.5,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603823",
@@ -761,10 +784,10 @@
       "limit_days": 2,
       "close": 85.9,
       "prev_close": 78.09,
-      "first_seal": "09:35:52",
-      "last_seal": "10:31:52",
+      "first_seal": "09:36:00",
+      "last_seal": "10:27:00",
       "seal_fund": 4174740,
-      "break_times": 17,
+      "break_times": 2,
       "industry": "化学制品",
       "turnover": 3.18,
       "amount": 1120552688,
@@ -790,7 +813,8 @@
           "close": 85.9,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600108",
@@ -801,10 +825,10 @@
       "limit_days": 1,
       "close": 3.56,
       "prev_close": 3.14,
-      "first_seal": "09:36:22",
-      "last_seal": "09:37:25",
+      "first_seal": "09:38:00",
+      "last_seal": "09:38:00",
       "seal_fund": 4621948,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "种植业",
       "turnover": 4.38,
       "amount": 295959392,
@@ -815,7 +839,8 @@
           "close": 3.56,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600707",
@@ -826,10 +851,10 @@
       "limit_days": 1,
       "close": 10.8,
       "prev_close": 8.91,
-      "first_seal": "09:36:27",
-      "last_seal": "14:34:42",
+      "first_seal": "09:37:00",
+      "last_seal": "14:35:00",
       "seal_fund": 5294160,
-      "break_times": 6,
+      "break_times": 4,
       "industry": "光学光电",
       "turnover": 9.32,
       "amount": 3553079936,
@@ -840,7 +865,8 @@
           "close": 10.8,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600227",
@@ -851,8 +877,8 @@
       "limit_days": 1,
       "close": 3.75,
       "prev_close": 3.34,
-      "first_seal": "09:37:55",
-      "last_seal": "09:37:55",
+      "first_seal": "09:38:00",
+      "last_seal": "09:38:00",
       "seal_fund": 3852375,
       "break_times": 0,
       "industry": "农化制品",
@@ -865,7 +891,8 @@
           "close": 3.75,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600313",
@@ -876,10 +903,10 @@
       "limit_days": 2,
       "close": 6.78,
       "prev_close": 6.16,
-      "first_seal": "09:38:08",
-      "last_seal": "09:39:05",
+      "first_seal": "09:39:00",
+      "last_seal": "09:39:00",
       "seal_fund": 8466186,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "种植业",
       "turnover": 8.76,
       "amount": 627830912,
@@ -905,7 +932,8 @@
           "close": 6.78,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603065",
@@ -916,8 +944,8 @@
       "limit_days": 1,
       "close": 18.11,
       "prev_close": 16.14,
-      "first_seal": "09:38:53",
-      "last_seal": "14:51:14",
+      "first_seal": "09:39:00",
+      "last_seal": "14:52:00",
       "seal_fund": 505269,
       "break_times": 2,
       "industry": "化学制品",
@@ -930,7 +958,8 @@
           "close": 18.11,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603406",
@@ -941,10 +970,10 @@
       "limit_days": 1,
       "close": 29.56,
       "prev_close": 27.1,
-      "first_seal": "09:40:34",
-      "last_seal": "09:51:25",
+      "first_seal": "09:41:00",
+      "last_seal": "09:41:00",
       "seal_fund": 1424792,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "化学纤维",
       "turnover": 7.85,
       "amount": 133239315,
@@ -955,7 +984,8 @@
           "close": 29.56,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002638",
@@ -966,8 +996,8 @@
       "limit_days": 1,
       "close": 3.85,
       "prev_close": 3.66,
-      "first_seal": "09:41:18",
-      "last_seal": "09:41:18",
+      "first_seal": "09:42:00",
+      "last_seal": "09:42:00",
       "seal_fund": 42306872,
       "break_times": 0,
       "industry": "照明设备",
@@ -980,7 +1010,8 @@
           "close": 3.85,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603221",
@@ -991,10 +1022,10 @@
       "limit_days": 1,
       "close": 30.0,
       "prev_close": 24.82,
-      "first_seal": "09:44:49",
-      "last_seal": "14:20:40",
+      "first_seal": "10:23:00",
+      "last_seal": "14:13:00",
       "seal_fund": 2373000,
-      "break_times": 7,
+      "break_times": 3,
       "industry": "家居用品",
       "turnover": 13.35,
       "amount": 939908336,
@@ -1005,7 +1036,8 @@
           "close": 30.0,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000735",
@@ -1016,8 +1048,8 @@
       "limit_days": 2,
       "close": 6.18,
       "prev_close": 5.62,
-      "first_seal": "09:45:21",
-      "last_seal": "09:45:21",
+      "first_seal": "09:46:00",
+      "last_seal": "09:46:00",
       "seal_fund": 106127978,
       "break_times": 0,
       "industry": "养殖业",
@@ -1045,7 +1077,8 @@
           "close": 6.18,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "605577",
@@ -1056,8 +1089,8 @@
       "limit_days": 1,
       "close": 10.76,
       "prev_close": 9.64,
-      "first_seal": "09:47:13",
-      "last_seal": "09:56:10",
+      "first_seal": "09:48:00",
+      "last_seal": "09:57:00",
       "seal_fund": 1196512,
       "break_times": 1,
       "industry": "出版",
@@ -1070,7 +1103,8 @@
           "close": 10.76,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000852",
@@ -1081,8 +1115,8 @@
       "limit_days": 1,
       "close": 5.79,
       "prev_close": 5.37,
-      "first_seal": "09:48:06",
-      "last_seal": "09:48:06",
+      "first_seal": "09:49:00",
+      "last_seal": "09:49:00",
       "seal_fund": 40268685,
       "break_times": 0,
       "industry": "专用设备",
@@ -1095,7 +1129,8 @@
           "close": 5.79,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "601116",
@@ -1106,8 +1141,8 @@
       "limit_days": 1,
       "close": 11.77,
       "prev_close": 10.61,
-      "first_seal": "09:48:30",
-      "last_seal": "09:48:30",
+      "first_seal": "09:49:00",
+      "last_seal": "09:49:00",
       "seal_fund": 1384152,
       "break_times": 0,
       "industry": "一般零售",
@@ -1120,7 +1155,8 @@
           "close": 11.77,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603739",
@@ -1131,10 +1167,10 @@
       "limit_days": 1,
       "close": 13.81,
       "prev_close": 11.51,
-      "first_seal": "09:53:55",
-      "last_seal": "09:54:13",
+      "first_seal": "09:54:00",
+      "last_seal": "09:54:00",
       "seal_fund": 1306426,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "化学制品",
       "turnover": 3.81,
       "amount": 129767698,
@@ -1145,7 +1181,8 @@
           "close": 13.81,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002041",
@@ -1156,10 +1193,10 @@
       "limit_days": 1,
       "close": 9.8,
       "prev_close": 8.74,
-      "first_seal": "09:54:06",
-      "last_seal": "09:56:54",
+      "first_seal": "09:55:00",
+      "last_seal": "09:55:00",
       "seal_fund": 59865240,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "种植业",
       "turnover": 5.37,
       "amount": 448275760,
@@ -1170,7 +1207,8 @@
           "close": 9.8,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "001366",
@@ -1181,8 +1219,8 @@
       "limit_days": 1,
       "close": 13.49,
       "prev_close": 11.46,
-      "first_seal": "09:54:48",
-      "last_seal": "09:54:48",
+      "first_seal": "09:55:00",
+      "last_seal": "09:55:00",
       "seal_fund": 47634431,
       "break_times": 0,
       "industry": "饲料",
@@ -1195,7 +1233,8 @@
           "close": 13.49,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600722",
@@ -1206,10 +1245,10 @@
       "limit_days": 1,
       "close": 13.02,
       "prev_close": 11.38,
-      "first_seal": "10:00:31",
-      "last_seal": "10:00:31",
+      "first_seal": "09:56:00",
+      "last_seal": "10:01:00",
       "seal_fund": 8384880,
-      "break_times": 0,
+      "break_times": 1,
       "industry": "化学原料",
       "turnover": 18.76,
       "amount": 1598030880,
@@ -1220,7 +1259,8 @@
           "close": 13.02,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000019",
@@ -1231,8 +1271,8 @@
       "limit_days": 1,
       "close": 6.96,
       "prev_close": 6.09,
-      "first_seal": "10:04:06",
-      "last_seal": "13:00:09",
+      "first_seal": "10:05:00",
+      "last_seal": "13:01:00",
       "seal_fund": 12345306,
       "break_times": 2,
       "industry": "农产品加",
@@ -1245,7 +1285,8 @@
           "close": 6.96,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603400",
@@ -1256,10 +1297,10 @@
       "limit_days": 1,
       "close": 48.14,
       "prev_close": 44.97,
-      "first_seal": "10:11:14",
-      "last_seal": "13:00:55",
+      "first_seal": "10:12:00",
+      "last_seal": "10:12:00",
       "seal_fund": 1242012,
-      "break_times": 2,
+      "break_times": 0,
       "industry": "通用设备",
       "turnover": 19.94,
       "amount": 340278496,
@@ -1270,7 +1311,8 @@
           "close": 48.14,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000716",
@@ -1281,8 +1323,8 @@
       "limit_days": 1,
       "close": 5.81,
       "prev_close": 4.74,
-      "first_seal": "10:17:33",
-      "last_seal": "10:17:33",
+      "first_seal": "10:18:00",
+      "last_seal": "10:18:00",
       "seal_fund": 27138527,
       "break_times": 0,
       "industry": "休闲食品",
@@ -1295,7 +1337,8 @@
           "close": 5.81,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000020",
@@ -1306,8 +1349,8 @@
       "limit_days": 1,
       "close": 12.49,
       "prev_close": 10.92,
-      "first_seal": "10:17:39",
-      "last_seal": "10:17:39",
+      "first_seal": "10:18:00",
+      "last_seal": "10:18:00",
       "seal_fund": 104071651,
       "break_times": 0,
       "industry": "光学光电",
@@ -1320,7 +1363,8 @@
           "close": 12.49,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000505",
@@ -1331,8 +1375,8 @@
       "limit_days": 2,
       "close": 6.79,
       "prev_close": 6.17,
-      "first_seal": "10:19:33",
-      "last_seal": "10:52:36",
+      "first_seal": "10:20:00",
+      "last_seal": "10:53:00",
       "seal_fund": 30318708,
       "break_times": 1,
       "industry": "农产品加",
@@ -1360,7 +1404,8 @@
           "close": 6.79,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600598",
@@ -1371,8 +1416,8 @@
       "limit_days": 1,
       "close": 13.46,
       "prev_close": 12.17,
-      "first_seal": "10:22:25",
-      "last_seal": "13:13:54",
+      "first_seal": "10:23:00",
+      "last_seal": "13:14:00",
       "seal_fund": 9963092,
       "break_times": 3,
       "industry": "种植业",
@@ -1385,7 +1430,8 @@
           "close": 13.46,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "605268",
@@ -1396,10 +1442,10 @@
       "limit_days": 1,
       "close": 10.16,
       "prev_close": 9.22,
-      "first_seal": "10:31:09",
-      "last_seal": "10:34:12",
+      "first_seal": "10:35:00",
+      "last_seal": "10:35:00",
       "seal_fund": 2139696,
-      "break_times": 2,
+      "break_times": 0,
       "industry": "家居用品",
       "turnover": 1.87,
       "amount": 81393973,
@@ -1410,7 +1456,8 @@
           "close": 10.16,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000678",
@@ -1421,10 +1468,10 @@
       "limit_days": 1,
       "close": 10.51,
       "prev_close": 9.02,
-      "first_seal": "10:38:57",
-      "last_seal": "10:39:39",
+      "first_seal": "10:39:00",
+      "last_seal": "10:39:00",
       "seal_fund": 35890788,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "汽车零部",
       "turnover": 9.99,
       "amount": 454335968,
@@ -1435,7 +1482,8 @@
           "close": 10.51,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603280",
@@ -1446,8 +1494,8 @@
       "limit_days": 1,
       "close": 29.22,
       "prev_close": 25.69,
-      "first_seal": "10:49:54",
-      "last_seal": "11:03:36",
+      "first_seal": "10:50:00",
+      "last_seal": "11:04:00",
       "seal_fund": 508428,
       "break_times": 1,
       "industry": "工程机械",
@@ -1460,7 +1508,8 @@
           "close": 29.22,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002553",
@@ -1471,8 +1520,8 @@
       "limit_days": 1,
       "close": 17.51,
       "prev_close": 16.26,
-      "first_seal": "11:06:00",
-      "last_seal": "11:06:00",
+      "first_seal": "11:07:00",
+      "last_seal": "11:07:00",
       "seal_fund": 92113106,
       "break_times": 0,
       "industry": "汽车零部",
@@ -1485,7 +1534,8 @@
           "close": 17.51,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000597",
@@ -1496,8 +1546,8 @@
       "limit_days": 1,
       "close": 5.51,
       "prev_close": 4.61,
-      "first_seal": "11:24:18",
-      "last_seal": "11:24:18",
+      "first_seal": "11:25:00",
+      "last_seal": "11:25:00",
       "seal_fund": 62369546,
       "break_times": 0,
       "industry": "化学制药",
@@ -1510,7 +1560,8 @@
           "close": 5.51,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000007",
@@ -1521,8 +1572,8 @@
       "limit_days": 1,
       "close": 11.69,
       "prev_close": 9.55,
-      "first_seal": "13:00:45",
-      "last_seal": "13:00:45",
+      "first_seal": "13:01:00",
+      "last_seal": "13:01:00",
       "seal_fund": 19618169,
       "break_times": 0,
       "industry": "一般零售",
@@ -1535,7 +1586,8 @@
           "close": 11.69,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600737",
@@ -1546,8 +1598,8 @@
       "limit_days": 1,
       "close": 15.08,
       "prev_close": 12.97,
-      "first_seal": "13:04:59",
-      "last_seal": "13:55:56",
+      "first_seal": "13:05:00",
+      "last_seal": "13:56:00",
       "seal_fund": 3019016,
       "break_times": 2,
       "industry": "农产品加",
@@ -1560,7 +1612,8 @@
           "close": 15.08,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "603112",
@@ -1571,8 +1624,8 @@
       "limit_days": 1,
       "close": 16.59,
       "prev_close": 15.22,
-      "first_seal": "13:12:31",
-      "last_seal": "13:12:31",
+      "first_seal": "13:13:00",
+      "last_seal": "13:13:00",
       "seal_fund": 1018626,
       "break_times": 0,
       "industry": "家电零部",
@@ -1585,7 +1638,8 @@
           "close": 16.59,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600113",
@@ -1596,8 +1650,8 @@
       "limit_days": 1,
       "close": 35.2,
       "prev_close": 31.11,
-      "first_seal": "13:36:18",
-      "last_seal": "13:36:18",
+      "first_seal": "13:37:00",
+      "last_seal": "13:37:00",
       "seal_fund": 2288000,
       "break_times": 0,
       "industry": "一般零售",
@@ -1610,7 +1664,8 @@
           "close": 35.2,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "605333",
@@ -1621,8 +1676,8 @@
       "limit_days": 1,
       "close": 18.66,
       "prev_close": 17.27,
-      "first_seal": "13:41:52",
-      "last_seal": "13:41:52",
+      "first_seal": "13:42:00",
+      "last_seal": "13:42:00",
       "seal_fund": 682956,
       "break_times": 0,
       "industry": "汽车零部",
@@ -1635,7 +1690,8 @@
           "close": 18.66,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "003043",
@@ -1646,8 +1702,8 @@
       "limit_days": 1,
       "close": 79.53,
       "prev_close": 67.5,
-      "first_seal": "13:48:57",
-      "last_seal": "13:48:57",
+      "first_seal": "13:49:00",
+      "last_seal": "13:49:00",
       "seal_fund": 69843246,
       "break_times": 0,
       "industry": "半导体",
@@ -1660,7 +1716,8 @@
           "close": 79.53,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600536",
@@ -1671,10 +1728,10 @@
       "limit_days": 1,
       "close": 34.45,
       "prev_close": 33.53,
-      "first_seal": "14:06:01",
-      "last_seal": "14:08:55",
+      "first_seal": "14:09:00",
+      "last_seal": "14:09:00",
       "seal_fund": 14110720,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "IT服务Ⅱ",
       "turnover": 6.0,
       "amount": 1665230400,
@@ -1685,7 +1742,8 @@
           "close": 34.45,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600354",
@@ -1696,8 +1754,8 @@
       "limit_days": 1,
       "close": 6.99,
       "prev_close": 5.94,
-      "first_seal": "14:25:32",
-      "last_seal": "14:25:32",
+      "first_seal": "14:26:00",
+      "last_seal": "14:26:00",
       "seal_fund": 1326003,
       "break_times": 0,
       "industry": "种植业",
@@ -1710,7 +1768,8 @@
           "close": 6.99,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600359",
@@ -1721,8 +1780,8 @@
       "limit_days": 1,
       "close": 6.93,
       "prev_close": 6.01,
-      "first_seal": "14:26:58",
-      "last_seal": "14:26:58",
+      "first_seal": "14:27:00",
+      "last_seal": "14:27:00",
       "seal_fund": 227997,
       "break_times": 0,
       "industry": "种植业",
@@ -1735,7 +1794,8 @@
           "close": 6.93,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "601702",
@@ -1746,8 +1806,8 @@
       "limit_days": 1,
       "close": 16.7,
       "prev_close": 15.57,
-      "first_seal": "14:30:01",
-      "last_seal": "14:30:01",
+      "first_seal": "14:31:00",
+      "last_seal": "14:31:00",
       "seal_fund": 1189040,
       "break_times": 0,
       "industry": "工业金属",
@@ -1760,7 +1820,8 @@
           "close": 16.7,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002025",
@@ -1771,8 +1832,8 @@
       "limit_days": 1,
       "close": 71.68,
       "prev_close": 66.33,
-      "first_seal": "14:35:00",
-      "last_seal": "14:35:00",
+      "first_seal": "14:36:00",
+      "last_seal": "14:36:00",
       "seal_fund": 152452608,
       "break_times": 0,
       "industry": "军工电子",
@@ -1785,7 +1846,8 @@
           "close": 71.68,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002819",
@@ -1796,8 +1858,8 @@
       "limit_days": 1,
       "close": 22.78,
       "prev_close": 21.01,
-      "first_seal": "14:39:18",
-      "last_seal": "14:39:18",
+      "first_seal": "14:40:00",
+      "last_seal": "14:40:00",
       "seal_fund": 75902960,
       "break_times": 0,
       "industry": "通用设备",
@@ -1810,7 +1872,8 @@
           "close": 22.78,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000998",
@@ -1821,8 +1884,8 @@
       "limit_days": 1,
       "close": 9.22,
       "prev_close": 8.28,
-      "first_seal": "14:40:27",
-      "last_seal": "14:40:27",
+      "first_seal": "14:41:00",
+      "last_seal": "14:41:00",
       "seal_fund": 180935806,
       "break_times": 0,
       "industry": "种植业",
@@ -1835,7 +1898,8 @@
           "close": 9.22,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "601952",
@@ -1846,8 +1910,8 @@
       "limit_days": 1,
       "close": 9.38,
       "prev_close": 8.2,
-      "first_seal": "14:44:28",
-      "last_seal": "14:44:28",
+      "first_seal": "14:45:00",
+      "last_seal": "14:45:00",
       "seal_fund": 704438,
       "break_times": 0,
       "industry": "种植业",
@@ -1860,7 +1924,8 @@
           "close": 9.38,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "600272",
@@ -1871,10 +1936,10 @@
       "limit_days": 2,
       "close": 20.93,
       "prev_close": 17.6,
-      "first_seal": "14:48:13",
-      "last_seal": "14:49:37",
+      "first_seal": "14:49:00",
+      "last_seal": "14:49:00",
       "seal_fund": 3779958,
-      "break_times": 1,
+      "break_times": 0,
       "industry": "医药商业",
       "turnover": 35.88,
       "amount": 1131763216,
@@ -1885,7 +1950,8 @@
           "close": 20.93,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "002385",
@@ -1896,8 +1962,8 @@
       "limit_days": 1,
       "close": 3.38,
       "prev_close": 3.04,
-      "first_seal": "14:50:48",
-      "last_seal": "14:50:48",
+      "first_seal": "14:51:00",
+      "last_seal": "14:51:00",
       "seal_fund": 27082334,
       "break_times": 0,
       "industry": "饲料",
@@ -1910,7 +1976,8 @@
           "close": 3.38,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "000713",
@@ -1921,8 +1988,8 @@
       "limit_days": 1,
       "close": 6.5,
       "prev_close": 5.78,
-      "first_seal": "14:56:00",
-      "last_seal": "14:56:00",
+      "first_seal": "14:57:00",
+      "last_seal": "14:57:00",
       "seal_fund": 3598140,
       "break_times": 0,
       "industry": "种植业",
@@ -1935,7 +2002,8 @@
           "close": 6.5,
           "cons": 1
         }
-      ]
+      ],
+      "seal_recalced": true
     },
     {
       "code": "605179",
@@ -1946,8 +2014,8 @@
       "limit_days": 2,
       "close": 38.61,
       "prev_close": 35.1,
-      "first_seal": "14:56:59",
-      "last_seal": "14:56:59",
+      "first_seal": "14:57:00",
+      "last_seal": "14:57:00",
       "seal_fund": 293436,
       "break_times": 0,
       "industry": "饮料乳品",
@@ -1975,7 +2043,8 @@
           "close": 38.61,
           "cons": 2
         }
-      ]
+      ],
+      "seal_recalced": true
     }
   ]
 }
