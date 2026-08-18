@@ -69,10 +69,12 @@ def fingerprint(code, klines, board):
             return None
     # 启动价 = 连板起点(第1板)前一日收盘价
     start_price = klines[n - board - 1].get('close', 0)
-    # 量比 = 最新板量 / 前一板量
+    # 量比 = 最新板量 / 前20日均量 (与研究回测口径一致: research_streaks.py 的 vr 函数,
+    # 0.8x/1.2x 阈值即按此口径统计的成妖率; 环比口径未回测不可套用)
     v_latest = klines[n - 1].get('volume', 0) or 0
-    v_prev = klines[n - 2].get('volume', 0) or 0
-    vol_ratio = round(v_latest / v_prev, 2) if v_prev > 0 else 99.0
+    vols = [klines[j].get('volume', 0) or 0 for j in range(max(0, n - 21), n - 1)]
+    avg = sum(vols) / len(vols) if vols else 0
+    vol_ratio = round(v_latest / avg, 2) if avg > 0 else 99.0
     # 前20日涨幅 = 启动价 / (起点前20日收盘) - 1
     idx = n - board - 1 - 20
     pre20 = None
