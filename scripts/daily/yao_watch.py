@@ -69,10 +69,10 @@ def fingerprint(code, klines, board):
             return None
     # 启动价 = 连板起点(第1板)前一日收盘价
     start_price = klines[n - board - 1].get('close', 0)
-    # 量比 = 最新板量 / 前20日均量 (与研究回测口径一致: research_streaks.py 的 vr 函数,
-    # 0.8x/1.2x 阈值即按此口径统计的成妖率; 环比口径未回测不可套用)
+    # 量比 = 最新板量 / 前5日均量 (三口径对比实验最优: 区分度2.04x > 20日均量1.96x > 环比1.88x,
+    # 且5日窗口受连板爆量污染小于20日; 阈值0.8x/1.2x按此口径统计的成妖率)
     v_latest = klines[n - 1].get('volume', 0) or 0
-    vols = [klines[j].get('volume', 0) or 0 for j in range(max(0, n - 21), n - 1)]
+    vols = [klines[j].get('volume', 0) or 0 for j in range(max(0, n - 6), n - 1)]
     avg = sum(vols) / len(vols) if vols else 0
     vol_ratio = round(v_latest / avg, 2) if avg > 0 else 99.0
     # 前20日涨幅 = 启动价 / (起点前20日收盘) - 1
@@ -182,7 +182,7 @@ def main():
 
     if near:
         near.sort(key=lambda x: -sum(x['conds'].values()))
-        print(f'\n  ◐ 接近命中 {len(near)} 只 (缺1个条件):')
+        print(f'\n  ◐ 接近命中 {len(near)} 只 (缺1-2个条件):')
         for h in near:
             print(f"    {h['name']}({h['code']}) {h['board']}板 {h['industry']} | "
                   f"量比{h['vol_ratio']:.2f}x 启动{h['start_price']:.2f}元 前20日{h['pre20']:+.1f}% 板块{h['sector']}只 "
