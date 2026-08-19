@@ -46,7 +46,9 @@ def find_kline_path(code):
 
 
 def _tencent_latest(code, last_date, end_date):
-    """腾讯qfq日K → 最近bar (主源), volume手→股"""
+    """腾讯qfq日K → 最近bar (主源), volume手→股
+    pct_change 在 qfq 序列内部计算: 前复权不改变相邻两日的相对涨跌,
+    故 qfq 内部 (close/prev_close-1) 即真实当日涨跌幅 (除权日也准确)"""
     try:
         import urllib.request
         mkt = 'sz' if code.startswith(('0', '3', '1')) else 'sh'
@@ -55,17 +57,23 @@ def _tencent_latest(code, last_date, end_date):
         d = json.loads(urllib.request.urlopen(req, timeout=10).read().decode('utf-8'))
         rows = (d.get('data', {}).get(f'{mkt}{code}', {}) or {}).get('qfqday') or []
         out = []
-        for r in rows:
-            if r[0] > last_date and r[0] <= end_date:
-                # 腾讯格式: [date, open, close, high, low, volume(手)]
-                out.append({
-                    'date': r[0],
-                    'open': round(float(r[1]), 2),
-                    'high': round(float(r[3]), 2),
-                    'low': round(float(r[4]), 2),
-                    'close': round(float(r[2]), 2),
-                    'volume': round(float(r[5]) * 100, 2),
-                })
+        for i, r in enumerate(rows):
+            if not (r[0] > last_date and r[0] <= end_date):
+                continue
+            # 腾讯格式: [date, open, close, high, low, volume(手)]
+            row = {
+                'date': r[0],
+                'open': round(float(r[1]), 2),
+                'high': round(float(r[3]), 2),
+                'low': round(float(r[4]), 2),
+                'close': round(float(r[2]), 2),
+                'volume': round(float(r[5]) * 100, 2),
+            }
+            # qfq序列内计算pct_change: 前一行(序列内, 升序)收盘价
+            prev_close = float(rows[i - 1][2]) if i > 0 else None
+            if prev_close:
+                row['pct_change'] = round((row['close'] - prev_close) / prev_close * 100, 2)
+            out.append(row)
         return out or None
     except Exception:
         return None
@@ -122,8 +130,9 @@ def _corporate_action_suspect(code, klines, new_rows):
     return abs(first_open - prev_close) / prev_close > limit + 0.01
 
 
-def append_latest(code, existing_path, end_date):
-    """追加最新一天到已有K线文件 (腾讯fqkline主源, 新浪兜底)"""
+def append_latest(code, existing_path, end_date, pool_map=None):
+    """追加最新一天到已有K线文件 (腾讯fqkline主源, 新浪兜底)
+    pool_map: {code: {turnover, amount}} 当日涨停池映射, 用于补追加行的换手/成交额字段"""
     with open(existing_path, encoding='utf-8') as f:
         raw = json.load(f)
     # 兼容两种格式: dict {metadata, data} 或 list
@@ -157,6 +166,17 @@ def append_latest(code, existing_path, end_date):
                 source = 'sina'
         else:
             return -1
+
+    # 字段补齐: 追加行缺 turnover_pct/amount → 从涨停池映射补 (池外股票维持None)
+    if new_rows and pool_map and code in pool_map:
+        pm = pool_map[code]
+        for row in new_rows:
+            if row['date'] == end_date:
+                if pm.get('turnover') and row.get('turnover_pct') is None:
+                    row['turnover_pct'] = round(float(pm['turnover']), 2)
+                if pm.get('amount') and row.get('amount_10k_cny') is None:
+                    # 东财 amount 单位元 → 万元 (与搜狐主库 amount_10k_cny 口径一致)
+                    row['amount_10k_cny'] = round(float(pm['amount']) / 10000, 2)
 
     if new_rows:
         klines.extend(new_rows)
@@ -242,10 +262,11 @@ def main():
             new_success += 1
         time.sleep(0.05)
 
-    # 5. 已有标的: 追加最新一天
+    # 5. 已有标的: 追加最新一天 (池映射用于补追加行的换手/成交额字段)
+    pool_map = {s['code']: s for s in zt_pool}
     append_count = 0
     for s, fpath in existing:
-        n = append_latest(s['code'], fpath, today)
+        n = append_latest(s['code'], fpath, today, pool_map=pool_map)
         if n > 0:
             append_count += 1
         time.sleep(0.03)

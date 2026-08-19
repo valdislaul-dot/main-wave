@@ -75,15 +75,26 @@ def fetch_tushare_daily(code, start_date, end_date):
         if df is None or df.empty:
             return None
         rows = []
+        prev_close = None
         for _, r in df.iterrows():
-            rows.append({
+            close = round(float(r['close']), 2)
+            row = {
                 'date': _fmt_date(r['trade_date']),
                 'open': round(float(r['open']), 2),
                 'high': round(float(r['high']), 2),
                 'low': round(float(r['low']), 2),
-                'close': round(float(r['close']), 2),
+                'close': close,
                 'volume': round(float(r['vol']) * 100, 2),  # 手→股
-            })
+            }
+            # pct_change 序列内计算 (不复权序列内自洽)
+            if prev_close:
+                row['pct_change'] = round((close - prev_close) / prev_close * 100, 2)
+            prev_close = close
+            # amount 千元→元 (与主库成交额口径对齐, 追加行补字段用)
+            amt = r.get('amount')
+            if amt is not None and float(amt) > 0:
+                row['amount_10k_cny'] = round(float(amt) / 10, 2)
+            rows.append(row)
         rows.sort(key=lambda x: x['date'])  # tushare默认降序, 转升序
         return rows or None
     except Exception:

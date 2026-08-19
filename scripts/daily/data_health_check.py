@@ -38,6 +38,37 @@ def fetch_quote(code):
         return None
 
 
+def fetch_quotes_batch(codes):
+    """腾讯批量行情 → {code: {close, prev_close}} (一次请求全池, 2026-08-19全量化)"""
+    result = {}
+    prefixed = []
+    for c in codes:
+        mkt = 'sz' if c.startswith(('0', '3', '1')) else 'sh'
+        prefixed.append(f'{mkt}{c}')
+    # 腾讯批量单次建议 ≤50只, 分批
+    for i in range(0, len(prefixed), 50):
+        batch = prefixed[i:i + 50]
+        url = f'http://qt.gtimg.cn/q={",".join(batch)}'
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            txt = urllib.request.urlopen(req, timeout=10).read().decode('gbk')
+            for line in txt.strip().split(';'):
+                if '=' not in line or '"' not in line:
+                    continue
+                key = line.split('=')[0].split('_')[-1]
+                fields = line.split('"')[1].split('~')
+                if len(fields) < 5:
+                    continue
+                code = key[2:]
+                try:
+                    result[code] = {'close': float(fields[3]), 'prev_close': float(fields[4])}
+                except ValueError:
+                    continue
+        except Exception:
+            continue
+    return result
+
+
 def _log_result(today, warnings):
     """体检结果落库 → logs/data_quality_log.json (追加, 保留最近90天, 失真可追溯)"""
     log_path = os.path.join(LOG_DIR, 'data_quality_log.json')
@@ -140,17 +171,20 @@ def main():
     else:
         print(f'  - 候选文件缺失, 跳过vr校验')
 
-    # ── 4. 腾讯收盘价 vs 池文件价格 ──
+    # ── 4. 腾讯收盘价 vs 池文件价格 (全池批量, 2026-08-19从5只抽样改全量化) ──
     if os.path.exists(pool_path):
         pool = load_json(pool_path)
         pstocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
-        import random
-        sample = random.sample(pstocks, min(5, len(pstocks)))
+        codes = [str(p.get('code', '')).replace('sh', '').replace('sz', '') for p in pstocks]
+        quotes = fetch_quotes_batch(codes)
         bad_price = []
-        for p in sample:
-            q = fetch_quote(str(p.get('code', '')).replace('sh', '').replace('sz', ''))
+        checked = 0
+        for p in pstocks:
+            code = str(p.get('code', '')).replace('sh', '').replace('sz', '')
+            q = quotes.get(code)
             if q is None:
                 continue
+            checked += 1
             pool_price = float(p.get('price', 0) or 0)
             if pool_price > 0 and q['close'] > 0 and abs(q['close'] - pool_price) / pool_price > 0.02:
                 bad_price.append(f'{p.get("name")}(池{pool_price}vs腾讯{q["close"]})')
@@ -158,18 +192,16 @@ def main():
             warnings.append(f'收盘价偏差: {"; ".join(bad_price)}')
             print(f'  ⚠ {warnings[-1]}')
         else:
-            print(f'  ✓ 收盘价抽样: 池文件与腾讯一致 ({len(sample)}只)')
+            print(f'  ✓ 收盘价全池校验: {checked}/{len(pstocks)}只 池文件与腾讯一致')
     else:
         print(f'  - 池文件缺失, 跳过价格校验')
 
-    # ── 5. K线最新日期抽查 ──
+    # ── 5. K线最新日期检查 (全池, 2026-08-19从5只抽样改全量化) ──
     if os.path.exists(pool_path):
         pool = load_json(pool_path)
         pstocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
-        import random
-        sample = random.sample(pstocks, min(5, len(pstocks)))
         stale = []
-        for p in sample:
+        for p in pstocks:
             code = str(p.get('code', '')).replace('sh', '').replace('sz', '')
             kp = os.path.join(KLINE_DIR, f'{code}.json')
             if not os.path.exists(kp):
@@ -183,10 +215,10 @@ def main():
             if rows and rows[-1].get('date', '') < today:
                 stale.append(f'{p.get("name")}(K线停在{rows[-1].get("date")})')
         if stale:
-            warnings.append(f'K线滞后: {"; ".join(stale)}')
+            warnings.append(f'K线滞后: {"; ".join(stale[:8])}')
             print(f'  ⚠ {warnings[-1]}')
         else:
-            print(f'  ✓ K线日期抽查: {len(sample)}只均为最新')
+            print(f'  ✓ K线日期全池检查: {len(pstocks)}只均为最新')
     else:
         print(f'  - 池文件缺失, 跳过K线校验')
 
@@ -225,6 +257,22 @@ def main():
 
     # ── 落库 ──
     _log_result(today, warnings)
+
+    # ── 体检→候选联动 (2026-08-19): 警告写入候选文件, 竞价面板显示 ──
+    try:
+        cand_path2 = os.path.join(LOG_DIR, f'candidates_{today}.json')
+        if os.path.exists(cand_path2) and warnings:
+            cand = load_json(cand_path2)
+            if isinstance(cand, dict):
+                cand['data_quality'] = {
+                    'warnings': warnings,
+                    'checked_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                }
+                with open(cand_path2, 'w', encoding='utf-8') as f:
+                    json.dump(cand, f, ensure_ascii=False, indent=1)
+                print(f'  → 已将 {len(warnings)} 项警告写入候选文件 data_quality 字段')
+    except Exception as e:
+        print(f'  [警告] 体检→候选联动失败: {e}')
 
     print('-' * 60)
     if warnings:

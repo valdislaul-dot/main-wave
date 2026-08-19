@@ -51,6 +51,45 @@ def fetch_live_quote(code):
         return None
 
 
+def fetch_sina_quote(code):
+    """获取实时行情 (新浪第二源, 用于持仓双源交叉验证)"""
+    import urllib.request
+    try:
+        mkt = 'sz' if code.startswith(('0', '3', '1')) else 'sh'
+        url = f'https://hq.sinajs.cn/list={mkt}{code}'
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0',
+            'Referer': 'https://finance.sina.com.cn/'})
+        resp = urllib.request.urlopen(req, timeout=10)
+        data = resp.read().decode('gbk')
+        fields = data.split('"')[1].split(',')
+        return {
+            'open': float(fields[1]),
+            'prev_close': float(fields[2]),
+            'current': float(fields[3]),
+        }
+    except Exception:
+        return None
+
+
+def cross_check_quote(code, tencent_quote):
+    """持仓双源校验 (腾讯 vs 新浪): open/prev_close 偏差>0.5% → 告警列表
+    返回 [(字段, 腾讯值, 新浪值, 偏差%), ...] 空列表=两源一致"""
+    sina = fetch_sina_quote(code)
+    if not sina:
+        return None   # 新浪源不可用(不告警, 但标记)
+    issues = []
+    for field in ('open', 'prev_close'):
+        tv = tencent_quote.get(field)
+        sv = sina.get(field)
+        if not tv or not sv:
+            continue
+        diff = abs(tv - sv) / tv * 100
+        if diff > 0.5:
+            issues.append((field, tv, sv, round(diff, 2)))
+    return issues
+
+
 def find_divergence_candidates():
     """🐉分歧弱转强候选 (2026-08-13新增, 半自动提示)
     T-1爆量+烂板涨停(大分歧日, 板块>=2只) → T日竞价高开 → 弱转强观察名单
@@ -211,6 +250,14 @@ def main():
     print(f'  日期: {datetime.now().strftime("%Y-%m-%d %H:%M")}')
     print('=' * 65)
 
+    # ── 盘后体检警告展示 (2026-08-19, 体检→候选联动) ──
+    if data and data.get('data_quality'):
+        dq = data['data_quality']
+        print(f'\n  ⚠⚠ 盘后数据体检发现 {len(dq.get("warnings", []))} 项警告 ⚠⚠')
+        for w in dq.get('warnings', [])[:8]:
+            print(f'    - {w}')
+        print(f'  (体检时间: {dq.get("checked_at", "?")}) 买入决策前请先排除数据问题')
+
     # ── 竞价池采集 (先采集, 面板用最新快照) ──
     try:
         from auction_pool import capture_auction
@@ -239,6 +286,16 @@ def main():
             quote = fetch_live_quote(code)
             if quote:
                 gap_pct = round((quote['open'] - quote['prev_close']) / quote['prev_close'] * 100, 2)
+
+                # ── 双源交叉验证 (腾讯vs新浪, 偏差>0.5%标红, 2026-08-19新增) ──
+                issues = cross_check_quote(code, quote)
+                if issues is None:
+                    print(f'  ║  ⚠ 新浪校验源不可用, 仅腾讯单源')
+                elif issues:
+                    for field, tv, sv, diff in issues:
+                        print(f'  ║  🔴 数据存疑[{field}]: 腾讯{tv} vs 新浪{sv} 偏差{diff}%')
+                else:
+                    print(f'  ║  ✓ 双源校验: 腾讯/新浪 open·昨收 一致')
 
                 # ── K线新鲜度检查 (滞后→昨涨停/断板判断会失真) ──
                 try:
