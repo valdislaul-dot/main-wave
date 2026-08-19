@@ -450,29 +450,105 @@
           "verdict": "✅推荐正确"
         }
       ]
+    },
+    "2026-08-18": {
+      "date": "2026-08-18",
+      "settled_on": "2026-08-19",
+      "total": 3,
+      "wins": 2,
+      "avg_pnl": 1.6,
+      "stocks": [
+        {
+          "rank": 1,
+          "code": "600353",
+          "name": "旭光电子",
+          "score": 33.0,
+          "rec_gap": 5.48,
+          "T": {
+            "open": 36.75,
+            "close": 37.54,
+            "limit_up": true,
+            "pct": 9.99
+          },
+          "T1": {
+            "gap": -2.72,
+            "close": 33.79,
+            "limit_up": false
+          },
+          "sell": 36.98,
+          "note": "实际: 买2200股@36.75 → 全卖@36.98",
+          "pnl_pct": 0.64,
+          "actual": true,
+          "verdict": "✅推荐正确"
+        },
+        {
+          "rank": 2,
+          "code": "600127",
+          "name": "金健米业",
+          "score": 23.0,
+          "rec_gap": 6.04,
+          "T": {
+            "open": 6.85,
+            "close": 7.11,
+            "limit_up": true,
+            "pct": 10.06
+          },
+          "T1": {
+            "gap": 9.99,
+            "close": 7.82,
+            "limit_up": true
+          },
+          "sell": 7.82,
+          "note": "昨涨停高开+9.99%→持有至收盘",
+          "pnl_pct": 14.16,
+          "verdict": "✅推荐正确"
+        },
+        {
+          "rank": 3,
+          "code": "603929",
+          "name": "亚翔集成",
+          "score": 23.0,
+          "rec_gap": 5.05,
+          "T": {
+            "open": 188.0,
+            "close": 182.95,
+            "limit_up": false,
+            "pct": 2.22
+          },
+          "T1": {
+            "gap": -4.25,
+            "close": 167.47,
+            "limit_up": false
+          },
+          "sell": 169.2,
+          "note": "硬止损-10%",
+          "pnl_pct": -10.0,
+          "verdict": "❌推荐错误"
+        }
+      ]
     }
   },
   "stats": {
-    "total": 18,
-    "wins": 9,
-    "avg_pnl": 1.07,
+    "total": 21,
+    "wins": 11,
+    "avg_pnl": 1.15,
     "by_rank": {
       "1": {
-        "n": 6,
-        "wins": 4,
-        "avg_pnl": 1.15
+        "n": 7,
+        "wins": 5,
+        "avg_pnl": 1.08
       },
       "2": {
-        "n": 6,
-        "wins": 2,
-        "avg_pnl": -1.21
+        "n": 7,
+        "wins": 3,
+        "avg_pnl": 0.98
       },
       "3": {
-        "n": 6,
+        "n": 7,
         "wins": 3,
-        "avg_pnl": 3.27
+        "avg_pnl": 1.37
       }
     },
-    "win_rate": 50.0
+    "win_rate": 52.4
   }
 }
