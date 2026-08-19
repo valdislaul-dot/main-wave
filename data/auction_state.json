@@ -1,89 +1,40 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 30,
+  "total_sessions": 31,
   "current": {
-    "date": "2026-08-18",
-    "captured": "2026-08-18 09:25:22",
-    "total": 92,
-    "buyable": 11,
+    "date": "2026-08-19",
+    "captured": "2026-08-19 09:25:33",
+    "total": 69,
+    "buyable": 3,
     "gap_distribution": {
-      "0-2%": 37,
+      "0-2%": 14,
       "-3-0%": 18,
-      "<-3%": 5,
-      "2-5%": 12,
-      "5-9%": 10,
-      "9%+": 10
+      "9%+": 6,
+      "2-5%": 7,
+      "<-3%": 21,
+      "5-9%": 3
     },
     "buyable_stocks": [
       {
-        "code": "600353",
-        "name": "旭光电子",
-        "gap_pct": 5.48,
-        "score": 33.0,
+        "code": "603958",
+        "name": "哈森股份",
+        "gap_pct": 7.69,
+        "score": 96.0,
         "limit_days": 2
       },
       {
-        "code": "600127",
-        "name": "金健米业",
-        "gap_pct": 6.04,
-        "score": 23.0,
-        "limit_days": 1
-      },
-      {
-        "code": "603929",
-        "name": "亚翔集成",
-        "gap_pct": 5.05,
-        "score": 23.0,
-        "limit_days": 1
-      },
-      {
-        "code": "603118",
-        "name": "共进股份",
-        "gap_pct": 4.3,
-        "score": 23.0,
-        "limit_days": 3
-      },
-      {
-        "code": "600206",
-        "name": "有研新材",
-        "gap_pct": 7.0,
-        "score": 10.0,
-        "limit_days": 1
-      },
-      {
-        "code": "603936",
-        "name": "博敏电子",
-        "gap_pct": 6.96,
-        "score": 6.0,
-        "limit_days": 1
-      },
-      {
-        "code": "603002",
-        "name": "宏昌电子",
-        "gap_pct": 5.4,
-        "score": 5.0,
-        "limit_days": 1
-      },
-      {
-        "code": "001229",
-        "name": "魅视科技",
-        "gap_pct": 6.29,
-        "score": 3.0,
+        "code": "000526",
+        "name": "学大教育",
+        "gap_pct": 4.98,
+        "score": 68.0,
         "limit_days": 1
       },
       {
         "code": "603823",
         "name": "百合花",
-        "gap_pct": 4.88,
-        "score": -6.0,
-        "limit_days": 1
-      },
-      {
-        "code": "601700",
-        "name": "风范股份",
-        "gap_pct": 4.57,
-        "score": -16.0,
-        "limit_days": 1
+        "gap_pct": 5.94,
+        "score": 17.0,
+        "limit_days": 2
       }
     ]
   },
@@ -472,7 +423,20 @@
         "5-9%": 10,
         "9%+": 10
       }
+    },
+    {
+      "date": "2026-08-19",
+      "total": 69,
+      "buyable": 3,
+      "gap_distribution": {
+        "0-2%": 14,
+        "-3-0%": 18,
+        "9%+": 6,
+        "2-5%": 7,
+        "<-3%": 21,
+        "5-9%": 3
+      }
     }
   ],
-  "last_update": "2026-08-18"
+  "last_update": "2026-08-19"
 }

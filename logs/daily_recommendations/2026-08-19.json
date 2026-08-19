@@ -1,0 +1,58 @@
+{
+  "date": "2026-08-19",
+  "generated": "2026-08-19 09:25",
+  "total_in_pool": 69,
+  "buyable_count": 3,
+  "top_pick": {
+    "code": "603958",
+    "name": "哈森股份",
+    "gap": 7.69,
+    "score": 96.0,
+    "limit_days": 2,
+    "industry": "服装家纺",
+    "sector": 1,
+    "vr20": 0.25,
+    "turnover": 0.5,
+    "in_candidates": true
+  },
+  "buyable": [
+    {
+      "code": "603958",
+      "name": "哈森股份",
+      "gap": 7.69,
+      "score": 96.0,
+      "limit_days": 2,
+      "industry": "服装家纺",
+      "sector": 1,
+      "vr20": 0.25,
+      "turnover": 0.5,
+      "in_candidates": true
+    },
+    {
+      "code": "000526",
+      "name": "学大教育",
+      "gap": 4.98,
+      "score": 68.0,
+      "limit_days": 1,
+      "industry": "教育",
+      "sector": 1,
+      "vr20": 0.54,
+      "turnover": 2.64,
+      "in_candidates": true
+    },
+    {
+      "code": "603823",
+      "name": "百合花",
+      "gap": 5.94,
+      "score": 17.0,
+      "limit_days": 2,
+      "industry": "化学制品",
+      "sector": 3,
+      "vr20": 0.67,
+      "turnover": 3.18,
+      "in_candidates": true
+    }
+  ],
+  "position_status": "旭光电子",
+  "action_taken": null
+}
