@@ -491,22 +491,23 @@ def main():
                   + (' — 3年数据: 弱市竞价4-8%期望-1.20%, 86%当日炸板' if _pos_pct == 0 else ''))
             _env_budget = 0
 
-            # ── 竞价二次确认 (2026-08-20新增, 3年数据: 涨停股次日均gap<0→接力差) ──
-            # 数据: 均gap -4~0%档次日-1.27% | 0-4%档+1.32% | 4-8%档+3.90%
-            # 规则: 今日竞价池均gap ≤ -2% → 环境降一档 (正常→弱市, 强势→正常)
+            # ── 竞价二次确认 (2026-08-20新增, 池均gap信号校准表3年724交易日) ──
+            # 数据: 池均gap≤-0.5%的5天 当日-2.87%/上涨31%/晋级11% (历史最差档);
+            #       -2%阈值三年从未触发过, 无效, 已校准为-0.5%
+            # 规则: 今日竞价池均gap ≤ -0.5% → 环境降一档 (正常→弱市, 强势→正常)
             try:
                 _astate_path = os.path.join(BASE, 'data', 'auction_state.json')
                 if os.path.exists(_astate_path):
                     with open(_astate_path, encoding='utf-8') as _f:
                         _astate = json.load(_f)
                     _avg_gap = (_astate.get('current') or {}).get('avg_gap')
-                    if _avg_gap is not None and _avg_gap <= -2.0:
+                    if _avg_gap is not None and _avg_gap <= -0.5:
                         _downgrade = {'🌡️ 弱市': ('🌡️ 弱市', '🛑 买入开关: 关闭(空仓)', 0.0),
                                       '🌡️ 正常': ('🌡️ 弱市↓', '🛑 买入开关: 关闭(空仓, 竞价二次确认降档)', 0.0),
                                       '🌡️ 强势': ('🌡️ 正常↓', '🟡 买入开关: 1/3仓(竞价二次确认降档)', 0.33)}
                         if _env in _downgrade:
                             _env2, _switch2, _pct2 = _downgrade[_env]
-                            print(f'  ⚠ 竞价二次确认: 池均gap {_avg_gap:+.1f}% ≤ -2% → 环境降档')
+                            print(f'  ⚠ 竞价二次确认: 池均gap {_avg_gap:+.1f}% ≤ -0.5% → 环境降档')
                             print(f'  {_env2}: {_switch2} (仓位由个人交易情况决定, 仅温度建议)')
             except Exception:
                 pass
