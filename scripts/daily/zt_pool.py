@@ -269,7 +269,8 @@ def fetch_zt_pool_raw(date_str):
                 'price': p.get("p", 0) / 1000 if p.get("p", 0) > 100 else p.get("p", 0),
                 'pct': round(p.get("zdp", 0), 2),
                 'turnover': round(p.get("hs", 0), 2),
-                'limit_days': p.get("lbc", 1) or (p.get("zttj") or {}).get("days", 1),
+                # 2026-08-20: 东财接口改版, lbc恒为1失效, 连板数在 zttj.ct (如6天5板→ct=5)
+                'limit_days': (p.get("zttj") or {}).get("ct") or p.get("lbc", 1) or 1,
                 'first_seal': f"{str(ft).zfill(6)[:2]}:{str(ft).zfill(6)[2:4]}:{str(ft).zfill(6)[4:6]}",
                 'last_seal': f"{str(lt).zfill(6)[:2]}:{str(lt).zfill(6)[2:4]}:{str(lt).zfill(6)[4:6]}",
                 'seal_fund': p.get("fund", 0),
@@ -373,16 +374,24 @@ def update_zt_pool(date_str=None, verbose=True):
                 t_close = tq_.get('close', 0)
                 today_lu = bool(t_close and t_close > 0 and
                                 is_limit_up(t_close, float(kls[-1].get('close', 0)), lpct))
-                start_i = len(kls) - 1
-            # 从start_i向前数连续涨停(不含今日)
-            for i in range(start_i, max(start_i - 13, -1), -1):
-                if i <= 0:
-                    break
-                if is_limit_up(float(kls[i].get('close', 0)),
-                               float(kls[i-1].get('close', 0)), lpct):
-                    cons += 1
+                # 2026-08-20修复: 昨日(K线末行)若断板 → 今日=首板(cons=0), 不再往前数
+                if not today_lu:
+                    start_i = None
+                elif len(kls) >= 2 and is_limit_up(float(kls[-1].get('close', 0)),
+                                                  float(kls[-2].get('close', 0)), lpct):
+                    start_i = len(kls) - 2   # 昨日也涨停, 从昨日往前继续数
                 else:
-                    break
+                    start_i = None           # 昨日断板 → 今日首板
+            # 从start_i向前数连续涨停(不含今日)
+            if start_i is not None:
+                for i in range(start_i, max(start_i - 13, -1), -1):
+                    if i <= 0:
+                        break
+                    if is_limit_up(float(kls[i].get('close', 0)),
+                                   float(kls[i-1].get('close', 0)), lpct):
+                        cons += 1
+                    else:
+                        break
         # K线+腾讯都拿不到今日涨停判定时, 用东财连板数兜底
         if not kline_fresh and not today_lu:
             em_cons = s.get('limit_days', 1) - 1

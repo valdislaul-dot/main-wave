@@ -122,6 +122,18 @@ def main():
 
     merge_recalced_seal(pool)
 
+    # 2026-08-20: 快照 limit_days 用 state 的K线回算连板数覆盖
+    # (东财 zttj.ct 是「N天M板」窗口板数, 与连板数语义不同; lbc 已失效恒1)
+    try:
+        from zt_pool import load_state as _load_state
+        _st = _load_state()
+        _smap = {s['code']: s for s in _st.get('stocks', [])}
+        for p in pool:
+            if p['code'] in _smap:
+                p['limit_days'] = _smap[p['code']].get('limit_days', p['limit_days'])
+    except Exception:
+        pass
+
     # Save snapshot
     snap_dir = os.path.join(BASE, 'data', 'zt_pool')
     os.makedirs(snap_dir, exist_ok=True)
@@ -208,6 +220,9 @@ def main():
         'top_pick': preferred_pick_temp,
         'candidates': results,
         'one_line_watch': one_line_today[:10] if one_line_today else [],
+        # 2026-08-20: 评分失败原因落库, 供体检区分「设计内过滤」与「真失败」
+        'score_fail': score_fail,
+        'fail_reasons': fail_reasons,
     }
     fpath = os.path.join(LOG_DIR, f'candidates_{today}.json')
     with open(fpath, 'w', encoding='utf-8') as f:

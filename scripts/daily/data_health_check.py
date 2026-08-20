@@ -140,12 +140,15 @@ def main():
         pstocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
         n_pool = len(pstocks)
         n_cand = len(cand.get('candidates', [])) if isinstance(cand, dict) else 0
-        n_fail = n_pool - n_cand
+        # 2026-08-20: 设计内过滤(活跃度<2)不计入失败, 只统计真失败
+        fr = cand.get('fail_reasons', {}) if isinstance(cand, dict) else {}
+        n_designed = sum(v for k, v in fr.items() if '活跃度' in str(k))
+        n_fail = max(0, n_pool - n_cand - n_designed)
         if n_fail > 3:
-            warnings.append(f'评分失败{n_fail}/{n_pool}只 (覆盖率{100 - n_fail / n_pool * 100:.0f}%)')
+            warnings.append(f'评分失败{n_fail}/{n_pool}只 (覆盖率{100 - n_fail / n_pool * 100:.0f}%, 另有{n_designed}只活跃度过滤)')
             print(f'  ⚠ {warnings[-1]}')
         else:
-            print(f'  ✓ 评分覆盖率: {n_cand}/{n_pool} ({n_fail}只失败)')
+            print(f'  ✓ 评分覆盖率: {n_cand}/{n_pool} ({n_fail}只真失败, {n_designed}只活跃度过滤)')
     else:
         print(f'  - 候选文件缺失, 跳过覆盖率校验')
 
@@ -238,18 +241,24 @@ def main():
     else:
         print(f'  - 竞价快照缺失, 跳过竞价质量校验')
 
-    # ── 7. 炸板次数异常校验 (东财zbc派生字段对烂板股失真, >5次告警) ──
+    # ── 7. 炸板次数异常校验 (2026-08-20: 区分分钟线重算值与东财原始值) ──
     if os.path.exists(state_path):
         state = load_json(state_path)
         sstocks = state.get('stocks', []) if isinstance(state, dict) else []
-        odd = []
+        recalc_odd = []    # 分钟线重算后仍>5次 → 真异常
+        em_raw_odd = []    # 未重算(东财原始zbc)>5次 → 东财失真待重算
         for s in sstocks:
             bt = int(s.get('break_times', 0) or 0)
             if bt > 5:
-                odd.append(f'{s.get("name")}(炸{bt}次)')
-        if odd:
-            warnings.append(f'炸板次数异常{len(odd)}只(>5次, 疑似东财失真): {"; ".join(odd[:5])}')
+                if s.get('seal_recalced'):
+                    recalc_odd.append(f'{s.get("name")}(炸{bt}次)')
+                else:
+                    em_raw_odd.append(f'{s.get("name")}(炸{bt}次)')
+        if recalc_odd:
+            warnings.append(f'炸板次数异常{len(recalc_odd)}只(分钟线重算后仍>5次): {"; ".join(recalc_odd[:5])}')
             print(f'  ⚠ {warnings[-1]}')
+        elif em_raw_odd:
+            print(f'  - 炸板校验: {len(em_raw_odd)}只未重算(东财原始zbc>5, 提示级): {"; ".join(em_raw_odd[:3])}')
         else:
             print(f'  ✓ 炸板次数: {len(sstocks)}只均在合理范围')
     else:
