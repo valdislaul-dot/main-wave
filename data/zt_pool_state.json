@@ -1,384 +1,204 @@
 {
   "as_of_date": "2026-08-20",
-  "last_updated": "2026-08-20 15:27:54",
+  "last_updated": "2026-08-20 16:53:58",
   "stocks": [
     {
-      "code": "000931",
-      "name": "中 关 村",
+      "code": "603666",
+      "name": "亿嘉和",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 4.63,
-      "prev_close": 4.63,
-      "first_seal": "09:30:00",
-      "last_seal": "09:30:00",
-      "seal_fund": 94679893,
+      "close": 26.07,
+      "prev_close": 26.07,
+      "first_seal": "14:56:00",
+      "last_seal": "14:56:00",
+      "seal_fund": 49621638.0,
       "break_times": 0,
-      "industry": "化学制药",
-      "turnover": 1.55,
-      "amount": 53753740,
-      "float_cap": 0,
+      "industry": "人形机器人+具身智能+华为合作",
+      "turnover": 3.13,
+      "amount": 0,
+      "float_cap": 5358178000.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 4.63,
+          "close": 26.07,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 4.63,
+          "close": 26.07,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 4.63,
+          "close": 26.07,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 26.07,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -3708266.21,
-        "ratioamount": -0.0985,
-        "r0_net": 0.0,
-        "r0_ratio": 0.0,
-        "r0x_ratio": 180.0,
+        "date": "2026-08-20",
+        "netamount": 30076132.6,
+        "ratioamount": 0.1921,
+        "r0_net": 13052335.0,
+        "r0_ratio": 0.0834,
+        "r0x_ratio": 39.82,
         "source": "sina_moneyflow"
       }
     },
     {
-      "code": "002038",
-      "name": "双鹭药业",
+      "code": "605080",
+      "name": "浙江自然",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 6.44,
-      "prev_close": 6.44,
-      "first_seal": "09:30:00",
-      "last_seal": "09:30:00",
-      "seal_fund": 119118104,
-      "break_times": 0,
-      "industry": "化学制药",
-      "turnover": 2.0,
-      "amount": 109523779,
-      "float_cap": 0,
+      "close": 22.34,
+      "prev_close": 22.34,
+      "first_seal": "10:42:00",
+      "last_seal": "14:55:00",
+      "seal_fund": 1840816.0,
+      "break_times": 3,
+      "industry": "露营经济+智能床垫+海外产能",
+      "turnover": 7.25,
+      "amount": 0,
+      "float_cap": 3135445800.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 6.44,
+          "close": 22.34,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 6.44,
+          "close": 22.34,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 6.44,
+          "close": 22.34,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 22.34,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -37335896.64,
-        "ratioamount": -0.2452,
-        "r0_net": -5714678.0,
-        "r0_ratio": -0.0375,
-        "r0x_ratio": -132.72,
+        "date": "2026-08-20",
+        "netamount": 111951042.2,
+        "ratioamount": 0.5048,
+        "r0_net": 55536940.8,
+        "r0_ratio": 0.2504,
+        "r0x_ratio": 68.24,
         "source": "sina_moneyflow"
       }
     },
     {
-      "code": "002412",
-      "name": "汉森制药",
-      "added_date": "2026-08-19",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 5,
-      "limit_days": 2,
-      "close": 9.26,
-      "prev_close": 9.26,
-      "first_seal": "09:30:00",
-      "last_seal": "09:30:00",
-      "seal_fund": 234275203,
-      "break_times": 0,
-      "industry": "中药Ⅱ",
-      "turnover": 0.87,
-      "amount": 40263425,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-19",
-          "close": 8.42,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-19",
-          "close": 8.42,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 9.26,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 9.26,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 9.26,
-          "cons": 2
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 180260864.5,
-        "ratioamount": 0.6876,
-        "r0_net": 91475803.62,
-        "r0_ratio": 0.3489,
-        "r0x_ratio": 73.91,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "001277",
-      "name": "速达股份",
-      "added_date": "2026-08-19",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 5,
-      "limit_days": 2,
-      "close": 36.27,
-      "prev_close": 36.27,
-      "first_seal": "09:30:00",
-      "last_seal": "09:38:00",
-      "seal_fund": 223202388,
-      "break_times": 1,
-      "industry": "专用设备",
-      "turnover": 13.56,
-      "amount": 222483222,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-19",
-          "close": 32.97,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-19",
-          "close": 32.97,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 36.27,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 36.27,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 36.27,
-          "cons": 2
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 80728442.81,
-        "ratioamount": 0.9837,
-        "r0_net": 34670865.69,
-        "r0_ratio": 0.4225,
-        "r0x_ratio": 76.67,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002399",
-      "name": "海普瑞",
+      "code": "000523",
+      "name": "红棉股份",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 11.28,
-      "prev_close": 11.28,
-      "first_seal": "09:31:00",
-      "last_seal": "09:31:00",
-      "seal_fund": 102834796,
+      "close": 3.53,
+      "prev_close": 3.53,
+      "first_seal": "14:23:00",
+      "last_seal": "14:23:00",
+      "seal_fund": 22625712.0,
       "break_times": 0,
-      "industry": "化学制药",
-      "turnover": 0.7,
-      "amount": 98805010,
-      "float_cap": 0,
+      "industry": "代糖+饮料+半年报预增+广州国资",
+      "turnover": 11.08,
+      "amount": 0,
+      "float_cap": 6335707700.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 11.28,
+          "close": 3.53,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 11.28,
+          "close": 3.53,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 11.28,
+          "close": 3.53,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 3.53,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -14211155.84,
-        "ratioamount": -0.2848,
-        "r0_net": -1234389.0,
-        "r0_ratio": -0.0247,
-        "r0x_ratio": -129.06,
+        "date": "2026-08-20",
+        "netamount": 168155746.91,
+        "ratioamount": 0.2628,
+        "r0_net": 140355874.73,
+        "r0_ratio": 0.2194,
+        "r0x_ratio": 65.56,
         "source": "sina_moneyflow"
       }
     },
     {
-      "code": "603590",
-      "name": "康辰药业",
+      "code": "600683",
+      "name": "京投发展",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 34.33,
-      "prev_close": 34.33,
-      "first_seal": "09:30:00",
-      "last_seal": "09:30:00",
-      "seal_fund": 2032336,
-      "break_times": 0,
-      "industry": "生物制品",
-      "turnover": 1.63,
-      "amount": 88614847,
-      "float_cap": 0,
+      "close": 10.65,
+      "prev_close": 10.65,
+      "first_seal": "13:06:00",
+      "last_seal": "14:45:00",
+      "seal_fund": 64654020.0,
+      "break_times": 4,
+      "industry": "资产重组+拟购光电子资产+TOD轨道物业+北京国资",
+      "turnover": 10.4,
+      "amount": 0,
+      "float_cap": 7889281400.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 34.33,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 34.33,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 34.33,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -12036004.16,
-        "ratioamount": -0.1732,
-        "r0_net": 400435.0,
-        "r0_ratio": 0.0058,
-        "r0x_ratio": 170.05,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002940",
-      "name": "昂利康",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 28.41,
-      "prev_close": 28.41,
-      "first_seal": "09:31:00",
-      "last_seal": "10:01:00",
-      "seal_fund": 110562628,
-      "break_times": 1,
-      "industry": "化学制药",
-      "turnover": 10.01,
-      "amount": 520697280,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 28.41,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 28.41,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 28.41,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -28604346.0,
-        "ratioamount": -0.1514,
-        "r0_net": -11941047.0,
-        "r0_ratio": -0.0632,
-        "r0x_ratio": -122.64,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "600613",
-      "name": "神奇制药",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 8.56,
-      "prev_close": 8.56,
-      "first_seal": "09:30:00",
-      "last_seal": "09:30:00",
-      "seal_fund": 15747832,
-      "break_times": 0,
-      "industry": "化学制药",
-      "turnover": 12.55,
-      "amount": 514941968,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 8.56,
+          "close": 10.65,
           "cons": 5
         },
         {
           "date": "2026-08-20",
-          "close": 8.56,
+          "close": 10.65,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 8.56,
+          "close": 10.65,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 10.65,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 578402491.67,
-        "ratioamount": 0.442,
-        "r0_net": 441403972.65,
-        "r0_ratio": 0.3373,
-        "r0x_ratio": 89.12,
+        "date": "2026-08-20",
+        "netamount": 163185640.0,
+        "ratioamount": 0.2051,
+        "r0_net": 116775378.65,
+        "r0_ratio": 0.1468,
+        "r0x_ratio": 55.68,
         "source": "sina_moneyflow"
       }
     },
@@ -387,18 +207,18 @@
       "name": "永安药业",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
       "close": 15.76,
       "prev_close": 15.76,
       "first_seal": "09:58:00",
       "last_seal": "14:38:00",
-      "seal_fund": 26855040,
+      "seal_fund": 26855040.0,
       "break_times": 2,
-      "industry": "化学制药",
+      "industry": "牛磺酸+创新药+中报预增",
       "turnover": 29.81,
-      "amount": 1141291968,
-      "float_cap": 0,
+      "amount": 0,
+      "float_cap": 3865746200.0,
       "history": [
         {
           "date": "2026-08-20",
@@ -414,61 +234,321 @@
           "date": "2026-08-20",
           "close": 15.76,
           "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 15.76,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -48093437.71,
-        "ratioamount": -0.0568,
-        "r0_net": -58437938.6,
-        "r0_ratio": -0.069,
-        "r0x_ratio": -138.67,
+        "date": "2026-08-20",
+        "netamount": 613600303.89,
+        "ratioamount": 0.5384,
+        "r0_net": 462045583.65,
+        "r0_ratio": 0.4054,
+        "r0x_ratio": 76.17,
         "source": "sina_moneyflow"
       }
     },
     {
-      "code": "000590",
-      "name": "古汉医药",
+      "code": "003010",
+      "name": "若羽臣",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 9.69,
-      "prev_close": 9.69,
-      "first_seal": "09:31:00",
-      "last_seal": "09:31:00",
-      "seal_fund": 16799252,
+      "close": 29.16,
+      "prev_close": 29.16,
+      "first_seal": "14:18:00",
+      "last_seal": "14:18:00",
+      "seal_fund": 46919373.0,
       "break_times": 0,
-      "industry": "中药Ⅱ",
-      "turnover": 1.45,
-      "amount": 33544631,
-      "float_cap": 0,
+      "industry": "自有品牌高增+宠物经济+中报预增",
+      "turnover": 6.87,
+      "amount": 0,
+      "float_cap": 6594306000.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 9.69,
+          "close": 29.16,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 9.69,
+          "close": 29.16,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 9.69,
+          "close": 29.16,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 29.16,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -114681.0,
-        "ratioamount": -0.0034,
-        "r0_net": 1776186.0,
-        "r0_ratio": 0.0519,
-        "r0x_ratio": 117.99,
+        "date": "2026-08-20",
+        "netamount": 141904842.14,
+        "ratioamount": 0.3254,
+        "r0_net": 97085470.52,
+        "r0_ratio": 0.2226,
+        "r0x_ratio": 65.82,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002552",
+      "name": "宝鼎科技",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 57.04,
+      "prev_close": 57.04,
+      "first_seal": "09:53:00",
+      "last_seal": "14:07:00",
+      "seal_fund": 65533256.0,
+      "break_times": 2,
+      "industry": "覆铜板+黄金+业绩预增+地方国资",
+      "turnover": 10.45,
+      "amount": 0,
+      "float_cap": 21019428000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 57.04,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 57.04,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 57.04,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 57.04,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 1230160095.92,
+        "ratioamount": 0.578,
+        "r0_net": 945615319.0,
+        "r0_ratio": 0.4443,
+        "r0x_ratio": 77.3,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002491",
+      "name": "通鼎互联",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 19.27,
+      "prev_close": 19.27,
+      "first_seal": "10:02:00",
+      "last_seal": "14:07:00",
+      "seal_fund": 235984270.0,
+      "break_times": 4,
+      "industry": "中报扭亏+光纤光缆+光棒扩产",
+      "turnover": 19.1,
+      "amount": 0,
+      "float_cap": 22670554000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 19.27,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 19.27,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 19.27,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 19.27,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 2652854654.76,
+        "ratioamount": 0.6268,
+        "r0_net": 2314143187.27,
+        "r0_ratio": 0.5468,
+        "r0x_ratio": 79.65,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "001333",
+      "name": "光华股份",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 22.19,
+      "prev_close": 22.19,
+      "first_seal": "13:28:00",
+      "last_seal": "13:30:00",
+      "seal_fund": 27082895.0,
+      "break_times": 1,
+      "industry": "聚酯树脂+电子封装材料+产能扩张",
+      "turnover": 3.98,
+      "amount": 0,
+      "float_cap": 2840320000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 22.19,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 22.19,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 22.19,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 22.19,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 55253767.28,
+        "ratioamount": 0.5026,
+        "r0_net": 21355401.0,
+        "r0_ratio": 0.1942,
+        "r0x_ratio": 62.72,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "601118",
+      "name": "海南橡胶",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 6.2,
+      "prev_close": 6.2,
+      "first_seal": "10:18:00",
+      "last_seal": "13:34:00",
+      "seal_fund": 127146872.0,
+      "break_times": 1,
+      "industry": "天然橡胶龙头+海南自贸区+国企改革",
+      "turnover": 4.57,
+      "amount": 0,
+      "float_cap": 26532452000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 6.2,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 6.2,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 6.2,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 6.2,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 339148870.53,
+        "ratioamount": 0.2921,
+        "r0_net": 307772762.41,
+        "r0_ratio": 0.2651,
+        "r0x_ratio": 69.46,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002172",
+      "name": "澳洋健康",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 4.44,
+      "prev_close": 4.44,
+      "first_seal": "13:11:00",
+      "last_seal": "13:11:00",
+      "seal_fund": 101419368.0,
+      "break_times": 0,
+      "industry": "此前炒作生肖+脑机接口+医疗服务+国企改革",
+      "turnover": 26.36,
+      "amount": 0,
+      "float_cap": 3397224800.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 4.44,
+          "cons": 5
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.44,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.44,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.44,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 171096912.7,
+        "ratioamount": 0.2062,
+        "r0_net": 111875782.7,
+        "r0_ratio": 0.1348,
+        "r0x_ratio": 53.71,
         "source": "sina_moneyflow"
       }
     },
@@ -477,18 +557,18 @@
       "name": "金健米业",
       "added_date": "2026-08-17",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 9,
+      "days_in_pool": 10,
       "limit_days": 4,
       "close": 8.6,
       "prev_close": 8.6,
       "first_seal": "09:31:00",
       "last_seal": "10:13:00",
-      "seal_fund": 8262880,
+      "seal_fund": 54634940.0,
       "break_times": 4,
-      "industry": "农产品加",
+      "industry": "粮食安全+粮油加工+大健康食品+湖南国资",
       "turnover": 43.41,
-      "amount": 2357097472,
-      "float_cap": 0,
+      "amount": 0,
+      "float_cap": 5519335700.0,
       "history": [
         {
           "date": "2026-08-17",
@@ -534,1871 +614,21 @@
           "date": "2026-08-20",
           "close": 8.6,
           "cons": 4
+        },
+        {
+          "date": "2026-08-20",
+          "close": 8.6,
+          "cons": 4
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 155584835.38,
-        "ratioamount": 0.6842,
-        "r0_net": 22011133.86,
-        "r0_ratio": 0.0968,
-        "r0x_ratio": 44.11,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "000710",
-      "name": "贝瑞基因",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 9.37,
-      "prev_close": 9.37,
-      "first_seal": "09:32:00",
-      "last_seal": "09:32:00",
-      "seal_fund": 31012826,
-      "break_times": 0,
-      "industry": "医疗服务",
-      "turnover": 4.65,
-      "amount": 142630809,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 9.37,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 9.37,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 9.37,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -15904789.0,
-        "ratioamount": -0.1517,
-        "r0_net": -1118740.0,
-        "r0_ratio": -0.0107,
-        "r0x_ratio": -166.61,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603801",
-      "name": "志邦家居",
-      "added_date": "2026-08-19",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 5,
-      "limit_days": 2,
-      "close": 7.23,
-      "prev_close": 7.23,
-      "first_seal": "09:32:00",
-      "last_seal": "09:34:00",
-      "seal_fund": 3697422,
-      "break_times": 1,
-      "industry": "家居用品",
-      "turnover": 4.76,
-      "amount": 147231727,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-19",
-          "close": 6.57,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-19",
-          "close": 6.57,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 7.23,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 7.23,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 7.23,
-          "cons": 2
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 77930199.44,
-        "ratioamount": 0.8844,
-        "r0_net": 27886810.0,
-        "r0_ratio": 0.3165,
-        "r0x_ratio": 72.38,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603988",
-      "name": "中电电机",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 21.2,
-      "prev_close": 21.2,
-      "first_seal": "09:33:00",
-      "last_seal": "09:33:00",
-      "seal_fund": 2259920,
-      "break_times": 0,
-      "industry": "电机Ⅱ",
-      "turnover": 2.74,
-      "amount": 135831445,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 21.2,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 21.2,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 21.2,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -5246780.0,
-        "ratioamount": -0.0318,
-        "r0_net": 6940765.0,
-        "r0_ratio": 0.0421,
-        "r0x_ratio": 144.04,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "601700",
-      "name": "风范股份",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 7.5,
-      "prev_close": 7.5,
-      "first_seal": "09:33:00",
-      "last_seal": "09:33:00",
-      "seal_fund": 5322000,
-      "break_times": 0,
-      "industry": "电网设备",
-      "turnover": 7.25,
-      "amount": 612844896,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 7.5,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 7.5,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 7.5,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -10972350.0,
-        "ratioamount": -0.0086,
-        "r0_net": 3177132.94,
-        "r0_ratio": 0.0025,
-        "r0x_ratio": 177.96,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002030",
-      "name": "达安基因",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 5.97,
-      "prev_close": 5.97,
-      "first_seal": "09:32:00",
-      "last_seal": "09:32:00",
-      "seal_fund": 84974263,
-      "break_times": 0,
-      "industry": "医疗器械",
-      "turnover": 2.56,
-      "amount": 213092196,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 5.97,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 5.97,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 5.97,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -38633172.5,
-        "ratioamount": -0.2713,
-        "r0_net": -12410133.0,
-        "r0_ratio": -0.0871,
-        "r0x_ratio": -111.2,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "001210",
-      "name": "金房能源",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 29.76,
-      "prev_close": 29.76,
-      "first_seal": "09:34:00",
-      "last_seal": "09:34:00",
-      "seal_fund": 130432544,
-      "break_times": 0,
-      "industry": "电力",
-      "turnover": 3.72,
-      "amount": 145946381,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 29.76,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 29.76,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 29.76,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -10826276.43,
-        "ratioamount": -0.0246,
-        "r0_net": -6429918.26,
-        "r0_ratio": -0.0146,
-        "r0x_ratio": -153.57,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603036",
-      "name": "如通股份",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 15.49,
-      "prev_close": 15.49,
-      "first_seal": "11:01:00",
-      "last_seal": "11:04:00",
-      "seal_fund": 381054,
-      "break_times": 1,
-      "industry": "专用设备",
-      "turnover": 9.06,
-      "amount": 284477840,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 15.49,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 15.49,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 15.49,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 16231422.0,
-        "ratioamount": 0.1117,
-        "r0_net": 8301095.0,
-        "r0_ratio": 0.0571,
-        "r0x_ratio": 68.44,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002880",
-      "name": "卫光生物",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 21.89,
-      "prev_close": 21.89,
-      "first_seal": "09:34:00",
-      "last_seal": "09:34:00",
-      "seal_fund": 55848920,
-      "break_times": 0,
-      "industry": "生物制品",
-      "turnover": 1.19,
-      "amount": 58704783,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 21.89,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 21.89,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 21.89,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -3528903.0,
-        "ratioamount": -0.1273,
-        "r0_net": 1252359.0,
-        "r0_ratio": 0.0452,
-        "r0x_ratio": 118.45,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603392",
-      "name": "万泰生物",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 30.81,
-      "prev_close": 30.81,
-      "first_seal": "09:34:00",
-      "last_seal": "09:34:00",
-      "seal_fund": 1324830,
-      "break_times": 0,
-      "industry": "医疗器械",
-      "turnover": 0.54,
-      "amount": 208890650,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 30.81,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 30.81,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 30.81,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -11369488.75,
-        "ratioamount": -0.0893,
-        "r0_net": -2562836.0,
-        "r0_ratio": -0.0201,
-        "r0x_ratio": -143.38,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002743",
-      "name": "富煌钢构",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 4.42,
-      "prev_close": 4.42,
-      "first_seal": "09:35:00",
-      "last_seal": "09:43:00",
-      "seal_fund": 9900800,
-      "break_times": 1,
-      "industry": "专业工程",
-      "turnover": 10.72,
-      "amount": 200992734,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 4.42,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.42,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.42,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -22586384.0,
-        "ratioamount": -0.3953,
-        "r0_net": -12956157.0,
-        "r0_ratio": -0.2268,
-        "r0x_ratio": -113.94,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "000017",
-      "name": "深中华A",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 6.46,
-      "prev_close": 6.46,
-      "first_seal": "09:35:00",
-      "last_seal": "09:35:00",
-      "seal_fund": 33997532,
-      "break_times": 0,
-      "industry": "饰品",
-      "turnover": 2.38,
-      "amount": 66504400,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 6.46,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 6.46,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 6.46,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -2204756.66,
-        "ratioamount": -0.0511,
-        "r0_net": 2226300.0,
-        "r0_ratio": 0.0516,
-        "r0x_ratio": 117.2,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "000520",
-      "name": "凤凰航运",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 4.41,
-      "prev_close": 4.41,
-      "first_seal": "09:38:00",
-      "last_seal": "09:38:00",
-      "seal_fund": 68280100,
-      "break_times": 0,
-      "industry": "航运港口",
-      "turnover": 3.09,
-      "amount": 135718201,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 4.41,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.41,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.41,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -19414916.29,
-        "ratioamount": -0.137,
-        "r0_net": 1098013.0,
-        "r0_ratio": 0.0077,
-        "r0x_ratio": 169.78,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "601877",
-      "name": "正泰电器",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 26.28,
-      "prev_close": 26.28,
-      "first_seal": "09:38:00",
-      "last_seal": "09:38:00",
-      "seal_fund": 3495240,
-      "break_times": 0,
-      "industry": "电网设备",
-      "turnover": 1.84,
-      "amount": 1034728768,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 26.28,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 26.28,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 26.28,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -35555219.42,
-        "ratioamount": -0.0775,
-        "r0_net": -52591975.56,
-        "r0_ratio": -0.1147,
-        "r0x_ratio": -106.67,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603285",
-      "name": "键邦股份",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 37.51,
-      "prev_close": 37.51,
-      "first_seal": "09:38:00",
-      "last_seal": "09:38:00",
-      "seal_fund": 1916761,
-      "break_times": 0,
-      "industry": "化学制品",
-      "turnover": 7.61,
-      "amount": 175136820,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 37.51,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 37.51,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 37.51,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -37919639.62,
-        "ratioamount": -0.1295,
-        "r0_net": -17679221.0,
-        "r0_ratio": -0.0604,
-        "r0x_ratio": -148.88,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603376",
-      "name": "大明电子",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 28.4,
-      "prev_close": 28.4,
-      "first_seal": "09:42:00",
-      "last_seal": "09:56:00",
-      "seal_fund": 585040,
-      "break_times": 1,
-      "industry": "汽车零部",
-      "turnover": 13.34,
-      "amount": 119941809,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 28.4,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 28.4,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 28.4,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -14491651.06,
-        "ratioamount": -0.2084,
-        "r0_net": -1151750.0,
-        "r0_ratio": -0.0166,
-        "r0x_ratio": -165.68,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002579",
-      "name": "中京电子",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 15.29,
-      "prev_close": 15.29,
-      "first_seal": "09:41:00",
-      "last_seal": "09:41:00",
-      "seal_fund": 185184620,
-      "break_times": 0,
-      "industry": "元件",
-      "turnover": 5.7,
-      "amount": 495325952,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 15.29,
-          "cons": 3
-        },
-        {
-          "date": "2026-08-20",
-          "close": 15.29,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 15.29,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -70002235.64,
-        "ratioamount": -0.0633,
-        "r0_net": 14829197.44,
-        "r0_ratio": 0.0134,
-        "r0x_ratio": 170.76,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603519",
-      "name": "立霸股份",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 16.53,
-      "prev_close": 16.53,
-      "first_seal": "09:43:00",
-      "last_seal": "11:07:00",
-      "seal_fund": 1157100,
-      "break_times": 2,
-      "industry": "家电零部",
-      "turnover": 7.67,
-      "amount": 333642624,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 16.53,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 16.53,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 16.53,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -11446864.0,
-        "ratioamount": -0.0907,
-        "r0_net": 1432448.0,
-        "r0_ratio": 0.0113,
-        "r0x_ratio": 156.36,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603882",
-      "name": "金域医学",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 30.76,
-      "prev_close": 30.76,
-      "first_seal": "09:43:00",
-      "last_seal": "09:43:00",
-      "seal_fund": 2577688,
-      "break_times": 0,
-      "industry": "医疗服务",
-      "turnover": 2.37,
-      "amount": 331003648,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 30.76,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 30.76,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 30.76,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -10052659.68,
-        "ratioamount": -0.0457,
-        "r0_net": 1535943.0,
-        "r0_ratio": 0.007,
-        "r0x_ratio": 168.7,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603958",
-      "name": "哈森股份",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 18.68,
-      "prev_close": 18.68,
-      "first_seal": "09:43:00",
-      "last_seal": "09:43:00",
-      "seal_fund": 2067876,
-      "break_times": 0,
-      "industry": "服装家纺",
-      "turnover": 7.69,
-      "amount": 299677168,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 18.68,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 18.68,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 18.68,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -18865229.87,
-        "ratioamount": -0.0326,
-        "r0_net": 13879154.4,
-        "r0_ratio": 0.024,
-        "r0x_ratio": 164.15,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "600250",
-      "name": "南京商旅",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 9.24,
-      "prev_close": 9.24,
-      "first_seal": "10:22:00",
-      "last_seal": "10:22:00",
-      "seal_fund": 2430120,
-      "break_times": 0,
-      "industry": "旅游及景",
-      "turnover": 8.83,
-      "amount": 248528336,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 9.24,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 9.24,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 9.24,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -4849475.0,
-        "ratioamount": -0.1116,
-        "r0_net": 0.0,
-        "r0_ratio": 0.0,
-        "r0x_ratio": 180.0,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603016",
-      "name": "新宏泰",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 30.68,
-      "prev_close": 30.68,
-      "first_seal": "09:45:00",
-      "last_seal": "10:09:00",
-      "seal_fund": 1150500,
-      "break_times": 1,
-      "industry": "电网设备",
-      "turnover": 3.53,
-      "amount": 157191578,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 30.68,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 30.68,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 30.68,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -12055243.0,
-        "ratioamount": -0.219,
-        "r0_net": 0.0,
-        "r0_ratio": 0.0,
-        "r0x_ratio": 180.0,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603177",
-      "name": "德创环保",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 11.0,
-      "prev_close": 11.0,
-      "first_seal": "09:48:00",
-      "last_seal": "09:48:00",
-      "seal_fund": 1019700,
-      "break_times": 0,
-      "industry": "环境治理",
-      "turnover": 3.38,
-      "amount": 73558904,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 11.0,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 11.0,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 11.0,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -12731521.0,
-        "ratioamount": -0.1151,
-        "r0_net": -3657360.0,
-        "r0_ratio": -0.0331,
-        "r0x_ratio": -153.71,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002437",
-      "name": "誉衡药业",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 4.73,
-      "prev_close": 4.73,
-      "first_seal": "09:49:00",
-      "last_seal": "09:49:00",
-      "seal_fund": 254354288,
-      "break_times": 0,
-      "industry": "化学制药",
-      "turnover": 22.96,
-      "amount": 2222111536,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 4.73,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.73,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.73,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 17964512.59,
-        "ratioamount": 0.0054,
-        "r0_net": 51892020.87,
-        "r0_ratio": 0.0156,
-        "r0x_ratio": 170.85,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603637",
-      "name": "镇海股份",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 14.06,
-      "prev_close": 14.06,
-      "first_seal": "09:51:00",
-      "last_seal": "09:51:00",
-      "seal_fund": 1353978,
-      "break_times": 0,
-      "industry": "专业工程",
-      "turnover": 4.68,
-      "amount": 153321761,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 14.06,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 14.06,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 14.06,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -35320019.59,
-        "ratioamount": -0.2251,
-        "r0_net": -13329374.0,
-        "r0_ratio": -0.085,
-        "r0x_ratio": -134.07,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603716",
-      "name": "塞力医疗",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 17.3,
-      "prev_close": 17.3,
-      "first_seal": "09:51:00",
-      "last_seal": "09:51:00",
-      "seal_fund": 2546560,
-      "break_times": 0,
-      "industry": "医药商业",
-      "turnover": 9.15,
-      "amount": 350012624,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 17.3,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 17.3,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 17.3,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -16200645.71,
-        "ratioamount": -0.0772,
-        "r0_net": -7486368.0,
-        "r0_ratio": -0.0357,
-        "r0x_ratio": -148.47,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "000007",
-      "name": "全新好",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 12.09,
-      "prev_close": 12.09,
-      "first_seal": "09:53:00",
-      "last_seal": "10:43:00",
-      "seal_fund": 64290980,
-      "break_times": 1,
-      "industry": "一般零售",
-      "turnover": 5.23,
-      "amount": 214508937,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 12.09,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 12.09,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 12.09,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -36586235.24,
-        "ratioamount": -0.1906,
-        "r0_net": -16564200.0,
-        "r0_ratio": -0.0863,
-        "r0x_ratio": -125.9,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002552",
-      "name": "宝鼎科技",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 57.04,
-      "prev_close": 57.04,
-      "first_seal": "09:53:00",
-      "last_seal": "14:07:00",
-      "seal_fund": 65533256,
-      "break_times": 2,
-      "industry": "元件",
-      "turnover": 10.45,
-      "amount": 2128262368,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 57.04,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 57.04,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 57.04,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -98962803.9,
-        "ratioamount": -0.0414,
-        "r0_net": 2248373.0,
-        "r0_ratio": 0.0009,
-        "r0x_ratio": 179.46,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "605116",
-      "name": "奥锐特",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 22.0,
-      "prev_close": 22.0,
-      "first_seal": "09:55:00",
-      "last_seal": "09:55:00",
-      "seal_fund": 1133000,
-      "break_times": 0,
-      "industry": "化学制药",
-      "turnover": 2.01,
-      "amount": 175428024,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 22.0,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 22.0,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 22.0,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 2591460.0,
-        "ratioamount": 0.0367,
-        "r0_net": -129779.0,
-        "r0_ratio": -0.0018,
-        "r0x_ratio": -174.65,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "600539",
-      "name": "狮头股份",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 15.36,
-      "prev_close": 15.36,
-      "first_seal": "09:58:00",
-      "last_seal": "10:27:00",
-      "seal_fund": 1294848,
-      "break_times": 1,
-      "industry": "互联网电",
-      "turnover": 12.49,
-      "amount": 432388000,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 15.36,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 15.36,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 15.36,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -21568495.95,
-        "ratioamount": -0.074,
-        "r0_net": -12689486.0,
-        "r0_ratio": -0.0436,
-        "r0x_ratio": -132.46,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002491",
-      "name": "通鼎互联",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 19.27,
-      "prev_close": 19.27,
-      "first_seal": "10:02:00",
-      "last_seal": "14:07:00",
-      "seal_fund": 235984274,
-      "break_times": 4,
-      "industry": "通信设备",
-      "turnover": 19.1,
-      "amount": 4235345280,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 19.27,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 19.27,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 19.27,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -291400302.81,
-        "ratioamount": -0.1073,
-        "r0_net": -145604088.5,
-        "r0_ratio": -0.0536,
-        "r0x_ratio": -151.83,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "001360",
-      "name": "南矿集团",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 18.11,
-      "prev_close": 18.11,
-      "first_seal": "10:14:00",
-      "last_seal": "10:14:00",
-      "seal_fund": 66385827,
-      "break_times": 0,
-      "industry": "专用设备",
-      "turnover": 4.79,
-      "amount": 106572249,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 18.11,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 18.11,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 18.11,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -13014428.0,
-        "ratioamount": -0.1635,
-        "r0_net": -6003151.0,
-        "r0_ratio": -0.0754,
-        "r0x_ratio": -128.25,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "601118",
-      "name": "海南橡胶",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 6.2,
-      "prev_close": 6.2,
-      "first_seal": "10:18:00",
-      "last_seal": "13:34:00",
-      "seal_fund": 1768240,
-      "break_times": 1,
-      "industry": "种植业",
-      "turnover": 4.57,
-      "amount": 1162765616,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 6.2,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 6.2,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 6.2,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -41758998.08,
-        "ratioamount": -0.0524,
-        "r0_net": -71916223.26,
-        "r0_ratio": -0.0902,
-        "r0x_ratio": -95.57,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603578",
-      "name": "三星新材",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 13.75,
-      "prev_close": 13.75,
-      "first_seal": "10:21:00",
-      "last_seal": "10:21:00",
-      "seal_fund": 911625,
-      "break_times": 0,
-      "industry": "家电零部",
-      "turnover": 3.15,
-      "amount": 75630301,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 13.75,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 13.75,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 13.75,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -13969711.6,
-        "ratioamount": -0.2509,
-        "r0_net": -2331201.0,
-        "r0_ratio": -0.0419,
-        "r0x_ratio": -145.74,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002811",
-      "name": "郑中设计",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 13.32,
-      "prev_close": 13.32,
-      "first_seal": "10:21:00",
-      "last_seal": "10:21:00",
-      "seal_fund": 84123658,
-      "break_times": 0,
-      "industry": "装修装饰",
-      "turnover": 5.87,
-      "amount": 214846231,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 13.32,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 13.32,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 13.32,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 12725234.81,
-        "ratioamount": 0.0496,
-        "r0_net": 11232913.0,
-        "r0_ratio": 0.0438,
-        "r0x_ratio": 98.53,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603580",
-      "name": "艾艾精工",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 74.79,
-      "prev_close": 74.79,
-      "first_seal": "10:31:00",
-      "last_seal": "10:31:00",
-      "seal_fund": 4397652,
-      "break_times": 0,
-      "industry": "塑料",
-      "turnover": 10.12,
-      "amount": 957283136,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 74.79,
-          "cons": 3
-        },
-        {
-          "date": "2026-08-20",
-          "close": 74.79,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 74.79,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 42977381.01,
-        "ratioamount": 0.0349,
-        "r0_net": -11831548.08,
-        "r0_ratio": -0.0096,
-        "r0x_ratio": -5.6,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "605080",
-      "name": "浙江自然",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 22.34,
-      "prev_close": 22.34,
-      "first_seal": "10:42:00",
-      "last_seal": "14:55:00",
-      "seal_fund": 174252,
-      "break_times": 3,
-      "industry": "文娱用品",
-      "turnover": 7.25,
-      "amount": 222597846,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 22.34,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 22.34,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 22.34,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -733050.0,
-        "ratioamount": -0.0158,
-        "r0_net": 2444445.0,
-        "r0_ratio": 0.0527,
-        "r0x_ratio": 97.4,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "603626",
-      "name": "科森科技",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 16.95,
-      "prev_close": 16.95,
-      "first_seal": "10:52:00",
-      "last_seal": "11:24:00",
-      "seal_fund": 2281470,
-      "break_times": 2,
-      "industry": "消费电子",
-      "turnover": 8.9,
-      "amount": 814107504,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 16.95,
-          "cons": 2
-        },
-        {
-          "date": "2026-08-20",
-          "close": 16.95,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 16.95,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -43287397.41,
-        "ratioamount": -0.0765,
-        "r0_net": -23413.7,
-        "r0_ratio": -0.0,
-        "r0x_ratio": -179.97,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002313",
-      "name": "日海智能",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 8.78,
-      "prev_close": 8.78,
-      "first_seal": "11:23:00",
-      "last_seal": "11:23:00",
-      "seal_fund": 1966720,
-      "break_times": 0,
-      "industry": "通信设备",
-      "turnover": 5.6,
-      "amount": 179593968,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 8.78,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 8.78,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 8.78,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -9243560.0,
-        "ratioamount": -0.1897,
-        "r0_net": 0.0,
-        "r0_ratio": 0.0,
-        "r0x_ratio": 180.0,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "600327",
-      "name": "大东方",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 4.24,
-      "prev_close": 4.24,
-      "first_seal": "11:15:00",
-      "last_seal": "11:15:00",
-      "seal_fund": 1200768,
-      "break_times": 0,
-      "industry": "一般零售",
-      "turnover": 5.87,
-      "amount": 215283196,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 4.24,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.24,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.24,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -15252100.48,
-        "ratioamount": -0.2324,
-        "r0_net": -1338199.56,
-        "r0_ratio": -0.0204,
-        "r0x_ratio": -141.15,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "600211",
-      "name": "西藏药业",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 41.86,
-      "prev_close": 41.86,
-      "first_seal": "11:30:00",
-      "last_seal": "11:30:00",
-      "seal_fund": 1699516,
-      "break_times": 0,
-      "industry": "生物制品",
-      "turnover": 4.5,
-      "amount": 596200864,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 41.86,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 41.86,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 41.86,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -26155360.64,
-        "ratioamount": -0.1756,
-        "r0_net": -8147709.0,
-        "r0_ratio": -0.0547,
-        "r0x_ratio": -109.46,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "600649",
-      "name": "城投控股",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 4.16,
-      "prev_close": 4.16,
-      "first_seal": "13:01:00",
-      "last_seal": "14:57:00",
-      "seal_fund": 318240,
-      "break_times": 7,
-      "industry": "房地产开",
-      "turnover": 5.22,
-      "amount": 530918512,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 4.16,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.16,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.16,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 31477891.28,
-        "ratioamount": 0.2422,
-        "r0_net": 15092943.76,
-        "r0_ratio": 0.1161,
-        "r0x_ratio": 82.09,
+        "date": "2026-08-20",
+        "netamount": 1703729606.69,
+        "ratioamount": 0.7234,
+        "r0_net": 1499511842.01,
+        "r0_ratio": 0.6367,
+        "r0x_ratio": 81.1,
         "source": "sina_moneyflow"
       }
     },
@@ -2407,19 +637,24 @@
       "name": "宇环数控",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
       "close": 30.67,
       "prev_close": 30.67,
       "first_seal": "13:04:00",
       "last_seal": "13:04:00",
-      "seal_fund": 65649135,
+      "seal_fund": 65649135.0,
       "break_times": 0,
-      "industry": "通用设备",
+      "industry": "机器人+消费电子+数控机床",
       "turnover": 20.08,
-      "amount": 638273888,
-      "float_cap": 0,
+      "amount": 0,
+      "float_cap": 3299047700.0,
       "history": [
+        {
+          "date": "2026-08-20",
+          "close": 30.67,
+          "cons": 1
+        },
         {
           "date": "2026-08-20",
           "close": 30.67,
@@ -2438,282 +673,2292 @@
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -19922671.2,
-        "ratioamount": -0.056,
-        "r0_net": 198151.32,
-        "r0_ratio": 0.0006,
-        "r0x_ratio": 179.5,
+        "date": "2026-08-20",
+        "netamount": 235468433.88,
+        "ratioamount": 0.3692,
+        "r0_net": 177011559.74,
+        "r0_ratio": 0.2775,
+        "r0x_ratio": 70.17,
         "source": "sina_moneyflow"
       }
     },
     {
-      "code": "600683",
-      "name": "京投发展",
+      "code": "600211",
+      "name": "西藏药业",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 10.65,
-      "prev_close": 10.65,
-      "first_seal": "13:06:00",
-      "last_seal": "14:45:00",
-      "seal_fund": 1921260,
-      "break_times": 4,
-      "industry": "房地产开",
-      "turnover": 10.4,
-      "amount": 795905648,
-      "float_cap": 0,
-      "history": [
-        {
-          "date": "2026-08-20",
-          "close": 10.65,
-          "cons": 5
-        },
-        {
-          "date": "2026-08-20",
-          "close": 10.65,
-          "cons": 1
-        },
-        {
-          "date": "2026-08-20",
-          "close": 10.65,
-          "cons": 1
-        }
-      ],
-      "seal_recalced": true,
-      "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -100653684.25,
-        "ratioamount": -0.1932,
-        "r0_net": -26833814.0,
-        "r0_ratio": -0.0515,
-        "r0x_ratio": -152.84,
-        "source": "sina_moneyflow"
-      }
-    },
-    {
-      "code": "002172",
-      "name": "澳洋健康",
-      "added_date": "2026-08-20",
-      "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
-      "limit_days": 1,
-      "close": 4.44,
-      "prev_close": 4.44,
-      "first_seal": "13:11:00",
-      "last_seal": "13:11:00",
-      "seal_fund": 101419368,
+      "close": 41.86,
+      "prev_close": 41.86,
+      "first_seal": "11:30:00",
+      "last_seal": "11:30:00",
+      "seal_fund": 42161225.0,
       "break_times": 0,
-      "industry": "医疗服务",
-      "turnover": 26.36,
-      "amount": 829644048,
-      "float_cap": 0,
+      "industry": "创新药+基因编辑+半年报增长",
+      "turnover": 4.5,
+      "amount": 0,
+      "float_cap": 13492282000.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 4.44,
-          "cons": 5
-        },
-        {
-          "date": "2026-08-20",
-          "close": 4.44,
+          "close": 41.86,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 4.44,
+          "close": 41.86,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 41.86,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 41.86,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -8848977.31,
-        "ratioamount": -0.0088,
-        "r0_net": 28184012.44,
-        "r0_ratio": 0.028,
-        "r0x_ratio": 164.37,
+        "date": "2026-08-20",
+        "netamount": 225230851.92,
+        "ratioamount": 0.3803,
+        "r0_net": 159261243.37,
+        "r0_ratio": 0.2689,
+        "r0x_ratio": 69.58,
         "source": "sina_moneyflow"
       }
     },
     {
-      "code": "001333",
-      "name": "光华股份",
+      "code": "603626",
+      "name": "科森科技",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 22.19,
-      "prev_close": 22.19,
-      "first_seal": "13:28:00",
-      "last_seal": "13:30:00",
-      "seal_fund": 27082895,
+      "close": 16.95,
+      "prev_close": 16.95,
+      "first_seal": "10:52:00",
+      "last_seal": "11:24:00",
+      "seal_fund": 110161610.0,
+      "break_times": 2,
+      "industry": "机器人+消费电子+AI散热+中报扭亏",
+      "turnover": 8.9,
+      "amount": 0,
+      "float_cap": 9405210700.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 16.95,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 16.95,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 16.95,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 16.95,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 322919499.3,
+        "ratioamount": 0.397,
+        "r0_net": 195012140.95,
+        "r0_ratio": 0.2398,
+        "r0x_ratio": 67.37,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002313",
+      "name": "日海智能",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 8.78,
+      "prev_close": 8.78,
+      "first_seal": "11:23:00",
+      "last_seal": "11:23:00",
+      "seal_fund": 1966720.0,
+      "break_times": 0,
+      "industry": "端侧AI智能模组+机器人+半年报扭亏+珠海国资",
+      "turnover": 5.6,
+      "amount": 0,
+      "float_cap": 3287050300.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 8.78,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 8.78,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 8.78,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 8.78,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 109840210.0,
+        "ratioamount": 0.6172,
+        "r0_net": 55433980.0,
+        "r0_ratio": 0.3115,
+        "r0x_ratio": 72.16,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "600327",
+      "name": "大东方",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 4.24,
+      "prev_close": 4.24,
+      "first_seal": "11:15:00",
+      "last_seal": "11:15:00",
+      "seal_fund": 10367308.8,
+      "break_times": 0,
+      "industry": "医疗服务+百货零售+回购",
+      "turnover": 5.87,
+      "amount": 0,
+      "float_cap": 3751465200.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 4.24,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.24,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.24,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.24,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 160706019.96,
+        "ratioamount": 0.7475,
+        "r0_net": 76789732.0,
+        "r0_ratio": 0.3572,
+        "r0x_ratio": 74.17,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603519",
+      "name": "立霸股份",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 16.53,
+      "prev_close": 16.53,
+      "first_seal": "09:43:00",
+      "last_seal": "11:07:00",
+      "seal_fund": 13460379.0,
+      "break_times": 2,
+      "industry": "半年报增长+股权转让+第三代半导体+家电复合材料",
+      "turnover": 7.67,
+      "amount": 0,
+      "float_cap": 4402399200.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 16.53,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 16.53,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 16.53,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 16.53,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 239016812.07,
+        "ratioamount": 0.7179,
+        "r0_net": 134234273.38,
+        "r0_ratio": 0.4032,
+        "r0x_ratio": 76.1,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603036",
+      "name": "如通股份",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 15.49,
+      "prev_close": 15.49,
+      "first_seal": "11:01:00",
+      "last_seal": "11:04:00",
+      "seal_fund": 15658841.0,
       "break_times": 1,
-      "industry": "塑料",
-      "turnover": 3.98,
-      "amount": 110018984,
-      "float_cap": 0,
+      "industry": "油气钻采+天然气+轨交业务",
+      "turnover": 9.06,
+      "amount": 0,
+      "float_cap": 3191033300.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 22.19,
+          "close": 15.49,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 22.19,
+          "close": 15.49,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 22.19,
+          "close": 15.49,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 15.49,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -5189512.0,
-        "ratioamount": -0.0985,
-        "r0_net": 0.0,
-        "r0_ratio": 0.0,
-        "r0x_ratio": 180.0,
+        "date": "2026-08-20",
+        "netamount": 87652486.45,
+        "ratioamount": 0.3087,
+        "r0_net": 52802359.35,
+        "r0_ratio": 0.1859,
+        "r0x_ratio": 61.69,
         "source": "sina_moneyflow"
       }
     },
     {
-      "code": "003010",
-      "name": "若羽臣",
+      "code": "000007",
+      "name": "全新好",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 29.16,
-      "prev_close": 29.16,
-      "first_seal": "14:18:00",
-      "last_seal": "14:18:00",
-      "seal_fund": 46919373,
-      "break_times": 0,
-      "industry": "互联网电",
-      "turnover": 6.87,
-      "amount": 437117568,
-      "float_cap": 0,
+      "close": 12.09,
+      "prev_close": 12.09,
+      "first_seal": "09:53:00",
+      "last_seal": "10:43:00",
+      "seal_fund": 64290981.0,
+      "break_times": 1,
+      "industry": "物业管理+汽车销售+医疗器械销售+粤港澳大湾区",
+      "turnover": 5.23,
+      "amount": 0,
+      "float_cap": 4188556900.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 29.16,
+          "close": 12.09,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 12.09,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 29.16,
+          "close": 12.09,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 29.16,
+          "close": 12.09,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -42525319.4,
-        "ratioamount": -0.149,
-        "r0_net": -14876668.0,
-        "r0_ratio": -0.0521,
-        "r0x_ratio": -135.2,
+        "date": "2026-08-20",
+        "netamount": 97185137.77,
+        "ratioamount": 0.4531,
+        "r0_net": 35198973.0,
+        "r0_ratio": 0.1641,
+        "r0x_ratio": 58.62,
         "source": "sina_moneyflow"
       }
     },
     {
-      "code": "000523",
-      "name": "红棉股份",
+      "code": "603580",
+      "name": "艾艾精工",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 3.53,
-      "prev_close": 3.53,
-      "first_seal": "14:23:00",
-      "last_seal": "14:23:00",
-      "seal_fund": 22625711,
+      "close": 74.79,
+      "prev_close": 74.79,
+      "first_seal": "10:31:00",
+      "last_seal": "10:31:00",
+      "seal_fund": 41725341.0,
       "break_times": 0,
-      "industry": "综合Ⅱ",
-      "turnover": 15.01,
-      "amount": 646299424,
-      "float_cap": 0,
+      "industry": "控制权拟变更+轻型输送带+精密金属结构件",
+      "turnover": 10.12,
+      "amount": 0,
+      "float_cap": 9773048600.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 3.53,
+          "close": 74.79,
+          "cons": 3
+        },
+        {
+          "date": "2026-08-20",
+          "close": 74.79,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 3.53,
+          "close": 74.79,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 3.53,
+          "close": 74.79,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": 127659928.59,
-        "ratioamount": 0.2491,
-        "r0_net": 107264684.84,
-        "r0_ratio": 0.2093,
-        "r0x_ratio": 75.88,
+        "date": "2026-08-20",
+        "netamount": 165413234.6,
+        "ratioamount": 0.1732,
+        "r0_net": 103814974.4,
+        "r0_ratio": 0.1087,
+        "r0x_ratio": 47.38,
         "source": "sina_moneyflow"
       }
     },
     {
-      "code": "603666",
-      "name": "亿嘉和",
+      "code": "600539",
+      "name": "狮头股份",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-20",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 1,
-      "close": 26.07,
-      "prev_close": 26.07,
-      "first_seal": "14:56:00",
-      "last_seal": "14:56:00",
-      "seal_fund": 195525,
-      "break_times": 0,
-      "industry": "自动化设",
-      "turnover": 3.13,
-      "amount": 160637436,
-      "float_cap": 0,
+      "close": 15.36,
+      "prev_close": 15.36,
+      "first_seal": "09:58:00",
+      "last_seal": "10:27:00",
+      "seal_fund": 38572032.0,
+      "break_times": 1,
+      "industry": "半导体先进封装+机器视觉+AI应用+并购重组",
+      "turnover": 12.49,
+      "amount": 0,
+      "float_cap": 3532800000.0,
       "history": [
         {
           "date": "2026-08-20",
-          "close": 26.07,
+          "close": 15.36,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 26.07,
+          "close": 15.36,
           "cons": 1
         },
         {
           "date": "2026-08-20",
-          "close": 26.07,
+          "close": 15.36,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 15.36,
           "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-19",
-        "netamount": -32563887.35,
-        "ratioamount": -0.219,
-        "r0_net": -12885319.0,
-        "r0_ratio": -0.0866,
-        "r0x_ratio": -138.85,
+        "date": "2026-08-20",
+        "netamount": 286735999.16,
+        "ratioamount": 0.6633,
+        "r0_net": 193076138.0,
+        "r0_ratio": 0.4466,
+        "r0x_ratio": 77.34,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "600250",
+      "name": "南京商旅",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 9.24,
+      "prev_close": 9.24,
+      "first_seal": "10:22:00",
+      "last_seal": "10:22:00",
+      "seal_fund": 59698725.0,
+      "break_times": 0,
+      "industry": "国资整合+旅游+商贸+南京国资",
+      "turnover": 8.83,
+      "amount": 0,
+      "float_cap": 2890192600.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 9.24,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.24,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.24,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.24,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 115922062.76,
+        "ratioamount": 0.467,
+        "r0_net": 82520805.0,
+        "r0_ratio": 0.3324,
+        "r0x_ratio": 73.26,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002811",
+      "name": "郑中设计",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 13.32,
+      "prev_close": 13.32,
+      "first_seal": "10:21:00",
+      "last_seal": "10:21:00",
+      "seal_fund": 84123659.0,
+      "break_times": 0,
+      "industry": "MEMS芯片+室内设计+订单高增",
+      "turnover": 5.87,
+      "amount": 0,
+      "float_cap": 3764058300.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 13.32,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 13.32,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 13.32,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 13.32,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 87134726.7,
+        "ratioamount": 0.4071,
+        "r0_net": 33332174.0,
+        "r0_ratio": 0.1557,
+        "r0x_ratio": 57.32,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603578",
+      "name": "三星新材",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 13.75,
+      "prev_close": 13.75,
+      "first_seal": "10:21:00",
+      "last_seal": "10:21:00",
+      "seal_fund": 43057080.0,
+      "break_times": 0,
+      "industry": "光伏玻璃+低温储藏玻璃门体",
+      "turnover": 3.15,
+      "amount": 0,
+      "float_cap": 2479909200.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 13.75,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 13.75,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 13.75,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 13.75,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 33516084.14,
+        "ratioamount": 0.4445,
+        "r0_net": 5142158.0,
+        "r0_ratio": 0.0682,
+        "r0x_ratio": 34.29,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "001360",
+      "name": "南矿集团",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 18.11,
+      "prev_close": 18.11,
+      "first_seal": "10:14:00",
+      "last_seal": "10:14:00",
+      "seal_fund": 66385827.0,
+      "break_times": 0,
+      "industry": "黄金开采+矿山装备+高端装备",
+      "turnover": 4.79,
+      "amount": 0,
+      "float_cap": 2272521700.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 18.11,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 18.11,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 18.11,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 18.11,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 60953858.26,
+        "ratioamount": 0.5761,
+        "r0_net": 18291128.0,
+        "r0_ratio": 0.1729,
+        "r0x_ratio": 59.89,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "601877",
+      "name": "正泰电器",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 26.28,
+      "prev_close": 26.28,
+      "first_seal": "09:38:00",
+      "last_seal": "09:38:00",
+      "seal_fund": 99737856.0,
+      "break_times": 0,
+      "industry": "半年报增长+低压电器+光伏+储能",
+      "turnover": 1.84,
+      "amount": 0,
+      "float_cap": 56474905000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 26.28,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 26.28,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 26.28,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 26.28,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 716993174.83,
+        "ratioamount": 0.6944,
+        "r0_net": 463283246.83,
+        "r0_ratio": 0.4487,
+        "r0x_ratio": 77.43,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603016",
+      "name": "新宏泰",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 30.68,
+      "prev_close": 30.68,
+      "first_seal": "09:45:00",
+      "last_seal": "10:09:00",
+      "seal_fund": 43458220.0,
+      "break_times": 1,
+      "industry": "特高压+断路器+国企改革",
+      "turnover": 3.53,
+      "amount": 0,
+      "float_cap": 4545548800.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 30.68,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 30.68,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 30.68,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 30.68,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 65118957.33,
+        "ratioamount": 0.4146,
+        "r0_net": 45118509.0,
+        "r0_ratio": 0.2872,
+        "r0x_ratio": 70.8,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002940",
+      "name": "昂利康",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 28.41,
+      "prev_close": 28.41,
+      "first_seal": "09:31:00",
+      "last_seal": "10:01:00",
+      "seal_fund": 110562629.0,
+      "break_times": 1,
+      "industry": "创新药+仿制药获批+定增过会",
+      "turnover": 10.01,
+      "amount": 0,
+      "float_cap": 5263657300.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 28.41,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 28.41,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 28.41,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 28.41,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 285405523.99,
+        "ratioamount": 0.5484,
+        "r0_net": 171084391.29,
+        "r0_ratio": 0.3287,
+        "r0x_ratio": 73.1,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603376",
+      "name": "大明电子",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 28.4,
+      "prev_close": 28.4,
+      "first_seal": "09:42:00",
+      "last_seal": "09:56:00",
+      "seal_fund": 14799297.0,
+      "break_times": 1,
+      "industry": "汽车电子+无人驾驶+赛力斯产业链",
+      "turnover": 13.34,
+      "amount": 0,
+      "float_cap": 908822720.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 28.4,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 28.4,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 28.4,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 28.4,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 97777151.64,
+        "ratioamount": 0.8161,
+        "r0_net": 29864247.68,
+        "r0_ratio": 0.2493,
+        "r0x_ratio": 68.16,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "605116",
+      "name": "奥锐特",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 22.0,
+      "prev_close": 22.0,
+      "first_seal": "09:55:00",
+      "last_seal": "09:55:00",
+      "seal_fund": 42266400.0,
+      "break_times": 0,
+      "industry": "创新药+司美格鲁肽+集采拟中选",
+      "turnover": 2.01,
+      "amount": 0,
+      "float_cap": 8936031100.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 22.0,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 22.0,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 22.0,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 22.0,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 84843072.0,
+        "ratioamount": 0.4845,
+        "r0_net": 32932272.0,
+        "r0_ratio": 0.188,
+        "r0x_ratio": 62.0,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603716",
+      "name": "塞力医疗",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 17.3,
+      "prev_close": 17.3,
+      "first_seal": "09:51:00",
+      "last_seal": "09:51:00",
+      "seal_fund": 55973908.0,
+      "break_times": 0,
+      "industry": "创新药+高血压疫苗+脑机接口",
+      "turnover": 9.15,
+      "amount": 0,
+      "float_cap": 3906180300.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 17.3,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 17.3,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 17.3,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 17.3,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 162075297.5,
+        "ratioamount": 0.4635,
+        "r0_net": 62425776.5,
+        "r0_ratio": 0.1785,
+        "r0x_ratio": 60.79,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603637",
+      "name": "镇海股份",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 14.06,
+      "prev_close": 14.06,
+      "first_seal": "09:51:00",
+      "last_seal": "09:51:00",
+      "seal_fund": 48580112.0,
+      "break_times": 0,
+      "industry": "控制权拟变更+石化工程+产业转型",
+      "turnover": 4.68,
+      "amount": 0,
+      "float_cap": 3355923400.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 14.06,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 14.06,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 14.06,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 14.06,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 91015047.84,
+        "ratioamount": 0.6336,
+        "r0_net": 48693686.0,
+        "r0_ratio": 0.339,
+        "r0x_ratio": 73.54,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002437",
+      "name": "誉衡药业",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 4.73,
+      "prev_close": 4.73,
+      "first_seal": "09:49:00",
+      "last_seal": "09:49:00",
+      "seal_fund": 254354290.0,
+      "break_times": 0,
+      "industry": "创新药+神经退行性疾病+仿制药龙头",
+      "turnover": 22.96,
+      "amount": 0,
+      "float_cap": 9933727700.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 4.73,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.73,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.73,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.73,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 791276484.44,
+        "ratioamount": 0.3586,
+        "r0_net": 557164328.85,
+        "r0_ratio": 0.2525,
+        "r0x_ratio": 68.39,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603177",
+      "name": "德创环保",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 11.0,
+      "prev_close": 11.0,
+      "first_seal": "09:48:00",
+      "last_seal": "09:48:00",
+      "seal_fund": 41774150.0,
+      "break_times": 0,
+      "industry": "钠电池+大气治理+船舶SCR",
+      "turnover": 3.38,
+      "amount": 0,
+      "float_cap": 2246112000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 11.0,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 11.0,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 11.0,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 11.0,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 33331102.0,
+        "ratioamount": 0.4542,
+        "r0_net": 13491837.0,
+        "r0_ratio": 0.1838,
+        "r0x_ratio": 61.46,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002743",
+      "name": "富煌钢构",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 4.42,
+      "prev_close": 4.42,
+      "first_seal": "09:35:00",
+      "last_seal": "09:43:00",
+      "seal_fund": 9900800.0,
+      "break_times": 1,
+      "industry": "预重整+装配式建筑+钢结构",
+      "turnover": 10.72,
+      "amount": 0,
+      "float_cap": 1920803700.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 4.42,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.42,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.42,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.42,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 132277442.69,
+        "ratioamount": 0.6589,
+        "r0_net": 74138395.0,
+        "r0_ratio": 0.3693,
+        "r0x_ratio": 74.92,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603958",
+      "name": "哈森股份",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 18.68,
+      "prev_close": 18.68,
+      "first_seal": "09:43:00",
+      "last_seal": "09:43:00",
+      "seal_fund": 66361914.0,
+      "break_times": 0,
+      "industry": "苹果产业链+机器人概念+重组+中报预计扭亏",
+      "turnover": 7.69,
+      "amount": 0,
+      "float_cap": 4097644800.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 18.68,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 18.68,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 18.68,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 18.68,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 105631471.8,
+        "ratioamount": 0.3529,
+        "r0_net": 67799034.2,
+        "r0_ratio": 0.2265,
+        "r0x_ratio": 66.15,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603882",
+      "name": "金域医学",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 30.76,
+      "prev_close": 30.76,
+      "first_seal": "09:43:00",
+      "last_seal": "09:43:00",
+      "seal_fund": 98259744.0,
+      "break_times": 0,
+      "industry": "AI医疗+数据要素+半年报扭亏+回购",
+      "turnover": 2.37,
+      "amount": 0,
+      "float_cap": 14153740000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 30.76,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 30.76,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 30.76,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 30.76,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 149814004.5,
+        "ratioamount": 0.4532,
+        "r0_net": 103668048.2,
+        "r0_ratio": 0.3136,
+        "r0x_ratio": 72.29,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002579",
+      "name": "中京电子",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 15.29,
+      "prev_close": 15.29,
+      "first_seal": "09:41:00",
+      "last_seal": "09:41:00",
+      "seal_fund": 185184620.0,
+      "break_times": 0,
+      "industry": "PCB+定增获批+算力+光模块",
+      "turnover": 5.7,
+      "amount": 0,
+      "float_cap": 8920367900.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 15.29,
+          "cons": 3
+        },
+        {
+          "date": "2026-08-20",
+          "close": 15.29,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 15.29,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 15.29,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 306010884.33,
+        "ratioamount": 0.6178,
+        "r0_net": 147622773.48,
+        "r0_ratio": 0.298,
+        "r0x_ratio": 71.45,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603285",
+      "name": "键邦股份",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 37.51,
+      "prev_close": 37.51,
+      "first_seal": "09:38:00",
+      "last_seal": "09:38:00",
+      "seal_fund": 110436942.0,
+      "break_times": 0,
+      "industry": "电磁线漆+赛克产品+锂电池+拟收购",
+      "turnover": 7.61,
+      "amount": 0,
+      "float_cap": 2336752200.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 37.51,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 37.51,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 37.51,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 37.51,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 90541121.21,
+        "ratioamount": 0.5173,
+        "r0_net": 64349801.75,
+        "r0_ratio": 0.3676,
+        "r0x_ratio": 74.78,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "001277",
+      "name": "速达股份",
+      "added_date": "2026-08-19",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 6,
+      "limit_days": 2,
+      "close": 36.27,
+      "prev_close": 36.27,
+      "first_seal": "09:30:00",
+      "last_seal": "09:38:00",
+      "seal_fund": 223202390.0,
+      "break_times": 1,
+      "industry": "煤炭设备后市场+农机+高管增持",
+      "turnover": 13.56,
+      "amount": 0,
+      "float_cap": 1652080000.0,
+      "history": [
+        {
+          "date": "2026-08-19",
+          "close": 32.97,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-19",
+          "close": 32.97,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 36.27,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 36.27,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 36.27,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 36.27,
+          "cons": 2
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 124415952.51,
+        "ratioamount": 0.5594,
+        "r0_net": 86644691.86,
+        "r0_ratio": 0.3896,
+        "r0x_ratio": 75.59,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "000520",
+      "name": "凤凰航运",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 4.41,
+      "prev_close": 4.41,
+      "first_seal": "09:38:00",
+      "last_seal": "09:38:00",
+      "seal_fund": 68280101.0,
+      "break_times": 0,
+      "industry": "半年报业绩大增+干散货航运+灵便型船",
+      "turnover": 3.09,
+      "amount": 0,
+      "float_cap": 4463288000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 4.41,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.41,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.41,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.41,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 63829255.14,
+        "ratioamount": 0.4723,
+        "r0_net": 20673415.0,
+        "r0_ratio": 0.153,
+        "r0x_ratio": 56.89,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603988",
+      "name": "中电电机",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 21.2,
+      "prev_close": 21.2,
+      "first_seal": "09:33:00",
+      "last_seal": "09:33:00",
+      "seal_fund": 33574440.0,
+      "break_times": 0,
+      "industry": "实控人涉及黄金开采+电机+风电+储能",
+      "turnover": 2.74,
+      "amount": 0,
+      "float_cap": 4986240000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 21.2,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 21.2,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 21.2,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 21.2,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 103043537.0,
+        "ratioamount": 0.7591,
+        "r0_net": 42544586.0,
+        "r0_ratio": 0.3134,
+        "r0x_ratio": 72.28,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "000017",
+      "name": "深中华A",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 6.46,
+      "prev_close": 6.46,
+      "first_seal": "09:35:00",
+      "last_seal": "09:35:00",
+      "seal_fund": 33997533.0,
+      "break_times": 0,
+      "industry": "黄金珠宝+黄金涨价+年报增长",
+      "turnover": 2.38,
+      "amount": 0,
+      "float_cap": 2847709800.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 6.46,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 6.46,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 6.46,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 6.46,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 52065837.65,
+        "ratioamount": 0.7876,
+        "r0_net": 18564424.61,
+        "r0_ratio": 0.2808,
+        "r0x_ratio": 70.31,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603392",
+      "name": "万泰生物",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 30.81,
+      "prev_close": 30.81,
+      "first_seal": "09:34:00",
+      "last_seal": "09:34:00",
+      "seal_fund": 95608853.0,
+      "break_times": 0,
+      "industry": "九价HPV疫苗+出海+创新药",
+      "turnover": 0.54,
+      "amount": 0,
+      "float_cap": 38955942000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 30.81,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 30.81,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 30.81,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 30.81,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 89471751.87,
+        "ratioamount": 0.4292,
+        "r0_net": 15261615.57,
+        "r0_ratio": 0.0732,
+        "r0x_ratio": 36.22,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002880",
+      "name": "卫光生物",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 21.89,
+      "prev_close": 21.89,
+      "first_seal": "09:34:00",
+      "last_seal": "09:34:00",
+      "seal_fund": 55848920.0,
+      "break_times": 0,
+      "industry": "血液制品+采浆增长+定增扩产+深圳国资",
+      "turnover": 1.19,
+      "amount": 0,
+      "float_cap": 4964652000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 21.89,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 21.89,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 21.89,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 21.89,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 46806823.74,
+        "ratioamount": 0.8063,
+        "r0_net": 11988199.0,
+        "r0_ratio": 0.2065,
+        "r0x_ratio": 64.16,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603801",
+      "name": "志邦家居",
+      "added_date": "2026-08-19",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 6,
+      "limit_days": 2,
+      "close": 7.23,
+      "prev_close": 7.23,
+      "first_seal": "09:32:00",
+      "last_seal": "09:34:00",
+      "seal_fund": 41086557.0,
+      "break_times": 1,
+      "industry": "定制家居+海外业务+整家一体化+高股息",
+      "turnover": 4.76,
+      "amount": 0,
+      "float_cap": 3140361200.0,
+      "history": [
+        {
+          "date": "2026-08-19",
+          "close": 6.57,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-19",
+          "close": 6.57,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 7.23,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 7.23,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 7.23,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 7.23,
+          "cons": 2
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 85942269.44,
+        "ratioamount": 0.5841,
+        "r0_net": 64033644.43,
+        "r0_ratio": 0.4352,
+        "r0x_ratio": 77.0,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "001210",
+      "name": "金房能源",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 29.76,
+      "prev_close": 29.76,
+      "first_seal": "09:34:00",
+      "last_seal": "09:34:00",
+      "seal_fund": 130432545.0,
+      "break_times": 0,
+      "industry": "磁悬浮热泵+新能源供热+数据中心供冷+综合能源",
+      "turnover": 3.72,
+      "amount": 0,
+      "float_cap": 3970576000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 29.76,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 29.76,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 29.76,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 29.76,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 89536544.34,
+        "ratioamount": 0.616,
+        "r0_net": 40126075.5,
+        "r0_ratio": 0.2761,
+        "r0x_ratio": 70.05,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002030",
+      "name": "达安基因",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 5.97,
+      "prev_close": 5.97,
+      "first_seal": "09:32:00",
+      "last_seal": "09:32:00",
+      "seal_fund": 84974264.0,
+      "break_times": 0,
+      "industry": "广药入主+猴痘概念+分子诊断+广州国资",
+      "turnover": 2.56,
+      "amount": 0,
+      "float_cap": 8378572800.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 5.97,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 5.97,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 5.97,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 5.97,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 178621160.03,
+        "ratioamount": 0.8395,
+        "r0_net": 104336500.76,
+        "r0_ratio": 0.4904,
+        "r0x_ratio": 78.54,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "601700",
+      "name": "风范股份",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 7.5,
+      "prev_close": 7.5,
+      "first_seal": "09:33:00",
+      "last_seal": "09:33:00",
+      "seal_fund": 111732240.0,
+      "break_times": 0,
+      "industry": "特高压+中报预增+国企改革",
+      "turnover": 7.25,
+      "amount": 0,
+      "float_cap": 8540679800.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 7.5,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 7.5,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 7.5,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 7.5,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 503654017.45,
+        "ratioamount": 0.8231,
+        "r0_net": 354414898.45,
+        "r0_ratio": 0.5792,
+        "r0x_ratio": 80.23,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002399",
+      "name": "海普瑞",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 11.28,
+      "prev_close": 11.28,
+      "first_seal": "09:31:00",
+      "last_seal": "09:31:00",
+      "seal_fund": 102834797.0,
+      "break_times": 0,
+      "industry": "创新药+依诺肝素制剂+集采中标",
+      "turnover": 0.7,
+      "amount": 0,
+      "float_cap": 14068435000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 11.28,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 11.28,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 11.28,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 11.28,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 65182226.92,
+        "ratioamount": 0.6606,
+        "r0_net": 15612673.0,
+        "r0_ratio": 0.1582,
+        "r0x_ratio": 57.58,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "000710",
+      "name": "贝瑞基因",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 9.37,
+      "prev_close": 9.37,
+      "first_seal": "09:32:00",
+      "last_seal": "09:32:00",
+      "seal_fund": 31012826.0,
+      "break_times": 0,
+      "industry": "AI医疗+基因测序+医疗服务",
+      "turnover": 4.65,
+      "amount": 0,
+      "float_cap": 3087695400.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 9.37,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.37,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.37,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.37,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 109256785.0,
+        "ratioamount": 0.7684,
+        "r0_net": 35952908.0,
+        "r0_ratio": 0.2529,
+        "r0x_ratio": 68.47,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "000590",
+      "name": "古汉医药",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 9.69,
+      "prev_close": 9.69,
+      "first_seal": "09:31:00",
+      "last_seal": "09:31:00",
+      "seal_fund": 16799253.0,
+      "break_times": 0,
+      "industry": "中药+流感",
+      "turnover": 1.45,
+      "amount": 0,
+      "float_cap": 2319384100.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 9.69,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.69,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.69,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.69,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 33187232.39,
+        "ratioamount": 0.992,
+        "r0_net": 11061367.0,
+        "r0_ratio": 0.3306,
+        "r0x_ratio": 73.19,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "600613",
+      "name": "神奇制药",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 8.56,
+      "prev_close": 8.56,
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
+      "seal_fund": 339477460.0,
+      "break_times": 0,
+      "industry": "创新药+抗肿瘤+品牌OTC",
+      "turnover": 12.55,
+      "amount": 0,
+      "float_cap": 4102979000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 8.56,
+          "cons": 5
+        },
+        {
+          "date": "2026-08-20",
+          "close": 8.56,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 8.56,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 8.56,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 50567248.08,
+        "ratioamount": 0.0987,
+        "r0_net": -29141015.2,
+        "r0_ratio": -0.0569,
+        "r0x_ratio": -29.56,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "603590",
+      "name": "康辰药业",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 34.33,
+      "prev_close": 34.33,
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
+      "seal_fund": 59093225.0,
+      "break_times": 0,
+      "industry": "创新药+KAT6/7抑制剂+血凝酶龙头",
+      "turnover": 1.63,
+      "amount": 0,
+      "float_cap": 5431812000.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 34.33,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 34.33,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 34.33,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 34.33,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 62971519.0,
+        "ratioamount": 0.7127,
+        "r0_net": 34481052.0,
+        "r0_ratio": 0.3903,
+        "r0x_ratio": 75.63,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002412",
+      "name": "汉森制药",
+      "added_date": "2026-08-19",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 6,
+      "limit_days": 2,
+      "close": 9.26,
+      "prev_close": 9.26,
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
+      "seal_fund": 234275200.0,
+      "break_times": 0,
+      "industry": "创新药+中药+中报预增",
+      "turnover": 0.87,
+      "amount": 0,
+      "float_cap": 4610044700.0,
+      "history": [
+        {
+          "date": "2026-08-19",
+          "close": 8.42,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-19",
+          "close": 8.42,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.26,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.26,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.26,
+          "cons": 2
+        },
+        {
+          "date": "2026-08-20",
+          "close": 9.26,
+          "cons": 2
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 4182760.52,
+        "ratioamount": 0.1039,
+        "r0_net": -15745639.18,
+        "r0_ratio": -0.3911,
+        "r0x_ratio": -75.69,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "002038",
+      "name": "双鹭药业",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 6.44,
+      "prev_close": 6.44,
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
+      "seal_fund": 119118104.0,
+      "break_times": 0,
+      "industry": "mRNA平台+GLP-1+创新药+国企改革",
+      "turnover": 2.0,
+      "amount": 0,
+      "float_cap": 5486308900.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 6.44,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 6.44,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 6.44,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 6.44,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 42679837.76,
+        "ratioamount": 0.3908,
+        "r0_net": -12398262.24,
+        "r0_ratio": -0.1135,
+        "r0x_ratio": -48.38,
+        "source": "sina_moneyflow"
+      }
+    },
+    {
+      "code": "000931",
+      "name": "中关村",
+      "added_date": "2026-08-20",
+      "last_lu_date": "2026-08-20",
+      "days_in_pool": 4,
+      "limit_days": 1,
+      "close": 4.63,
+      "prev_close": 4.63,
+      "first_seal": "09:30:00",
+      "last_seal": "09:30:00",
+      "seal_fund": 94679893.0,
+      "break_times": 0,
+      "industry": "创新药+精麻镇痛+药品获批",
+      "turnover": 1.55,
+      "amount": 0,
+      "float_cap": 3477266700.0,
+      "history": [
+        {
+          "date": "2026-08-20",
+          "close": 4.63,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.63,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.63,
+          "cons": 1
+        },
+        {
+          "date": "2026-08-20",
+          "close": 4.63,
+          "cons": 1
+        }
+      ],
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-20",
+        "netamount": 32923934.63,
+        "ratioamount": 0.6132,
+        "r0_net": 1383772.73,
+        "r0_ratio": 0.0258,
+        "r0x_ratio": 14.49,
         "source": "sina_moneyflow"
       }
     }

@@ -7144,5 +7144,14 @@
     "days_in_pool": 2,
     "last_lu_date": "2026-08-19",
     "limit_days": 1
+  },
+  {
+    "code": "600649",
+    "name": "城投控股",
+    "exit_date": "2026-08-20",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 3,
+    "last_lu_date": "2026-08-20",
+    "limit_days": 1
   }
 ]
