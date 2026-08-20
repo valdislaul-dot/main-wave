@@ -265,17 +265,7 @@ def sell_signal(position, today_auction, config=None):
     auction_price = today_auction.get('open', 0)
     prev_close = today_auction.get('prev_close', 0)
 
-    # ── 硬止损(最高优先级) ──
-    current_price = today_auction.get('current_price', auction_price)
-    if current_price and current_price > 0:
-        loss_pct = (current_price - buy_price) / buy_price * 100
-        hard_stop = config['loss_feedback']['hard_stop_pct']
-        if loss_pct <= hard_stop:
-            return _signal('sell', 'urgent',
-                f'硬止损: 浮亏{loss_pct:+.1f}% ≤ {hard_stop:+.0f}% — 无条件卖出',
-                current_price)
-
-    # ── 加载K线 ──
+    # ── 加载K线 (提前: 硬止损需要判断昨日炸板状态) ──
     klines = _load_klines(code, name)
     if not klines:
         return _signal('hold', 'normal', '无K线数据', auction_price, '建议手动判断')
@@ -290,6 +280,23 @@ def sell_signal(position, today_auction, config=None):
     yest_lu = was_limit_up(klines, yesterday_idx)
     board_num = get_board_count(klines, yesterday_idx)
     yest_vol = yesterday.get('volume', 0)
+
+    # ── 硬止损 (2026-08-20调整: 炸板缓冲, 3年数据支撑) ──
+    # 数据: 竞价4-8%买入当天炸板(弱市86%/正常69%), 炸板股T+1开盘卖均-3.63%(正收益8%)
+    #       vs T+1收盘卖均-2.01%(正收益30%) → 炸板次日机械止损劣于等修复
+    # 规则: 昨日买入且昨日炸板(收未涨停) → 跳过硬止损, 交给下方断板分支按gap决策
+    #       其余情形(持有≥2日 / 昨日封板今日浮亏) → 硬止损保留
+    current_price = today_auction.get('current_price', auction_price)
+    if current_price and current_price > 0:
+        loss_pct = (current_price - buy_price) / buy_price * 100
+        hard_stop = config['loss_feedback']['hard_stop_pct']
+        if loss_pct <= hard_stop:
+            bought_yest = bool(buy_date) and buy_date == yesterday['date']
+            broke_on_buy_day = bought_yest and not yest_lu
+            if not broke_on_buy_day:
+                return _signal('sell', 'urgent',
+                    f'硬止损: 浮亏{loss_pct:+.1f}% ≤ {hard_stop:+.0f}% — 无条件卖出',
+                    current_price)
 
     # 前日量能 (T-2)
     prev_day_idx = yesterday_idx - 1
@@ -394,6 +401,17 @@ def sell_signal(position, today_auction, config=None):
             loss_pct = (yesterday['close'] - prev_k['open']) / prev_k['open'] * 100 if prev_k['open'] > 0 else 0
 
         is_minor_loss = loss_pct > soft_stop  # 浮亏在软止损范围内=小亏
+
+        # ── 大亏+平开/高开 → 等修复冲高 (2026-08-20新增, 3年数据支撑) ──
+        # 数据: 炸板股T+1开盘卖均-3.63%(正收益8%) vs T+1收盘卖均-2.01%(正收益30%);
+        #       炸板股次日平开76%上涨均+2.18%。哈森案例: 开盘止损-16.4% vs 等修复-5.5%
+        hard_stop = config['loss_feedback']['hard_stop_pct']
+        if loss_pct <= hard_stop and gap > cfg_gap['deep_low_open'] + 1:
+            return _signal('watch', 'urgent',
+                f'昨浮亏{loss_pct:+.1f}%超硬止损+今{gap:+.1f}%平开/高开 → 等修复冲高减亏',
+                yesterday.get('high', auction_price),
+                '3年数据: 炸板股次日平开76%上涨+2.18%, 比开盘止损平均少亏约1.6%; '
+                '盘中破-4%或冲高乏力→走')
 
         # ── 弱转强高开 (gap≥5%) — A体系 ──
         if gap >= cfg_gap['strong_high_open']:

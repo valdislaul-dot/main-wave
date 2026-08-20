@@ -445,21 +445,54 @@ def main():
 
     buyable.sort(key=lambda x: x['score'], reverse=True)
 
-    # ── 🌡️ 市场环境评级 (2026-08-15新增) ──
+    # ── 🌡️ 市场环境评级 → 买入开关 (2026-08-20升级, 3年弱市回测数据支撑) ──
+    # 数据: 竞价4-8%买入期望 弱市-1.20%(86%当日炸板)/正常-0.52%/强势+0.08%
+    # 升温日(涨停数较前日回升)历史67%胜 vs 降温日42%胜
     try:
         _pp = _load_prev_pool()
         if _pp:
             _stocks, _ = _pp
             _zt_n = len(_stocks)
             _max_cons = max((int(x.get('limit_days', 1) or 1) for x in _stocks), default=1)
+            # 前日涨停数(升温判断): data/zt_pool/ 倒数第二个快照
+            _zt_prev = None
+            try:
+                _zt_dir = os.path.join(BASE, 'data', 'zt_pool')
+                _pool_files = sorted(f for f in os.listdir(_zt_dir) if f.endswith('.json'))
+                if len(_pool_files) >= 2:
+                    _p2 = os.path.join(_zt_dir, _pool_files[-2])
+                    try:
+                        with open(_p2, encoding='utf-8') as _f:
+                            _pp2 = json.load(_f)
+                    except UnicodeDecodeError:
+                        with open(_p2, encoding='gbk') as _f:
+                            _pp2 = json.load(_f)
+                    _p2stocks = _pp2 if isinstance(_pp2, list) else _pp2.get('stocks', _pp2.get('data', []))
+                    _zt_prev = len(_p2stocks)
+            except Exception:
+                pass
+            _warming = _zt_prev is not None and _zt_n > _zt_prev
+
             if _zt_n < 40 or _max_cons <= 2:
-                _env, _advice = '🌡️ 弱市', '建议观望或1/3仓'
+                _env = '🌡️ 弱市'
+                if _warming:
+                    _switch, _pos_pct = '🟡 买入开关: 1/3仓(升温日例外)', 0.33
+                else:
+                    _switch, _pos_pct = '🛑 买入开关: 关闭(空仓)', 0.0
             elif _zt_n >= 70 and _max_cons >= 5:
-                _env, _advice = '🌡️ 强势', '可积极(按评分仓位映射)'
+                _env, _switch, _pos_pct = '🌡️ 强势', '🟢 买入开关: 全仓', 1.0
             else:
-                _env, _advice = '🌡️ 正常', '常规仓位'
-            print(f'\n  {_env}: 昨日涨停{_zt_n}只, 最高{_max_cons}板 → {_advice}')
+                _env, _switch, _pos_pct = '🌡️ 正常', '🟢 买入开关: 半仓', 0.5
+
+            _cash = pf.get('cash', 0) if pf else 0
+            _budget = _cash * _pos_pct
+            print(f'\n  {_env}: 昨日涨停{_zt_n}只, 最高{_max_cons}板'
+                  + (f', 较前日{_zt_prev}只{"回升" if _warming else "回落"}' if _zt_prev is not None else ''))
+            print(f'  {_switch} | 建议买入金额上限: {_budget:,.0f}元'
+                  + (' (3年数据: 弱市竞价4-8%期望-1.20%, 86%当日炸板)' if _pos_pct == 0 else ''))
+            _env_budget = _budget
     except Exception:
+        _env_budget = 0
         pass
 
     # ── 📊 表1: 当日可买前三 ──
