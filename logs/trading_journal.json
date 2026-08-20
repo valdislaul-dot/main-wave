@@ -529,5 +529,48 @@
     "cost": 41510.7,
     "type": "model",
     "note": "竞价面板评分96第1名(量比0.25极缩+真一字)"
+  },
+  {
+    "date": "2026-08-20 09:35:51",
+    "action": "SELL",
+    "name": "学大教育",
+    "code": "000526",
+    "price": 37.86,
+    "shares": 1100,
+    "proceeds": 41646.0,
+    "pnl_pct": -0.81,
+    "pnl_amt": -341.0,
+    "buy_date": "2026-08-19",
+    "buy_price": 38.17,
+    "hold_days": 1,
+    "cash_after": 42771.3,
+    "note": "竞价低开-3.25% 引擎卖出"
+  },
+  {
+    "date": "2026-08-20 09:35:51",
+    "action": "SELL",
+    "name": "哈森股份",
+    "code": "603958",
+    "price": 16.533,
+    "shares": 2100,
+    "proceeds": 34719.3,
+    "pnl_pct": -16.36,
+    "pnl_amt": -6791.4,
+    "buy_date": "2026-08-19",
+    "buy_price": 19.767,
+    "hold_days": 1,
+    "cash_after": 77490.6,
+    "note": "硬止损 浮亏-14.1%"
+  },
+  {
+    "date": "2026-08-20 09:35:51",
+    "action": "BUY",
+    "name": "宝泰隆",
+    "code": "601011",
+    "price": 3.252,
+    "shares": 23700,
+    "cost": 77072.4,
+    "cash_after": 418.20000000001164,
+    "note": "竞价评分32第2名 gap+6.9% 弱市"
   }
 ]

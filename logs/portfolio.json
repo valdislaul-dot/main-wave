@@ -1,37 +1,30 @@
 {
-  "cash": 1125.3,
+  "cash": 418.20000000001164,
   "position": {
-    "name": "哈森股份",
-    "code": "603958",
-    "buy_price": 19.767,
-    "shares": 2100,
-    "buy_date": "2026-08-19"
+    "name": "宝泰隆",
+    "code": "601011",
+    "buy_date": "2026-08-20",
+    "buy_price": 3.252,
+    "shares": 23700
   },
   "positions": [
     {
-      "name": "学大教育",
-      "code": "000526",
-      "buy_price": 38.17,
-      "shares": 1100,
-      "buy_date": "2026-08-19"
-    },
-    {
-      "name": "哈森股份",
-      "code": "603958",
-      "buy_price": 19.767,
-      "shares": 2100,
-      "buy_date": "2026-08-19"
+      "name": "宝泰隆",
+      "code": "601011",
+      "buy_date": "2026-08-20",
+      "buy_price": 3.252,
+      "shares": 23700
     }
   ],
-  "total_trades": 14,
+  "total_trades": 16,
   "winning_trades": 11,
-  "total_pnl": 74289.3,
-  "model_trades": 11,
+  "total_pnl": 67156.90000000001,
+  "model_trades": 13,
   "model_wins": 11,
-  "model_pnl": 77024.6,
+  "model_pnl": 69892.2,
   "subjective_trades": 3,
   "subjective_wins": 0,
   "subjective_pnl": -2735.3,
   "created": "2026-07-25 16:12:18",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }

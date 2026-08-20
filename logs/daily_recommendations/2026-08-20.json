@@ -1,0 +1,70 @@
+{
+  "date": "2026-08-20",
+  "generated": "2026-08-20 09:25",
+  "total_in_pool": 32,
+  "buyable_count": 4,
+  "top_pick": {
+    "code": "600127",
+    "name": "金健米业",
+    "gap": 4.09,
+    "score": 73.0,
+    "limit_days": 3,
+    "industry": "农产品加",
+    "sector": 3,
+    "vr20": 0.81,
+    "turnover": 4.56,
+    "in_candidates": true
+  },
+  "buyable": [
+    {
+      "code": "600127",
+      "name": "金健米业",
+      "gap": 4.09,
+      "score": 73.0,
+      "limit_days": 3,
+      "industry": "农产品加",
+      "sector": 3,
+      "vr20": 0.81,
+      "turnover": 4.56,
+      "in_candidates": true
+    },
+    {
+      "code": "601011",
+      "name": "宝泰隆",
+      "gap": 6.91,
+      "score": 32.0,
+      "limit_days": 1,
+      "industry": "焦炭Ⅱ",
+      "sector": 3,
+      "vr20": 2.07,
+      "turnover": 3.8,
+      "in_candidates": true
+    },
+    {
+      "code": "603102",
+      "name": "百合股份",
+      "gap": 5.55,
+      "score": 21.0,
+      "limit_days": 1,
+      "industry": "食品加工",
+      "sector": 1,
+      "vr20": 2.45,
+      "turnover": 11.48,
+      "in_candidates": true
+    },
+    {
+      "code": "603801",
+      "name": "志邦家居",
+      "gap": 4.41,
+      "score": 0,
+      "limit_days": 1,
+      "industry": "家居用品",
+      "sector": 2,
+      "vr20": 0,
+      "turnover": 0,
+      "in_candidates": false
+    }
+  ],
+  "position_status": "学大教育, 哈森股份",
+  "action_taken": null
+}
