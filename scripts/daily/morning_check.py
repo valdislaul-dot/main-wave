@@ -354,7 +354,7 @@ def main():
     pf = load_portfolio()
 
     print('=' * 65)
-    print('  竞价观察面板 v4.1 — 集成A卖点引擎')
+    print('  竞价观察结果')
     print(f'  日期: {datetime.now().strftime("%Y-%m-%d %H:%M")}')
     print('=' * 65)
 
