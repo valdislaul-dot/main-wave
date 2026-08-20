@@ -239,77 +239,81 @@ def _zt_get(url, params=None, headers=None, timeout=15):
 
 def fetch_zt_pool_raw(date_str):
     """
-    拉取东财涨停池原始数据
+    拉取涨停池原始数据 (2026-08-20起: 同花顺涨停揭秘, 弃用东财push2ex)
+    弃用原因: 东财接口改版, lbc连板数恒1失效 / zbc炸板次数大面积失真(金健米业报9次实4次)
+              / 收盘后数据仍会修正(城投控股zbc 7→5), 已不可作为单一可靠源
     date_str: 'YYYY-MM-DD' 或 'YYYYMMDD'
     返回: [{code, name, price, pct, turnover, limit_days, first_seal,
             last_seal, seal_fund, break_times, industry, amount, float_cap}, ...]
     """
     date_yyyymmdd = date_str.replace('-', '')
-    url = "https://push2ex.eastmoney.com/getTopicZTPool"
-    params = {"ut": ZT_UT, "dpt": "wz.ztzt", "Pageindex": 0,
-              "pagesize": 10000, "sort": "fbt:asc", "date": date_yyyymmdd}
-    headers = {"User-Agent": ZT_UA, "Referer": "https://quote.eastmoney.com/"}
+    url = 'https://data.10jqka.com.cn/dataapi/limit_up/limit_up_pool'
+    THS_FIELDS = ('199112,10,9001,330323,330324,330325,9002,330329,'
+                  '133971,133970,1968584,3475914,9003,9004')
+
+    def _fmt_ts(ts):
+        """Unix秒 → HH:MM:SS"""
+        try:
+            return datetime.fromtimestamp(int(ts)).strftime('%H:%M:%S')
+        except Exception:
+            return ''
+
+    def _parse_high_days(hd):
+        """'6天5板'/'首板' → 板数 ('3天2板'→2, 窗口板数; 连板数由K线回算覆盖)"""
+        import re
+        m = re.search(r'(\d+)板', str(hd))
+        if m:
+            return int(m.group(1))
+        return 1
 
     try:
-        r = _zt_get(url, params=params, headers=headers, timeout=15)
-        _save_raw(date_str, 'zt_pool_eastmoney.json', r.text)
-        data = r.json()
-        pool_data = (data.get("data") or {}).get("pool") or []
+        import requests
+        all_info = []
+        page = 1
+        while True:
+            params = {'page': page, 'limit': 200, 'field': THS_FIELDS,
+                      'filter': 'HS,GEM2STAR', 'order_field': '330324',
+                      'order_type': '0', 'date': date_yyyymmdd}
+            r = requests.get(url, params=params, headers={'User-Agent': ZT_UA}, timeout=15)
+            _save_raw(date_str, 'zt_pool_10jqka.json', r.text)
+            info = (r.json().get('data') or {}).get('info', [])
+            if not info:
+                break
+            all_info.extend(info)
+            if len(info) < 200:
+                break
+            page += 1
+            import time as _t
+            _t.sleep(0.5)
 
         result = []
-        for p in pool_data:
-            code = p.get("c", "")
+        for p in all_info:
+            code = str(p.get('code', ''))
             if not code or code.startswith(('300', '301', '688', '8', '9')):
                 continue
-            ft = p.get("fbt", 0)
-            lt = p.get("lbt", 0)
             result.append({
                 'code': code,
-                'name': p.get("n", ""),
-                'price': p.get("p", 0) / 1000 if p.get("p", 0) > 100 else p.get("p", 0),
-                'pct': round(p.get("zdp", 0), 2),
-                'turnover': round(p.get("hs", 0), 2),
-                # 2026-08-20: 东财接口改版, lbc恒为1失效, 连板数在 zttj.ct (如6天5板→ct=5)
-                'limit_days': (p.get("zttj") or {}).get("ct") or p.get("lbc", 1) or 1,
-                'first_seal': f"{str(ft).zfill(6)[:2]}:{str(ft).zfill(6)[2:4]}:{str(ft).zfill(6)[4:6]}",
-                'last_seal': f"{str(lt).zfill(6)[:2]}:{str(lt).zfill(6)[2:4]}:{str(lt).zfill(6)[4:6]}",
-                'seal_fund': p.get("fund", 0),
-                'break_times': p.get("zbc", 0),
-                'industry': p.get("hybk", ""),
-                'amount': p.get("amount", 0),
-                'float_cap': p.get("f20", 0),
+                'name': p.get('name', ''),
+                'price': float(p.get('latest', 0) or 0),
+                'pct': round(float(p.get('change_rate', 0) or 0), 2),
+                'turnover': round(float(p.get('turnover_rate', 0) or 0), 2),
+                'limit_days': _parse_high_days(p.get('high_days')),
+                'first_seal': _fmt_ts(p.get('first_limit_up_time')),
+                'last_seal': _fmt_ts(p.get('last_limit_up_time')),
+                'seal_fund': float(p.get('order_amount', 0) or 0),
+                'break_times': int(p.get('open_num', 0) or 0),
+                # industry 用同花顺涨停原因题材 (比东财行业分类更适合板块共振判定)
+                'industry': p.get('reason_type', '') or '',
+                'amount': 0,   # 同花顺无成交额字段 (K线成交额由pool_map补, 池外维持None)
+                'float_cap': float(p.get('currency_value', 0) or 0),
+                # 附加字段 (下游可选消费, 不破坏旧结构)
+                'board_type': p.get('limit_up_type', ''),
+                'seal_rate': float(p.get('limit_up_suc_rate', 0) or 0),
+                'is_again': int(p.get('is_again_limit', 0) or 0),
             })
         return result
     except Exception as e:
-        print(f'[ZT Pool] 东财API异常: {e}')
-
-        # 备用: akshare
-        try:
-            import akshare as ak
-            df = ak.stock_zt_pool_em(date=date_yyyymmdd)
-            if df is not None and len(df) > 0:
-                pool = []
-                for _, row in df.iterrows():
-                    code = str(row.get('代码', '')).zfill(6)
-                    if code.startswith(('300', '301', '688', '8', '9')):
-                        continue
-                    pool.append({
-                        'code': code, 'name': str(row.get('名称', '')),
-                        'price': float(row.get('最新价', 0)),
-                        'pct': float(row.get('涨跌幅', 0)),
-                        'turnover': float(row.get('换手率', 0)),
-                        'limit_days': int(row.get('连板数', 1)),
-                        'first_seal': str(row.get('首次封板时间', '')),
-                        'last_seal': str(row.get('最后封板时间', '')),
-                        'break_times': int(row.get('炸板次数', 0)),
-                        'industry': str(row.get('所属行业', '')),
-                        'amount': float(row.get('成交额', 0)),
-                        'float_cap': float(row.get('流通市值', 0)),
-                    })
-                return pool
-        except:
-            pass
-
+        print(f'[ZT Pool] 同花顺涨停池拉取失败: {e}')
         return []
 
 

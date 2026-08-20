@@ -133,9 +133,9 @@ def recalc_pool(stocks, date_str, verbose=True):
         new_first = calc['first_seal']
         warn = ''
         if abs(em_breaks - new_breaks) > 2:
-            warn = f'  ⚠ 东财炸{em_breaks}次 vs 分钟算炸{new_breaks}次'
+            warn = f'  ⚠ 源炸{em_breaks}次 vs 分钟算炸{new_breaks}次'
         elif em_first and new_first and abs(_hhmm_to_min(em_first[:4]) - _hhmm_to_min(new_first)) > 30:
-            warn = f'  ⚠ 东财封{em_first} vs 分钟算封{new_first}'
+            warn = f'  ⚠ 源封{em_first} vs 分钟算封{new_first}'
         if verbose:
             print(f'  {s.get("name", "")}({code}) 封{_fmt_hhmm(new_first)} '
                   f'炸{new_breaks}次 末封{_fmt_hhmm(calc["last_seal"])}{warn}')

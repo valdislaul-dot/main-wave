@@ -51,23 +51,9 @@ def _em_zt_api(endpoint, sort, date):
         return []
 
 def fetch_zt_pool(date_yyyymmdd):
-    pool = _em_zt_api("getTopicZTPool", "fbt:asc", date_yyyymmdd)
-    result = []
-    for p in pool:
-        code = p["c"]
-        if code.startswith(('300', '301', '688', '8', '9')):
-            continue
-        result.append({
-            'code': code, 'name': p["n"],
-            'price': p["p"] / 1000, 'pct': round(p["zdp"], 2),
-            'turnover': round(p["hs"], 2), 'limit_days': p["lbc"],
-            'first_seal': _fmt_zt_time(p["fbt"]),
-            'last_seal': _fmt_zt_time(p["lbt"]),
-            'seal_fund': p["fund"], 'break_times': p["zbc"],
-            'industry': p.get("hybk", ""), 'amount': p.get("amount", 0),
-            'float_cap': p.get("ltsz", 0),
-        })
-    return result
+    """2026-08-20起: 复用 zt_pool.fetch_zt_pool_raw (同花顺涨停揭秘, 弃用东财push2ex)"""
+    from zt_pool import fetch_zt_pool_raw
+    return fetch_zt_pool_raw(date_yyyymmdd)
 
 def get_today():
     today = datetime.now()

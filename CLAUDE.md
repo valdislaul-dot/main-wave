@@ -14,7 +14,7 @@
 - **Tushare Pro daily** — K线增量备源+权威校准（120积分，不复权，当日更新及时；token 在 data/tushare_token.txt 或环境变量 TUSHARE_TOKEN）
 - **新浪 CN_MarketData** — K线全量+兜底（不复权，与主库同口径）
 - **搜狐 hisHq** — 历史主库（kline_data/ 3048只 + backtest_kline/ 70只，不复权）
-- **东财 push2ex** — 涨停池实时（akshare 东财K线接口已失效弃用，见 akshare issue#5820）
+- **同花顺涨停揭秘** — 涨停池主源（2026-08-20起，弃用东财push2ex：lbc连板数恒1失效/zbc炸板大面积失真/收盘后数据修正/混入未涨停股；同花顺含封板时间/炸板/题材/板型，涨停原因题材→industry字段）
 - **腾讯 qt.gtimg.cn** — 竞价行情
 - **新浪 MoneyFlow** — 资金流日频（主力/超大单净流入，观察数据不进评分，支持翻历史页）
 - **mootdx 禁用** | **baostock 已移除**(2026-08-17, 当日数据延迟反复出错)

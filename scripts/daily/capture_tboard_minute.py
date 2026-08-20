@@ -17,49 +17,13 @@ UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 # Step 1: Get today's limit-up pool from 东财
 # ============================================================
 def get_today_zt_pool(date_str=None):
-    """拉取东财涨停池，返回涨停股列表"""
+    """2026-08-20起: 复用 zt_pool.fetch_zt_pool_raw (同花顺涨停揭秘, 弃用东财push2ex)"""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from zt_pool import fetch_zt_pool_raw
     if date_str is None:
         date_str = datetime.now().strftime('%Y%m%d')
-
-    import requests
-    url = "https://push2ex.eastmoney.com/getTopicZTPool"
-    params = {
-        "ut": "7eea3edcaed734bea9cbfc24409ed989",
-        "dpt": "wz.ztzt", "Pageindex": 0, "pagesize": 5000,
-        "sort": "fbt:asc", "date": date_str,
-    }
-    headers = {"User-Agent": UA, "Referer": "https://quote.eastmoney.com/"}
-
-    try:
-        r = requests.get(url, params=params, headers=headers, timeout=15)
-        pool = (r.json().get("data") or {}).get("pool") or []
-    except Exception as e:
-        print(f"[ERROR] 涨停池请求失败: {e}")
-        return []
-
-    results = []
-    for p in pool:
-        code = p["c"]
-        # 排除300/301/688
-        if code.startswith(('300', '301', '688', '8', '9')):
-            continue
-        fbt = p.get("fbt", 0)
-        lbt = p.get("lbt", 0)
-        results.append({
-            'code': code,
-            'name': p.get('n', ''),
-            'price': p.get('p', 0) / 1000,
-            'pct': round(p.get('zdp', 0), 2),
-            'limit_days': p.get('lbc', 0),
-            'first_seal': f"{str(fbt).zfill(6)[:2]}:{str(fbt).zfill(6)[2:4]}:{str(fbt).zfill(6)[4:6]}" if fbt else '',
-            'last_seal': f"{str(lbt).zfill(6)[:2]}:{str(lbt).zfill(6)[2:4]}:{str(lbt).zfill(6)[4:6]}" if lbt else '',
-            'break_times': p.get('zbc', 0),
-            'seal_fund': p.get('fund', 0),
-            'turnover': round(p.get('hs', 0), 2),
-            'industry': p.get('hybk', ''),
-            'zt_stat': f"{(p.get('zttj') or {}).get('days','?')}天{(p.get('zttj') or {}).get('ct','?')}板",
-        })
-    return results
+    date_str = f'{date_str[:4]}-{date_str[4:6]}-{date_str[6:]}' if len(date_str) == 8 else date_str
+    return fetch_zt_pool_raw(date_str)
 
 # ============================================================
 # Step 2: Identify T-board from limit-up pool
@@ -221,9 +185,10 @@ def main(date_str=None):
     if t_boards:
         print(f"\n  T字板列表:")
         for t in t_boards:
+            stat = t.get('zt_stat') or f"{t.get('limit_days', 1)}板"
             print(f"    {t['code']} {t['name']:<8} "
                   f"封板{t['first_seal']} 炸{t['break_times']}次 "
-                  f"末封{t['last_seal']} {t['zt_stat']}")
+                  f"末封{t['last_seal']} {stat}")
 
     # Step 3: Download minute data
     print(f"\n[2/3] 下载分钟K线...")
