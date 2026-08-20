@@ -281,11 +281,14 @@ def sell_signal(position, today_auction, config=None):
     board_num = get_board_count(klines, yesterday_idx)
     yest_vol = yesterday.get('volume', 0)
 
-    # ── 硬止损 (2026-08-20调整: 炸板缓冲, 3年数据支撑) ──
-    # 数据: 竞价4-8%买入当天炸板(弱市86%/正常69%), 炸板股T+1开盘卖均-3.63%(正收益8%)
-    #       vs T+1收盘卖均-2.01%(正收益30%) → 炸板次日机械止损劣于等修复
-    # 规则: 昨日买入且昨日炸板(收未涨停) → 跳过硬止损, 交给下方断板分支按gap决策
-    #       其余情形(持有≥2日 / 昨日封板今日浮亏) → 硬止损保留
+    # ── 硬止损 (2026-08-20调整: 炸板缓冲, 按当日收盘跌幅分级) ──
+    # 数据(3年, 炸板股T日收盘分档×次日):
+    #   跌停档(≤-9%): 次日-15.0% 正收益0%  |  -9~-7%: 次日-8.8%
+    #   -7~-5%: 次日-5.6%  |  -5~-3%: -3.4%  |  -3~0%: -1.5%  |  收红: +2.8%
+    # 规则:
+    #   昨买入+昨炸板+收盘≥-3% → 缓冲(等修复, 次日平开76%上涨)
+    #   昨买入+昨炸板+收盘<-7% → 不缓冲(深炸股次日继续暴跌, 哈森涨停是极端幸存者)
+    #   其余情形(持有≥2日 / 昨封板 / 深炸) → 硬止损保留
     current_price = today_auction.get('current_price', auction_price)
     if current_price and current_price > 0:
         loss_pct = (current_price - buy_price) / buy_price * 100
@@ -293,7 +296,12 @@ def sell_signal(position, today_auction, config=None):
         if loss_pct <= hard_stop:
             bought_yest = bool(buy_date) and buy_date == yesterday['date']
             broke_on_buy_day = bought_yest and not yest_lu
-            if not broke_on_buy_day:
+            # 炸板缓冲只适用于温和炸板: 昨日收盘跌幅 > -7% (vs 前日收盘)
+            mild_break = False
+            if broke_on_buy_day and yesterday_idx >= 1:
+                yest_pct = (yesterday['close'] - klines[yesterday_idx - 1]['close']) / klines[yesterday_idx - 1]['close'] * 100
+                mild_break = yest_pct > -7.0
+            if not mild_break:
                 return _signal('sell', 'urgent',
                     f'硬止损: 浮亏{loss_pct:+.1f}% ≤ {hard_stop:+.0f}% — 无条件卖出',
                     current_price)
@@ -402,15 +410,15 @@ def sell_signal(position, today_auction, config=None):
 
         is_minor_loss = loss_pct > soft_stop  # 浮亏在软止损范围内=小亏
 
-        # ── 大亏+平开/高开 → 等修复冲高 (2026-08-20新增, 3年数据支撑) ──
-        # 数据: 炸板股T+1开盘卖均-3.63%(正收益8%) vs T+1收盘卖均-2.01%(正收益30%);
-        #       炸板股次日平开76%上涨均+2.18%。哈森案例: 开盘止损-16.4% vs 等修复-5.5%
+        # ── 大亏+平开/高开 → 等修复冲高 (2026-08-20新增, 仅温和炸板适用) ──
+        # 数据: 炸板股T日收盘分档×次日 — 温和档(-3%内)次日-1.5%, 收红档+2.8%;
+        #       深炸档(≤-7%)次日-8.8%~-15%, 正收益0%, 不适用缓冲(硬止损已在前面拦截)
         hard_stop = config['loss_feedback']['hard_stop_pct']
         if loss_pct <= hard_stop and gap > cfg_gap['deep_low_open'] + 1:
             return _signal('watch', 'urgent',
                 f'昨浮亏{loss_pct:+.1f}%超硬止损+今{gap:+.1f}%平开/高开 → 等修复冲高减亏',
                 yesterday.get('high', auction_price),
-                '3年数据: 炸板股次日平开76%上涨+2.18%, 比开盘止损平均少亏约1.6%; '
+                '3年数据: 温和炸板次日平开76%上涨+2.18%, 比开盘止损平均少亏约1.6%; '
                 '盘中破-4%或冲高乏力→走')
 
         # ── 弱转强高开 (gap≥5%) — A体系 ──

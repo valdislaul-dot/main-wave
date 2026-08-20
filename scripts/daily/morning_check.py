@@ -482,7 +482,8 @@ def main():
             elif _zt_n >= 70 and _max_cons >= 5:
                 _env, _switch, _pos_pct = '🌡️ 强势', '🟢 买入开关: 全仓', 1.0
             else:
-                _env, _switch, _pos_pct = '🌡️ 正常', '🟢 买入开关: 半仓', 0.5
+                # 正常日期望-0.52%仍为负, 仓位压至1/3 (2026-08-20修正)
+                _env, _switch, _pos_pct = '🌡️ 正常', '🟡 买入开关: 1/3仓', 0.33
 
             _cash = pf.get('cash', 0) if pf else 0
             _budget = _cash * _pos_pct
