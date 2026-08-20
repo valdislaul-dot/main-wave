@@ -1,0 +1,21 @@
+{
+  "status": "completed",
+  "started_at": "2026-08-05T23:13:36+08:00",
+  "finished_at": "2026-08-05T23:29:07+08:00",
+  "elapsed_seconds": 931.86,
+  "range": {
+    "start": "2016-08-05",
+    "end": "2026-08-05"
+  },
+  "output": "C:\\Users\\Davis\\Desktop\\K",
+  "total": 3045,
+  "success": 3045,
+  "skipped": 0,
+  "failed": 0,
+  "failure_details": [],
+  "files": {
+    "stock_universe": "C:\\Users\\Davis\\Desktop\\K\\_stock_universe.json",
+    "log": "C:\\Users\\Davis\\Desktop\\K\\_download.log",
+    "state": "C:\\Users\\Davis\\Desktop\\K\\_download_state.json"
+  }
+}

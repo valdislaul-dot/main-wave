@@ -323,12 +323,16 @@ def capture_auction(force=False):
     if os.path.exists(fpath) and not force:
         print(f'[Auction Pool] 快照已存在({fpath}), 跳过覆盖 (--force可覆盖)')
     else:
+        # 平均gap (2026-08-20新增: 当日情绪二次确认信号, 3年数据: 均gap<0次日接力差)
+        _gaps = [s.get('gap_pct', 0) or 0 for s in snapshot if (s.get('gap_pct') or 0) != 0]
+        avg_gap = round(sum(_gaps) / len(_gaps), 2) if _gaps else 0.0
         payload = {
             'date': today,
             'captured': ts,
             'total_stocks': len(snapshot),
             'quoted': len(quotes),
             'buyable_count': buyable_count,
+            'avg_gap': avg_gap,
             'gap_distribution': dict(gap_dist),
             'stocks': snapshot,
         }
@@ -344,11 +348,14 @@ def capture_auction(force=False):
     state['total_sessions'] = state.get('total_sessions', 0) + 1
 
     # 当天摘要
+    _gaps_state = [s.get('gap_pct', 0) or 0 for s in snapshot if (s.get('gap_pct') or 0) != 0]
+    avg_gap_state = round(sum(_gaps_state) / len(_gaps_state), 2) if _gaps_state else 0.0
     state['current'] = {
         'date': today,
         'captured': ts,
         'total': len(snapshot),
         'buyable': buyable_count,
+        'avg_gap': avg_gap_state,
         'gap_distribution': dict(gap_dist),
         'buyable_stocks': sorted([
             {'code': s['code'], 'name': s['name'], 'gap_pct': s['gap_pct'],

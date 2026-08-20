@@ -485,13 +485,31 @@ def main():
                 # 正常日期望-0.52%仍为负, 仓位压至1/3 (2026-08-20修正)
                 _env, _switch, _pos_pct = '🌡️ 正常', '🟡 买入开关: 1/3仓', 0.33
 
-            _cash = pf.get('cash', 0) if pf else 0
-            _budget = _cash * _pos_pct
             print(f'\n  {_env}: 昨日涨停{_zt_n}只, 最高{_max_cons}板'
                   + (f', 较前日{_zt_prev}只{"回升" if _warming else "回落"}' if _zt_prev is not None else ''))
-            print(f'  {_switch} | 建议买入金额上限: {_budget:,.0f}元'
-                  + (' (3年数据: 弱市竞价4-8%期望-1.20%, 86%当日炸板)' if _pos_pct == 0 else ''))
-            _env_budget = _budget
+            print(f'  {_switch} (仓位由个人交易情况决定, 仅温度建议)'
+                  + (' — 3年数据: 弱市竞价4-8%期望-1.20%, 86%当日炸板' if _pos_pct == 0 else ''))
+            _env_budget = 0
+
+            # ── 竞价二次确认 (2026-08-20新增, 3年数据: 涨停股次日均gap<0→接力差) ──
+            # 数据: 均gap -4~0%档次日-1.27% | 0-4%档+1.32% | 4-8%档+3.90%
+            # 规则: 今日竞价池均gap ≤ -2% → 环境降一档 (正常→弱市, 强势→正常)
+            try:
+                _astate_path = os.path.join(BASE, 'data', 'auction_state.json')
+                if os.path.exists(_astate_path):
+                    with open(_astate_path, encoding='utf-8') as _f:
+                        _astate = json.load(_f)
+                    _avg_gap = (_astate.get('current') or {}).get('avg_gap')
+                    if _avg_gap is not None and _avg_gap <= -2.0:
+                        _downgrade = {'🌡️ 弱市': ('🌡️ 弱市', '🛑 买入开关: 关闭(空仓)', 0.0),
+                                      '🌡️ 正常': ('🌡️ 弱市↓', '🛑 买入开关: 关闭(空仓, 竞价二次确认降档)', 0.0),
+                                      '🌡️ 强势': ('🌡️ 正常↓', '🟡 买入开关: 1/3仓(竞价二次确认降档)', 0.33)}
+                        if _env in _downgrade:
+                            _env2, _switch2, _pct2 = _downgrade[_env]
+                            print(f'  ⚠ 竞价二次确认: 池均gap {_avg_gap:+.1f}% ≤ -2% → 环境降档')
+                            print(f'  {_env2}: {_switch2} (仓位由个人交易情况决定, 仅温度建议)')
+            except Exception:
+                pass
     except Exception:
         _env_budget = 0
         pass
