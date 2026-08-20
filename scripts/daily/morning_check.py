@@ -473,17 +473,18 @@ def main():
                 pass
             _warming = _zt_prev is not None and _zt_n > _zt_prev
 
-            if _zt_n < 40 or _max_cons <= 2:
+            # 分档(2026-08-20数据驱动修正): 期望转正线~70只, 稳定为正110+
+            # 3年扫描: <60档期望-0.2%~-2.0% | 60-109档-0.2%~+0.7% | 110+档+1.9%~+3.0%
+            if _zt_n < 60 or _max_cons <= 2:
                 _env = '🌡️ 弱市'
                 if _warming:
                     _switch, _pos_pct = '🟡 买入开关: 1/3仓(升温日例外)', 0.33
                 else:
                     _switch, _pos_pct = '🛑 买入开关: 关闭(空仓)', 0.0
-            elif _zt_n >= 70 and _max_cons >= 5:
+            elif _zt_n >= 110:
                 _env, _switch, _pos_pct = '🌡️ 强势', '🟢 买入开关: 全仓', 1.0
             else:
-                # 正常日期望-0.52%仍为负, 仓位压至1/3 (2026-08-20修正)
-                _env, _switch, _pos_pct = '🌡️ 正常', '🟡 买入开关: 1/3仓', 0.33
+                _env, _switch, _pos_pct = '🌡️ 正常', '🟢 买入开关: 半仓', 0.5
 
             print(f'\n  {_env}: 昨日涨停{_zt_n}只, 最高{_max_cons}板'
                   + (f', 较前日{_zt_prev}只{"回升" if _warming else "回落"}' if _zt_prev is not None else ''))
@@ -504,7 +505,7 @@ def main():
                     if _avg_gap is not None and _avg_gap <= -0.5:
                         _downgrade = {'🌡️ 弱市': ('🌡️ 弱市', '🛑 买入开关: 关闭(空仓)', 0.0),
                                       '🌡️ 正常': ('🌡️ 弱市↓', '🛑 买入开关: 关闭(空仓, 竞价二次确认降档)', 0.0),
-                                      '🌡️ 强势': ('🌡️ 正常↓', '🟡 买入开关: 1/3仓(竞价二次确认降档)', 0.33)}
+                                      '🌡️ 强势': ('🌡️ 正常↓', '🟢 买入开关: 半仓(竞价二次确认降档)', 0.5)}
                         if _env in _downgrade:
                             _env2, _switch2, _pct2 = _downgrade[_env]
                             print(f'  ⚠ 竞价二次确认: 池均gap {_avg_gap:+.1f}% ≤ -0.5% → 环境降档')
