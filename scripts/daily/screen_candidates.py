@@ -13,7 +13,7 @@ BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 from scoring import (
     score_v2, score_v3, load_config as load_scoring_config,
     score_to_prob, score_to_position, get_buy_window, get_score_min,
-    load_config
+    load_config, sector_resonance_count,
 )
 LOG_DIR = os.path.join(BASE, 'logs')
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -128,9 +128,10 @@ def main():
 
     print(f'[Screen] Today LU stocks (eligible): {len(pool)}')
 
-    sector_counts = {}
-    for s in pool:
-        ind = s['industry']; sector_counts[ind] = sector_counts.get(ind, 0) + 1
+    # 板块共振: 拆词交集计数 (2026-08-21, 同花顺个股化原因串适配)
+    _all_industries = [s.get('industry', '') for s in pool]
+    sector_counts = {s['industry']: sector_resonance_count(s['industry'], _all_industries)
+                     for s in pool}
 
     cfg = load_scoring_config()
     version = cfg.get('active', 'v3')

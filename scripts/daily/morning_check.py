@@ -219,8 +219,8 @@ def find_divergence_candidates():
             pool = json.load(f)
     stocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
 
-    from collections import Counter
-    sector_cnt = Counter(str(s.get('industry', '')) for s in stocks)
+    from scoring import sector_resonance_count
+    sector_cnt = [str(s.get('industry', '')) for s in stocks]
 
     auc = {}
     af = os.path.join(BASE, 'data', 'auction', f'{today_str}.json')
@@ -276,7 +276,8 @@ def find_divergence_candidates():
         cands.append({
             'code': code, 'name': s.get('name', '?'), 'gap': gap,
             'zhaban': zhaban, 'cons': s.get('limit_days', s.get('cons', '?')),
-            'industry': s.get('industry', ''), 'sector': sector_cnt.get(s.get('industry', ''), 0),
+            'industry': s.get('industry', ''),
+            'sector': sector_resonance_count(s.get('industry', ''), sector_cnt),
             'grade': 'WATCH' if gap > 0 else 'REJECT',
         })
     return cands
@@ -303,8 +304,8 @@ def _load_prev_pool():
         with open(os.path.join(zt_dir, files[-1]), encoding='gbk') as f:
             pool = json.load(f)
     stocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
-    from collections import Counter
-    sector_cnt = Counter(str(x.get('industry', '')) for x in stocks)
+    # 板块共振计数改拆词交集 (2026-08-21, 同花顺个股化原因串适配)
+    sector_cnt = [str(x.get('industry', '')) for x in stocks]
     _prev_pool_cache = (stocks, sector_cnt)
     return _prev_pool_cache
 
@@ -330,7 +331,8 @@ def stock_scoring_meta(code):
             p = next((x for x in stocks if str(x.get('code', '')).replace('sh', '').replace('sz', '') == code), None)
             if p:
                 meta['industry'] = p.get('industry', '')
-                meta['sector'] = sector_cnt.get(p.get('industry', ''), 1)
+                from scoring import sector_resonance_count
+                meta['sector'] = sector_resonance_count(p.get('industry', ''), sector_cnt)
                 meta['cons'] = p.get('limit_days', '?')
                 meta['detail'] = {
                     'seal_time': str(p.get('first_seal', '')).replace(':', ''),

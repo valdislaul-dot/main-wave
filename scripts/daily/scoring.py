@@ -61,6 +61,19 @@ def step_score_desc(x, tiers):
     return tiers[-1][1] if tiers else 0
 
 
+def sector_resonance_count(industry, all_industries):
+    """板块共振计数 — 拆词集合交集 (2026-08-21, 同花顺源适配)
+    同花顺 industry 是个股化原因串(如'创新药+中药+中报预增'), 完全匹配永远=1,
+    东财时代的标准行业名多股共享已失效 → 改为按 '+' 拆题材词, 交集非空即共振。
+    返回: 池内与该股有共同题材词的股票数(含自身)"""
+    def _words(ind):
+        return {w.strip() for w in str(ind or '').replace('，', '+').split('+') if w.strip()}
+    w0 = _words(industry)
+    if not w0:
+        return 1
+    return sum(1 for ind in all_industries if w0 & _words(ind))
+
+
 # ============================================================
 # 配置加载
 # ============================================================
