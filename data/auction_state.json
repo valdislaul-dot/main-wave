@@ -1,46 +1,61 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 32,
+  "total_sessions": 33,
   "current": {
-    "date": "2026-08-20",
-    "captured": "2026-08-20 09:25:32",
-    "total": 32,
-    "buyable": 4,
+    "date": "2026-08-21",
+    "captured": "2026-08-21 09:25:32",
+    "total": 58,
+    "buyable": 6,
+    "avg_gap": 1.61,
     "gap_distribution": {
-      "<-3%": 11,
-      "-3-0%": 10,
-      "9%+": 3,
-      "2-5%": 5,
-      "0-2%": 1,
-      "5-9%": 2
+      "2-5%": 13,
+      "9%+": 5,
+      "0-2%": 17,
+      "-3-0%": 11,
+      "5-9%": 5,
+      "<-3%": 7
     },
     "buyable_stocks": [
       {
-        "code": "600127",
-        "name": "金健米业",
-        "gap_pct": 4.09,
-        "score": 73.0,
-        "limit_days": 3
+        "code": "001277",
+        "name": "速达股份",
+        "gap_pct": 4.96,
+        "score": 52.0,
+        "limit_days": 2
       },
       {
-        "code": "601011",
-        "name": "宝泰隆",
-        "gap_pct": 6.91,
-        "score": 32.0,
-        "limit_days": 1
-      },
-      {
-        "code": "603102",
-        "name": "百合股份",
-        "gap_pct": 5.55,
-        "score": 21.0,
+        "code": "603590",
+        "name": "康辰药业",
+        "gap_pct": 5.62,
+        "score": 42.0,
         "limit_days": 1
       },
       {
         "code": "603801",
         "name": "志邦家居",
-        "gap_pct": 4.41,
-        "score": 0,
+        "gap_pct": 5.81,
+        "score": 19.0,
+        "limit_days": 2
+      },
+      {
+        "code": "603958",
+        "name": "哈森股份",
+        "gap_pct": 7.07,
+        "score": -5.0,
+        "limit_days": 1
+      },
+      {
+        "code": "600250",
+        "name": "南京商旅",
+        "gap_pct": 6.06,
+        "score": -8.0,
+        "limit_days": 1
+      },
+      {
+        "code": "002491",
+        "name": "通鼎互联",
+        "gap_pct": 4.1,
+        "score": -23.0,
         "limit_days": 1
       }
     ]
@@ -456,7 +471,20 @@
         "0-2%": 1,
         "5-9%": 2
       }
+    },
+    {
+      "date": "2026-08-21",
+      "total": 58,
+      "buyable": 6,
+      "gap_distribution": {
+        "2-5%": 13,
+        "9%+": 5,
+        "0-2%": 17,
+        "-3-0%": 11,
+        "5-9%": 5,
+        "<-3%": 7
+      }
     }
   ],
-  "last_update": "2026-08-20"
+  "last_update": "2026-08-21"
 }
