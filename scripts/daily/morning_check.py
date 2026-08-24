@@ -165,7 +165,8 @@ def compute_environment(pf):
             pass
         r['warming'] = r['zt_prev'] is not None and r['zt_n'] > r['zt_prev']
 
-        # 3年数据驱动分档
+        # 3年数据驱动分档: 期望转正线~70只, 稳定为正110+
+        # 最高≤2板条件: 08-24二维扫描验证为冗余(涨停60+时几乎必>2板), 防御性保留
         if r['zt_n'] < 60 or r['max_cons'] <= 2:
             r['env'] = '🌡️ 弱市'
             if r['warming']:
@@ -576,10 +577,25 @@ def main():
     print(f'  📊 表1: 当日可买前三 (评分≥10, 竞价4-8%, 已过滤一字/4板+一字/300·688)')
     print(f'{"=" * 65}')
     if top3:
-        print(f'  {"#":<3}{"标的":<14}{"评分":>6}{"竞价gap":>8}{"连板":>5}{"板块":>9}')
+        print(f'  {"#":<3}{"标的":<14}{"评分":>6}{"竞价gap":>8}{"连板":>5}{"板块":>9}{"⚠跌停风险":>10}')
         for i, b in enumerate(top3, 1):
+            # 跌停风险查表 (2026-08-24, 3年全路径积分模型)
+            _cons = int(b.get('limit_days') or 1)
+            _vr = b.get('vr20', 0) or 0
+            if _cons >= 3:
+                _dt_p, _dt_risk = 30.5, -0.93
+            elif _cons == 2:
+                _dt_p, _dt_risk = 22.0, -0.81
+            elif _vr >= 4:
+                _dt_p, _dt_risk = 9.5, -0.92
+            elif _vr < 1:
+                _dt_p, _dt_risk = 4.1, -0.28
+            else:
+                _dt_p, _dt_risk = 10.7, -0.42
+            _dt_mark = '🔴' if _dt_p >= 20 else ('🟡' if _dt_p >= 10 else '⚪')
+            _dt_str = f'{_dt_mark}{_dt_p:.0f}%({_dt_risk:+.2f})'
             print(f'  {i:<3}{b["name"]}({b["code"]}){b["score"]:>8.0f}{b["gap"]:>+7.1f}%'
-                  f'{str(b["limit_days"]) + "板":>6}{str(b["sector"]) + "只":>6}')
+                  f'{str(_cons) + "板":>6}{str(b["sector"]) + "只":>6}{_dt_str:>14}')
     else:
         print(f'  (无评分≥10的可买标的)')
 

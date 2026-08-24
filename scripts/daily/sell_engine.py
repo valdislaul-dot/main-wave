@@ -440,7 +440,17 @@ def sell_signal(position, today_auction, config=None):
                 yesterday.get('high', auction_price),
                 'V3.2回测验证: 断板日gap≥4%持有收益为正')
 
-        # ── 低开分支 — A体系 ──
+        # ── 低开分支 — A体系 (2026-08-24修正: 跌停开按3年数据拆分) ──
+        # 数据(v3跌停分析): 跌停开盘开板率仅30.1%(69.9%封死), 封死次日-2.1%~-5.75%;
+        #   深水非跌停开(-9.5%~-5%)开板率更高, 3板内自救有价值
+        if gap <= -9.5:
+            # 跌停开盘 → 竞价排队卖出 (v3: 30.1%开板, 撬板反抽1-3%为主, 期望为负)
+            return _signal('sell', 'urgent',
+                f'昨断板+跌停开盘{gap:+.1f}% → 竞价排队卖出',
+                auction_price,
+                '3年数据: 跌停开仅30.1%当日开板, 封死次日再跌-2.1%~-5.75%; '
+                '若开盘快速撬板可撤单改反抽卖, 不恋战')
+
         if is_deep_low and board_num <= 3:
             return _signal('watch', 'urgent',
                 f'昨断板+深水低开{gap:+.1f}%({board_num}板) → 等自救冲高',
