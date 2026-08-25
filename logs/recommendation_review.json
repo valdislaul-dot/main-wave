@@ -679,29 +679,104 @@
           "verdict": "❌推荐错误"
         }
       ]
+    },
+    "2026-08-21": {
+      "date": "2026-08-21",
+      "settled_on": "2026-08-25",
+      "total": 3,
+      "wins": 0,
+      "avg_pnl": -10.0,
+      "stocks": [
+        {
+          "rank": 1,
+          "code": "001277",
+          "name": "速达股份",
+          "score": 52.0,
+          "rec_gap": 4.96,
+          "T": {
+            "open": 38.07,
+            "close": 35.43,
+            "limit_up": false,
+            "pct": -2.32
+          },
+          "T1": {
+            "gap": -13.04,
+            "close": 33.36,
+            "limit_up": false
+          },
+          "sell": 34.263,
+          "note": "硬止损-10%",
+          "pnl_pct": -10.0,
+          "verdict": "❌推荐错误"
+        },
+        {
+          "rank": 2,
+          "code": "603590",
+          "name": "康辰药业",
+          "score": 42.0,
+          "rec_gap": 5.62,
+          "T": {
+            "open": 36.26,
+            "close": 32.21,
+            "limit_up": false,
+            "pct": -6.18
+          },
+          "T1": {
+            "gap": -6.52,
+            "close": 30.85,
+            "limit_up": false
+          },
+          "sell": 32.634,
+          "note": "硬止损-10%",
+          "pnl_pct": -10.0,
+          "verdict": "❌推荐错误"
+        },
+        {
+          "rank": 3,
+          "code": "603801",
+          "name": "志邦家居",
+          "score": 19.0,
+          "rec_gap": 5.81,
+          "T": {
+            "open": 7.65,
+            "close": 6.95,
+            "limit_up": false,
+            "pct": -3.87
+          },
+          "T1": {
+            "gap": -5.61,
+            "close": 6.7,
+            "limit_up": false
+          },
+          "sell": 6.885,
+          "note": "硬止损-10%",
+          "pnl_pct": -10.0,
+          "verdict": "❌推荐错误"
+        }
+      ]
     }
   },
   "stats": {
-    "total": 27,
+    "total": 30,
     "wins": 12,
-    "avg_pnl": -0.88,
+    "avg_pnl": -1.79,
     "by_rank": {
       "1": {
-        "n": 9,
+        "n": 10,
         "wins": 6,
-        "avg_pnl": -0.9
+        "avg_pnl": -1.81
       },
       "2": {
-        "n": 9,
+        "n": 10,
         "wins": 3,
-        "avg_pnl": -0.6
+        "avg_pnl": -1.54
       },
       "3": {
-        "n": 9,
+        "n": 10,
         "wins": 3,
-        "avg_pnl": -1.15
+        "avg_pnl": -2.04
       }
     },
-    "win_rate": 44.4
+    "win_rate": 40.0
   }
 }

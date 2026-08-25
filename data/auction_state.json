@@ -1,61 +1,61 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 33,
+  "total_sessions": 34,
   "current": {
-    "date": "2026-08-21",
-    "captured": "2026-08-21 09:25:32",
-    "total": 58,
+    "date": "2026-08-25",
+    "captured": "2026-08-25 09:25:52",
+    "total": 44,
     "buyable": 6,
-    "avg_gap": 1.61,
+    "avg_gap": 1.52,
     "gap_distribution": {
-      "2-5%": 13,
-      "9%+": 5,
-      "0-2%": 17,
-      "-3-0%": 11,
-      "5-9%": 5,
-      "<-3%": 7
+      "9%+": 3,
+      "0-2%": 15,
+      "<-3%": 3,
+      "-3-0%": 14,
+      "2-5%": 4,
+      "5-9%": 5
     },
     "buyable_stocks": [
       {
-        "code": "001277",
-        "name": "速达股份",
-        "gap_pct": 4.96,
-        "score": 52.0,
-        "limit_days": 2
+        "code": "002412",
+        "name": "汉森制药",
+        "gap_pct": 6.33,
+        "score": 47.0,
+        "limit_days": 3
       },
       {
-        "code": "603590",
-        "name": "康辰药业",
-        "gap_pct": 5.62,
-        "score": 42.0,
+        "code": "601212",
+        "name": "白银有色",
+        "gap_pct": 6.42,
+        "score": 32.0,
         "limit_days": 1
       },
       {
-        "code": "603801",
-        "name": "志邦家居",
-        "gap_pct": 5.81,
+        "code": "603200",
+        "name": "上海洗霸",
+        "gap_pct": 4.78,
         "score": 19.0,
-        "limit_days": 2
-      },
-      {
-        "code": "603958",
-        "name": "哈森股份",
-        "gap_pct": 7.07,
-        "score": -5.0,
         "limit_days": 1
       },
       {
-        "code": "600250",
-        "name": "南京商旅",
-        "gap_pct": 6.06,
-        "score": -8.0,
+        "code": "001268",
+        "name": "联合精密",
+        "gap_pct": 4.33,
+        "score": 1.0,
         "limit_days": 1
       },
       {
-        "code": "002491",
-        "name": "通鼎互联",
-        "gap_pct": 4.1,
-        "score": -23.0,
+        "code": "600508",
+        "name": "上海能源",
+        "gap_pct": 6.98,
+        "score": 0,
+        "limit_days": 1
+      },
+      {
+        "code": "002906",
+        "name": "华阳集团",
+        "gap_pct": 5.77,
+        "score": 0,
         "limit_days": 1
       }
     ]
@@ -484,7 +484,20 @@
         "5-9%": 5,
         "<-3%": 7
       }
+    },
+    {
+      "date": "2026-08-25",
+      "total": 44,
+      "buyable": 6,
+      "gap_distribution": {
+        "9%+": 3,
+        "0-2%": 15,
+        "<-3%": 3,
+        "-3-0%": 14,
+        "2-5%": 4,
+        "5-9%": 5
+      }
     }
   ],
-  "last_update": "2026-08-21"
+  "last_update": "2026-08-25"
 }

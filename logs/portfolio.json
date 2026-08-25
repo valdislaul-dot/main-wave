@@ -1,7 +1,28 @@
 {
-  "cash": 71281.20000000001,
-  "position": null,
-  "positions": [],
+  "cash": 25466.500000000015,
+  "position": {
+    "name": "白银有色",
+    "code": "601212",
+    "buy_date": "2026-08-25",
+    "buy_price": 6.863,
+    "shares": 3400
+  },
+  "positions": [
+    {
+      "name": "白银有色",
+      "code": "601212",
+      "buy_date": "2026-08-25",
+      "buy_price": 6.863,
+      "shares": 3400
+    },
+    {
+      "name": "楚天龙",
+      "code": "003040",
+      "buy_date": "2026-08-25",
+      "buy_price": 14.987,
+      "shares": 1500
+    }
+  ],
   "total_trades": 17,
   "winning_trades": 11,
   "total_pnl": 60947.500000000015,
