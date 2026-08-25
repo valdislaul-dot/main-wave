@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scoring import (
-    score_v2, score_v3, load_config as load_scoring_config,
+    score_v2, score_v3, score_v4, load_config as load_scoring_config,
     score_to_prob, score_to_position, get_buy_window, get_score_min,
     load_config, sector_resonance_count,
 )
@@ -132,10 +132,23 @@ def main():
     _all_industries = [s.get('industry', '') for s in pool]
     sector_counts = {s['industry']: sector_resonance_count(s['industry'], _all_industries)
                      for s in pool}
+    # V4题材热度分档: 该股题材词中当日出现次数最多的词的热度
+    from collections import Counter as _C
+    _word_freq = _C()
+    for s in pool:
+        for w in str(s.get('industry', '')).replace('，', '+').split('+'):
+            if w.strip():
+                _word_freq[w.strip()] += 1
+    _sector_bucket_map = {}
+    for s in pool:
+        _ws = [w for w in str(s.get('industry', '')).replace('，', '+').split('+') if w.strip()]
+        _heat = max(_word_freq[w] for w in _ws) if _ws else 0
+        _sector_bucket_map[s['industry']] = ('<3' if _heat < 3 else ('3-4' if _heat < 5 else (
+            '5-9' if _heat < 10 else '>=10')))
 
     cfg = load_scoring_config()
-    version = cfg.get('active', 'v3')
-    score_fn = score_v3 if version == 'v3' else score_v2
+    version = cfg.get('active', 'v4')
+    score_fn = {'v4': score_v4, 'v3': score_v3, 'v2': score_v2}.get(version, score_v4)
 
     results = []
     score_fail = 0
@@ -154,6 +167,7 @@ def main():
             'zhaban': s['break_times'],
             'sector_count': sector_counts.get(s['industry'], 1),
             'industry': s['industry'], 'turnover': s['turnover'],
+            'sector_bucket': _sector_bucket_map.get(s['industry'], '>=10'),
         }
 
         score, details = score_fn(code, klines, details_raw)
@@ -178,17 +192,35 @@ def main():
             seal_duration = lm - fm
         except: pass
 
-        results.append({
-            'code': code, 'name': name,
-            'score': score, 'vr20': details['vr20'],
-            'gap': details['gap'], 'cons': details['cons'],
-            'one_line': details['one_line'],
-            'true_one_line': details['true_one_line'],
-            'open': details['open'], 'close': details['close'],
-            'seal_time': s['first_seal'], 'seal_dur': seal_duration,
-            'break_n': s['break_times'], 'last_seal': s['last_seal'],
-            'industry': s['industry'], 'turnover': s['turnover'],
-        })
+        if version == 'v4':
+            # v4 det结构: {score, factor_scores, cons, vr, gap, board_type, dt_p}
+            _kl = klines.get('data', klines) if isinstance(klines, dict) else klines
+            k = _kl[-1]
+            results.append({
+                'code': code, 'name': name,
+                'score': score, 'vr20': details.get('vr', 0),
+                'gap': details.get('gap', 0), 'cons': details.get('cons', 1),
+                'one_line': details.get('board_type') == '一字',
+                'true_one_line': details.get('board_type') == '一字',
+                'open': k['open'], 'close': k['close'],
+                'seal_time': s['first_seal'], 'seal_dur': seal_duration,
+                'break_n': s['break_times'], 'last_seal': s['last_seal'],
+                'industry': s['industry'], 'turnover': s['turnover'],
+                'factor_scores': details.get('factor_scores', {}),
+                'dt_p': details.get('dt_p', 0),
+            })
+        else:
+            results.append({
+                'code': code, 'name': name,
+                'score': score, 'vr20': details['vr20'],
+                'gap': details['gap'], 'cons': details['cons'],
+                'one_line': details['one_line'],
+                'true_one_line': details['true_one_line'],
+                'open': details['open'], 'close': details['close'],
+                'seal_time': s['first_seal'], 'seal_dur': seal_duration,
+                'break_n': s['break_times'], 'last_seal': s['last_seal'],
+                'industry': s['industry'], 'turnover': s['turnover'],
+            })
 
     results.sort(key=lambda x: x['score'], reverse=True)
 

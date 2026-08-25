@@ -1,6 +1,6 @@
 {
   "version": "4.0",
-  "active": "v3",
+  "active": "v4",
   "tables": {
     "v2": {
       "vr_tiers": [
@@ -299,7 +299,7 @@
     4.0,
     8.0
   ],
-  "score_min": 10,
+  "score_min": 50,
   "filters": {
     "true_one_line_skip": true,
     "board4_one_line_skip": true

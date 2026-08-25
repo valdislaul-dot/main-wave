@@ -313,6 +313,19 @@ def _load_prev_pool():
 _meta_cache = {}
 
 
+def _sector_bucket_of(industry, stocks):
+    """V4题材热度分档: 该股题材词中池内出现次数最多的词的热度"""
+    from collections import Counter as _C
+    freq = _C()
+    for s in stocks:
+        for w in str(s.get('industry', '')).replace('，', '+').split('+'):
+            if w.strip():
+                freq[w.strip()] += 1
+    ws = [w for w in str(industry or '').replace('，', '+').split('+') if w.strip()]
+    heat = max(freq[w] for w in ws) if ws else 0
+    return '<3' if heat < 3 else ('3-4' if heat < 5 else ('5-9' if heat < 10 else '>=10'))
+
+
 def stock_scoring_meta(code):
     """按评分表现场打分 + T-1池明细 → {score, industry, sector, cons, klines, detail}
     (解决流水线评分盲区: 无分股票现场补打分)"""
@@ -339,10 +352,17 @@ def stock_scoring_meta(code):
                     'final_seal_time': str(p.get('last_seal', '')).replace(':', ''),
                     'zhaban': int(p.get('break_times', 0) or 0),
                     'sector_count': meta['sector'],
+                    # V4题材热度分档(池级词频)
+                    'sector_bucket': _sector_bucket_of(p.get('industry', ''), stocks),
                 }
         if meta['klines'] and meta['detail']:
-            from scoring import compute_score
-            sc, _ = compute_score(code, meta['klines'], meta['detail'], 'v3')
+            from scoring import score_v4, load_config as _lc
+            _cfg = _lc()
+            if _cfg.get('active') == 'v4':
+                sc, _ = score_v4(code, meta['klines'], meta['detail'])
+            else:
+                from scoring import compute_score
+                sc, _ = compute_score(code, meta['klines'], meta['detail'], 'v3')
             meta['score'] = sc
     except Exception:
         pass
@@ -571,9 +591,10 @@ def main():
             print(f'  ✓ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% > -0.5%, 维持评级')
 
     # ── 📊 表1: 当日可买前三 ──
-    top3 = [b for b in buyable if b['score'] >= 10][:3]
+    from scoring import get_score_min as _gsm
+    top3 = [b for b in buyable if b['score'] >= _gsm()][:3]
     print(f'\n{"=" * 65}')
-    print(f'  📊 表1: 当日可买前三 (评分≥10, 竞价4-8%, 已过滤一字/4板+一字/300·688)')
+    print(f'  📊 表1: 当日可买前三 (评分≥50, 竞价4-8%, 已过滤一字/4板+一字/300·688)')
     print(f'{"=" * 65}')
     if top3:
         print(f'  {"#":<3}{"标的":<14}{"评分":>6}{"竞价gap":>8}{"连板":>5}{"板块":>9}{"⚠跌停风险":>10}')
@@ -596,22 +617,35 @@ def main():
             print(f'  {i:<3}{b["name"]}({b["code"]}){b["score"]:>8.0f}{b["gap"]:>+7.1f}%'
                   f'{str(_cons) + "板":>6}{str(b["sector"]) + "只":>6}{_dt_str:>14}')
     else:
-        print(f'  (无评分≥10的可买标的)')
+        print(f'  (无评分≥50的可买标的)')
 
     # ── 📊 表2: 前三名得分细则 ──
     if top3:
         print(f'\n{"=" * 65}')
-        print(f'  📊 表2: 前三名得分细则 (V3评分表逐因子)')
+        print(f'  📊 表2: 前三名得分细则 (V4百分制加权)')
         print(f'{"=" * 65}')
-        from scoring import full_breakdown
+        from scoring import load_config as _lc2
+        _cfg2 = _lc2()
+        _is_v4 = _cfg2.get('active') == 'v4'
         for b in top3:
             meta = stock_scoring_meta(b['code'])
             if meta['klines'] and meta['detail']:
-                r = full_breakdown(b['code'], meta['klines'], meta['detail'], 'v3')
-                if r:
-                    total, items = r
-                    print(f'  {b["name"]}({b["code"]})  {total:.0f}分')
-                    print(f'    ' + '  '.join(f'{f}({v}){s:+}' for f, v, s in items))
+                if _is_v4:
+                    from scoring import score_v4
+                    _sc4, _det4 = score_v4(b['code'], meta['klines'], meta['detail'])
+                    if _det4:
+                        print(f'  {b["name"]}({b["code"]})  {_sc4:.0f}分')
+                        _f = _det4['factor_scores']
+                        _w = _cfg2['v4']['weights']
+                        print(f'    ' + '  '.join(
+                            f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
+                else:
+                    from scoring import full_breakdown
+                    r = full_breakdown(b['code'], meta['klines'], meta['detail'], 'v3')
+                    if r:
+                        total, items = r
+                        print(f'  {b["name"]}({b["code"]})  {total:.0f}分')
+                        print(f'    ' + '  '.join(f'{f}({v}){s:+}' for f, v, s in items))
 
     # ── 昨日候选（参考） ──
     if data:
