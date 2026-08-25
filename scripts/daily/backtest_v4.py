@@ -188,20 +188,23 @@ def main():
                         today_lu = is_lu_pct(k0, kls[idx0 - 1] if idx0 > 0 else None)
                         gap = (k0['open'] - k1['close']) / k1['close'] * 100
                         loss = (k0['open'] - pos['buy_price']) / pos['buy_price'] * 100
-                        if loss <= -10:
+                        # 用户行为口径(2026-08-25): 观察15分钟弱转强则持有, 往高卖, 硬止损-10%兜底
+                        loss_min = (k0['low'] - pos['buy_price']) / pos['buy_price'] * 100
+                        if loss_min <= -10:
+                            # 硬止损: 盘中跌破-10%卖在止损线
+                            sell_price = pos['buy_price'] * 0.90
                             action = 'sell'
-                        elif yest_lu and gap < 0:
+                        elif yest_lu and gap < 0 and not today_lu:
+                            # 昨涨停今低开且收盘未涨停(弱转强失败) → 卖当日HIGH(往高卖)
+                            sell_price = k0['high'] * (1 - COST)
                             action = 'sell'
-                        elif yest_lu and today_lu:
-                            action = 'hold'
-                        elif yest_lu:
+                        elif not yest_lu and gap < 4 and not today_lu:
+                            # 昨断板+竞价差+未弱转强 → 卖当日HIGH
+                            sell_price = k0['high'] * (1 - COST)
                             action = 'sell'
-                        elif gap >= 4:
-                            action = 'hold'
                         else:
-                            action = 'sell'
+                            action = 'hold'
                         if action == 'sell':
-                            sell_price = k0['open'] * (1 - COST)
                             pnl = (sell_price - pos['buy_price']) / pos['buy_price'] * 100
                             cash += pos['shares'] * sell_price
                             trades.append({'pnl': pnl})
@@ -211,7 +214,7 @@ def main():
                 prev_d = dates_fmt[i - 1]
                 cands = []
                 for code, (f, btype, cons, k) in factor_days.get(prev_d, {}).items():
-                    if btype == '一字' or cons >= 4:
+                    if btype == '一字' or (cons >= 4 and btype in ('一字', 'T字')):
                         continue
                     score = sum(weights[fac] * f[fac] for fac in FACTORS) / 100.0
                     cands.append((score, code))

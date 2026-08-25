@@ -349,16 +349,16 @@
   "v4": {
     "_note": "V4百分制加权评分(2026-08-25): 总分=Σ归一化分(0-100)×权重; 归一化形状来自1年数据(factor_shape)",
     "weights": {
-      "vr": 10.8,
-      "gap": 14.4,
-      "board_type": 3.6,
-      "cons": 7.2,
-      "dow": 12.6,
-      "seal": 7.2,
+      "vr": 10.1,
+      "gap": 12.8,
+      "board_type": 3.4,
+      "cons": 6.7,
+      "dow": 11.8,
+      "seal": 6.7,
       "zhaban": 0.0,
-      "sector": 21.6,
-      "divergence": 8.1,
-      "dt_risk": 14.4
+      "sector": 30.2,
+      "divergence": 0.0,
+      "dt_risk": 18.2
     },
     "normalize": {
       "vr": {
@@ -423,6 +423,6 @@
         "p": "线性: 触跌停概率≤5%→100, ≥35%→10"
       }
     },
-    "searched_obj": 30.3
+    "searched_obj": 756.4
   }
 }
