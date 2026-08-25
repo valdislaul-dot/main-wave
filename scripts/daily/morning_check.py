@@ -165,18 +165,17 @@ def compute_environment(pf):
             pass
         r['warming'] = r['zt_prev'] is not None and r['zt_n'] > r['zt_prev']
 
-        # 3年数据驱动分档: 期望转正线~70只, 稳定为正110+
-        # 最高≤2板条件: 08-24二维扫描验证为冗余(涨停60+时几乎必>2板), 防御性保留
-        if r['zt_n'] < 60 or r['max_cons'] <= 2:
-            r['env'] = '🌡️ 弱市'
+        # 温度分档(2026-08-25用户定稿): 极弱<40空仓(升温例外半仓) | 弱市40-109半仓 | 强市≥110全仓
+        if r['zt_n'] < 40 or r['max_cons'] <= 2:
+            r['env'] = '🌡️ 极弱'
             if r['warming']:
-                r['switch'], r['pos_pct'] = '🟡 买入开关: 1/3仓(升温日例外)', 0.33
+                r['switch'], r['pos_pct'] = '🟡 买入开关: 半仓(升温日例外)', 0.5
             else:
                 r['switch'], r['pos_pct'] = '🛑 买入开关: 关闭(空仓)', 0.0
         elif r['zt_n'] >= 110:
             r['env'], r['switch'], r['pos_pct'] = '🌡️ 强势', '🟢 买入开关: 全仓', 1.0
         else:
-            r['env'], r['switch'], r['pos_pct'] = '🌡️ 正常', '🟢 买入开关: 半仓', 0.5
+            r['env'], r['switch'], r['pos_pct'] = '🌡️ 弱市', '🟢 买入开关: 半仓', 0.5
 
         # 竞价二次确认: 池均gap ≤ -0.5% → 降一档 (3年724日校准)
         try:
@@ -186,9 +185,9 @@ def compute_environment(pf):
                     _astate = json.load(_f)
                 r['avg_gap'] = (_astate.get('current') or {}).get('avg_gap')
                 if r['avg_gap'] is not None and r['avg_gap'] <= -0.5:
-                    _downgrade = {'🌡️ 弱市': ('🌡️ 弱市', '🛑 买入开关: 关闭(空仓)', 0.0),
-                                  '🌡️ 正常': ('🌡️ 弱市↓', '🛑 买入开关: 关闭(空仓, 竞价二次确认降档)', 0.0),
-                                  '🌡️ 强势': ('🌡️ 正常↓', '🟢 买入开关: 半仓(竞价二次确认降档)', 0.5)}
+                    _downgrade = {'🌡️ 极弱': ('🌡️ 极弱', '🛑 买入开关: 关闭(空仓)', 0.0),
+                                  '🌡️ 弱市': ('🌡️ 极弱↓', '🛑 买入开关: 关闭(空仓, 竞价二次确认降档)', 0.0),
+                                  '🌡️ 强势': ('🌡️ 弱市↓', '🟢 买入开关: 半仓(竞价二次确认降档)', 0.5)}
                     if r['env'] in _downgrade:
                         r['env'], r['switch'], r['pos_pct'] = _downgrade[r['env']]
                         r['downgraded'] = True

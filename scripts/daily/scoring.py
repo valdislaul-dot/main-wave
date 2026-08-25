@@ -469,6 +469,88 @@ def score_v3(code, klines, details_raw=None, config=None):
     return compute_score(code, klines, details_raw, 'v3', config)
 
 
+def score_v4(code, klines, details_raw=None, config=None):
+    """
+    V4百分制加权评分 (2026-08-25) — 总分 = Σ 因子归一化分(0-100) × 权重%
+    因子: vr/gap/board_type/cons/dow/seal/zhaban/sector/divergence/dt_risk
+    归一化形状来自1年数据(factor_shape), 权重由5月窗口搜索(backtest_v4)
+    返回: (score 0-100, details) or (None, None)
+    """
+    if config is None:
+        config = load_config()
+    v4 = config.get('v4')
+    if not v4:
+        return None, None
+    result = precompute_klines(code, klines)
+    if result is None or result[0] is None:
+        return None, None
+    pdb, today_dt = result
+    t1 = pdb[today_dt]
+
+    # 活跃度过滤(与v3一致)
+    from datetime import timedelta
+    cutoff = (datetime.strptime(today_dt, '%Y-%m-%d') - timedelta(days=365)).strftime('%Y-%m-%d')
+    recent_lu = sum(1 for dt, entry in pdb.items()
+                    if dt >= cutoff and dt != today_dt and entry['is_limit_up'])
+    if recent_lu < 2:
+        return None, None
+
+    if details_raw is None:
+        details_raw = {}
+    norm = v4['normalize']
+    weights = v4['weights']
+
+    cons = t1['cons_lu_before'] + 1   # 当日是第几板
+
+    # ---- 因子原始值 ----
+    vr = t1['vol_ratio5'] if cons >= 2 else t1['vol_ratio20']
+    gap = t1['gap_open_pct']
+    board_type = '一字' if t1.get('is_one_line') and abs(t1['high'] - t1['low']) < 0.001 else \
+                 ('T字' if t1.get('is_one_line') else '换手')
+    dow = ['周一', '周二', '周三', '周四', '周五'][
+        (datetime.strptime(today_dt, '%Y-%m-%d') + timedelta(days=1)).weekday()]
+    seal = str(details_raw.get('seal_time', '1459') or '1459').replace(':', '')
+    seal_b = '<5min' if seal <= '0935' else ('5-10min' if seal <= '0940' else (
+        '10-30min' if seal <= '1000' else ('30-60min' if seal <= '1030' else '>60min')))
+    zh = int(details_raw.get('zhaban', 0) or 0)
+    zh_b = '0' if zh == 0 else ('1' if zh == 1 else ('2' if zh == 2 else '3+'))
+    sec_b = str(details_raw.get('sector_bucket', '>=10'))
+    div_b = '分歧' if (zh >= 1 and vr >= 1.5) else '非分歧'
+    if cons >= 3:
+        dt_p = 30.5
+    elif cons == 2:
+        dt_p = 22.0
+    elif vr >= 4:
+        dt_p = 9.5
+    elif vr < 1:
+        dt_p = 4.1
+    else:
+        dt_p = 10.7
+
+    # ---- 归一化 ----
+    f = {
+        'vr': norm['vr'].get(('<0.5' if vr < 0.5 else '0.5-1' if vr < 1 else '1-2' if vr < 2
+                              else '2-4' if vr < 4 else '>=4'), 50),
+        'gap': norm['gap'].get(('<0' if gap < 0 else '0-2' if gap < 2 else '2-4' if gap < 4
+                                else '4-6' if gap < 6 else '6-8' if gap < 8
+                                else '8-10' if gap < 10 else '>=10'), 50),
+        'board_type': norm['board_type'].get(board_type, 50),
+        'cons': norm['cons'].get(('1' if cons == 1 else '2' if cons == 2 else '3' if cons == 3
+                                  else '4' if cons == 4 else '5+'), 55),
+        'dow': norm['dow'].get(dow, 55),
+        'seal': norm['seal'].get(seal_b, 60),
+        'zhaban': norm['zhaban'].get(zh_b, 70),
+        'sector': norm['sector'].get(sec_b, 70),
+        'divergence': norm['divergence'].get(div_b, 55),
+        'dt_risk': max(10, min(100, 100 - (dt_p - 5) * 3)),
+    }
+    score = sum(weights[k] * f[k] for k in weights if k in f) / 100.0
+    det = {'score': round(score, 1), 'factor_scores': f, 'cons': cons,
+           'vr': round(vr, 2), 'gap': round(gap, 2), 'board_type': board_type,
+           'dt_p': dt_p}
+    return round(score, 1), det
+
+
 def score_to_prob(score, config=None):
     if config is None:
         config = load_config()
