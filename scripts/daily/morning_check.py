@@ -193,6 +193,22 @@ def compute_environment(pf):
                         r['downgraded'] = True
         except Exception:
             pass
+        # 盘后赚钱效应校准 (2026-08-25, 斯皮尔曼+0.403最强指标): 昨日<-2% → 降一档
+        try:
+            _ms_path = os.path.join(BASE, 'data', 'market_state.json')
+            if os.path.exists(_ms_path):
+                with open(_ms_path, encoding='utf-8') as _f:
+                    _ms = json.load(_f)
+                r['money_effect'] = _ms.get('money_effect')
+                if r['money_effect'] is not None and r['money_effect'] < -2.0 and not r['downgraded']:
+                    _downgrade_me = {'🌡️ 极弱': ('🌡️ 极弱', '🛑 买入开关: 关闭(空仓)', 0.0),
+                                     '🌡️ 弱市': ('🌡️ 极弱↓', '🛑 买入开关: 关闭(空仓, 赚钱效应-2%校准)', 0.0),
+                                     '🌡️ 强势': ('🌡️ 弱市↓', '🟢 买入开关: 半仓(赚钱效应-2%校准)', 0.5)}
+                    if r['env'] in _downgrade_me:
+                        r['env'], r['switch'], r['pos_pct'] = _downgrade_me[r['env']]
+                        r['downgraded'] = True
+        except Exception:
+            pass
     except Exception:
         pass
     return r
@@ -589,6 +605,13 @@ def main():
                   f' (3年724日: 该档当日-2.87%/上涨31%)')
         elif env_info.get('avg_gap') is not None:
             print(f'  ✓ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% > -0.5%, 维持评级')
+        if env_info.get('money_effect') is not None:
+            _me = env_info['money_effect']
+            if _me < -2.0 and env_info.get('downgraded'):
+                print(f'  ⚠ 盘后赚钱效应: 昨日{_me:+.1f}% < -2% → 已降档')
+            else:
+                _me_mark = '⚠' if _me < 0 else '✓'
+                print(f'  {_me_mark} 盘后赚钱效应: 昨日{_me:+.1f}% (关联最强指标, <-2%降档)')
 
     # ── 📊 表1: 当日可买前三 ──
     from scoring import get_score_min as _gsm

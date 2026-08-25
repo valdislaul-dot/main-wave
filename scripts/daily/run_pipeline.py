@@ -138,6 +138,13 @@ def main():
             except Exception as e:
                 print(f'[Warning] 数据体检失败: {e}')
 
+            # Step 8.5: 市场状态采集 (赚钱效应, 次日竞价校准温度开关)
+            try:
+                from capture_market_state import main as capture_market_state
+                capture_market_state()
+            except Exception as e:
+                print(f'[Warning] 市场状态采集失败: {e}')
+
             # Step 9: 数据上云同步 (2026-08-16新增, 自动push关键快照到GitHub)
             print('\n[Step 9] 数据上云同步...')
             try:
