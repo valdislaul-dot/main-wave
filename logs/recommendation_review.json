@@ -754,29 +754,105 @@
           "verdict": "❌推荐错误"
         }
       ]
+    },
+    "2026-08-25": {
+      "date": "2026-08-25",
+      "settled_on": "2026-08-26",
+      "total": 3,
+      "wins": 1,
+      "avg_pnl": -0.03,
+      "stocks": [
+        {
+          "rank": 1,
+          "code": "002412",
+          "name": "汉森制药",
+          "score": 47.0,
+          "rec_gap": 6.33,
+          "T": {
+            "open": 11.92,
+            "close": 12.33,
+            "limit_up": true,
+            "pct": 9.99
+          },
+          "T1": {
+            "gap": 9.08,
+            "close": 13.09,
+            "limit_up": false
+          },
+          "sell": 13.09,
+          "note": "昨涨停高开+9.08%→持有至收盘",
+          "pnl_pct": 9.82,
+          "verdict": "✅推荐正确"
+        },
+        {
+          "rank": 2,
+          "code": "601212",
+          "name": "白银有色",
+          "score": 32.0,
+          "rec_gap": 6.42,
+          "T": {
+            "open": 6.863,
+            "close": 6.58,
+            "limit_up": false,
+            "pct": -1.79
+          },
+          "T1": {
+            "gap": -0.3,
+            "close": 7.24,
+            "limit_up": true
+          },
+          "sell": 6.65,
+          "note": "实际: 买3400股@6.86 → 全卖@6.65",
+          "pnl_pct": -3.1,
+          "actual": true,
+          "verdict": "❌推荐错误"
+        },
+        {
+          "rank": 3,
+          "code": "603200",
+          "name": "上海洗霸",
+          "score": 19.0,
+          "rec_gap": 4.78,
+          "T": {
+            "open": 41.0,
+            "close": 38.81,
+            "limit_up": false,
+            "pct": -0.82
+          },
+          "T1": {
+            "gap": -1.55,
+            "close": 42.69,
+            "limit_up": true
+          },
+          "sell": 38.21,
+          "note": "断板gap-1.55%<4%→开盘卖",
+          "pnl_pct": -6.8,
+          "verdict": "❌推荐错误"
+        }
+      ]
     }
   },
   "stats": {
-    "total": 30,
-    "wins": 12,
-    "avg_pnl": -1.79,
+    "total": 33,
+    "wins": 13,
+    "avg_pnl": -1.63,
     "by_rank": {
       "1": {
-        "n": 10,
-        "wins": 6,
-        "avg_pnl": -1.81
+        "n": 11,
+        "wins": 7,
+        "avg_pnl": -0.75
       },
       "2": {
-        "n": 10,
+        "n": 11,
         "wins": 3,
-        "avg_pnl": -1.54
+        "avg_pnl": -1.68
       },
       "3": {
-        "n": 10,
+        "n": 11,
         "wins": 3,
-        "avg_pnl": -2.04
+        "avg_pnl": -2.47
       }
     },
-    "win_rate": 40.0
+    "win_rate": 39.4
   }
 }

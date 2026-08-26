@@ -1,60 +1,60 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 34,
+  "total_sessions": 35,
   "current": {
-    "date": "2026-08-25",
-    "captured": "2026-08-25 09:25:52",
-    "total": 44,
+    "date": "2026-08-26",
+    "captured": "2026-08-26 09:25:58",
+    "total": 61,
     "buyable": 6,
-    "avg_gap": 1.52,
+    "avg_gap": 1.83,
     "gap_distribution": {
-      "9%+": 3,
-      "0-2%": 15,
-      "<-3%": 3,
-      "-3-0%": 14,
-      "2-5%": 4,
-      "5-9%": 5
+      "2-5%": 10,
+      "0-2%": 18,
+      "-3-0%": 15,
+      "9%+": 8,
+      "5-9%": 4,
+      "<-3%": 6
     },
     "buyable_stocks": [
       {
-        "code": "002412",
-        "name": "汉森制药",
-        "gap_pct": 6.33,
-        "score": 47.0,
-        "limit_days": 3
-      },
-      {
-        "code": "601212",
-        "name": "白银有色",
-        "gap_pct": 6.42,
-        "score": 32.0,
+        "code": "000428",
+        "name": "华天酒店",
+        "gap_pct": 4.17,
+        "score": 66.6,
         "limit_days": 1
       },
       {
-        "code": "603200",
-        "name": "上海洗霸",
-        "gap_pct": 4.78,
-        "score": 19.0,
+        "code": "002703",
+        "name": "浙江世宝",
+        "gap_pct": 5.86,
+        "score": 58.9,
         "limit_days": 1
       },
       {
-        "code": "001268",
-        "name": "联合精密",
-        "gap_pct": 4.33,
-        "score": 1.0,
+        "code": "002837",
+        "name": "英维克",
+        "gap_pct": 4.68,
+        "score": 57.4,
         "limit_days": 1
       },
       {
-        "code": "600508",
-        "name": "上海能源",
-        "gap_pct": 6.98,
-        "score": 0,
+        "code": "002686",
+        "name": "亿利达",
+        "gap_pct": 7.48,
+        "score": 51.4,
         "limit_days": 1
       },
       {
-        "code": "002906",
-        "name": "华阳集团",
-        "gap_pct": 5.77,
+        "code": "600714",
+        "name": "金瑞矿业",
+        "gap_pct": 5.1,
+        "score": 49.7,
+        "limit_days": 1
+      },
+      {
+        "code": "002880",
+        "name": "卫光生物",
+        "gap_pct": 5.54,
         "score": 0,
         "limit_days": 1
       }
@@ -497,7 +497,20 @@
         "2-5%": 4,
         "5-9%": 5
       }
+    },
+    {
+      "date": "2026-08-26",
+      "total": 61,
+      "buyable": 6,
+      "gap_distribution": {
+        "2-5%": 10,
+        "0-2%": 18,
+        "-3-0%": 15,
+        "9%+": 8,
+        "5-9%": 4,
+        "<-3%": 6
+      }
     }
   ],
-  "last_update": "2026-08-25"
+  "last_update": "2026-08-26"
 }
