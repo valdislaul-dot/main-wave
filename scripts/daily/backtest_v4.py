@@ -5,6 +5,8 @@
 窗口: 强市窗2026-03-04~07-24 + 弱市窗2025-10-09~2026-03-03 (避开同花顺9-10月缺失段)
 用法: python backtest_v4.py            # 运行搜索(500组)
       python backtest_v4.py --best     # 仅跑最优权重
+      python backtest_v4.py --sweep    # 单因子敏感性扫描(每个因子0-40%的obj曲线)
+      python backtest_v4.py --seeds 5  # 多种子稳定性检验(每个seed各跑600组)
 """
 import json, os, sys, random
 from datetime import datetime, timedelta
@@ -15,7 +17,7 @@ KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
 THS_DIR = os.path.join(BASE, 'data', 'zt_pool_history_ths')
 INIT = 200000
 COST = 0.00125   # 滑点+佣金
-FACTORS = ['vr', 'gap', 'board_type', 'cons', 'dow', 'seal', 'zhaban', 'sector', 'divergence', 'dt_risk']
+FACTORS = ['vr', 'gap', 'board_type', 'cons', 'seal', 'zhaban', 'sector', 'divergence', 'dt_risk', 'turnover']
 
 
 def load_config_v4():
@@ -125,8 +127,12 @@ def main():
             is_yz = k['open'] >= lu_price - 0.005 and k['low'] >= lu_price - 0.005
             is_tz = k['open'] >= lu_price - 0.005 and k['close'] >= lu_price - 0.005 and k['low'] < lu_price - 0.005
             board_type = '一字' if is_yz else ('T字' if is_tz else '换手')
-            # 周几(买入日)
-            dow = ['周一', '周二', '周三', '周四', '周五'][datetime.strptime(date_fmt, '%Y-%m-%d').weekday()]
+            # 换手率(同花顺池)
+            try:
+                to = float(s.get('turnover_rate', 0) or 0)
+            except Exception:
+                to = 0
+            to_b = '<2' if to < 2 else ('2-20' if to < 20 else '>=20')
             # 封板/炸板
             try:
                 seal_hm = datetime.fromtimestamp(int(s.get('first_limit_up_time'))).strftime('%H%M')
@@ -158,12 +164,12 @@ def main():
                 'gap': norm['gap'].get(('<0' if gap < 0 else '0-2' if gap < 2 else '2-4' if gap < 4 else '4-6' if gap < 6 else '6-8' if gap < 8 else '8-10' if gap < 10 else '>=10'), 50),
                 'board_type': norm['board_type'].get(board_type, 50),
                 'cons': norm['cons'].get(('1' if cons == 1 else '2' if cons == 2 else '3' if cons == 3 else '4' if cons == 4 else '5+'), 55),
-                'dow': norm['dow'].get(dow, 55),
                 'seal': norm['seal'].get(seal_b, 60),
                 'zhaban': norm['zhaban'].get(zh_b, 70),
                 'sector': norm['sector'].get(sec_b, 70),
                 'divergence': norm['divergence'].get(div_b, 55),
                 'dt_risk': max(10, min(100, 100 - (dt_p - 5) * 3)),
+                'turnover': norm.get('turnover', {}).get(to_b, 50),
             }
             day_map[code] = (f, board_type, cons, k)
         factor_days[date_fmt] = day_map
@@ -263,6 +269,62 @@ def main():
         return obj, results
 
     base_w = cfg4['weights']
+
+    # ===== --sweep 单因子敏感性扫描 =====
+    if '--sweep' in sys.argv:
+        print('\n' + '=' * 84)
+        print('单因子敏感性扫描: 每次只动一个因子, 其余非零因子等比缩放补足100')
+        print('(obj=收益60%+胜率40%; 曲线峰值=该因子最佳权重; 平坦=权重不重要)')
+        print('=' * 84)
+        for fac in FACTORS:
+            curve = []
+            for w in range(0, 41, 2):
+                wts = {k: v for k, v in base_w.items() if k != fac}  # 保留0权重键(divergence)
+                nonzero = {k: v for k, v in wts.items() if v > 0}
+                s_rest = sum(nonzero.values())
+                if s_rest > 0:
+                    for k in nonzero:
+                        wts[k] = round(nonzero[k] * (100 - w) / s_rest, 2)
+                wts[fac] = float(w)
+                obj, results = objective(wts)
+                curve.append((w, obj, results[0][0], results[0][1], results[1][0]))
+            b = max(curve, key=lambda x: x[1])
+            print(f'\n{fac:<10} 峰值={b[0]}% obj={b[1]:+.0f} 当前={base_w.get(fac, 0)}% '
+                  f'(当前obj={max((o for w, o, *_ in curve if w == base_w.get(fac, 0)), default=0):+.0f})')
+            print('  ' + ' '.join(f'{w}%:{o:+.0f}' for w, o, *_ in curve))
+        return
+
+    # ===== --seeds 多种子稳定性检验 =====
+    if '--seeds' in sys.argv:
+        n_seeds = int(sys.argv[sys.argv.index('--seeds') + 1])
+        trials = int(sys.argv[sys.argv.index('--seeds') + 2]) if len(sys.argv) > sys.argv.index('--seeds') + 2 else 600
+        print(f'\n多种子稳定性检验: {n_seeds}个seed × {trials}组')
+        objs, wts = [], []
+        for sd in range(n_seeds):
+            random.seed(sd)
+            best = None
+            for i in range(trials):
+                w = dict(base_w)
+                for _ in range(3):
+                    fac = random.choice(FACTORS)
+                    w[fac] = max(0, min(40, w[fac] + random.choice([-10, -5, 5, 10])))
+                total = sum(w.values())
+                if total > 0:
+                    w = {k: round(v * 100 / total, 1) for k, v in w.items()}
+                obj, results = objective(w)
+                if best is None or obj > best[0]:
+                    best = (obj, dict(w))
+            objs.append(best[0])
+            wts.append(best[1])
+            print(f'  seed{sd}: obj={best[0]:+.1f} 权重={ {k: v for k, v in best[1].items() if v > 0} }')
+        import statistics
+        print(f'\n统计: obj 均值{statistics.mean(objs):+.1f} 中位{statistics.median(objs):+.1f} '
+              f'min{min(objs):+.1f} max{max(objs):+.1f} 标准差{statistics.stdev(objs):.1f}')
+        for fac in FACTORS:
+            vals = [w.get(fac, 0) for w in wts]
+            print(f'  {fac:<10} 跨seed权重: 均值{statistics.mean(vals):.1f} 范围{min(vals)}~{max(vals)}')
+        return
+
     # 搜索: 随机扰动
     best = None
     trials = 600 if '--best' not in sys.argv else 1

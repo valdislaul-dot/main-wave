@@ -4,8 +4,9 @@
 
 ### 评分体系 V4（已实装）
 - 百分制加权 10 因子: 总分 = Σ 因子归一化分(0-100) × 权重%，权重总和 100%
-- 因子+权重(搜索定稿): sector题材热度30.2 / dt_risk18.2 / gap12.8 / dow11.8 / vr10.1 /
-  cons6.7 / seal6.7 / board_type3.4 / zhaban0.0 / divergence0.0
+- 因子+权重(2026-08-26重搜定稿, 去dow加turnover): sector32.6 / dt_risk19.6 / gap13.8 /
+  cons7.2 / seal7.2 / vr5.9 / zhaban5.0 / turnover5.0 / board_type3.7 / divergence0.0
+  (验证: 单因子敏感性扫描9/10因子在峰, 5种子obj 901~951收敛±2.8%)
 - active=v4, 买入门槛 score_min=50, 配置 data/scoring_config.json v4 段
 - **权重滚动更新**: 每月1日 `python scripts/daily/backtest_v4.py` 用近1年数据重搜(跨期外推会崩)
 
@@ -230,8 +231,9 @@ T日断板 + T+1 gap<4% → 卖出
 - 形状来自1年数据(factor_shape.py), 权重来自5月窗口搜索(backtest_v4.py, 强市窗+105.1%)
 - **权重滚动更新**: 每月1日运行 `python scripts/daily/backtest_v4.py` 用近1年数据重搜权重
   (跨期外推失败实测: 同一权重2024强市-22% vs 2026强市+105%, 权重是短期参数)
-- 10因子: vr/gap/board_type/cons/dow/seal/zhaban/sector/divergence/dt_risk
-  (zhaban权重搜索后归0 — 1年数据炸1-2次无惩罚)
+- 10因子: vr/gap/board_type/cons/seal/zhaban/sector/divergence/dt_risk/turnover
+  (2026-08-26: 去dow因子; zhaban复活5.0%; turnover归一化 <2%=57 / 2-20%=50 / ≥20%=33,
+   形状=剔一字后1年数据, 高分档对涨率43-47%惩罚; 高分档权重由搜索定)
 - 切换: 流水线/面板评分入口从 score_v3 切到 score_v4 待用户确认后执行
 
 ### 跌停风险因子（2026-08-24用户指示，N≥50解冻后第一优先实施）

@@ -472,8 +472,8 @@ def score_v3(code, klines, details_raw=None, config=None):
 def score_v4(code, klines, details_raw=None, config=None):
     """
     V4百分制加权评分 (2026-08-25) — 总分 = Σ 因子归一化分(0-100) × 权重%
-    因子: vr/gap/board_type/cons/dow/seal/zhaban/sector/divergence/dt_risk
-    归一化形状来自1年数据(factor_shape), 权重由5月窗口搜索(backtest_v4)
+    因子: vr/gap/board_type/cons/seal/zhaban/sector/divergence/dt_risk/turnover
+    (2026-08-26: 去dow因子, 加turnover换手率因子; 归一化形状来自1年数据, 权重由5月窗口搜索)
     返回: (score 0-100, details) or (None, None)
     """
     if config is None:
@@ -507,8 +507,11 @@ def score_v4(code, klines, details_raw=None, config=None):
     gap = t1['gap_open_pct']
     board_type = '一字' if t1.get('is_one_line') and abs(t1['high'] - t1['low']) < 0.001 else \
                  ('T字' if t1.get('is_one_line') else '换手')
-    dow = ['周一', '周二', '周三', '周四', '周五'][
-        (datetime.strptime(today_dt, '%Y-%m-%d') + timedelta(days=1)).weekday()]
+    try:
+        to = float(details_raw.get('turnover', 0) or 0)
+    except Exception:
+        to = 0
+    to_b = '<2' if to < 2 else ('2-20' if to < 20 else '>=20')
     seal = str(details_raw.get('seal_time', '1459') or '1459').replace(':', '')
     seal_b = '<5min' if seal <= '0935' else ('5-10min' if seal <= '0940' else (
         '10-30min' if seal <= '1000' else ('30-60min' if seal <= '1030' else '>60min')))
@@ -537,12 +540,12 @@ def score_v4(code, klines, details_raw=None, config=None):
         'board_type': norm['board_type'].get(board_type, 50),
         'cons': norm['cons'].get(('1' if cons == 1 else '2' if cons == 2 else '3' if cons == 3
                                   else '4' if cons == 4 else '5+'), 55),
-        'dow': norm['dow'].get(dow, 55),
         'seal': norm['seal'].get(seal_b, 60),
         'zhaban': norm['zhaban'].get(zh_b, 70),
         'sector': norm['sector'].get(sec_b, 70),
         'divergence': norm['divergence'].get(div_b, 55),
         'dt_risk': max(10, min(100, 100 - (dt_p - 5) * 3)),
+        'turnover': norm.get('turnover', {}).get(to_b, 50),
     }
     score = sum(weights[k] * f[k] for k in weights if k in f) / 100.0
     det = {'score': round(score, 1), 'factor_scores': f, 'cons': cons,
