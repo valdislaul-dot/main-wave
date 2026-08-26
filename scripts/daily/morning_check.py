@@ -372,13 +372,8 @@ def stock_scoring_meta(code):
                     'sector_bucket': _sector_bucket_of(p.get('industry', ''), stocks),
                 }
         if meta['klines'] and meta['detail']:
-            from scoring import score_v4, load_config as _lc
-            _cfg = _lc()
-            if _cfg.get('active') == 'v4':
-                sc, _ = score_v4(code, meta['klines'], meta['detail'])
-            else:
-                from scoring import compute_score
-                sc, _ = compute_score(code, meta['klines'], meta['detail'], 'v3')
+            from scoring import score_v4
+            sc, _ = score_v4(code, meta['klines'], meta['detail'])
             meta['score'] = sc
     except Exception:
         pass
@@ -649,26 +644,17 @@ def main():
         print(f'{"=" * 65}')
         from scoring import load_config as _lc2
         _cfg2 = _lc2()
-        _is_v4 = _cfg2.get('active') == 'v4'
         for b in top3:
             meta = stock_scoring_meta(b['code'])
             if meta['klines'] and meta['detail']:
-                if _is_v4:
-                    from scoring import score_v4
-                    _sc4, _det4 = score_v4(b['code'], meta['klines'], meta['detail'])
-                    if _det4:
-                        print(f'  {b["name"]}({b["code"]})  {_sc4:.0f}分')
-                        _f = _det4['factor_scores']
-                        _w = _cfg2['v4']['weights']
-                        print(f'    ' + '  '.join(
-                            f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
-                else:
-                    from scoring import full_breakdown
-                    r = full_breakdown(b['code'], meta['klines'], meta['detail'], 'v3')
-                    if r:
-                        total, items = r
-                        print(f'  {b["name"]}({b["code"]})  {total:.0f}分')
-                        print(f'    ' + '  '.join(f'{f}({v}){s:+}' for f, v, s in items))
+                from scoring import score_v4
+                _sc4, _det4 = score_v4(b['code'], meta['klines'], meta['detail'])
+                if _det4:
+                    print(f'  {b["name"]}({b["code"]})  {_sc4:.0f}分')
+                    _f = _det4['factor_scores']
+                    _w = _cfg2['v4']['weights']
+                    print(f'    ' + '  '.join(
+                        f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
 
     # ── 昨日候选（参考） ──
     if data:

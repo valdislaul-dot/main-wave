@@ -1,6 +1,6 @@
-"""V4长期验证 (2026-08-25) — K线回算池(3年) + 6因子子集
-背景: 同花顺池仅1年且9-10月缺失; 长期/3年用K线回算涨停池, 评分用6个K线可算因子
-  (vr/gap/cons/dow/dt_risk/board_type — seal/zhaban/sector/divergence无池明细不可算)
+"""V4长期验证 (2026-08-25) — K线回算池(3年) + 5因子子集
+背景: 同花顺池仅1年且9-10月缺失; 长期/3年用K线回算涨停池, 评分用5个K线可算因子
+  (vr/gap/cons/dt_risk/board_type — seal/zhaban/sector/divergence/turnover无池明细不可算)
 权重: 最优权重子集重归一化(子集内占比保持)
 四象限: 强弱×5月/12月 (强弱=区间日均涨停数: 强≥70/弱<60, 从3年滑动窗口自动切)
 输出: logs/backtest_v4_long.txt
@@ -14,7 +14,7 @@ KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
 START, END = '2023-08-19', '2026-08-19'
 INIT = 200000
 COST = 0.00125
-SUB_FACTORS = ['vr', 'gap', 'board_type', 'cons', 'dow', 'dt_risk']
+SUB_FACTORS = ['vr', 'gap', 'board_type', 'cons', 'dt_risk']
 
 
 def main():
@@ -88,7 +88,6 @@ def main():
         is_yz = k['open'] >= lu_price - 0.005 and k['low'] >= lu_price - 0.005
         is_tz = k['open'] >= lu_price - 0.005 and k['close'] >= lu_price - 0.005 and k['low'] < lu_price - 0.005
         board_type = '一字' if is_yz else ('T字' if is_tz else '换手')
-        dow = ['周一', '周二', '周三', '周四', '周五'][datetime.strptime(date_fmt, '%Y-%m-%d').weekday()]
         if cons >= 3:
             dt_p = 30.5
         elif cons == 2:
@@ -104,7 +103,6 @@ def main():
             'gap': norm['gap'].get(('<0' if gap < 0 else '0-2' if gap < 2 else '2-4' if gap < 4 else '4-6' if gap < 6 else '6-8' if gap < 8 else '8-10' if gap < 10 else '>=10'), 50),
             'board_type': norm['board_type'].get(board_type, 50),
             'cons': norm['cons'].get(('1' if cons == 1 else '2' if cons == 2 else '3' if cons == 3 else '4' if cons == 4 else '5+'), 55),
-            'dow': norm['dow'].get(dow, 55),
             'dt_risk': max(10, min(100, 100 - (dt_p - 5) * 3)),
         }
         return f, board_type, cons, k, kls, idx

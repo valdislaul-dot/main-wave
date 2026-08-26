@@ -1,5 +1,5 @@
 """
-盘后选股: 东财直连涨停池 → V2/V3评分(配置驱动) → 输出明日候选清单
+盘后选股: 同花顺涨停池 → V4评分 → 输出明日候选清单
 """
 import json, os, sys, time, random, requests
 # 强制utf-8输出, 避免Windows gbk崩溃
@@ -11,8 +11,8 @@ from datetime import datetime, timedelta
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scoring import (
-    score_v2, score_v3, score_v4, load_config as load_scoring_config,
-    score_to_prob, score_to_position, get_buy_window, get_score_min,
+    score_v4, load_config as load_scoring_config,
+    get_buy_window, get_score_min,
     load_config, sector_resonance_count,
 )
 LOG_DIR = os.path.join(BASE, 'logs')
@@ -148,7 +148,6 @@ def main():
 
     cfg = load_scoring_config()
     version = cfg.get('active', 'v4')
-    score_fn = {'v4': score_v4, 'v3': score_v3, 'v2': score_v2}.get(version, score_v4)
 
     results = []
     score_fail = 0
@@ -170,7 +169,7 @@ def main():
             'sector_bucket': _sector_bucket_map.get(s['industry'], '>=10'),
         }
 
-        score, details = score_fn(code, klines, details_raw)
+        score, details = score_v4(code, klines, details_raw)
         if score is None:
             score_fail += 1
             kl = klines.get('data', klines) if isinstance(klines, dict) else klines
@@ -192,35 +191,22 @@ def main():
             seal_duration = lm - fm
         except: pass
 
-        if version == 'v4':
-            # v4 det结构: {score, factor_scores, cons, vr, gap, board_type, dt_p}
-            _kl = klines.get('data', klines) if isinstance(klines, dict) else klines
-            k = _kl[-1]
-            results.append({
-                'code': code, 'name': name,
-                'score': score, 'vr20': details.get('vr', 0),
-                'gap': details.get('gap', 0), 'cons': details.get('cons', 1),
-                'one_line': details.get('board_type') == '一字',
-                'true_one_line': details.get('board_type') == '一字',
-                'open': k['open'], 'close': k['close'],
-                'seal_time': s['first_seal'], 'seal_dur': seal_duration,
-                'break_n': s['break_times'], 'last_seal': s['last_seal'],
-                'industry': s['industry'], 'turnover': s['turnover'],
-                'factor_scores': details.get('factor_scores', {}),
-                'dt_p': details.get('dt_p', 0),
-            })
-        else:
-            results.append({
-                'code': code, 'name': name,
-                'score': score, 'vr20': details['vr20'],
-                'gap': details['gap'], 'cons': details['cons'],
-                'one_line': details['one_line'],
-                'true_one_line': details['true_one_line'],
-                'open': details['open'], 'close': details['close'],
-                'seal_time': s['first_seal'], 'seal_dur': seal_duration,
-                'break_n': s['break_times'], 'last_seal': s['last_seal'],
-                'industry': s['industry'], 'turnover': s['turnover'],
-            })
+        # v4 det结构: {score, factor_scores, cons, vr, gap, board_type, dt_p}
+        _kl = klines.get('data', klines) if isinstance(klines, dict) else klines
+        k = _kl[-1]
+        results.append({
+            'code': code, 'name': name,
+            'score': score, 'vr20': details.get('vr', 0),
+            'gap': details.get('gap', 0), 'cons': details.get('cons', 1),
+            'one_line': details.get('board_type') == '一字',
+            'true_one_line': details.get('board_type') == '一字',
+            'open': k['open'], 'close': k['close'],
+            'seal_time': s['first_seal'], 'seal_dur': seal_duration,
+            'break_n': s['break_times'], 'last_seal': s['last_seal'],
+            'industry': s['industry'], 'turnover': s['turnover'],
+            'factor_scores': details.get('factor_scores', {}),
+            'dt_p': details.get('dt_p', 0),
+        })
 
     results.sort(key=lambda x: x['score'], reverse=True)
 
