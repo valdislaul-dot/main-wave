@@ -296,12 +296,15 @@ def precompute_klines(code, klines):
 def compute_score(code, klines, details_raw=None, version='v3', config=None):
     """
     统一评分入口
-    version: 'v2' (当前陡峭) 或 'v3' (平滑)
-    details_raw: {seal_time, zhaban, final_seal_time, sector_count}
+    version: 'v2'/'v3' 已于2026-08-26移除(备份在 backup/), 仅保留v4(score_v4)
     返回: (score_float, details_dict) or (None, None)
     """
     if config is None:
         config = load_config()
+    if version in ('v2', 'v3') and 'tables' not in config:
+        raise RuntimeError(
+            f'评分版本 {version} 已移除(2026-08-26, 旧版在 backup/scoring_config_v3全段_20260826.json), '
+            f'当前使用 score_v4()')
 
     result = precompute_klines(code, klines)
     if result is None or result[0] is None:

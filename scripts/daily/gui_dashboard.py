@@ -14,7 +14,7 @@ from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import morning_check as mc
-from scoring import load_config, compute_score
+from scoring import load_config, compute_score, score_v4
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
@@ -216,19 +216,23 @@ if zt_stocks:
             'final_seal_time': (s.get('last_seal', ft) or ft).replace(':', ''),
             'zhaban': s.get('break_times', 0),
             'sector_count': industries.get(s.get('industry', ''), 1),
+            'industry': s.get('industry', ''), 'turnover': s.get('turnover', 0),
+            'sector_bucket': '>=10',
         }
         try:
-            score, det = compute_score(code, kls, details, 'v3', cfg)
+            # V4评分(2026-08-26起GUI切换到v4, v3配置已移除)
+            score, det = score_v4(code, kls, details)
         except Exception:
             continue
-        if score is None:
+        if score is None or det is None:
             continue
+        _bt = det.get('board_type', '')
         scored.append({'code': code, 'name': name, 'score': score, 'ft': ft,
                        'industry': s.get('industry', ''), 'limit_days': det.get('cons', 1),
                        'breaks': s.get('break_times', 0),
-                       'true_one': det.get('true_one_line', False),
-                       'one_line': det.get('one_line', False),
-                       'vr': det.get('vr20', 1), 'gap': det.get('gap', 0),
+                       'true_one': _bt == '一字',
+                       'one_line': _bt in ('一字', 'T字'),
+                       'vr': det.get('vr', 1), 'gap': det.get('gap', 0),
                        'turnover': s.get('turnover', 0)})
 
     scored.sort(key=lambda x: x['score'], reverse=True)

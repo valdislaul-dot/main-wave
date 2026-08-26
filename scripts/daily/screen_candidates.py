@@ -279,11 +279,9 @@ def main():
     if preferred_pick:
         preferred = preferred_pick
         sc = preferred['score']
-        prob = score_to_prob(sc)
-        pos = score_to_position(sc)
         lo = preferred['close'] * 1.04; hi = preferred['close'] * 1.08
         print(f'\n>> 首选: {preferred["name"]}({preferred["code"]}) 评分{sc:.0f} 量比{preferred["vr20"]:.1f}x')
-        print(f'>> 连板概率≈{prob}% | 建议仓位: {pos}%')
+        print(f'>> 仓位: 由温度开关决定(极弱空仓/弱市半仓/强市全仓), 门槛50分')
         print(f'>> 买入区间: {lo:.2f} - {hi:.2f} (竞价涨幅4%-8%)')
         if len(top3_by_score) > 1:
             print(f'>> 备选: {top3_by_score[1]["name"]}({top3_by_score[1]["code"]}) | {top3_by_score[2]["name"]}({top3_by_score[2]["code"]})')
