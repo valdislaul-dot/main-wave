@@ -371,9 +371,52 @@ def stock_scoring_meta(code):
                     # V4题材热度分档(池级词频)
                     'sector_bucket': _sector_bucket_of(p.get('industry', ''), stocks),
                 }
-        if meta['klines'] and meta['detail']:
+        if not meta['detail']:
+            # 2026-08-28: 不在昨日池(如断板持仓) → state → 历史池快照 → 纯K线三档兜底
+            try:
+                _sp = os.path.join(BASE, 'data', 'zt_pool_state.json')
+                _entry = None
+                if os.path.exists(_sp):
+                    with open(_sp, encoding='utf-8') as _f:
+                        _st = json.load(_f)
+                    _entry = next((x for x in _st.get('stocks', [])
+                                   if str(x.get('code', '')).replace('sh', '').replace('sz', '') == code), None)
+                if _entry is None:
+                    # state已清(出池) → 扫最近5个池快照找最后一次涨停明细
+                    _zt_dir = os.path.join(BASE, 'data', 'zt_pool')
+                    for _fn in sorted(f for f in os.listdir(_zt_dir) if f.endswith('.json'))[-6:-1]:
+                        _fp = os.path.join(_zt_dir, _fn)
+                        try:
+                            with open(_fp, encoding='utf-8') as _f:
+                                _pool = json.load(_f)
+                        except UnicodeDecodeError:
+                            with open(_fp, encoding='gbk') as _f:
+                                _pool = json.load(_f)
+                        _pl = _pool if isinstance(_pool, list) else _pool.get('stocks', [])
+                        _entry = next((x for x in _pl
+                                       if str(x.get('code', '')).replace('sh', '').replace('sz', '') == code), None)
+                        if _entry is not None:
+                            break
+                if _entry is not None:
+                    meta['industry'] = _entry.get('industry', '')
+                    meta['cons'] = _entry.get('limit_days', '?')
+                    _stocks = pp[0] if pp else []
+                    meta['detail'] = {
+                        'seal_time': str(_entry.get('first_seal', '')).replace(':', ''),
+                        'final_seal_time': str(_entry.get('last_seal', '')).replace(':', ''),
+                        'zhaban': int(_entry.get('break_times', 0) or 0),
+                        'sector_count': 1,
+                        'turnover': _entry.get('turnover', 0),
+                        'sector_bucket': _sector_bucket_of(_entry.get('industry', ''), _stocks),
+                    }
+                elif meta['klines']:
+                    # 池/state/快照都没有 → 纯K线, 题材热度诚实给低档(不在今日池=无热度)
+                    meta['detail'] = {'sector_bucket': '<3'}
+            except Exception:
+                pass
+        if meta['klines']:
             from scoring import score_v4
-            sc, _ = score_v4(code, meta['klines'], meta['detail'])
+            sc, _ = score_v4(code, meta['klines'], meta['detail'] or {})
             meta['score'] = sc
     except Exception:
         pass
@@ -409,6 +452,18 @@ def main():
         pos_list = []
     pos_results = [(pos, compute_position_decision(pos)) for pos in pos_list]
     env_info = compute_environment(pf)
+
+    # ── 持仓V4评分 (2026-08-28, 用户要求: 持仓与其他股票同台比较) ──
+    pos_scores = []
+    for pos in pos_list:
+        try:
+            _m = stock_scoring_meta(pos['code'])
+            if _m.get('score') is not None:
+                pos_scores.append({'name': pos['name'], 'code': pos['code'],
+                                   'score': _m['score'], 'cons': _m['cons'],
+                                   'industry': _m['industry']})
+        except Exception:
+            pass
 
     # ── 📌 今日决策摘要 (结论先行) ──
     print(f'\n  ╔══ 📌 今日决策摘要 ═══════════════════════════╗')
@@ -481,6 +536,7 @@ def main():
                         'pnl_pct': round((quote['current'] - cost) / cost * 100, 2),
                         'reason': signal['reason'],
                         'exec_note': exec_info['note'] if signal['action'] in ('sell', 'sell_half') else '',
+                        'score': next((p['score'] for p in pos_scores if p['code'] == code), None),
                     })
 
                     print(f'  ║')
@@ -539,8 +595,9 @@ def main():
             print(f'  📊 表3: 持仓交易建议')
             print(f'{"=" * 65}')
             for p in pos_advice:
+                _ps = f'评分{p["score"]:.0f}' if p.get('score') is not None else '评分-'
                 print(f'  {p["name"]}({p["code"]}) 成本{p["cost"]:.2f} 现价{p["current"]:.2f}({p["pnl_pct"]:+.1f}%) '
-                      f'竞价gap{p["gap"]:+.1f}%')
+                      f'竞价gap{p["gap"]:+.1f}% {_ps}')
                 print(f'    建议: {p["reason"]}')
                 if p['exec_note']:
                     print(f'    执行: {p["exec_note"]}')
@@ -655,6 +712,22 @@ def main():
                     _w = _cfg2['v4']['weights']
                     print(f'    ' + '  '.join(
                         f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
+
+    # ── 📊 表4: 持仓评分对比 (2026-08-28, 持仓与可买池同台比较) ──
+    if pos_scores:
+        print(f'\n{"=" * 65}')
+        print(f'  📊 表4: 持仓评分对比 (V4同口径)')
+        print(f'{"=" * 65}')
+        for p in pos_scores:
+            print(f'  持仓 {p["name"]}({p["code"]})  {p["score"]:.0f}分  {p["cons"]}板  {p["industry"][:10]}')
+        _buy_top = top3[0] if top3 else None
+        if _buy_top:
+            print(f'  可买Top1 {_buy_top["name"]}({_buy_top["code"]})  {_buy_top["score"]:.0f}分')
+            _ps_max = max(p['score'] for p in pos_scores)
+            if _ps_max >= _buy_top['score']:
+                print(f'  → 持仓最高 {_ps_max:.0f}分 ≥ 可买Top1 {_buy_top["score"]:.0f}分: 持仓不输于今日候选')
+            else:
+                print(f'  → 持仓最高 {_ps_max:.0f}分 < 可买Top1 {_buy_top["score"]:.0f}分: 候选评分更高(仅信息, 不触发买卖规则)')
 
     # ── 昨日候选（参考） ──
     if data:
