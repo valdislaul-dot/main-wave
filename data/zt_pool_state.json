@@ -1,16 +1,16 @@
 {
   "as_of_date": "2026-08-27",
-  "last_updated": "2026-08-27 15:53:49",
+  "last_updated": "2026-08-27 16:53:18",
   "stocks": [
     {
       "code": "605288",
       "name": "凯迪股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 63.14,
-      "prev_close": 57.63,
+      "prev_close": 63.14,
       "first_seal": "14:48:00",
       "last_seal": "14:48:00",
       "seal_fund": 33127032.0,
@@ -24,16 +24,21 @@
           "date": "2026-08-27",
           "close": 63.14,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 63.14,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 19789676.57,
-        "ratioamount": 0.1883,
-        "r0_net": 9380407.0,
-        "r0_ratio": 0.0893,
-        "r0x_ratio": 74.57,
+        "date": "2026-08-27",
+        "netamount": 68665101.48,
+        "ratioamount": 0.3765,
+        "r0_net": 28001409.0,
+        "r0_ratio": 0.1535,
+        "r0x_ratio": 56.92,
         "source": "sina_moneyflow"
       }
     },
@@ -42,10 +47,10 @@
       "name": "长江通信",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 52.06,
-      "prev_close": 45.9,
+      "prev_close": 52.06,
       "first_seal": "14:43:00",
       "last_seal": "14:43:00",
       "seal_fund": 139637940.0,
@@ -59,16 +64,21 @@
           "date": "2026-08-27",
           "close": 52.06,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 52.06,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -30459323.16,
-        "ratioamount": -0.057,
-        "r0_net": -14924430.8,
-        "r0_ratio": -0.0279,
-        "r0x_ratio": -116.89,
+        "date": "2026-08-27",
+        "netamount": 286751657.12,
+        "ratioamount": 0.3107,
+        "r0_net": 226793327.6,
+        "r0_ratio": 0.2458,
+        "r0x_ratio": 67.87,
         "source": "sina_moneyflow"
       }
     },
@@ -77,10 +87,10 @@
       "name": "百花医药",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
-      "limit_days": 6,
+      "days_in_pool": 2,
+      "limit_days": 1,
       "close": 16.68,
-      "prev_close": 12.75,
+      "prev_close": 16.68,
       "first_seal": "09:32:00",
       "last_seal": "14:40:00",
       "seal_fund": 42637149.0,
@@ -94,16 +104,21 @@
           "date": "2026-08-27",
           "close": 16.68,
           "cons": 6
+        },
+        {
+          "date": "2026-08-27",
+          "close": 16.68,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -76496181.32,
-        "ratioamount": -0.0406,
-        "r0_net": -61332422.58,
-        "r0_ratio": -0.0326,
-        "r0x_ratio": -69.73,
+        "date": "2026-08-27",
+        "netamount": 969373601.9,
+        "ratioamount": 0.3534,
+        "r0_net": 773868257.23,
+        "r0_ratio": 0.2821,
+        "r0x_ratio": 70.44,
         "source": "sina_moneyflow"
       }
     },
@@ -112,10 +127,10 @@
       "name": "星网锐捷",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 33.35,
-      "prev_close": 33.17,
+      "prev_close": 33.35,
       "first_seal": "14:37:00",
       "last_seal": "14:37:00",
       "seal_fund": 160023310.0,
@@ -129,16 +144,21 @@
           "date": "2026-08-27",
           "close": 33.35,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 33.35,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -146276527.37,
-        "ratioamount": -0.0648,
-        "r0_net": -106307552.91,
-        "r0_ratio": -0.0471,
-        "r0x_ratio": -109.7,
+        "date": "2026-08-27",
+        "netamount": 672324326.44,
+        "ratioamount": 0.2083,
+        "r0_net": 589490968.19,
+        "r0_ratio": 0.1826,
+        "r0x_ratio": 61.31,
         "source": "sina_moneyflow"
       }
     },
@@ -147,10 +167,10 @@
       "name": "平潭发展",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 6.81,
-      "prev_close": 6.61,
+      "prev_close": 6.81,
       "first_seal": "13:13:00",
       "last_seal": "13:39:00",
       "seal_fund": 72696750.0,
@@ -164,16 +184,21 @@
           "date": "2026-08-27",
           "close": 6.81,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 6.81,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -11835220.25,
-        "ratioamount": -0.0203,
-        "r0_net": 11111567.82,
-        "r0_ratio": 0.0191,
-        "r0x_ratio": 80.36,
+        "date": "2026-08-27",
+        "netamount": 925350275.22,
+        "ratioamount": 0.4775,
+        "r0_net": 639168966.53,
+        "r0_ratio": 0.3298,
+        "r0x_ratio": 73.11,
         "source": "sina_moneyflow"
       }
     },
@@ -182,10 +207,10 @@
       "name": "德明利",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 429.76,
-      "prev_close": 386.24,
+      "prev_close": 429.76,
       "first_seal": "14:31:00",
       "last_seal": "14:35:00",
       "seal_fund": 172055710.0,
@@ -199,16 +224,21 @@
           "date": "2026-08-27",
           "close": 429.76,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 429.76,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -392374105.73,
-        "ratioamount": -0.1152,
-        "r0_net": -356974492.38,
-        "r0_ratio": -0.1048,
-        "r0x_ratio": -98.66,
+        "date": "2026-08-27",
+        "netamount": 3212757771.09,
+        "ratioamount": 0.3673,
+        "r0_net": 3250263988.0,
+        "r0_ratio": 0.3716,
+        "r0x_ratio": 74.94,
         "source": "sina_moneyflow"
       }
     },
@@ -217,10 +247,10 @@
       "name": "金字火腿",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 8.58,
-      "prev_close": 8.71,
+      "prev_close": 8.58,
       "first_seal": "11:05:00",
       "last_seal": "11:19:00",
       "seal_fund": 28578264.0,
@@ -234,16 +264,21 @@
           "date": "2026-08-27",
           "close": 8.58,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 8.58,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -77847151.75,
-        "ratioamount": -0.1049,
-        "r0_net": -96459184.84,
-        "r0_ratio": -0.13,
-        "r0x_ratio": -116.02,
+        "date": "2026-08-27",
+        "netamount": 816384804.35,
+        "ratioamount": 0.6118,
+        "r0_net": 720747490.11,
+        "r0_ratio": 0.5402,
+        "r0x_ratio": 79.51,
         "source": "sina_moneyflow"
       }
     },
@@ -252,10 +287,10 @@
       "name": "石英股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 51.56,
-      "prev_close": 46.51,
+      "prev_close": 51.56,
       "first_seal": "14:25:00",
       "last_seal": "14:25:00",
       "seal_fund": 143885910.0,
@@ -269,16 +304,21 @@
           "date": "2026-08-27",
           "close": 51.56,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 51.56,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 18193376.73,
-        "ratioamount": 0.0394,
-        "r0_net": 12940136.0,
-        "r0_ratio": 0.028,
-        "r0x_ratio": 82.6,
+        "date": "2026-08-27",
+        "netamount": 325472003.08,
+        "ratioamount": 0.3138,
+        "r0_net": 235664814.9,
+        "r0_ratio": 0.2272,
+        "r0x_ratio": 66.23,
         "source": "sina_moneyflow"
       }
     },
@@ -287,10 +327,10 @@
       "name": "美湖股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 29.45,
-      "prev_close": 25.05,
+      "prev_close": 29.45,
       "first_seal": "14:22:00",
       "last_seal": "14:22:00",
       "seal_fund": 88822967.0,
@@ -304,16 +344,21 @@
           "date": "2026-08-27",
           "close": 29.45,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 29.45,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 34983376.15,
-        "ratioamount": 0.0989,
-        "r0_net": 32035219.0,
-        "r0_ratio": 0.0906,
-        "r0x_ratio": 77.18,
+        "date": "2026-08-27",
+        "netamount": 214424477.02,
+        "ratioamount": 0.3561,
+        "r0_net": 141395031.0,
+        "r0_ratio": 0.2348,
+        "r0x_ratio": 66.91,
         "source": "sina_moneyflow"
       }
     },
@@ -322,10 +367,10 @@
       "name": "成都路桥",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 5.28,
-      "prev_close": 5.56,
+      "prev_close": 5.28,
       "first_seal": "13:01:00",
       "last_seal": "14:09:00",
       "seal_fund": 7278955.2,
@@ -339,16 +384,21 @@
           "date": "2026-08-27",
           "close": 5.28,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 5.28,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -6735842.82,
-        "ratioamount": -0.1346,
-        "r0_net": -3418209.0,
-        "r0_ratio": -0.0683,
-        "r0x_ratio": -90.0,
+        "date": "2026-08-27",
+        "netamount": 237318552.34,
+        "ratioamount": 0.5902,
+        "r0_net": 142540384.76,
+        "r0_ratio": 0.3545,
+        "r0x_ratio": 74.25,
         "source": "sina_moneyflow"
       }
     },
@@ -357,10 +407,10 @@
       "name": "道道全",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 8.89,
-      "prev_close": 7.72,
+      "prev_close": 8.89,
       "first_seal": "13:10:00",
       "last_seal": "13:10:00",
       "seal_fund": 49623909.0,
@@ -374,16 +424,21 @@
           "date": "2026-08-27",
           "close": 8.89,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 8.89,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -478023.36,
-        "ratioamount": -0.0069,
-        "r0_net": -1939633.0,
-        "r0_ratio": -0.0279,
-        "r0x_ratio": -82.41,
+        "date": "2026-08-27",
+        "netamount": 105046954.11,
+        "ratioamount": 0.6198,
+        "r0_net": 48967445.78,
+        "r0_ratio": 0.2889,
+        "r0x_ratio": 70.87,
         "source": "sina_moneyflow"
       }
     },
@@ -392,10 +447,10 @@
       "name": "桐昆股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 26.0,
-      "prev_close": 22.99,
+      "prev_close": 26.0,
       "first_seal": "13:23:00",
       "last_seal": "13:23:00",
       "seal_fund": 37908000.0,
@@ -409,16 +464,21 @@
           "date": "2026-08-27",
           "close": 26.0,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 26.0,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 53684702.0,
-        "ratioamount": 0.064,
-        "r0_net": 14793555.86,
-        "r0_ratio": 0.0176,
-        "r0x_ratio": 99.5,
+        "date": "2026-08-27",
+        "netamount": 778366725.72,
+        "ratioamount": 0.464,
+        "r0_net": 660289675.08,
+        "r0_ratio": 0.3936,
+        "r0x_ratio": 75.77,
         "source": "sina_moneyflow"
       }
     },
@@ -427,10 +487,10 @@
       "name": "飞龙股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 54.23,
-      "prev_close": 46.97,
+      "prev_close": 54.23,
       "first_seal": "10:00:00",
       "last_seal": "13:38:00",
       "seal_fund": 120383008.0,
@@ -444,16 +504,21 @@
           "date": "2026-08-27",
           "close": 54.23,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 54.23,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -381403211.86,
-        "ratioamount": -0.1351,
-        "r0_net": -435771133.23,
-        "r0_ratio": -0.1544,
-        "r0x_ratio": -106.11,
+        "date": "2026-08-27",
+        "netamount": 1782926427.35,
+        "ratioamount": 0.5402,
+        "r0_net": 1447517315.31,
+        "r0_ratio": 0.4386,
+        "r0x_ratio": 77.16,
         "source": "sina_moneyflow"
       }
     },
@@ -462,10 +527,10 @@
       "name": "东材科技",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 49.1,
-      "prev_close": 45.94,
+      "prev_close": 49.1,
       "first_seal": "13:01:00",
       "last_seal": "13:31:00",
       "seal_fund": 106395330.0,
@@ -479,16 +544,21 @@
           "date": "2026-08-27",
           "close": 49.1,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 49.1,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -89050266.33,
-        "ratioamount": -0.0464,
-        "r0_net": -61042929.53,
-        "r0_ratio": -0.0318,
-        "r0x_ratio": -75.67,
+        "date": "2026-08-27",
+        "netamount": 1086752113.89,
+        "ratioamount": 0.2884,
+        "r0_net": 812233816.59,
+        "r0_ratio": 0.2156,
+        "r0x_ratio": 65.14,
         "source": "sina_moneyflow"
       }
     },
@@ -497,10 +567,10 @@
       "name": "天通股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 29.15,
-      "prev_close": 27.48,
+      "prev_close": 29.15,
       "first_seal": "10:57:00",
       "last_seal": "10:57:00",
       "seal_fund": 101934518.0,
@@ -514,16 +584,21 @@
           "date": "2026-08-27",
           "close": 29.15,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 29.15,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 66674299.16,
-        "ratioamount": 0.0192,
-        "r0_net": 51794957.85,
-        "r0_ratio": 0.0149,
-        "r0x_ratio": 155.79,
+        "date": "2026-08-27",
+        "netamount": 1478182426.66,
+        "ratioamount": 0.4,
+        "r0_net": 1168244878.08,
+        "r0_ratio": 0.3161,
+        "r0x_ratio": 72.44,
         "source": "sina_moneyflow"
       }
     },
@@ -532,10 +607,10 @@
       "name": "东方钽业",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
-      "limit_days": 2,
+      "days_in_pool": 2,
+      "limit_days": 1,
       "close": 57.55,
-      "prev_close": 51.63,
+      "prev_close": 57.55,
       "first_seal": "10:51:00",
       "last_seal": "13:27:00",
       "seal_fund": 256950050.0,
@@ -549,16 +624,21 @@
           "date": "2026-08-27",
           "close": 57.55,
           "cons": 2
+        },
+        {
+          "date": "2026-08-27",
+          "close": 57.55,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -49034245.44,
-        "ratioamount": -0.0448,
-        "r0_net": 24127246.52,
-        "r0_ratio": 0.0221,
-        "r0x_ratio": 73.95,
+        "date": "2026-08-27",
+        "netamount": 780325529.48,
+        "ratioamount": 0.4017,
+        "r0_net": 541499244.46,
+        "r0_ratio": 0.2788,
+        "r0x_ratio": 70.27,
         "source": "sina_moneyflow"
       }
     },
@@ -567,10 +647,10 @@
       "name": "南华期货",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 13.52,
-      "prev_close": 18.19,
+      "prev_close": 13.52,
       "first_seal": "13:24:00",
       "last_seal": "13:24:00",
       "seal_fund": 55862815.0,
@@ -584,16 +664,21 @@
           "date": "2026-08-27",
           "close": 13.52,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 13.52,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 232033658.78,
-        "ratioamount": 0.3748,
-        "r0_net": 172590511.11,
-        "r0_ratio": 0.2788,
-        "r0x_ratio": 77.23,
+        "date": "2026-08-27",
+        "netamount": 192776405.32,
+        "ratioamount": 0.2542,
+        "r0_net": 145533091.77,
+        "r0_ratio": 0.1919,
+        "r0x_ratio": 62.46,
         "source": "sina_moneyflow"
       }
     },
@@ -602,10 +687,10 @@
       "name": "先导基电",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 34.0,
-      "prev_close": 32.47,
+      "prev_close": 34.0,
       "first_seal": "11:10:00",
       "last_seal": "11:10:00",
       "seal_fund": 139711170.0,
@@ -619,16 +704,21 @@
           "date": "2026-08-27",
           "close": 34.0,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 34.0,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -45086408.07,
-        "ratioamount": -0.0355,
-        "r0_net": -9723591.09,
-        "r0_ratio": -0.0077,
-        "r0x_ratio": -156.36,
+        "date": "2026-08-27",
+        "netamount": 615610693.07,
+        "ratioamount": 0.315,
+        "r0_net": 476088260.66,
+        "r0_ratio": 0.2436,
+        "r0x_ratio": 67.69,
         "source": "sina_moneyflow"
       }
     },
@@ -637,10 +727,10 @@
       "name": "千金药业",
       "added_date": "2026-08-26",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 2,
-      "limit_days": 1,
+      "days_in_pool": 3,
+      "limit_days": 2,
       "close": 12.12,
-      "prev_close": 11.02,
+      "prev_close": 12.12,
       "first_seal": "09:32:00",
       "last_seal": "13:21:00",
       "seal_fund": 36494459.0,
@@ -659,16 +749,21 @@
           "date": "2026-08-27",
           "close": 12.12,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 12.12,
+          "cons": 2
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 213235581.82,
-        "ratioamount": 0.8695,
-        "r0_net": 107778556.76,
-        "r0_ratio": 0.4395,
-        "r0x_ratio": 77.21,
+        "date": "2026-08-27",
+        "netamount": 660536670.28,
+        "ratioamount": 0.5081,
+        "r0_net": 411249706.54,
+        "r0_ratio": 0.3164,
+        "r0x_ratio": 72.49,
         "source": "sina_moneyflow"
       }
     },
@@ -677,10 +772,10 @@
       "name": "楚天龙",
       "added_date": "2026-08-21",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 6,
-      "limit_days": 4,
+      "days_in_pool": 7,
+      "limit_days": 5,
       "close": 18.73,
-      "prev_close": 17.03,
+      "prev_close": 18.73,
       "first_seal": "09:31:00",
       "last_seal": "13:08:00",
       "seal_fund": 38151137.0,
@@ -719,16 +814,21 @@
           "date": "2026-08-27",
           "close": 18.73,
           "cons": 4
+        },
+        {
+          "date": "2026-08-27",
+          "close": 18.73,
+          "cons": 5
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 541432495.72,
-        "ratioamount": 0.3064,
-        "r0_net": 330216356.5,
-        "r0_ratio": 0.1869,
-        "r0x_ratio": 61.82,
+        "date": "2026-08-27",
+        "netamount": 1329074203.5,
+        "ratioamount": 0.7558,
+        "r0_net": 1080456182.64,
+        "r0_ratio": 0.6144,
+        "r0x_ratio": 80.77,
         "source": "sina_moneyflow"
       }
     },
@@ -737,10 +837,10 @@
       "name": "湘财股份",
       "added_date": "2026-08-26",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 2,
-      "limit_days": 1,
+      "days_in_pool": 3,
+      "limit_days": 2,
       "close": 9.54,
-      "prev_close": 8.67,
+      "prev_close": 9.54,
       "first_seal": "09:40:00",
       "last_seal": "13:02:00",
       "seal_fund": 65334690.0,
@@ -759,16 +859,21 @@
           "date": "2026-08-27",
           "close": 9.54,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 9.54,
+          "cons": 2
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 319342437.48,
-        "ratioamount": 0.4683,
-        "r0_net": 224514644.1,
-        "r0_ratio": 0.3292,
-        "r0x_ratio": 73.06,
+        "date": "2026-08-27",
+        "netamount": 821689541.05,
+        "ratioamount": 0.4289,
+        "r0_net": 624603404.66,
+        "r0_ratio": 0.3261,
+        "r0x_ratio": 72.89,
         "source": "sina_moneyflow"
       }
     },
@@ -777,10 +882,10 @@
       "name": "和胜股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 26.68,
-      "prev_close": 22.0,
+      "prev_close": 26.68,
       "first_seal": "11:14:00",
       "last_seal": "11:14:00",
       "seal_fund": 63882592.0,
@@ -794,16 +899,21 @@
           "date": "2026-08-27",
           "close": 26.68,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 26.68,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -145020936.89,
-        "ratioamount": -0.2592,
-        "r0_net": -71889386.58,
-        "r0_ratio": -0.1285,
-        "r0x_ratio": -107.44,
+        "date": "2026-08-27",
+        "netamount": 216211643.93,
+        "ratioamount": 0.36,
+        "r0_net": 179321768.75,
+        "r0_ratio": 0.2986,
+        "r0x_ratio": 71.45,
         "source": "sina_moneyflow"
       }
     },
@@ -812,10 +922,10 @@
       "name": "海鸥股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 20.16,
-      "prev_close": 15.96,
+      "prev_close": 20.16,
       "first_seal": "10:43:00",
       "last_seal": "10:43:00",
       "seal_fund": 67615209.0,
@@ -829,16 +939,21 @@
           "date": "2026-08-27",
           "close": 20.16,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 20.16,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -9457813.88,
-        "ratioamount": -0.028,
-        "r0_net": 1376547.6,
-        "r0_ratio": 0.0041,
-        "r0x_ratio": 143.13,
+        "date": "2026-08-27",
+        "netamount": 258750086.96,
+        "ratioamount": 0.4995,
+        "r0_net": 171867148.62,
+        "r0_ratio": 0.3317,
+        "r0x_ratio": 73.25,
         "source": "sina_moneyflow"
       }
     },
@@ -847,10 +962,10 @@
       "name": "合锻智能",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 25.14,
-      "prev_close": 26.68,
+      "prev_close": 25.14,
       "first_seal": "10:43:00",
       "last_seal": "10:43:00",
       "seal_fund": 100343796.0,
@@ -864,16 +979,21 @@
           "date": "2026-08-27",
           "close": 25.14,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 25.14,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 9507363.07,
-        "ratioamount": 0.0079,
-        "r0_net": 14797402.01,
-        "r0_ratio": 0.0123,
-        "r0x_ratio": 81.9,
+        "date": "2026-08-27",
+        "netamount": 538382022.77,
+        "ratioamount": 0.4343,
+        "r0_net": 412333164.97,
+        "r0_ratio": 0.3326,
+        "r0x_ratio": 73.23,
         "source": "sina_moneyflow"
       }
     },
@@ -882,10 +1002,10 @@
       "name": "金安国纪",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 69.41,
-      "prev_close": 56.18,
+      "prev_close": 69.41,
       "first_seal": "10:36:00",
       "last_seal": "10:36:00",
       "seal_fund": 143025410.0,
@@ -899,16 +1019,21 @@
           "date": "2026-08-27",
           "close": 69.41,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 69.41,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -108890695.55,
-        "ratioamount": -0.0392,
-        "r0_net": -113176746.18,
-        "r0_ratio": -0.0407,
-        "r0x_ratio": -110.2,
+        "date": "2026-08-27",
+        "netamount": 1660195002.69,
+        "ratioamount": 0.4775,
+        "r0_net": 1301385759.31,
+        "r0_ratio": 0.3743,
+        "r0x_ratio": 75.04,
         "source": "sina_moneyflow"
       }
     },
@@ -917,10 +1042,10 @@
       "name": "成飞集成",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 25.52,
-      "prev_close": 23.43,
+      "prev_close": 25.52,
       "first_seal": "10:28:00",
       "last_seal": "10:40:00",
       "seal_fund": 56653073.0,
@@ -934,16 +1059,21 @@
           "date": "2026-08-27",
           "close": 25.52,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 25.52,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -1788175.44,
-        "ratioamount": -0.0125,
-        "r0_net": 4181000.36,
-        "r0_ratio": 0.0291,
-        "r0x_ratio": 62.96,
+        "date": "2026-08-27",
+        "netamount": 396250358.55,
+        "ratioamount": 0.7055,
+        "r0_net": 223918831.85,
+        "r0_ratio": 0.3987,
+        "r0x_ratio": 75.92,
         "source": "sina_moneyflow"
       }
     },
@@ -952,10 +1082,10 @@
       "name": "华盛昌",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
-      "limit_days": 2,
+      "days_in_pool": 2,
+      "limit_days": 1,
       "close": 102.05,
-      "prev_close": 76.14,
+      "prev_close": 102.05,
       "first_seal": "10:39:00",
       "last_seal": "10:39:00",
       "seal_fund": 77897622.0,
@@ -969,16 +1099,21 @@
           "date": "2026-08-27",
           "close": 102.05,
           "cons": 2
+        },
+        {
+          "date": "2026-08-27",
+          "close": 102.05,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -78045003.6,
-        "ratioamount": -0.0988,
-        "r0_net": -40810466.2,
-        "r0_ratio": -0.0517,
-        "r0x_ratio": -109.72,
+        "date": "2026-08-27",
+        "netamount": 427692628.0,
+        "ratioamount": 0.3848,
+        "r0_net": 323780135.4,
+        "r0_ratio": 0.2913,
+        "r0x_ratio": 71.05,
         "source": "sina_moneyflow"
       }
     },
@@ -987,10 +1122,10 @@
       "name": "协和电子",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 31.9,
-      "prev_close": 25.97,
+      "prev_close": 31.9,
       "first_seal": "10:34:00",
       "last_seal": "10:34:00",
       "seal_fund": 7981380.0,
@@ -1004,16 +1139,21 @@
           "date": "2026-08-27",
           "close": 31.9,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 31.9,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 102085.21,
-        "ratioamount": 0.0012,
-        "r0_net": 1130594.0,
-        "r0_ratio": 0.0136,
-        "r0x_ratio": 28.07,
+        "date": "2026-08-27",
+        "netamount": 92203219.9,
+        "ratioamount": 0.6475,
+        "r0_net": 42176420.0,
+        "r0_ratio": 0.2962,
+        "r0x_ratio": 71.34,
         "source": "sina_moneyflow"
       }
     },
@@ -1022,10 +1162,10 @@
       "name": "嘉立创",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 162.03,
-      "prev_close": 199.91,
+      "prev_close": 162.03,
       "first_seal": "10:31:00",
       "last_seal": "10:31:00",
       "seal_fund": 68367100.0,
@@ -1039,16 +1179,21 @@
           "date": "2026-08-27",
           "close": 162.03,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 162.03,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -42056910.39,
-        "ratioamount": -0.0893,
-        "r0_net": -8274682.8,
-        "r0_ratio": -0.0176,
-        "r0x_ratio": -122.04,
+        "date": "2026-08-27",
+        "netamount": 435068914.98,
+        "ratioamount": 0.316,
+        "r0_net": 305907926.67,
+        "r0_ratio": 0.2222,
+        "r0x_ratio": 65.77,
         "source": "sina_moneyflow"
       }
     },
@@ -1057,10 +1202,10 @@
       "name": "天津普林",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 22.63,
-      "prev_close": 20.46,
+      "prev_close": 22.63,
       "first_seal": "10:27:00",
       "last_seal": "10:27:00",
       "seal_fund": 61451765.0,
@@ -1074,16 +1219,21 @@
           "date": "2026-08-27",
           "close": 22.63,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 22.63,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -6912729.62,
-        "ratioamount": -0.074,
-        "r0_net": -1539402.0,
-        "r0_ratio": -0.0165,
-        "r0x_ratio": -139.23,
+        "date": "2026-08-27",
+        "netamount": 71212651.0,
+        "ratioamount": 0.2824,
+        "r0_net": 43834794.0,
+        "r0_ratio": 0.1738,
+        "r0x_ratio": 60.05,
         "source": "sina_moneyflow"
       }
     },
@@ -1092,10 +1242,10 @@
       "name": "长飞光纤",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 426.82,
-      "prev_close": 312.4,
+      "prev_close": 426.82,
       "first_seal": "09:50:00",
       "last_seal": "09:50:00",
       "seal_fund": 339458480.0,
@@ -1109,16 +1259,21 @@
           "date": "2026-08-27",
           "close": 426.82,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 426.82,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -359290605.63,
-        "ratioamount": -0.0487,
-        "r0_net": -254513465.27,
-        "r0_ratio": -0.0345,
-        "r0x_ratio": -115.48,
+        "date": "2026-08-27",
+        "netamount": 3004168529.94,
+        "ratioamount": 0.4898,
+        "r0_net": 2450399457.34,
+        "r0_ratio": 0.3995,
+        "r0x_ratio": 75.95,
         "source": "sina_moneyflow"
       }
     },
@@ -1127,10 +1282,10 @@
       "name": "江钨装备",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 19.03,
-      "prev_close": 18.14,
+      "prev_close": 19.03,
       "first_seal": "10:24:00",
       "last_seal": "10:24:00",
       "seal_fund": 123457125.0,
@@ -1144,16 +1299,21 @@
           "date": "2026-08-27",
           "close": 19.03,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 19.03,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -111914056.14,
-        "ratioamount": -0.0832,
-        "r0_net": -111629313.29,
-        "r0_ratio": -0.083,
-        "r0x_ratio": -100.12,
+        "date": "2026-08-27",
+        "netamount": 919742800.21,
+        "ratioamount": 0.4905,
+        "r0_net": 709021777.68,
+        "r0_ratio": 0.3782,
+        "r0x_ratio": 75.19,
         "source": "sina_moneyflow"
       }
     },
@@ -1162,10 +1322,10 @@
       "name": "嘉德利",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 53.3,
-      "prev_close": 53.21,
+      "prev_close": 53.3,
       "first_seal": "10:19:00",
       "last_seal": "10:19:00",
       "seal_fund": 41764441.0,
@@ -1179,16 +1339,21 @@
           "date": "2026-08-27",
           "close": 53.3,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 53.3,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -11805498.98,
-        "ratioamount": -0.1757,
-        "r0_net": -2106558.0,
-        "r0_ratio": -0.0314,
-        "r0x_ratio": -114.73,
+        "date": "2026-08-27",
+        "netamount": 107595149.13,
+        "ratioamount": 0.5824,
+        "r0_net": 66410481.03,
+        "r0_ratio": 0.3595,
+        "r0x_ratio": 74.44,
         "source": "sina_moneyflow"
       }
     },
@@ -1197,10 +1362,10 @@
       "name": "恒尚节能",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 24.44,
-      "prev_close": 27.58,
+      "prev_close": 24.44,
       "first_seal": "10:12:00",
       "last_seal": "10:12:00",
       "seal_fund": 76224718.0,
@@ -1214,16 +1379,21 @@
           "date": "2026-08-27",
           "close": 24.44,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 24.44,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -2417916.01,
-        "ratioamount": -0.0075,
-        "r0_net": 13184646.56,
-        "r0_ratio": 0.041,
-        "r0x_ratio": 63.78,
+        "date": "2026-08-27",
+        "netamount": 196625280.12,
+        "ratioamount": 0.4404,
+        "r0_net": 140448409.12,
+        "r0_ratio": 0.3146,
+        "r0x_ratio": 72.38,
         "source": "sina_moneyflow"
       }
     },
@@ -1232,10 +1402,10 @@
       "name": "中国重汽",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 22.39,
-      "prev_close": 22.02,
+      "prev_close": 22.39,
       "first_seal": "09:33:00",
       "last_seal": "09:54:00",
       "seal_fund": 58101154.0,
@@ -1249,16 +1419,21 @@
           "date": "2026-08-27",
           "close": 22.39,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 22.39,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 11727847.4,
-        "ratioamount": 0.0668,
-        "r0_net": 13266292.0,
-        "r0_ratio": 0.0755,
-        "r0x_ratio": 80.63,
+        "date": "2026-08-27",
+        "netamount": 490917059.37,
+        "ratioamount": 0.7091,
+        "r0_net": 345543068.37,
+        "r0_ratio": 0.4991,
+        "r0x_ratio": 78.64,
         "source": "sina_moneyflow"
       }
     },
@@ -1267,10 +1442,10 @@
       "name": "郴电国际",
       "added_date": "2026-08-26",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 2,
-      "limit_days": 1,
+      "days_in_pool": 3,
+      "limit_days": 2,
       "close": 10.45,
-      "prev_close": 9.5,
+      "prev_close": 10.45,
       "first_seal": "10:10:00",
       "last_seal": "10:10:00",
       "seal_fund": 18546242.0,
@@ -1289,16 +1464,21 @@
           "date": "2026-08-27",
           "close": 10.45,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 10.45,
+          "cons": 2
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 113213493.5,
-        "ratioamount": 0.7529,
-        "r0_net": 45707678.0,
-        "r0_ratio": 0.304,
-        "r0x_ratio": 71.87,
+        "date": "2026-08-27",
+        "netamount": 176016979.7,
+        "ratioamount": 0.4816,
+        "r0_net": 81481851.8,
+        "r0_ratio": 0.223,
+        "r0x_ratio": 65.84,
         "source": "sina_moneyflow"
       }
     },
@@ -1307,10 +1487,10 @@
       "name": "亚盛集团",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 3.78,
-      "prev_close": 3.56,
+      "prev_close": 3.78,
       "first_seal": "10:09:00",
       "last_seal": "10:09:00",
       "seal_fund": 54726054.0,
@@ -1324,16 +1504,21 @@
           "date": "2026-08-27",
           "close": 3.78,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 3.78,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 1217663.95,
-        "ratioamount": 0.0026,
-        "r0_net": 26761215.67,
-        "r0_ratio": 0.0574,
-        "r0x_ratio": 67.53,
+        "date": "2026-08-27",
+        "netamount": 200315193.92,
+        "ratioamount": 0.3654,
+        "r0_net": 101717169.43,
+        "r0_ratio": 0.1856,
+        "r0x_ratio": 61.96,
         "source": "sina_moneyflow"
       }
     },
@@ -1342,10 +1527,10 @@
       "name": "凯瑞德",
       "added_date": "2026-08-26",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 2,
-      "limit_days": 1,
+      "days_in_pool": 3,
+      "limit_days": 2,
       "close": 8.9,
-      "prev_close": 8.09,
+      "prev_close": 8.9,
       "first_seal": "09:37:00",
       "last_seal": "10:04:00",
       "seal_fund": 38225491.0,
@@ -1364,16 +1549,21 @@
           "date": "2026-08-27",
           "close": 8.9,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 8.9,
+          "cons": 2
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 81515068.37,
-        "ratioamount": 0.346,
-        "r0_net": 52826099.95,
-        "r0_ratio": 0.2242,
-        "r0x_ratio": 65.82,
+        "date": "2026-08-27",
+        "netamount": 237349944.08,
+        "ratioamount": 0.6568,
+        "r0_net": 151589407.4,
+        "r0_ratio": 0.4195,
+        "r0x_ratio": 76.58,
         "source": "sina_moneyflow"
       }
     },
@@ -1382,10 +1572,10 @@
       "name": "香江控股",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 4.87,
-      "prev_close": 4.29,
+      "prev_close": 4.87,
       "first_seal": "10:07:00",
       "last_seal": "10:07:00",
       "seal_fund": 73617842.0,
@@ -1399,16 +1589,21 @@
           "date": "2026-08-27",
           "close": 4.87,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 4.87,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 5800977.38,
-        "ratioamount": 0.0073,
-        "r0_net": 21331889.53,
-        "r0_ratio": 0.027,
-        "r0x_ratio": 49.4,
+        "date": "2026-08-27",
+        "netamount": 157071306.93,
+        "ratioamount": 0.2476,
+        "r0_net": 88890099.4,
+        "r0_ratio": 0.1401,
+        "r0x_ratio": 54.67,
         "source": "sina_moneyflow"
       }
     },
@@ -1417,10 +1612,10 @@
       "name": "京投发展",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 11.04,
-      "prev_close": 10.65,
+      "prev_close": 11.04,
       "first_seal": "09:59:00",
       "last_seal": "09:59:00",
       "seal_fund": 71743440.0,
@@ -1434,16 +1629,21 @@
           "date": "2026-08-27",
           "close": 11.04,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 11.04,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -17293207.0,
-        "ratioamount": -0.0578,
-        "r0_net": -2529435.0,
-        "r0_ratio": -0.0085,
-        "r0x_ratio": -151.7,
+        "date": "2026-08-27",
+        "netamount": 212244365.53,
+        "ratioamount": 0.4635,
+        "r0_net": 151689579.53,
+        "r0_ratio": 0.3312,
+        "r0x_ratio": 73.26,
         "source": "sina_moneyflow"
       }
     },
@@ -1452,10 +1652,10 @@
       "name": "新农开发",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 7.47,
-      "prev_close": 6.93,
+      "prev_close": 7.47,
       "first_seal": "09:33:00",
       "last_seal": "09:59:00",
       "seal_fund": 40110494.0,
@@ -1469,16 +1669,21 @@
           "date": "2026-08-27",
           "close": 7.47,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 7.47,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -390269.16,
-        "ratioamount": -0.0034,
-        "r0_net": -1983130.44,
-        "r0_ratio": -0.017,
-        "r0x_ratio": -99.78,
+        "date": "2026-08-27",
+        "netamount": 92869825.72,
+        "ratioamount": 0.5089,
+        "r0_net": 33195432.52,
+        "r0_ratio": 0.1819,
+        "r0x_ratio": 61.16,
         "source": "sina_moneyflow"
       }
     },
@@ -1487,10 +1692,10 @@
       "name": "汇源通信",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 14.41,
-      "prev_close": 11.66,
+      "prev_close": 14.41,
       "first_seal": "09:56:00",
       "last_seal": "09:56:00",
       "seal_fund": 17351081.0,
@@ -1504,16 +1709,21 @@
           "date": "2026-08-27",
           "close": 14.41,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 14.41,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 24206726.0,
-        "ratioamount": 0.2139,
-        "r0_net": 14039092.0,
-        "r0_ratio": 0.124,
-        "r0x_ratio": 84.31,
+        "date": "2026-08-27",
+        "netamount": 82303181.41,
+        "ratioamount": 0.5612,
+        "r0_net": 28699757.0,
+        "r0_ratio": 0.1957,
+        "r0x_ratio": 62.93,
         "source": "sina_moneyflow"
       }
     },
@@ -1522,10 +1732,10 @@
       "name": "艾艾精工",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 80.52,
-      "prev_close": 74.79,
+      "prev_close": 80.52,
       "first_seal": "09:56:00",
       "last_seal": "09:56:00",
       "seal_fund": 61704731.0,
@@ -1539,16 +1749,21 @@
           "date": "2026-08-27",
           "close": 80.52,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 80.52,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -74787988.83,
-        "ratioamount": -0.0888,
-        "r0_net": -45424168.8,
-        "r0_ratio": -0.0539,
-        "r0x_ratio": -98.2,
+        "date": "2026-08-27",
+        "netamount": 289462745.36,
+        "ratioamount": 0.447,
+        "r0_net": 194044089.16,
+        "r0_ratio": 0.2996,
+        "r0x_ratio": 71.54,
         "source": "sina_moneyflow"
       }
     },
@@ -1557,10 +1772,10 @@
       "name": "甘化科工",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 8.0,
-      "prev_close": 7.02,
+      "prev_close": 8.0,
       "first_seal": "09:31:00",
       "last_seal": "09:53:00",
       "seal_fund": 33069648.0,
@@ -1574,16 +1789,21 @@
           "date": "2026-08-27",
           "close": 8.0,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 8.0,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -387240.0,
-        "ratioamount": -0.0081,
-        "r0_net": 0.0,
-        "r0_ratio": 0.0,
-        "r0x_ratio": 0.0,
+        "date": "2026-08-27",
+        "netamount": 132680366.57,
+        "ratioamount": 0.4943,
+        "r0_net": 68763274.0,
+        "r0_ratio": 0.2562,
+        "r0x_ratio": 68.6,
         "source": "sina_moneyflow"
       }
     },
@@ -1592,10 +1812,10 @@
       "name": "宏昌电子",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 16.91,
-      "prev_close": 17.59,
+      "prev_close": 16.91,
       "first_seal": "09:53:00",
       "last_seal": "09:53:00",
       "seal_fund": 135985150.0,
@@ -1609,16 +1829,21 @@
           "date": "2026-08-27",
           "close": 16.91,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 16.91,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -29957632.59,
-        "ratioamount": -0.0432,
-        "r0_net": -5573662.0,
-        "r0_ratio": -0.008,
-        "r0x_ratio": -142.08,
+        "date": "2026-08-27",
+        "netamount": 478621603.0,
+        "ratioamount": 0.4965,
+        "r0_net": 384490457.0,
+        "r0_ratio": 0.3988,
+        "r0x_ratio": 75.9,
         "source": "sina_moneyflow"
       }
     },
@@ -1627,10 +1852,10 @@
       "name": "日丰股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 11.88,
-      "prev_close": 11.73,
+      "prev_close": 11.88,
       "first_seal": "09:51:00",
       "last_seal": "09:51:00",
       "seal_fund": 46847295.0,
@@ -1644,16 +1869,21 @@
           "date": "2026-08-27",
           "close": 11.88,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 11.88,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -6076233.07,
-        "ratioamount": -0.025,
-        "r0_net": 13516946.0,
-        "r0_ratio": 0.0557,
-        "r0x_ratio": 98.41,
+        "date": "2026-08-27",
+        "netamount": 153750593.16,
+        "ratioamount": 0.7185,
+        "r0_net": 75771053.0,
+        "r0_ratio": 0.3541,
+        "r0x_ratio": 74.23,
         "source": "sina_moneyflow"
       }
     },
@@ -1662,10 +1892,10 @@
       "name": "沃特股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 24.0,
-      "prev_close": 21.24,
+      "prev_close": 24.0,
       "first_seal": "09:35:00",
       "last_seal": "09:46:00",
       "seal_fund": 122493600.0,
@@ -1679,16 +1909,21 @@
           "date": "2026-08-27",
           "close": 24.0,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 24.0,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 8837805.65,
-        "ratioamount": 0.0119,
-        "r0_net": 20650388.58,
-        "r0_ratio": 0.0279,
-        "r0x_ratio": 46.63,
+        "date": "2026-08-27",
+        "netamount": 431881766.5,
+        "ratioamount": 0.5559,
+        "r0_net": 344030489.5,
+        "r0_ratio": 0.4428,
+        "r0x_ratio": 77.29,
         "source": "sina_moneyflow"
       }
     },
@@ -1697,10 +1932,10 @@
       "name": "康盛股份",
       "added_date": "2026-08-25",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 4,
-      "limit_days": 2,
+      "days_in_pool": 5,
+      "limit_days": 3,
       "close": 4.91,
-      "prev_close": 4.46,
+      "prev_close": 4.91,
       "first_seal": "09:35:00",
       "last_seal": "09:47:00",
       "seal_fund": 86280008.0,
@@ -1729,16 +1964,21 @@
           "date": "2026-08-27",
           "close": 4.91,
           "cons": 2
+        },
+        {
+          "date": "2026-08-27",
+          "close": 4.91,
+          "cons": 3
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 307177304.1,
-        "ratioamount": 0.5798,
-        "r0_net": 176284318.72,
-        "r0_ratio": 0.3327,
-        "r0x_ratio": 73.08,
+        "date": "2026-08-27",
+        "netamount": 708904611.69,
+        "ratioamount": 0.578,
+        "r0_net": 557083925.59,
+        "r0_ratio": 0.4542,
+        "r0x_ratio": 77.48,
         "source": "sina_moneyflow"
       }
     },
@@ -1747,10 +1987,10 @@
       "name": "三孚股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 44.96,
-      "prev_close": 39.8,
+      "prev_close": 44.96,
       "first_seal": "09:46:00",
       "last_seal": "09:46:00",
       "seal_fund": 76888029.0,
@@ -1764,16 +2004,21 @@
           "date": "2026-08-27",
           "close": 44.96,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 44.96,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 1028663.58,
-        "ratioamount": 0.0026,
-        "r0_net": 28354802.18,
-        "r0_ratio": 0.0724,
-        "r0x_ratio": 103.44,
+        "date": "2026-08-27",
+        "netamount": 335184053.88,
+        "ratioamount": 0.5858,
+        "r0_net": 260227964.07,
+        "r0_ratio": 0.4548,
+        "r0x_ratio": 77.59,
         "source": "sina_moneyflow"
       }
     },
@@ -1782,10 +2027,10 @@
       "name": "莱绅通灵",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 7.14,
-      "prev_close": 5.95,
+      "prev_close": 7.14,
       "first_seal": "09:40:00",
       "last_seal": "09:40:00",
       "seal_fund": 72769024.0,
@@ -1799,16 +2044,21 @@
           "date": "2026-08-27",
           "close": 7.14,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 7.14,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -10130674.68,
-        "ratioamount": -0.0531,
-        "r0_net": -7135803.08,
-        "r0_ratio": -0.0374,
-        "r0x_ratio": -99.26,
+        "date": "2026-08-27",
+        "netamount": 116382998.82,
+        "ratioamount": 0.6063,
+        "r0_net": 60641018.24,
+        "r0_ratio": 0.3159,
+        "r0x_ratio": 72.41,
         "source": "sina_moneyflow"
       }
     },
@@ -1817,10 +2067,10 @@
       "name": "中安科",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 3.3,
-      "prev_close": 2.98,
+      "prev_close": 3.3,
       "first_seal": "09:39:00",
       "last_seal": "09:39:00",
       "seal_fund": 80570820.0,
@@ -1834,16 +2084,21 @@
           "date": "2026-08-27",
           "close": 3.3,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 3.3,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 18249968.13,
-        "ratioamount": 0.1069,
-        "r0_net": 18868393.1,
-        "r0_ratio": 0.1106,
-        "r0x_ratio": 84.78,
+        "date": "2026-08-27",
+        "netamount": 196926291.7,
+        "ratioamount": 0.6049,
+        "r0_net": 115441995.1,
+        "r0_ratio": 0.3546,
+        "r0x_ratio": 74.25,
         "source": "sina_moneyflow"
       }
     },
@@ -1852,10 +2107,10 @@
       "name": "金健米业",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 10.78,
-      "prev_close": 9.31,
+      "prev_close": 10.78,
       "first_seal": "09:37:00",
       "last_seal": "09:37:00",
       "seal_fund": 189199040.0,
@@ -1869,16 +2124,21 @@
           "date": "2026-08-27",
           "close": 10.78,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 10.78,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 247837488.45,
-        "ratioamount": 0.0861,
-        "r0_net": 200646689.35,
-        "r0_ratio": 0.0697,
-        "r0x_ratio": 50.23,
+        "date": "2026-08-27",
+        "netamount": 543825908.1,
+        "ratioamount": 0.3983,
+        "r0_net": 378000984.22,
+        "r0_ratio": 0.2768,
+        "r0x_ratio": 70.14,
         "source": "sina_moneyflow"
       }
     },
@@ -1887,10 +2147,10 @@
       "name": "立航科技",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 58.73,
-      "prev_close": 57.37,
+      "prev_close": 58.73,
       "first_seal": "09:36:00",
       "last_seal": "09:36:00",
       "seal_fund": 70981078.0,
@@ -1904,16 +2164,21 @@
           "date": "2026-08-27",
           "close": 58.73,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 58.73,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 6131378.0,
-        "ratioamount": 0.0418,
-        "r0_net": -6120407.0,
-        "r0_ratio": -0.0418,
-        "r0x_ratio": -32.16,
+        "date": "2026-08-27",
+        "netamount": 54148512.0,
+        "ratioamount": 0.5371,
+        "r0_net": 18122755.0,
+        "r0_ratio": 0.1798,
+        "r0x_ratio": 60.91,
         "source": "sina_moneyflow"
       }
     },
@@ -1922,10 +2187,10 @@
       "name": "深中华A",
       "added_date": "2026-08-20",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 11,
-      "limit_days": 5,
+      "days_in_pool": 12,
+      "limit_days": 6,
       "close": 10.41,
-      "prev_close": 9.46,
+      "prev_close": 10.41,
       "first_seal": "09:34:00",
       "last_seal": "09:34:00",
       "seal_fund": 45440691.0,
@@ -1989,16 +2254,21 @@
           "date": "2026-08-27",
           "close": 10.41,
           "cons": 5
+        },
+        {
+          "date": "2026-08-27",
+          "close": 10.41,
+          "cons": 6
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 167807559.14,
-        "ratioamount": 0.1745,
-        "r0_net": 94206230.34,
-        "r0_ratio": 0.098,
-        "r0x_ratio": 44.41,
+        "date": "2026-08-27",
+        "netamount": 175119217.28,
+        "ratioamount": 0.2894,
+        "r0_net": 107002858.28,
+        "r0_ratio": 0.1769,
+        "r0x_ratio": 60.41,
         "source": "sina_moneyflow"
       }
     },
@@ -2007,10 +2277,10 @@
       "name": "杭电股份",
       "added_date": "2026-08-26",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 2,
-      "limit_days": 1,
+      "days_in_pool": 3,
+      "limit_days": 2,
       "close": 35.11,
-      "prev_close": 31.92,
+      "prev_close": 35.11,
       "first_seal": "09:36:00",
       "last_seal": "09:36:00",
       "seal_fund": 347233970.0,
@@ -2029,16 +2299,21 @@
           "date": "2026-08-27",
           "close": 35.11,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 35.11,
+          "cons": 2
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 1458076787.32,
-        "ratioamount": 0.5792,
-        "r0_net": 1142298611.32,
-        "r0_ratio": 0.4538,
-        "r0x_ratio": 77.58,
+        "date": "2026-08-27",
+        "netamount": 757410290.72,
+        "ratioamount": 0.3303,
+        "r0_net": 615507924.11,
+        "r0_ratio": 0.2684,
+        "r0x_ratio": 69.58,
         "source": "sina_moneyflow"
       }
     },
@@ -2047,10 +2322,10 @@
       "name": "昊华科技",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 48.46,
-      "prev_close": 44.07,
+      "prev_close": 48.46,
       "first_seal": "09:32:00",
       "last_seal": "09:32:00",
       "seal_fund": 197313950.0,
@@ -2064,16 +2339,21 @@
           "date": "2026-08-27",
           "close": 48.46,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 48.46,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -78571073.19,
-        "ratioamount": -0.0476,
-        "r0_net": -35571908.02,
-        "r0_ratio": -0.0216,
-        "r0x_ratio": -53.18,
+        "date": "2026-08-27",
+        "netamount": 1057158167.42,
+        "ratioamount": 0.7364,
+        "r0_net": 814068511.72,
+        "r0_ratio": 0.567,
+        "r0x_ratio": 79.99,
         "source": "sina_moneyflow"
       }
     },
@@ -2082,10 +2362,10 @@
       "name": "神奇制药",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 11.61,
-      "prev_close": 9.9,
+      "prev_close": 11.61,
       "first_seal": "09:30:00",
       "last_seal": "09:30:00",
       "seal_fund": 167587940.0,
@@ -2099,16 +2379,21 @@
           "date": "2026-08-27",
           "close": 11.61,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 11.61,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 92605179.63,
-        "ratioamount": 0.0738,
-        "r0_net": 76373485.46,
-        "r0_ratio": 0.0608,
-        "r0x_ratio": 65.86,
+        "date": "2026-08-27",
+        "netamount": 306260131.37,
+        "ratioamount": 0.4526,
+        "r0_net": 188253676.49,
+        "r0_ratio": 0.2782,
+        "r0x_ratio": 70.14,
         "source": "sina_moneyflow"
       }
     },
@@ -2117,10 +2402,10 @@
       "name": "青山纸业",
       "added_date": "2026-08-25",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 4,
-      "limit_days": 2,
+      "days_in_pool": 5,
+      "limit_days": 3,
       "close": 3.82,
-      "prev_close": 3.47,
+      "prev_close": 3.82,
       "first_seal": "09:31:00",
       "last_seal": "09:31:00",
       "seal_fund": 307811500.0,
@@ -2149,16 +2434,21 @@
           "date": "2026-08-27",
           "close": 3.82,
           "cons": 2
+        },
+        {
+          "date": "2026-08-27",
+          "close": 3.82,
+          "cons": 3
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 401815081.39,
-        "ratioamount": 0.5327,
-        "r0_net": 316319761.54,
-        "r0_ratio": 0.4194,
-        "r0x_ratio": 76.38,
+        "date": "2026-08-27",
+        "netamount": 207177850.64,
+        "ratioamount": 0.4089,
+        "r0_net": 115306804.8,
+        "r0_ratio": 0.2276,
+        "r0x_ratio": 66.1,
         "source": "sina_moneyflow"
       }
     },
@@ -2167,10 +2457,10 @@
       "name": "法尔胜",
       "added_date": "2026-08-26",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 2,
-      "limit_days": 1,
+      "days_in_pool": 3,
+      "limit_days": 2,
       "close": 8.78,
-      "prev_close": 7.98,
+      "prev_close": 8.78,
       "first_seal": "09:31:00",
       "last_seal": "09:31:00",
       "seal_fund": 98898798.0,
@@ -2189,16 +2479,21 @@
           "date": "2026-08-27",
           "close": 8.78,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 8.78,
+          "cons": 2
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 75114014.0,
-        "ratioamount": 0.5342,
-        "r0_net": 28247434.0,
-        "r0_ratio": 0.2009,
-        "r0x_ratio": 63.38,
+        "date": "2026-08-27",
+        "netamount": 98615674.0,
+        "ratioamount": 0.7481,
+        "r0_net": 51376640.0,
+        "r0_ratio": 0.3897,
+        "r0x_ratio": 75.57,
         "source": "sina_moneyflow"
       }
     },
@@ -2207,10 +2502,10 @@
       "name": "五芳斋",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 15.88,
-      "prev_close": 14.4,
+      "prev_close": 15.88,
       "first_seal": "09:31:00",
       "last_seal": "09:31:00",
       "seal_fund": 30682351.0,
@@ -2224,16 +2519,21 @@
           "date": "2026-08-27",
           "close": 15.88,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 15.88,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 1803221.13,
-        "ratioamount": 0.1249,
-        "r0_net": 0.0,
-        "r0_ratio": 0.0,
-        "r0x_ratio": 0.0,
+        "date": "2026-08-27",
+        "netamount": 50043288.46,
+        "ratioamount": 0.8804,
+        "r0_net": 23491982.22,
+        "r0_ratio": 0.4133,
+        "r0x_ratio": 76.43,
         "source": "sina_moneyflow"
       }
     },
@@ -2242,10 +2542,10 @@
       "name": "万向德农",
       "added_date": "2026-08-25",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 4,
-      "limit_days": 2,
+      "days_in_pool": 5,
+      "limit_days": 3,
       "close": 10.49,
-      "prev_close": 9.54,
+      "prev_close": 10.49,
       "first_seal": "09:31:00",
       "last_seal": "09:31:00",
       "seal_fund": 204232470.0,
@@ -2274,16 +2574,21 @@
           "date": "2026-08-27",
           "close": 10.49,
           "cons": 2
+        },
+        {
+          "date": "2026-08-27",
+          "close": 10.49,
+          "cons": 3
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 288777357.53,
-        "ratioamount": 0.639,
-        "r0_net": 212401836.88,
-        "r0_ratio": 0.47,
-        "r0x_ratio": 77.95,
+        "date": "2026-08-27",
+        "netamount": 79653353.73,
+        "ratioamount": 0.473,
+        "r0_net": 43573879.89,
+        "r0_ratio": 0.2588,
+        "r0x_ratio": 68.95,
         "source": "sina_moneyflow"
       }
     },
@@ -2292,10 +2597,10 @@
       "name": "新赛股份",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 4.59,
-      "prev_close": 3.89,
+      "prev_close": 4.59,
       "first_seal": "09:30:00",
       "last_seal": "09:30:00",
       "seal_fund": 161909500.0,
@@ -2309,16 +2614,21 @@
           "date": "2026-08-27",
           "close": 4.59,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 4.59,
+          "cons": 1
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": -3516027.21,
-        "ratioamount": -0.0282,
-        "r0_net": 1968964.0,
-        "r0_ratio": 0.0158,
-        "r0x_ratio": 47.28,
+        "date": "2026-08-27",
+        "netamount": 22956173.55,
+        "ratioamount": 0.5702,
+        "r0_net": -4160376.0,
+        "r0_ratio": -0.1033,
+        "r0x_ratio": -45.73,
         "source": "sina_moneyflow"
       }
     },
@@ -2327,10 +2637,10 @@
       "name": "新农股份",
       "added_date": "2026-08-26",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 2,
-      "limit_days": 1,
+      "days_in_pool": 3,
+      "limit_days": 2,
       "close": 19.01,
-      "prev_close": 17.28,
+      "prev_close": 19.01,
       "first_seal": "09:30:00",
       "last_seal": "09:30:00",
       "seal_fund": 356469250.0,
@@ -2349,16 +2659,21 @@
           "date": "2026-08-27",
           "close": 19.01,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 19.01,
+          "cons": 2
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 90482991.6,
-        "ratioamount": 0.9044,
-        "r0_net": 58547078.4,
-        "r0_ratio": 0.5852,
-        "r0x_ratio": 80.31,
+        "date": "2026-08-27",
+        "netamount": 21191017.3,
+        "ratioamount": 0.4935,
+        "r0_net": 7963289.0,
+        "r0_ratio": 0.1855,
+        "r0x_ratio": 61.64,
         "source": "sina_moneyflow"
       }
     },
@@ -2367,10 +2682,10 @@
       "name": "捷荣技术",
       "added_date": "2026-08-25",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 4,
-      "limit_days": 2,
+      "days_in_pool": 5,
+      "limit_days": 3,
       "close": 13.31,
-      "prev_close": 12.1,
+      "prev_close": 13.31,
       "first_seal": "09:30:00",
       "last_seal": "09:30:00",
       "seal_fund": 92996970.0,
@@ -2399,16 +2714,21 @@
           "date": "2026-08-27",
           "close": 13.31,
           "cons": 2
+        },
+        {
+          "date": "2026-08-27",
+          "close": 13.31,
+          "cons": 3
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 4771030.0,
-        "ratioamount": 0.1743,
-        "r0_net": -8215900.0,
-        "r0_ratio": -0.3002,
-        "r0x_ratio": -71.58,
+        "date": "2026-08-27",
+        "netamount": 3970373.0,
+        "ratioamount": 0.2108,
+        "r0_net": -6439378.0,
+        "r0_ratio": -0.3419,
+        "r0x_ratio": -73.69,
         "source": "sina_moneyflow"
       }
     },
@@ -2417,10 +2737,10 @@
       "name": "冀衡医药",
       "added_date": "2026-08-25",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 4,
-      "limit_days": 2,
+      "days_in_pool": 5,
+      "limit_days": 3,
       "close": 5.67,
-      "prev_close": 5.15,
+      "prev_close": 5.67,
       "first_seal": "09:30:00",
       "last_seal": "09:30:00",
       "seal_fund": 168347970.0,
@@ -2449,16 +2769,21 @@
           "date": "2026-08-27",
           "close": 5.67,
           "cons": 2
+        },
+        {
+          "date": "2026-08-27",
+          "close": 5.67,
+          "cons": 3
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 33619591.4,
-        "ratioamount": 0.5072,
-        "r0_net": 7308880.0,
-        "r0_ratio": 0.1103,
-        "r0x_ratio": 47.67,
+        "date": "2026-08-27",
+        "netamount": 18073125.0,
+        "ratioamount": 0.3209,
+        "r0_net": -3652047.0,
+        "r0_ratio": -0.0648,
+        "r0x_ratio": -32.71,
         "source": "sina_moneyflow"
       }
     },
@@ -2467,10 +2792,10 @@
       "name": "湖南黄金",
       "added_date": "2026-08-27",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 27.02,
-      "prev_close": 24.68,
+      "prev_close": 27.02,
       "first_seal": "09:30:00",
       "last_seal": "09:30:00",
       "seal_fund": 564939510.0,
@@ -2484,19 +2809,33 @@
           "date": "2026-08-27",
           "close": 27.02,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 27.02,
+          "cons": 1
         }
       ],
-      "seal_recalced": true
+      "seal_recalced": true,
+      "money_flow": {
+        "date": "2026-08-27",
+        "netamount": 200099744.32,
+        "ratioamount": 0.5254,
+        "r0_net": 89229983.36,
+        "r0_ratio": 0.2343,
+        "r0x_ratio": 66.85,
+        "source": "sina_moneyflow"
+      }
     },
     {
       "code": "002084",
       "name": "海鸥住工",
       "added_date": "2026-08-24",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 5,
-      "limit_days": 3,
+      "days_in_pool": 6,
+      "limit_days": 4,
       "close": 5.27,
-      "prev_close": 4.79,
+      "prev_close": 5.27,
       "first_seal": "09:30:00",
       "last_seal": "09:30:00",
       "seal_fund": 329225560.0,
@@ -2530,16 +2869,21 @@
           "date": "2026-08-27",
           "close": 5.27,
           "cons": 3
+        },
+        {
+          "date": "2026-08-27",
+          "close": 5.27,
+          "cons": 4
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 15951514.3,
-        "ratioamount": 1.0008,
-        "r0_net": 4379018.0,
-        "r0_ratio": 0.2747,
-        "r0x_ratio": 69.79,
+        "date": "2026-08-27",
+        "netamount": 20254902.45,
+        "ratioamount": 0.7365,
+        "r0_net": 7353188.84,
+        "r0_ratio": 0.2674,
+        "r0x_ratio": 69.46,
         "source": "sina_moneyflow"
       }
     },
@@ -2548,10 +2892,10 @@
       "name": "锦龙股份",
       "added_date": "2026-08-26",
       "last_lu_date": "2026-08-27",
-      "days_in_pool": 2,
-      "limit_days": 1,
+      "days_in_pool": 3,
+      "limit_days": 2,
       "close": 10.73,
-      "prev_close": 9.75,
+      "prev_close": 10.73,
       "first_seal": "09:30:00",
       "last_seal": "09:30:00",
       "seal_fund": 220685550.0,
@@ -2570,16 +2914,21 @@
           "date": "2026-08-27",
           "close": 10.73,
           "cons": 1
+        },
+        {
+          "date": "2026-08-27",
+          "close": 10.73,
+          "cons": 2
         }
       ],
       "seal_recalced": true,
       "money_flow": {
-        "date": "2026-08-26",
-        "netamount": 420311298.17,
-        "ratioamount": 0.8292,
-        "r0_net": 268065548.67,
-        "r0_ratio": 0.5288,
-        "r0x_ratio": 79.24,
+        "date": "2026-08-27",
+        "netamount": 51475533.31,
+        "ratioamount": 0.3268,
+        "r0_net": 4359641.92,
+        "r0_ratio": 0.0277,
+        "r0x_ratio": 15.4,
         "source": "sina_moneyflow"
       }
     }
