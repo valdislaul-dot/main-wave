@@ -1,37 +1,37 @@
 {
-  "cash": 1415.5000000000146,
+  "cash": 4025.3,
   "position": {
-    "name": "华天酒店",
-    "code": "000428",
+    "name": "楚天龙",
+    "code": "003040",
     "buy_date": "2026-08-26",
-    "buy_price": 4.462,
-    "shares": 5500
+    "buy_price": 15.8,
+    "shares": 1400
   },
   "positions": [
     {
-      "name": "华天酒店",
-      "code": "000428",
-      "buy_date": "2026-08-26",
-      "buy_price": 4.462,
-      "shares": 5500
-    },
-    {
       "name": "楚天龙",
       "code": "003040",
-      "buy_date": "2026-08-25",
-      "buy_price": 15.379,
-      "shares": 2900
+      "buy_date": "2026-08-26",
+      "buy_price": 15.8,
+      "shares": 1400
+    },
+    {
+      "name": "杭电股份",
+      "code": "603618",
+      "buy_date": "2026-08-27",
+      "buy_price": 34.018,
+      "shares": 1400
     }
   ],
-  "total_trades": 18,
-  "winning_trades": 11,
-  "total_pnl": 60223.30000000002,
-  "model_trades": 15,
-  "model_wins": 11,
-  "model_pnl": 62957.6,
-  "subjective_trades": 3,
-  "subjective_wins": 0,
-  "subjective_pnl": -2735.3,
+  "total_trades": 20,
+  "winning_trades": 13,
+  "total_pnl": 63436.8,
+  "model_trades": 16,
+  "model_wins": 12,
+  "model_pnl": 63106.6,
+  "subjective_trades": 4,
+  "subjective_wins": 1,
+  "subjective_pnl": 329.2,
   "created": "2026-07-25 16:12:18",
-  "updated": "2026-08-26"
+  "updated": "2026-08-27"
 }
