@@ -830,29 +830,105 @@
           "verdict": "❌推荐错误"
         }
       ]
+    },
+    "2026-08-26": {
+      "date": "2026-08-26",
+      "settled_on": "2026-08-27",
+      "total": 3,
+      "wins": 2,
+      "avg_pnl": 0.9,
+      "stocks": [
+        {
+          "rank": 1,
+          "code": "000428",
+          "name": "华天酒店",
+          "score": 66.6,
+          "rec_gap": 4.17,
+          "T": {
+            "open": 4.462,
+            "close": 4.75,
+            "limit_up": true,
+            "pct": 9.95
+          },
+          "T1": {
+            "gap": -1.89,
+            "close": 4.61,
+            "limit_up": false
+          },
+          "sell": 4.49,
+          "note": "实际: 买5500股@4.46 → 全卖@4.49",
+          "pnl_pct": 0.61,
+          "actual": true,
+          "verdict": "✅推荐正确"
+        },
+        {
+          "rank": 2,
+          "code": "002703",
+          "name": "浙江世宝",
+          "score": 58.9,
+          "rec_gap": 5.86,
+          "T": {
+            "open": 16.8,
+            "close": 17.46,
+            "limit_up": true,
+            "pct": 10.02
+          },
+          "T1": {
+            "gap": -1.09,
+            "close": 16.93,
+            "limit_up": false
+          },
+          "sell": 17.27,
+          "note": "昨涨停低开-1.09%→竞价全卖",
+          "pnl_pct": 2.8,
+          "verdict": "✅推荐正确"
+        },
+        {
+          "rank": 3,
+          "code": "002837",
+          "name": "英维克",
+          "score": 57.4,
+          "rec_gap": 4.68,
+          "T": {
+            "open": 63.05,
+            "close": 62.07,
+            "limit_up": false,
+            "pct": 3.05
+          },
+          "T1": {
+            "gap": 0.85,
+            "close": 65.97,
+            "limit_up": false
+          },
+          "sell": 62.6,
+          "note": "断板gap+0.85%<4%→开盘卖",
+          "pnl_pct": -0.71,
+          "verdict": "❌推荐错误"
+        }
+      ]
     }
   },
   "stats": {
-    "total": 33,
-    "wins": 13,
-    "avg_pnl": -1.63,
+    "total": 36,
+    "wins": 15,
+    "avg_pnl": -1.42,
     "by_rank": {
       "1": {
-        "n": 11,
-        "wins": 7,
-        "avg_pnl": -0.75
+        "n": 12,
+        "wins": 8,
+        "avg_pnl": -0.64
       },
       "2": {
-        "n": 11,
-        "wins": 3,
-        "avg_pnl": -1.68
+        "n": 12,
+        "wins": 4,
+        "avg_pnl": -1.31
       },
       "3": {
-        "n": 11,
+        "n": 12,
         "wins": 3,
-        "avg_pnl": -2.47
+        "avg_pnl": -2.32
       }
     },
-    "win_rate": 39.4
+    "win_rate": 41.7
   }
 }
