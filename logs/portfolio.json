@@ -1,37 +1,30 @@
 {
-  "cash": 3144.61,
+  "cash": 27205.61,
   "position": {
-    "name": "楚天龙",
-    "code": "003040",
-    "buy_date": "2026-08-26",
-    "buy_price": 13.638,
-    "shares": 1400
+    "name": "湖南黄金",
+    "code": "002155",
+    "buy_date": "2026-08-28",
+    "buy_price": 28.142,
+    "shares": 1900
   },
   "positions": [
     {
-      "name": "楚天龙",
-      "code": "003040",
-      "buy_date": "2026-08-26",
-      "buy_price": 13.638,
-      "shares": 1400
-    },
-    {
-      "name": "杭电股份",
-      "code": "603618",
-      "buy_date": "2026-08-27",
-      "buy_price": 34.018,
-      "shares": 1400
+      "name": "湖南黄金",
+      "code": "002155",
+      "buy_date": "2026-08-28",
+      "buy_price": 28.142,
+      "shares": 1900
     }
   ],
-  "total_trades": 20,
-  "winning_trades": 13,
-  "total_pnl": 63436.8,
-  "model_trades": 16,
-  "model_wins": 12,
-  "model_pnl": 63106.6,
-  "subjective_trades": 4,
-  "subjective_wins": 1,
-  "subjective_pnl": 329.2,
+  "total_trades": 22,
+  "winning_trades": 15,
+  "total_pnl": 71195.6,
+  "model_trades": 17,
+  "model_wins": 13,
+  "model_pnl": 67757.4,
+  "subjective_trades": 5,
+  "subjective_wins": 2,
+  "subjective_pnl": 3437.2,
   "created": "2026-07-25 16:12:18",
-  "updated": "2026-08-27"
+  "updated": "2026-08-28"
 }
