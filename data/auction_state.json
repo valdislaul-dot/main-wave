@@ -1,54 +1,68 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 36,
+  "total_sessions": 37,
   "current": {
-    "date": "2026-08-27",
-    "captured": "2026-08-27 09:25:28",
-    "total": 49,
-    "buyable": 5,
-    "avg_gap": 1.55,
+    "date": "2026-08-28",
+    "captured": "2026-08-28 09:25:14",
+    "total": 68,
+    "buyable": 7,
+    "avg_gap": 3.58,
     "gap_distribution": {
-      "0-2%": 9,
-      "-3-0%": 18,
-      "<-3%": 6,
-      "9%+": 6,
-      "5-9%": 4,
-      "2-5%": 6
+      "5-9%": 5,
+      "0-2%": 22,
+      "2-5%": 17,
+      "9%+": 14,
+      "-3-0%": 8,
+      "<-3%": 2
     },
     "buyable_stocks": [
       {
-        "code": "603618",
-        "name": "杭电股份",
-        "gap_pct": 4.95,
-        "score": 68.4,
+        "code": "002155",
+        "name": "湖南黄金",
+        "gap_pct": 5.29,
+        "score": 83.3,
         "limit_days": 1
       },
       {
-        "code": "000890",
-        "name": "法尔胜",
-        "gap_pct": 6.14,
-        "score": 60.4,
+        "code": "600613",
+        "name": "神奇制药",
+        "gap_pct": 7.92,
+        "score": 66.4,
         "limit_days": 1
       },
       {
-        "code": "002295",
-        "name": "精艺股份",
-        "gap_pct": 4.06,
-        "score": 55.0,
+        "code": "603261",
+        "name": "立航科技",
+        "gap_pct": 7.9,
+        "score": 61.8,
         "limit_days": 1
       },
       {
-        "code": "600272",
-        "name": "开开实业",
-        "gap_pct": 6.54,
-        "score": 54.3,
+        "code": "600162",
+        "name": "香江控股",
+        "gap_pct": 4.72,
+        "score": 59.8,
         "limit_days": 1
       },
       {
-        "code": "600103",
-        "name": "青山纸业",
-        "gap_pct": 6.92,
-        "score": 48.7,
+        "code": "603269",
+        "name": "海鸥股份",
+        "gap_pct": 4.17,
+        "score": 53.7,
+        "limit_days": 1
+      },
+      {
+        "code": "000017",
+        "name": "深中华A",
+        "gap_pct": 7.4,
+        "score": 47.1,
+        "limit_days": 6
+      },
+      {
+        "code": "603237",
+        "name": "五芳斋",
+        "gap_pct": 5.42,
+        "score": 0,
         "limit_days": 1
       }
     ]
@@ -516,7 +530,20 @@
         "5-9%": 4,
         "2-5%": 6
       }
+    },
+    {
+      "date": "2026-08-28",
+      "total": 68,
+      "buyable": 7,
+      "gap_distribution": {
+        "5-9%": 5,
+        "0-2%": 22,
+        "2-5%": 17,
+        "9%+": 14,
+        "-3-0%": 8,
+        "<-3%": 2
+      }
     }
   ],
-  "last_update": "2026-08-27"
+  "last_update": "2026-08-28"
 }

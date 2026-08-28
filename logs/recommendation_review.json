@@ -906,29 +906,105 @@
           "verdict": "❌推荐错误"
         }
       ]
+    },
+    "2026-08-27": {
+      "date": "2026-08-27",
+      "settled_on": "2026-08-28",
+      "total": 3,
+      "wins": 2,
+      "avg_pnl": 0.43,
+      "stocks": [
+        {
+          "rank": 1,
+          "code": "603618",
+          "name": "杭电股份",
+          "score": 68.7,
+          "rec_gap": 4.95,
+          "T": {
+            "open": 34.018,
+            "close": 35.11,
+            "limit_up": true,
+            "pct": 9.99
+          },
+          "T1": {
+            "gap": 9.97,
+            "close": 35.92,
+            "limit_up": false
+          },
+          "sell": 37.34,
+          "note": "实际: 买1400股@34.02 → 全卖@37.34",
+          "pnl_pct": 9.77,
+          "actual": true,
+          "verdict": "✅推荐正确"
+        },
+        {
+          "rank": 2,
+          "code": "000890",
+          "name": "法尔胜",
+          "score": 60.7,
+          "rec_gap": 6.14,
+          "T": {
+            "open": 8.47,
+            "close": 8.78,
+            "limit_up": true,
+            "pct": 10.03
+          },
+          "T1": {
+            "gap": 9.79,
+            "close": 8.6,
+            "limit_up": false
+          },
+          "sell": 8.6,
+          "note": "昨涨停高开+9.79%→持有至收盘",
+          "pnl_pct": 1.53,
+          "verdict": "✅推荐正确"
+        },
+        {
+          "rank": 3,
+          "code": "600272",
+          "name": "开开实业",
+          "score": 55.5,
+          "rec_gap": 6.54,
+          "T": {
+            "open": 22.48,
+            "close": 21.7,
+            "limit_up": false,
+            "pct": 2.84
+          },
+          "T1": {
+            "gap": 0.0,
+            "close": 20.29,
+            "limit_up": false
+          },
+          "sell": 20.232,
+          "note": "硬止损-10%",
+          "pnl_pct": -10.0,
+          "verdict": "❌推荐错误"
+        }
+      ]
     }
   },
   "stats": {
-    "total": 36,
-    "wins": 15,
-    "avg_pnl": -1.42,
+    "total": 39,
+    "wins": 17,
+    "avg_pnl": -1.28,
     "by_rank": {
       "1": {
-        "n": 12,
-        "wins": 8,
-        "avg_pnl": -0.64
+        "n": 13,
+        "wins": 9,
+        "avg_pnl": 0.16
       },
       "2": {
-        "n": 12,
-        "wins": 4,
-        "avg_pnl": -1.31
+        "n": 13,
+        "wins": 5,
+        "avg_pnl": -1.09
       },
       "3": {
-        "n": 12,
+        "n": 13,
         "wins": 3,
-        "avg_pnl": -2.32
+        "avg_pnl": -2.91
       }
     },
-    "win_rate": 41.7
+    "win_rate": 43.6
   }
 }
