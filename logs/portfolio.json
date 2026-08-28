@@ -19,12 +19,12 @@
   "total_trades": 22,
   "winning_trades": 15,
   "total_pnl": 71195.6,
-  "model_trades": 17,
-  "model_wins": 13,
-  "model_pnl": 67757.4,
-  "subjective_trades": 5,
-  "subjective_wins": 2,
-  "subjective_pnl": 3437.2,
+  "model_trades": 18,
+  "model_wins": 14,
+  "model_pnl": 70865.4,
+  "subjective_trades": 4,
+  "subjective_wins": 1,
+  "subjective_pnl": 329.2,
   "created": "2026-07-25 16:12:18",
   "updated": "2026-08-28"
 }
