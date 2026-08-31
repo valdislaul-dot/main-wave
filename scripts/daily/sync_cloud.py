@@ -7,17 +7,11 @@
   python sync_cloud.py --no-push   # 只 add + commit, 不 push (本地测试)
   python sync_cloud.py --status    # 只看将同步哪些文件/变更
 
-被同步的快照(云端面板只读这些, 不依赖 kline_data/网络):
+被同步的快照(仅行情数据; 2026-08-31用户定: 持仓/账目/日志不上传):
   data/zt_pool_state.json          涨停池状态
   data/zt_pool_exit_log.json       离池记录
   data/auction_state.json          竞价状态汇总(含可买标的+评分)
   data/auction/*.json              每日竞价快照
-  logs/portfolio.json              持仓(多持仓)
-  logs/trading_journal.json        交易日志
-  logs/trader_a.json               交易员A
-  logs/recommendation_review.json  推荐回看
-  logs/candidates_*.json           盘后候选评分
-  logs/daily_recommendations/*.json 每日推荐
 """
 import subprocess, sys, os, glob
 from datetime import datetime
@@ -37,15 +31,8 @@ def sync_files():
         'data/zt_pool_exit_log.json',
         'data/auction_state.json',
         'data/active_pool.json',
-        'logs/portfolio.json',
-        'logs/trading_journal.json',
-        'logs/trader_a.json',
-        'logs/recommendation_review.json',
     ]
     files += [os.path.relpath(f, BASE) for f in glob.glob(os.path.join(BASE, 'data', 'auction', '*.json'))]
-    files += [os.path.relpath(f, BASE) for f in glob.glob(os.path.join(BASE, 'logs', 'candidates_*.json'))
-              if 'candidates_v' not in f]  # 排除旧格式 candidates_v*
-    files += [os.path.relpath(f, BASE) for f in glob.glob(os.path.join(BASE, 'logs', 'daily_recommendations', '*.json'))]
     return sorted(f.replace('\\', '/') for f in set(files) if os.path.exists(f))
 
 

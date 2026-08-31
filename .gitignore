@@ -19,13 +19,16 @@ data/industry_map.json
 data/zhaban_map.json
 data/副本主升浪.xlsx
 
-# 排除大日志, 保留持仓/交易/候选/推荐(上云用)
+# 2026-08-31用户定: 持仓/账目/日志与项目说明一律不上传GitHub(仅本地)
 logs/*.log
-!logs/portfolio.json
-!logs/trading_journal.json
-!logs/trader_a.json
-!logs/recommendation_review.json
-!logs/candidates_*.json
-logs/candidates_v*.json
-!logs/daily_recommendations/
-!logs/daily_reports/
+CLAUDE.md
+CONTEXT.md
+README.md
+SETUP.md
+资料/
+memory/
+setup/
+策略分析完整报告.md
+多端部署.md
+回测对比条件.txt
+backup/CLAUDE_v3机制全量_20260826.md
