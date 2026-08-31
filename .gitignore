@@ -8,6 +8,7 @@ data/stock_db.json
 data/raw/
 data/trading_calendar.json
 data/tushare_token.txt
+data/hithink_token.txt
 logs/*
 results/
 每日收盘数据/

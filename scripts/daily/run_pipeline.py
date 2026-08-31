@@ -61,6 +61,28 @@ def main():
         except Exception as e:
             print(f'[Warning] ZT pool update failed: {e}')
 
+        # Step 1.1: 官方API双源校验 (2026-08-31, 仅警告不改数据)
+        try:
+            from hithink_api import fetch_limit_up_pool as _official_pool
+            from zt_pool import load_state as _load_state
+            _off = _official_pool()
+            _st = _load_state()
+            ours = _st.get('stocks', [])
+            off_codes = {x['code']: x for x in _off}
+            ours_codes = {s['code']: s for s in ours}
+            only_ours = set(ours_codes) - set(off_codes)
+            only_off = set(off_codes) - set(ours_codes)
+            ld_diff = [c for c in (set(ours_codes) & set(off_codes))
+                       if int(ours_codes[c].get('limit_days', 1) or 1) != off_codes[c]['limit_days']]
+            print(f'[官方API校验] 本地池{len(ours)}只 vs 官方{len(_off)}只 | '
+                  f'仅本地{len(only_ours)} 仅官方{len(only_off)} 连板数不一致{len(ld_diff)}')
+            if len(ld_diff) <= 10 and ld_diff:
+                print(f'  ⚠ 连板数不一致: {", ".join(ld_diff)}')
+            elif len(ld_diff) > 10:
+                print(f'  ⚠ 连板数不一致({len(ld_diff)}只): {", ".join(ld_diff[:10])}...')
+        except Exception as e:
+            print(f'[官方API校验] 失败(忽略): {e}')
+
         # Step 1.5: 重算封板质量 (分钟K线重算炸板/封板, 替代东财失真派生字段)
         print('\n[Step 1.5] 重算封板质量(分钟K线)...')
         try:

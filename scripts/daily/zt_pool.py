@@ -335,9 +335,28 @@ def update_zt_pool(date_str=None, verbose=True):
     # 1. 拉原始数据
     raw = fetch_zt_pool_raw(date_str)
     if not raw:
+        # 2026-08-31: 同花顺爬虫失败 → 官方API兜底 (炸板次数/换手率缺失, 炸板因子按0)
         if verbose:
-            print('[ZT Pool] 警告: 未获取到涨停数据')
-        return None
+            print('[ZT Pool] 同花顺爬取失败 → 官方API兜底')
+        try:
+            from hithink_api import fetch_limit_up_pool as _official_pool
+            _off = _official_pool(date_str)
+            raw = [{
+                'code': x['code'], 'name': x['name'], 'price': x['price'], 'pct': x['pct'],
+                'turnover': 0, 'limit_days': x['limit_days'], 'first_seal': x['first_seal'],
+                'last_seal': '', 'seal_fund': x['seal_fund'], 'break_times': 0,
+                'industry': x['industry'], 'amount': 0, 'float_cap': 0,
+                'board_type': '', 'seal_rate': 0, 'is_again': 0,
+            } for x in _off]
+            if verbose and raw:
+                print(f'[ZT Pool] 官方兜底 {len(raw)} 只 (注意: 炸板次数/换手率缺失)')
+        except Exception as e:
+            if verbose:
+                print(f'[ZT Pool] 官方API兜底也失败: {e}')
+        if not raw:
+            if verbose:
+                print('[ZT Pool] 警告: 未获取到涨停数据')
+            return None
 
     if verbose:
         print(f'[ZT Pool] 当日涨停(已过滤300/301/688): {len(raw)} 只')
@@ -353,6 +372,18 @@ def update_zt_pool(date_str=None, verbose=True):
 
     # 3.1 腾讯批量行情 (三方确认收盘涨停 + 除权检测)
     tencent_q = _fetch_tencent_batch([s['code'] for s in raw])
+
+    # 3.2 官方API连板数 (2026-08-31: K线滞后时兜底, 防跨断板误连)
+    _prev_td = datetime.strptime(date_str, '%Y-%m-%d') - timedelta(days=1)
+    while _prev_td.weekday() >= 5:
+        _prev_td -= timedelta(days=1)
+    _prev_td_str = _prev_td.strftime('%Y-%m-%d')
+    _off_ld = {}
+    try:
+        from hithink_api import fetch_limit_up_pool as _official_pool
+        _off_ld = {x['code']: x['limit_days'] for x in _official_pool(date_str)}
+    except Exception:
+        pass
 
     for s in raw:
         code = s['code']
@@ -381,9 +412,16 @@ def update_zt_pool(date_str=None, verbose=True):
                 # 2026-08-20修复: 昨日(K线末行)若断板 → 今日=首板(cons=0), 不再往前数
                 if not today_lu:
                     start_i = None
+                elif last_date < _prev_td_str:
+                    # 2026-08-31修复B: K线滞后于昨日(可能缺断板日) → 官方连板数兜底,
+                    # 防跨断板误连(如康盛股份断板日K线缺失被误算4板)
+                    start_i = None
+                    if _off_ld.get(code):
+                        cons = int(_off_ld[code]) - 1
                 elif len(kls) >= 2 and is_limit_up(float(kls[-1].get('close', 0)),
                                                   float(kls[-2].get('close', 0)), lpct):
-                    start_i = len(kls) - 2   # 昨日也涨停, 从昨日往前继续数
+                    # 2026-08-31修复A: 从昨日(末行)起数, 原len-2跳过昨日致连板数系统性少1
+                    start_i = len(kls) - 1
                 else:
                     start_i = None           # 昨日断板 → 今日首板
             # 从start_i向前数连续涨停(不含今日)
