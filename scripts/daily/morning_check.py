@@ -721,9 +721,10 @@ def main():
     elif not top3 and not quick:
         print(f'  (无评分≥50的可买标的)')
 
-    # quick模式: 买入开关允许时, 一行式可买前三 (2026-08-31, 用户要求)
-    if quick and env_info.get('pos_pct', 0) > 0:
-        print(f'\n  ⚡ 可买前三(quick, 评分≥50 竞价4-8%):')
+    # quick模式: 一行式可买前三 (2026-08-31用户定死: 持仓建议与可买标的必出, 开关关闭也列并标注仅参考)
+    if quick:
+        _note = '' if env_info.get('pos_pct', 0) > 0 else ' ⚠买入开关关闭, 以下仅参考'
+        print(f'\n  ⚡ 可买前三(quick, 评分≥50 竞价4-8%){_note}:')
         for i, b in enumerate(top3, 1):
             print(f'    #{i} {b["name"]}({b["code"]}) {b["score"]:.0f}分 '
                   f'gap{b["gap"]:+.1f}% {int(b.get("limit_days") or 1)}板 板块{b["sector"]}只')
