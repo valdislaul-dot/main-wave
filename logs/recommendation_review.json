@@ -982,29 +982,105 @@
           "verdict": "❌推荐错误"
         }
       ]
+    },
+    "2026-08-28": {
+      "date": "2026-08-28",
+      "settled_on": "2026-08-31",
+      "total": 3,
+      "wins": 0,
+      "avg_pnl": -7.73,
+      "stocks": [
+        {
+          "rank": 1,
+          "code": "002155",
+          "name": "湖南黄金",
+          "score": 83.3,
+          "rec_gap": 5.29,
+          "T": {
+            "open": 28.128,
+            "close": 28.92,
+            "limit_up": false,
+            "pct": 7.03
+          },
+          "T1": {
+            "gap": -5.08,
+            "close": 27.23,
+            "limit_up": false
+          },
+          "sell": 27.23,
+          "note": "实际: 买1900股@28.13 → 未卖, 按T+1收盘27.23估值",
+          "pnl_pct": -3.19,
+          "actual": true,
+          "verdict": "❌推荐错误"
+        },
+        {
+          "rank": 2,
+          "code": "600613",
+          "name": "神奇制药",
+          "score": 66.7,
+          "rec_gap": 7.92,
+          "T": {
+            "open": 12.53,
+            "close": 12.4,
+            "limit_up": false,
+            "pct": 6.8
+          },
+          "T1": {
+            "gap": -10.0,
+            "close": 11.16,
+            "limit_up": false
+          },
+          "sell": 11.277,
+          "note": "硬止损-10%",
+          "pnl_pct": -10.0,
+          "verdict": "❌推荐错误"
+        },
+        {
+          "rank": 3,
+          "code": "603261",
+          "name": "立航科技",
+          "score": 62.2,
+          "rec_gap": 7.9,
+          "T": {
+            "open": 63.37,
+            "close": 57.0,
+            "limit_up": false,
+            "pct": -2.95
+          },
+          "T1": {
+            "gap": -5.35,
+            "close": 56.14,
+            "limit_up": false
+          },
+          "sell": 57.033,
+          "note": "硬止损-10%",
+          "pnl_pct": -10.0,
+          "verdict": "❌推荐错误"
+        }
+      ]
     }
   },
   "stats": {
-    "total": 39,
+    "total": 42,
     "wins": 17,
-    "avg_pnl": -1.28,
+    "avg_pnl": -1.74,
     "by_rank": {
       "1": {
-        "n": 13,
+        "n": 14,
         "wins": 9,
-        "avg_pnl": 0.16
+        "avg_pnl": -0.07
       },
       "2": {
-        "n": 13,
+        "n": 14,
         "wins": 5,
-        "avg_pnl": -1.09
+        "avg_pnl": -1.72
       },
       "3": {
-        "n": 13,
+        "n": 14,
         "wins": 3,
-        "avg_pnl": -2.91
+        "avg_pnl": -3.42
       }
     },
-    "win_rate": 43.6
+    "win_rate": 40.5
   }
 }
