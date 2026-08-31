@@ -11,7 +11,8 @@ data/tushare_token.txt
 data/hithink_token.txt
 logs/*
 results/
-每日收盘数据/
+data/daily_close/
+data/README.md
 __pycache__/
 .DS_Store
 *.pyc

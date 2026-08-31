@@ -69,7 +69,7 @@ def generate():
         ystr = yesterday.strftime('%Y-%m-%d')
 
         close_price = None
-        daily_file = os.path.join(BASE, '每日收盘数据', ystr, 'daily_data.json')
+        daily_file = os.path.join(BASE, 'data', 'daily_close', ystr, 'daily_data.json')
         if os.path.exists(daily_file):
             with open(daily_file, 'r', encoding='utf-8') as f:
                 dd = json.load(f)

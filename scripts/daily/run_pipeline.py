@@ -106,6 +106,14 @@ def main():
         except Exception as e:
             print(f'[Warning] Data update failed: {e}')
 
+        # Step 2.5: 每日收盘快照 (2026-08-31, data/daily_close/, 持仓估值/回测用)
+        print('\n[Step 2.5] 每日收盘快照(daily_close)...')
+        try:
+            from update_data import snapshot_daily_close
+            snapshot_daily_close()
+        except Exception as e:
+            print(f'[Warning] 收盘快照失败: {e}')
+
         # Step 3: Update historical ZT pool
         print('\n[Step 3/7] 更新历史涨停池...')
         try:

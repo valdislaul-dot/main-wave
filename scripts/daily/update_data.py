@@ -197,6 +197,77 @@ def append_latest(code, existing_path, end_date, pool_map=None):
     return len(new_rows)
 
 
+def snapshot_daily_close(date_str=None):
+    """每日收盘快照 (2026-08-31): data/daily_close/YYYY-MM-DD/daily_data.json
+    宇宙 = 昨日快照代码 ∪ 今日涨停池代码 (滚动累计), OHLCV 取K线当日bar。
+    消费方: generate_report 持仓估值; 回测快照补充。"""
+    date_str = date_str or get_today()
+    dclose = os.path.join(BASE, 'data', 'daily_close')
+    os.makedirs(dclose, exist_ok=True)
+
+    # 昨日的宇宙
+    prev = (datetime.strptime(date_str, '%Y-%m-%d') - timedelta(days=1))
+    while prev.weekday() >= 5:
+        prev -= timedelta(days=1)
+    prev_str = prev.strftime('%Y-%m-%d')
+    universe = {}
+    prev_file = os.path.join(dclose, prev_str, 'daily_data.json')
+    if os.path.exists(prev_file):
+        try:
+            with open(prev_file, encoding='utf-8') as f:
+                universe = json.load(f)
+        except Exception:
+            universe = {}
+
+    # 今日涨停池并入 (含名称)
+    if os.path.exists(ZT_STATE_PATH):
+        try:
+            with open(ZT_STATE_PATH, encoding='utf-8') as f:
+                state = json.load(f)
+            for s in state.get('stocks', []):
+                code = str(s.get('code', '')).zfill(6)
+                universe.setdefault(code, {'name': s.get('name', '')})
+        except Exception:
+            pass
+
+    # OHLCV 从K线当日bar取
+    out = {}
+    for code in universe:
+        kp = find_kline_path(code)
+        if not kp:
+            continue
+        try:
+            with open(kp, encoding='utf-8') as f:
+                raw = json.load(f)
+            kl = raw.get('data', raw) if isinstance(raw, dict) else raw
+            bar = next((b for b in reversed(kl) if b.get('date') == date_str), None)
+            if bar and bar.get('close'):
+                out[code] = {
+                    'name': universe[code].get('name', ''),
+                    'open': float(bar.get('open', 0) or 0), 'high': float(bar.get('high', 0) or 0),
+                    'low': float(bar.get('low', 0) or 0), 'close': float(bar.get('close', 0) or 0),
+                    'volume': float(bar.get('volume', 0) or 0),
+                }
+        except Exception:
+            continue
+    if not out:
+        print('[DailyClose] 无数据, 跳过')
+        return
+
+    day_dir = os.path.join(dclose, date_str)
+    os.makedirs(day_dir, exist_ok=True)
+    with open(os.path.join(day_dir, 'daily_data.json'), 'w', encoding='utf-8') as f:
+        json.dump(out, f, ensure_ascii=False)
+    # 名称索引 (name→code, 取累计宇宙, 不只当日快照)
+    idx = {}
+    for code, v in universe.items():
+        if v.get('name'):
+            idx[v['name']] = code
+    with open(os.path.join(dclose, 'stock_index.json'), 'w', encoding='utf-8') as f:
+        json.dump(idx, f, ensure_ascii=False, indent=1)
+    print(f'[DailyClose] 快照 {date_str}: {len(out)} 只 (宇宙累计 {len(universe)})')
+
+
 def main():
     today = get_today()
     print(f'[K线更新] 目标日期: {today}')

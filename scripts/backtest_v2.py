@@ -24,7 +24,7 @@ def load_db():
                 if fld in k: k[fld] = float(k[fld])
 
     # 补充每日收盘快照 (7/28-7/31)
-    daily_dir = os.path.join(BASE, '每日收盘数据')
+    daily_dir = os.path.join(BASE, 'data', 'daily_close')
     for ds in ['2026-07-28', '2026-07-29', '2026-07-30', '2026-07-31']:
         fp = os.path.join(daily_dir, ds, 'daily_data.json')
         if os.path.exists(fp):

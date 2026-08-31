@@ -5,7 +5,7 @@ import os, sys, platform
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 DATA_DIR = os.path.join(PROJECT_ROOT, 'data')
-DAILY_DIR = os.path.join(PROJECT_ROOT, '每日收盘数据')
+DAILY_DIR = os.path.join(DATA_DIR, 'daily_close')
 LOG_DIR = os.path.join(PROJECT_ROOT, 'logs')
 KLINE_DIR = os.path.join(DATA_DIR, 'kline_data')
 
