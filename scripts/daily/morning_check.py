@@ -1,7 +1,7 @@
 """竞价观察面板 v4.0 — 次日9:25使用
 集成A的卖点引擎: 量能三态 + 封板质量 + 弱转强
 """
-import json, os, sys
+import json, os, sys, time
 from datetime import datetime, timedelta
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -442,6 +442,7 @@ def stock_scoring_meta(code):
 
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
+    quick = '--quick' in sys.argv
     data = load_latest_candidates()
     pf = load_portfolio()
 
@@ -451,11 +452,20 @@ def main():
     print('=' * 65)
 
     # ── 竞价池采集 (第1步: 摘要依赖快照) ──
-    try:
-        from auction_pool import capture_auction
-        capture_auction()
-    except Exception as e:
-        print(f'\n[WARN] 竞价池采集失败: {e}')
+    skip_capture = False
+    if quick:
+        # 2026-08-31: quick模式快照<3分钟直接复用, 不重新拉取(争分夺秒)
+        _snap = os.path.join(BASE, 'data', 'auction', datetime.now().strftime('%Y-%m-%d') + '.json')
+        if os.path.exists(_snap) and time.time() - os.path.getmtime(_snap) < 180:
+            skip_capture = True
+    if skip_capture:
+        print('[Auction Pool] ⚡ quick模式: 快照<3分钟, 跳过重新采集')
+    else:
+        try:
+            from auction_pool import capture_auction
+            capture_auction()
+        except Exception as e:
+            print(f'\n[WARN] 竞价池采集失败: {e}')
 
     # ── 静默计算: 持仓决策 + 环境评级 (2026-08-20, 结论先行重构) ──
     if pf:
@@ -684,10 +694,11 @@ def main():
     # ── 📊 表1: 当日可买前三 ──
     from scoring import get_score_min as _gsm
     top3 = [b for b in buyable if b['score'] >= _gsm()][:3]
-    print(f'\n{"=" * 65}')
-    print(f'  📊 表1: 当日可买前三 (评分≥50, 竞价4-8%, 已过滤一字/4板+一字/300·688)')
-    print(f'{"=" * 65}')
-    if top3:
+    if not quick:
+        print(f'\n{"=" * 65}')
+        print(f'  📊 表1: 当日可买前三 (评分≥50, 竞价4-8%, 已过滤一字/4板+一字/300·688)')
+        print(f'{"=" * 65}')
+    if top3 and not quick:
         print(f'  {"#":<3}{"标的":<14}{"评分":>6}{"竞价gap":>8}{"连板":>5}{"板块":>9}{"⚠跌停风险":>10}')
         for i, b in enumerate(top3, 1):
             # 跌停风险查表 (2026-08-24, 3年全路径积分模型)
@@ -707,11 +718,11 @@ def main():
             _dt_str = f'{_dt_mark}{_dt_p:.0f}%({_dt_risk:+.2f})'
             print(f'  {i:<3}{b["name"]}({b["code"]}){b["score"]:>8.0f}{b["gap"]:>+7.1f}%'
                   f'{str(_cons) + "板":>6}{str(b["sector"]) + "只":>6}{_dt_str:>14}')
-    else:
+    elif not top3 and not quick:
         print(f'  (无评分≥50的可买标的)')
 
     # ── 📊 表2: 前三名得分细则 ──
-    if top3:
+    if top3 and not quick:
         print(f'\n{"=" * 65}')
         print(f'  📊 表2: 前三名得分细则 (V4百分制加权)')
         print(f'{"=" * 65}')
@@ -746,7 +757,7 @@ def main():
                 print(f'  → 持仓最高 {_ps_max:.0f}分 < 可买Top1 {_buy_top["score"]:.0f}分: 候选评分更高(仅信息, 不触发买卖规则)')
 
     # ── 昨日候选（参考） ──
-    if data:
+    if data and not quick:
         print(f'\n  --- 昨日候选参考 (T-1={data["date"]}, 已评分) ---')
         non_one_line = [c for c in data['candidates'][:15] if not c.get('one_line', False)]
         for i, c in enumerate(non_one_line[:5]):
@@ -757,7 +768,7 @@ def main():
 
     # ── 一字板隔日关注 ──
     one_line_watch = data.get('one_line_watch', []) if data else []
-    if one_line_watch:
+    if one_line_watch and not quick:
         print(f'\n  ═══ ⚡ 一字板隔日关注 ═══')
         pp = _load_prev_pool()
         file_cons = {}
@@ -771,7 +782,7 @@ def main():
 
     # ── 🐉 分歧弱转强候选 (半自动提示, 三级分级) ──
     try:
-        div_cands = find_divergence_candidates()
+        div_cands = find_divergence_candidates() if not quick else []
         if div_cands:
             print(f'\n  ═══ 🐉 分歧弱转强候选 (T-1爆量烂板, CONFIRMED/WATCH/REJECT) ═══')
             for c in sorted(div_cands, key=lambda x: (x['grade'] == 'REJECT', -x['gap'])):
@@ -788,12 +799,13 @@ def main():
         print(f'  [WARN] 分歧候选计算失败: {e}')
 
     # ── 🎯 盘中买点参考 (2026-08-16, 源自干货合集_买点, 只提示不自动交易) ──
-    print(f'\n  ═══ 🎯 盘中买点参考 (竞价未买到时, 仅供参考) ═══')
-    print(f'  半路: 拉升破7%才考虑追 (冲不过7%多为假拉升/试盘)')
-    print(f'  低吸①: 高开急杀到 开盘价-7% 附近 (恐慌盘后博弈修复, 未回测)')
-    print(f'  低吸②: 盘中较开盘价低-10% 附近 (高开大幅下杀博弈修复, 未回测)')
-    print(f'  ⚠ 价格笼子: 9:25后补单 买入≤卖一价×102%, 卖出≥买一价×98%, 超限=废单')
-    print(f'  ⚠ 打板需高理解力, 早盘板多虚晃一枪, 无确定性不参与')
+    if not quick:
+        print(f'\n  ═══ 🎯 盘中买点参考 (竞价未买到时, 仅供参考) ═══')
+        print(f'  半路: 拉升破7%才考虑追 (冲不过7%多为假拉升/试盘)')
+        print(f'  低吸①: 高开急杀到 开盘价-7% 附近 (恐慌盘后博弈修复, 未回测)')
+        print(f'  低吸②: 盘中较开盘价低-10% 附近 (高开大幅下杀博弈修复, 未回测)')
+        print(f'  ⚠ 价格笼子: 9:25后补单 买入≤卖一价×102%, 卖出≥买一价×98%, 超限=废单')
+        print(f'  ⚠ 打板需高理解力, 早盘板多虚晃一枪, 无确定性不参与')
 
     print(f'\n  --- 操作步骤 ---')
     print(f'  卖出: 看上方持仓判断')
