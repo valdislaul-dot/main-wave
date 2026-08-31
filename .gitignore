@@ -28,3 +28,4 @@ logs/*.log
 !logs/candidates_*.json
 logs/candidates_v*.json
 !logs/daily_recommendations/
+!logs/daily_reports/
