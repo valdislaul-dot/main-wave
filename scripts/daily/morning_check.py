@@ -99,7 +99,7 @@ def compute_position_decision(pos):
         return None
     gap_pct = round((quote['open'] - quote['prev_close']) / quote['prev_close'] * 100, 2)
     issues = cross_check_quote(code, quote)
-    # K线新鲜度
+    # K线新鲜度(2026-08-31: 按最近交易日判断, 修复周一误报周末滞后)
     kline_stale = False
     try:
         _kp = os.path.join(BASE, 'data', 'kline_data', f'{code}.json')
@@ -108,7 +108,10 @@ def compute_position_decision(pos):
                 _raw = json.load(_f)
             _kl = _raw.get('data', _raw) if isinstance(_raw, dict) else _raw
             _last = _kl[-1]['date'] if _kl else '?'
-            if _last < (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'):
+            _td = datetime.now() - timedelta(days=1)
+            while _td.weekday() >= 5:
+                _td -= timedelta(days=1)
+            if _last < _td.strftime('%Y-%m-%d'):
                 kline_stale = True
     except Exception:
         pass
@@ -382,9 +385,9 @@ def stock_scoring_meta(code):
                     _entry = next((x for x in _st.get('stocks', [])
                                    if str(x.get('code', '')).replace('sh', '').replace('sz', '') == code), None)
                 if _entry is None:
-                    # state已清(出池) → 扫最近5个池快照找最后一次涨停明细
+                    # state已清(出池) → 扫最近5个池快照, 新→旧, 取最近一次涨停明细
                     _zt_dir = os.path.join(BASE, 'data', 'zt_pool')
-                    for _fn in sorted(f for f in os.listdir(_zt_dir) if f.endswith('.json'))[-6:-1]:
+                    for _fn in reversed(sorted(f for f in os.listdir(_zt_dir) if f.endswith('.json'))[-6:-1]):
                         _fp = os.path.join(_zt_dir, _fn)
                         try:
                             with open(_fp, encoding='utf-8') as _f:
@@ -417,6 +420,19 @@ def stock_scoring_meta(code):
         if meta['klines']:
             from scoring import score_v4
             sc, _ = score_v4(code, meta['klines'], meta['detail'] or {})
+            if sc is None:
+                # 末日非涨停(断板持仓) → 截取至最近一次涨停日打分(与池内口径一致)
+                _kl = meta['klines']
+                _idx = None
+                for i in range(len(_kl) - 1, 0, -1):
+                    _pc = _kl[i].get('pct_change')
+                    if _pc is None and _kl[i - 1].get('close', 0) > 0:
+                        _pc = (_kl[i]['close'] - _kl[i - 1]['close']) / _kl[i - 1]['close'] * 100
+                    if _pc is not None and _pc >= 9.8:
+                        _idx = i
+                        break
+                if _idx is not None and _idx >= 25:
+                    sc, _ = score_v4(code, _kl[:_idx + 1], meta['detail'] or {})
             meta['score'] = sc
     except Exception:
         pass
