@@ -378,12 +378,65 @@ def main():
     cfg_path = os.path.join(BASE, 'data', 'scoring_config.json')
     with open(cfg_path, encoding='utf-8') as f:
         cfg = json.load(f)
+    prev_obj = cfg.get('v4', {}).get('searched_obj')
     cfg['v4']['weights'] = w
     cfg['v4']['searched_obj'] = round(obj, 1)
     with open(cfg_path, 'w', encoding='utf-8') as f:
         json.dump(cfg, f, ensure_ascii=False, indent=2)
     print('\n最优权重已写回 scoring_config.json v4.weights')
 
+    # 2026-09-01起: 每次月度重搜后记录到权重历史 (data/weight_history.json, 供查找对比)
+    hist_path = os.path.join(BASE, 'data', 'weight_history.json')
+    hist = []
+    if os.path.exists(hist_path):
+        try:
+            with open(hist_path, encoding='utf-8') as f:
+                hist = json.load(f)
+        except Exception:
+            hist = []
+    hist.append({
+        'date': datetime.now().strftime('%Y-%m-%d'),
+        'prev_obj': prev_obj,
+        'obj': round(obj, 1),
+        'weights': dict(w),
+        'strong': {'ret': round(results[0][0], 1), 'win_rate': round(results[0][1], 1), 'trades': results[0][2]},
+        'weak': {'ret': round(results[1][0], 1), 'win_rate': round(results[1][1], 1), 'trades': results[1][2]},
+    })
+    with open(hist_path, 'w', encoding='utf-8') as f:
+        json.dump(hist, f, ensure_ascii=False, indent=2)
+    print(f'权重历史已记录: data/weight_history.json ({len(hist)}次)')
+
+
+def show_history():
+    """权重历史对比表 (2026-09-01起记录)"""
+    hist_path = os.path.join(BASE, 'data', 'weight_history.json')
+    if not os.path.exists(hist_path):
+        print('无权重历史记录')
+        return
+    with open(hist_path, encoding='utf-8') as f:
+        hist = json.load(f)
+    print(f'{"日期":<12}{"目标分":>8}{"较上次":>8}{"强市收益":>10}{"强市胜率":>8}{"弱市收益":>10}{"弱市胜率":>8}')
+    print('-' * 70)
+    for h in hist:
+        delta = ''
+        if h.get('prev_obj') is not None:
+            delta = f'{h["obj"] - h["prev_obj"]:+.1f}'
+        print(f'{h["date"]:<12}{h["obj"]:>+8.1f}{delta:>8}'
+              f'{h["strong"]["ret"]:>+9.1f}%{h["strong"]["win_rate"]:>7.0f}%'
+              f'{h["weak"]["ret"]:>+9.1f}%{h["weak"]["win_rate"]:>7.0f}%')
+    if len(hist) >= 2:
+        print()
+        print('因子变动对比(最近两次):')
+        w0, w1 = hist[-2]['weights'], hist[-1]['weights']
+        facs = sorted(set(w0) | set(w1), key=lambda k: -w1.get(k, 0))
+        print(f'{"因子":<14}{hist[-2]["date"]:>10}{hist[-1]["date"]:>10}{"变动":>8}')
+        for k in facs:
+            a, b = w0.get(k, 0), w1.get(k, 0)
+            print(f'{k:<14}{a:>9.1f}{b:>10.1f}{b-a:>+8.1f}')
+
 
 if __name__ == '__main__':
-    main()
+    if '--show-history' in sys.argv:
+        show_history()
+    else:
+        main()

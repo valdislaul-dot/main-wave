@@ -1,0 +1,29 @@
+[
+  {
+    "date": "2026-09-01",
+    "prev_obj": 1153.6,
+    "obj": 1214.0,
+    "weights": {
+      "vr": 9.5,
+      "gap": 12.0,
+      "board_type": 7.6,
+      "cons": 6.3,
+      "seal": 6.3,
+      "zhaban": 4.3,
+      "sector": 32.7,
+      "divergence": 0.0,
+      "dt_risk": 17.0,
+      "turnover": 4.3
+    },
+    "strong": {
+      "ret": 3834.3,
+      "win_rate": 74,
+      "trades": 54
+    },
+    "weak": {
+      "ret": 129.1,
+      "win_rate": 51,
+      "trades": 57
+    }
+  }
+]
