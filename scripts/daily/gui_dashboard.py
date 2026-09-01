@@ -282,3 +282,81 @@ if jn:
         st.dataframe(trades, width='stretch', hide_index=True)
         tp = sum(j.get('pnl_amt', 0) for j in jn if j.get('action') == 'SELL')
         st.caption(f"累计盈亏: **{tp:+,.0f}**")
+
+st.divider()
+
+# ══════ 权重历史 (2026-09-01起, 月度重搜自动记录) ══════
+st.subheader("📐 权重历史(月度重搜)")
+wh = _load_json(os.path.join(DATA_DIR, 'weight_history.json'))
+if wh:
+    st.dataframe([{'日期': h['date'], '目标分': f"{h['obj']:+.1f}",
+                   '较上次': f"{h['obj'] - h['prev_obj']:+.1f}" if h.get('prev_obj') is not None else '—',
+                   '强市': f"{h['strong']['ret']:+.1f}%/{h['strong']['win_rate']:.0f}%胜",
+                   '弱市': f"{h['weak']['ret']:+.1f}%/{h['weak']['win_rate']:.0f}%胜"}
+                  for h in wh], width='stretch', hide_index=True)
+    if len(wh) >= 2:
+        st.caption("因子变动(最近两次):")
+        w0, w1 = wh[-2]['weights'], wh[-1]['weights']
+        facs = sorted(set(w0) | set(w1), key=lambda k: -w1.get(k, 0))
+        st.dataframe([{'因子': k, wh[-2]['date']: w0.get(k, 0), wh[-1]['date']: w1.get(k, 0),
+                       '变动': round(w1.get(k, 0) - w0.get(k, 0), 1)} for k in facs],
+                     width='stretch', hide_index=True)
+else:
+    st.info("无权重历史")
+
+st.divider()
+
+# ══════ 官方API双源校验 (2026-09-01) ══════
+st.subheader("🔍 官方API双源校验")
+oc = _load_json(os.path.join(DATA_DIR, 'official_check.json'))
+if oc:
+    st.caption(f"{oc.get('date', '?')}: 本地池 {oc.get('ours_n')} 只 vs 官方 {oc.get('official_n')} 只"
+               f" | 连板数不一致 {oc.get('ld_diff_count', 0)} 只")
+    if oc.get('ld_diff_list'):
+        st.caption("不一致: " + ", ".join(oc['ld_diff_list'][:10]))
+else:
+    st.info("暂无校验记录(下次盘后流水线自动生成)")
+
+st.divider()
+
+# ══════ 每日收盘快照 (2026-09-01) ══════
+st.subheader("📅 每日收盘快照(daily_close)")
+dc_dir = os.path.join(DATA_DIR, 'daily_close')
+if os.path.isdir(dc_dir):
+    dc_files = sorted(d for d in os.listdir(dc_dir)
+                      if os.path.isdir(os.path.join(dc_dir, d)) and len(d) == 10)
+    if dc_files:
+        latest_d = dc_files[-1]
+        dc = _load_json(os.path.join(dc_dir, latest_d, 'daily_data.json'))
+        idx = _load_json(os.path.join(dc_dir, 'stock_index.json')) or {}
+        st.caption(f"最新快照: {latest_d} | {len(dc) if dc else 0} 只 | 名称索引 {len(idx)} 只")
+        _pos_list = pf.get('positions', []) if pf else []
+        if dc and _pos_list:
+            for p in _pos_list:
+                e = dc.get(p['code'])
+                if e:
+                    st.caption(f"持仓 {p['name']}({p['code']}): 收 {e['close']:.2f} "
+                               f"(成本 {p['buy_price']:.3f}, 浮盈 {(e['close'] - p['buy_price']) / p['buy_price'] * 100:+.1f}%)")
+    else:
+        st.info("无收盘快照")
+else:
+    st.info("无收盘快照")
+
+st.divider()
+
+# ══════ 温度/竞价历史 (2026-09-01) ══════
+st.subheader("📈 温度/竞价历史")
+ms = _load_json(os.path.join(DATA_DIR, 'market_state.json'))
+if ms and ms.get('history'):
+    mhist = ms['history']
+    c1, c2 = st.columns(2)
+    with c1:
+        st.caption("涨停家数(近30日)")
+        st.bar_chart({h['date'][5:]: h['zt_n'] for h in mhist[-30:]}, height=180)
+    with c2:
+        st.caption("赚钱效应(近30日)")
+        st.line_chart({h['date'][5:]: h.get('money_effect', 0) or 0 for h in mhist[-30:]}, height=180)
+as_ = _load_json(os.path.join(DATA_DIR, 'auction_state.json'))
+if as_ and as_.get('history'):
+    st.caption("竞价可买数(近30日)")
+    st.bar_chart({h['date'][5:]: h.get('buyable', 0) for h in as_['history'][-30:]}, height=150)

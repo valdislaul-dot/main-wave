@@ -7,7 +7,7 @@
   python run_pipeline.py --buy CODE PRICE SHARES
   python run_pipeline.py --sell CODE PRICE
 """
-import sys, os
+import sys, os, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -67,19 +67,28 @@ def main():
             from zt_pool import load_state as _load_state
             _off = _official_pool()
             _st = _load_state()
-            ours = _st.get('stocks', [])
-            off_codes = {x['code']: x for x in _off}
-            ours_codes = {s['code']: s for s in ours}
-            only_ours = set(ours_codes) - set(off_codes)
-            only_off = set(off_codes) - set(ours_codes)
-            ld_diff = [c for c in (set(ours_codes) & set(off_codes))
-                       if int(ours_codes[c].get('limit_days', 1) or 1) != off_codes[c]['limit_days']]
-            print(f'[官方API校验] 本地池{len(ours)}只 vs 官方{len(_off)}只 | '
-                  f'仅本地{len(only_ours)} 仅官方{len(only_off)} 连板数不一致{len(ld_diff)}')
-            if len(ld_diff) <= 10 and ld_diff:
-                print(f'  ⚠ 连板数不一致: {", ".join(ld_diff)}')
-            elif len(ld_diff) > 10:
-                print(f'  ⚠ 连板数不一致({len(ld_diff)}只): {", ".join(ld_diff[:10])}...')
+            if not _off:
+                print('[官方API校验] 官方池未就绪(0只), 跳过本次校验')
+            else:
+                ours = _st.get('stocks', [])
+                off_codes = {x['code']: x for x in _off}
+                ours_codes = {s['code']: s for s in ours}
+                only_ours = set(ours_codes) - set(off_codes)
+                only_off = set(off_codes) - set(ours_codes)
+                ld_diff = [c for c in (set(ours_codes) & set(off_codes))
+                           if int(ours_codes[c].get('limit_days', 1) or 1) != off_codes[c]['limit_days']]
+                print(f'[官方API校验] 本地池{len(ours)}只 vs 官方{len(_off)}只 | '
+                      f'仅本地{len(only_ours)} 仅官方{len(only_off)} 连板数不一致{len(ld_diff)}')
+                if len(ld_diff) <= 10 and ld_diff:
+                    print(f'  ⚠ 连板数不一致: {", ".join(ld_diff)}')
+                elif len(ld_diff) > 10:
+                    print(f'  ⚠ 连板数不一致({len(ld_diff)}只): {", ".join(ld_diff[:10])}...')
+                # 持久化(2026-09-01): 本地GUI「官方API双源校验」模块读取
+                with open(os.path.join(BASE, 'data', 'official_check.json'), 'w', encoding='utf-8') as _f:
+                    json.dump({'date': _st.get('as_of_date', ''), 'ours_n': len(ours),
+                               'official_n': len(_off), 'only_ours': sorted(only_ours),
+                               'only_off': sorted(only_off), 'ld_diff_count': len(ld_diff),
+                               'ld_diff_list': sorted(ld_diff)}, _f, ensure_ascii=False, indent=1)
         except Exception as e:
             print(f'[官方API校验] 失败(忽略): {e}')
 

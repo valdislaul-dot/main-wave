@@ -31,6 +31,7 @@ def sync_files():
         'data/zt_pool_exit_log.json',
         'data/auction_state.json',
         'data/active_pool.json',
+        'data/market_state.json',
     ]
     files += [os.path.relpath(f, BASE) for f in glob.glob(os.path.join(BASE, 'data', 'auction', '*.json'))]
     return sorted(f.replace('\\', '/') for f in set(files) if os.path.exists(f))
