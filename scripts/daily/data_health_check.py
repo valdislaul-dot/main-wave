@@ -19,6 +19,9 @@ POOL_DIR = os.path.join(BASE, 'data', 'zt_pool')
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
 LOG_DIR = os.path.join(BASE, 'logs')
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from update_data import find_kline_path  # 共享函数, 支持 name_code.json 与 code.json 两种命名
+
 
 def load_json(p, encodings=('utf-8', 'gbk')):
     for enc in encodings:
@@ -209,8 +212,8 @@ def main():
         stale = []
         for p in pstocks:
             code = str(p.get('code', '')).replace('sh', '').replace('sz', '')
-            kp = os.path.join(KLINE_DIR, f'{code}.json')
-            if not os.path.exists(kp):
+            kp = find_kline_path(code)
+            if not kp:
                 stale.append(f'{p.get("name")}(无K线文件)')
                 continue
             k = load_json(kp)

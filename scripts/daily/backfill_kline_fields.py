@@ -60,7 +60,11 @@ def qfq_bars(code):
     url = f'http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={mkt}{code},day,,,100,qfq'
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     d = json.loads(urllib.request.urlopen(req, timeout=10).read().decode('utf-8'))
-    rows = (d.get('data', {}).get(f'{mkt}{code}', {}) or {}).get('qfqday') or []
+    node = (d.get('data', {}).get(f'{mkt}{code}', {}) or {})
+    rows = node.get('qfqday') or []
+    if not rows:
+        # 无除权史的股票腾讯不返回qfqday, 数据在day键 (无除权时qfq≡day, 口径自洽)
+        rows = node.get('day') or []
     return {r[0]: (float(r[1]), float(r[2])) for r in rows}
 
 
