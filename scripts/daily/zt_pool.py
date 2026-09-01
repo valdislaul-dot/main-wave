@@ -53,6 +53,22 @@ def _empty_state():
     }
 
 
+def get_prev_pool_file(ref_date=None):
+    """最近一个严格早于 ref_date(默认今天) 的涨停池快照文件名 (YYYYMMDD.json)
+    2026-09-01统一: 此前4处手写过滤, capture_market_state写<=today致date_fmt=当天
+    → K线同日bar相减恒0, 赚钱效应连续7天输出0.0无人发现; 收敛为一处实现防复制出错
+    """
+    if ref_date is None:
+        ref_date = datetime.now().strftime('%Y%m%d')
+    ref_date = str(ref_date).replace('-', '')
+    try:
+        names = [f for f in os.listdir(POOL_DIR)
+                 if f.endswith('.json') and f[:-5].isdigit() and f[:-5] < ref_date]
+    except FileNotFoundError:
+        return None
+    return max(names, default=None)  # YYYYMMDD字符串比较=日期比较, max即最近一天
+
+
 def save_state(state):
     os.makedirs(os.path.dirname(STATE_PATH), exist_ok=True)
     state['last_updated'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

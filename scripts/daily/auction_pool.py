@@ -244,14 +244,14 @@ def capture_auction(force=False):
 
     # 2.7 昨日涨停池文件连板数(最准) → 修正state连板数少算问题
     file_cons = {}
-    zt_files = sorted(f for f in os.listdir(os.path.join(BASE, 'data', 'zt_pool'))
-                      if f.endswith('.json') and f[:-5] < datetime.now().strftime('%Y%m%d'))
-    if zt_files:
+    from zt_pool import get_prev_pool_file
+    zt_fn = get_prev_pool_file()
+    if zt_fn:
         try:
-            with open(os.path.join(BASE, 'data', 'zt_pool', zt_files[-1]), encoding='utf-8') as f:
+            with open(os.path.join(BASE, 'data', 'zt_pool', zt_fn), encoding='utf-8') as f:
                 _pp = json.load(f)
         except UnicodeDecodeError:
-            with open(os.path.join(BASE, 'data', 'zt_pool', zt_files[-1]), encoding='gbk') as f:
+            with open(os.path.join(BASE, 'data', 'zt_pool', zt_fn), encoding='gbk') as f:
                 _pp = json.load(f)
         _pstocks = _pp if isinstance(_pp, list) else _pp.get('stocks', _pp.get('data', []))
         file_cons = {str(x.get('code', '')).replace('sh', '').replace('sz', ''): int(x.get('limit_days', 1) or 1)

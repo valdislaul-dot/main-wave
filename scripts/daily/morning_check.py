@@ -223,18 +223,18 @@ def find_divergence_candidates():
     只提示不自动交易 (来源: 干货_怎么选.doc)"""
     today_str = datetime.now().strftime('%Y-%m-%d')
     zt_dir = os.path.join(BASE, 'data', 'zt_pool')
-    prev_files = sorted(f for f in os.listdir(zt_dir)
-                        if f.endswith('.json') and f[:-5] < today_str.replace('-', ''))
-    if not prev_files:
+    from zt_pool import get_prev_pool_file
+    prev_fn = get_prev_pool_file(today_str)
+    if not prev_fn:
         return None
-    prev_date = prev_files[-1][:-5]
+    prev_date = prev_fn[:-5]
     prev_date_fmt = f'{prev_date[:4]}-{prev_date[4:6]}-{prev_date[6:8]}'
 
     try:
-        with open(os.path.join(zt_dir, prev_files[-1]), encoding='utf-8') as f:
+        with open(os.path.join(zt_dir, prev_fn), encoding='utf-8') as f:
             pool = json.load(f)
     except UnicodeDecodeError:
-        with open(os.path.join(zt_dir, prev_files[-1]), encoding='gbk') as f:
+        with open(os.path.join(zt_dir, prev_fn), encoding='gbk') as f:
             pool = json.load(f)
     stocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
 
@@ -311,16 +311,16 @@ def _load_prev_pool():
     if _prev_pool_cache is not None:
         return _prev_pool_cache
     zt_dir = os.path.join(BASE, 'data', 'zt_pool')
-    today_yyyymmdd = datetime.now().strftime('%Y%m%d')
-    files = sorted(f for f in os.listdir(zt_dir) if f.endswith('.json') and f[:-5] < today_yyyymmdd)
-    if not files:
+    from zt_pool import get_prev_pool_file
+    fn = get_prev_pool_file()
+    if not fn:
         _prev_pool_cache = None
         return None
     try:
-        with open(os.path.join(zt_dir, files[-1]), encoding='utf-8') as f:
+        with open(os.path.join(zt_dir, fn), encoding='utf-8') as f:
             pool = json.load(f)
     except UnicodeDecodeError:
-        with open(os.path.join(zt_dir, files[-1]), encoding='gbk') as f:
+        with open(os.path.join(zt_dir, fn), encoding='gbk') as f:
             pool = json.load(f)
     stocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
     # 板块共振计数改拆词交集 (2026-08-21, 同花顺个股化原因串适配)

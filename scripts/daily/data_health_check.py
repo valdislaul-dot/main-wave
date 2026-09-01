@@ -6,6 +6,9 @@
   3. 候选 vr20↔换手率交叉验证 (隐含日均换手在合理区间; vr20=0=量比清零回归)
   4. 池内抽样: 腾讯实时收盘价 vs 池文件价格
   5. 池内股票K线最新日期抽查
+  6. 竞价快照质量 (open=0占比)
+  7. 炸板次数异常校验
+  8. 赚钱效应合理性 (恒0/None且样本≥10 → 报警, 2026-09-01教训)
 用法: python data_health_check.py [--date YYYY-MM-DD]   (默认今天, 返回警告数)
 """
 import json, os, sys, urllib.request
@@ -263,6 +266,27 @@ def main():
             print(f'  ✓ 炸板次数: {len(sstocks)}只均在合理范围')
     else:
         print(f'  - 池文件缺失, 跳过炸板校验')
+
+    # ── 8. 赚钱效应合理性 (2026-09-01: 旧代码<=today致恒0连续7天无人发现, 守卫+体检双保险) ──
+    ms_path = os.path.join(BASE, 'data', 'market_state.json')
+    if os.path.exists(ms_path):
+        ms = load_json(ms_path)
+        if isinstance(ms, dict):
+            _me = ms.get('money_effect')
+            _ztn = ms.get('zt_n', 0) or 0
+            _warn = ms.get('warning')
+            if _warn:
+                warnings.append(f'赚钱效应守卫报警: {_warn}')
+                print(f'  ⚠ {warnings[-1]}')
+            elif _ztn >= 10 and (_me is None or abs(_me) < 0.005):
+                warnings.append(f'赚钱效应{_me}%但样本{_ztn}只≥10, 疑似日期过滤bug恒0')
+                print(f'  ⚠ {warnings[-1]}')
+            else:
+                print(f'  ✓ 赚钱效应: {_me}% ({_ztn}只样本) 合理')
+        else:
+            print(f'  - market_state为空, 跳过赚钱效应校验')
+    else:
+        print(f'  - market_state缺失, 跳过赚钱效应校验')
 
     # ── 落库 ──
     _log_result(today, warnings)

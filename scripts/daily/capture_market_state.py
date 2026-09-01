@@ -7,6 +7,7 @@ import json, os, sys
 from datetime import datetime
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 STATE_PATH = os.path.join(BASE, 'data', 'market_state.json')
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
 ZT_DIR = os.path.join(BASE, 'data', 'zt_pool')
@@ -21,18 +22,19 @@ def is_limit_up_row(k, pk):
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
     today = datetime.now().strftime('%Y-%m-%d')
-    # 昨日涨停池快照 (2026-09-01修复: 用<排除今天的池文件, 否则date_fmt=今天导致赚钱效应恒0)
-    files = sorted(f for f in os.listdir(ZT_DIR) if f.endswith('.json') and f[:-5] < today.replace('-', ''))
-    if not files:
+    # 昨日涨停池快照 (2026-09-01统一走get_prev_pool_file共享函数, 防日期过滤复制出错)
+    from zt_pool import get_prev_pool_file
+    fn = get_prev_pool_file(today)
+    if not fn:
         print('[MarketState] 无池快照, 跳过')
         return
-    ymd = files[-1][:-5]
+    ymd = fn[:-5]
     date_fmt = f'{ymd[:4]}-{ymd[4:6]}-{ymd[6:]}'
     try:
-        with open(os.path.join(ZT_DIR, files[-1]), encoding='utf-8') as f:
+        with open(os.path.join(ZT_DIR, fn), encoding='utf-8') as f:
             pool = json.load(f)
     except UnicodeDecodeError:
-        with open(os.path.join(ZT_DIR, files[-1]), encoding='gbk') as f:
+        with open(os.path.join(ZT_DIR, fn), encoding='gbk') as f:
             pool = json.load(f)
     stocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
 
@@ -82,6 +84,14 @@ def main():
     money_effect = round(sum(rets) / len(rets), 2) if rets else None
     print(f'[MarketState] {date_fmt}: 涨停{zt_n}只 最高{max_cons}板 赚钱效应{money_effect}% ({len(rets)}只有效)')
 
+    # 结果合理性守卫 (2026-09-01教训): 样本≥10且均值恰为0 → 几乎必然是日期过滤/同日bar相减类bug
+    # (旧代码<=today致date_fmt=当天, 赚钱效应恒0连续7天无人发现)
+    warning = None
+    if len(rets) >= 10 and (money_effect is None or abs(money_effect) < 0.005):
+        warning = (f'赚钱效应{money_effect}%但样本{len(rets)}只≥10, 疑似日期过滤bug'
+                   f'(同日bar相减恒0), 检查昨日池文件选取')
+        print(f'[MarketState] ⚠⚠ {warning}')
+
     # 落库(保留30天)
     state = {}
     if os.path.exists(STATE_PATH):
@@ -94,6 +104,10 @@ def main():
     state['zt_n'] = zt_n
     state['max_cons'] = max_cons
     state['money_effect'] = money_effect
+    if warning:
+        state['warning'] = warning
+    else:
+        state.pop('warning', None)
     hist = [h for h in state.get('history', []) if h.get('date') != date_fmt]
     hist.append({'date': date_fmt, 'zt_n': zt_n, 'max_cons': max_cons, 'money_effect': money_effect})
     state['history'] = hist[-30:]
