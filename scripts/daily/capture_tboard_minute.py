@@ -63,8 +63,8 @@ def fetch_minute(code, freq, count=320):
         print(f"  [WARN] {code} {freq}: {e}")
     return []
 
-def download_tboard_minute(code, date_str):
-    """下载单只T字板的分钟K线"""
+def download_tboard_minute(code, date_str, reason='tboard'):
+    """下载单只T字板/慢推候选的分钟K线 (2026-09-01起含慢推型失败侧样本)"""
     out_file = OUT_DIR / f"{code}_{date_str}.json"
 
     # Skip if already downloaded and has data
@@ -87,7 +87,7 @@ def download_tboard_minute(code, date_str):
     m5_filtered = [b for b in m5_bars if b[0].startswith(date_compact)]
 
     data = {
-        'code': code, 'date': date_str,
+        'code': code, 'date': date_str, 'capture_reason': reason,
         'min1': [{
             't': b[0], 'o': round(float(b[1]), 2),
             'c': round(float(b[2]), 2), 'h': round(float(b[3]), 2),
@@ -213,8 +213,38 @@ def main(date_str=None):
             print(f"FAIL: {e}")
         time.sleep(0.3)
 
+    # Step 3.5: 慢推型样本采集 (2026-09-01起, 失败侧样本积累)
+    # 低开/平开(gap<4%)的竞价池股, 不论最终是否封板 → 2-4周后回测慢推型封板率
+    print(f"\n[3.5] 慢推型样本采集(低开/平开, 含失败侧)...")
+    slow_collected = 0
+    auction_file = BASE / 'data' / 'auction' / f'{date_str}.json'
+    if auction_file.exists():
+        try:
+            with open(auction_file, encoding='utf-8') as f:
+                auction = json.load(f)
+            tboard_codes = {t['code'] for t in t_boards}
+            slow_cands = [s for s in auction.get('stocks', [])
+                          if s.get('gap_pct') is not None and s['gap_pct'] < 4
+                          and s.get('code') and s['code'] not in tboard_codes]
+            for s in slow_cands[:40]:   # 每日上限40只, 防采集量过大
+                code = s['code']
+                out_file = OUT_DIR / f'{code}_{date_str}.json'
+                if out_file.exists():
+                    continue
+                try:
+                    download_tboard_minute(code, date_str, reason='slow_push')
+                    slow_collected += 1
+                except Exception as e:
+                    print(f"  [WARN] {code}: {e}")
+                time.sleep(0.25)
+            print(f"  低开/平开候选: {len(slow_cands)} 只, 新采集 {slow_collected} 只")
+        except Exception as e:
+            print(f"  竞价快照读取失败: {e}")
+    else:
+        print(f"  无竞价快照({auction_file.name}), 跳过")
+
     # Step 4: Print analysis
-    print(f"\n[3/3] T字板分钟分析:")
+    print(f"\n[4/4] T字板分钟分析:")
     if analyses:
         print(f"  {'代码':<8} {'名称':<8} {'开盘':>7} {'最低':>7} {'跌幅%':>7} "
               f"{'跳水时间':<10} {'回封时间':<10} {'封死':>4}")
