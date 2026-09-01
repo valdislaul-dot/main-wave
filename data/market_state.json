@@ -1,44 +1,44 @@
 {
-  "date": "2026-09-01",
-  "zt_n": 76,
-  "max_cons": 7,
-  "money_effect": 0.0,
+  "date": "2026-08-31",
+  "zt_n": 79,
+  "max_cons": 6,
+  "money_effect": 1.2,
   "history": [
     {
       "date": "2026-08-25",
       "zt_n": 61,
       "max_cons": 5,
-      "money_effect": 0.0
+      "money_effect": 0.82
     },
     {
       "date": "2026-08-26",
       "zt_n": 49,
       "max_cons": 4,
-      "money_effect": 0.0
+      "money_effect": 2.46
     },
     {
       "date": "2026-08-27",
       "zt_n": 68,
       "max_cons": 6,
-      "money_effect": 0.0
+      "money_effect": 3.2
     },
     {
       "date": "2026-08-28",
       "zt_n": 78,
       "max_cons": 6,
-      "money_effect": 0.0
-    },
-    {
-      "date": "2026-08-31",
-      "zt_n": 79,
-      "max_cons": 5,
-      "money_effect": 0.0
+      "money_effect": 2.73
     },
     {
       "date": "2026-09-01",
       "zt_n": 76,
       "max_cons": 7,
-      "money_effect": 0.0
+      "money_effect": 1.2
+    },
+    {
+      "date": "2026-08-31",
+      "zt_n": 79,
+      "max_cons": 6,
+      "money_effect": 1.2
     }
   ]
 }

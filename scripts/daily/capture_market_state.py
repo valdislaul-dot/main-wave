@@ -21,8 +21,8 @@ def is_limit_up_row(k, pk):
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
     today = datetime.now().strftime('%Y-%m-%d')
-    # 昨日涨停池快照
-    files = sorted(f for f in os.listdir(ZT_DIR) if f.endswith('.json') and f[:-5] <= today.replace('-', ''))
+    # 昨日涨停池快照 (2026-09-01修复: 用<排除今天的池文件, 否则date_fmt=今天导致赚钱效应恒0)
+    files = sorted(f for f in os.listdir(ZT_DIR) if f.endswith('.json') and f[:-5] < today.replace('-', ''))
     if not files:
         print('[MarketState] 无池快照, 跳过')
         return
@@ -37,9 +37,12 @@ def main():
     stocks = pool if isinstance(pool, list) else pool.get('stocks', pool.get('data', []))
 
     # 赚钱效应: 昨日涨停股今日均收益 (从K线取今日close vs 昨日close)
+    # 2026-09-01修复: ①日期过滤用<排除今日池文件 ②K线缺今日bar的股票用腾讯实时价兜底,
+    # 否则样本只剩「今日再涨停」的股(有效17/79), 赚钱效应被系统性高估
     rets = []
     zt_n = len(stocks)
     max_cons = 1
+    missing = []
     for s in stocks:
         code = str(s.get('code', '')).replace('sh', '').replace('sz', '')
         if not code:
@@ -48,6 +51,7 @@ def main():
             max_cons = max(max_cons, int(s.get('limit_days', 1) or 1))
         except Exception:
             pass
+        found = False
         for enc in ('utf-8', 'gbk'):
             try:
                 with open(os.path.join(KLINE_DIR, f'{code}.json'), encoding=enc) as f:
@@ -59,9 +63,22 @@ def main():
                     c_t, c_y = kls[idx_t].get('close', 0), kls[idx_y].get('close', 0)
                     if c_t > 0 and c_y > 0:
                         rets.append((c_t - c_y) / c_y * 100)
+                        found = True
                 break
             except Exception:
                 continue
+        if not found:
+            missing.append(code)
+    if missing:
+        try:
+            from auction_pool import fetch_quotes as _fq
+            q = _fq(missing)
+            for code in missing:
+                qq = q.get(code) or {}
+                if qq.get('price') and qq.get('prev_close') and qq['prev_close'] > 0:
+                    rets.append((qq['price'] - qq['prev_close']) / qq['prev_close'] * 100)
+        except Exception as e:
+            print(f'[MarketState] 腾讯兜底失败: {e}')
     money_effect = round(sum(rets) / len(rets), 2) if rets else None
     print(f'[MarketState] {date_fmt}: 涨停{zt_n}只 最高{max_cons}板 赚钱效应{money_effect}% ({len(rets)}只有效)')
 
