@@ -1,81 +1,60 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 41,
+  "total_sessions": 42,
   "current": {
-    "date": "2026-09-01",
-    "captured": "2026-09-01 09:25:16",
-    "total": 79,
-    "buyable": 9,
-    "avg_gap": 1.99,
+    "date": "2026-09-02",
+    "captured": "2026-09-02 09:25:36",
+    "total": 76,
+    "buyable": 6,
+    "avg_gap": 1.35,
     "gap_distribution": {
-      "<-3%": 7,
-      "5-9%": 9,
-      "9%+": 9,
-      "0-2%": 26,
-      "-3-0%": 16,
-      "2-5%": 12
+      "2-5%": 10,
+      "0-2%": 16,
+      "9%+": 12,
+      "<-3%": 10,
+      "-3-0%": 26,
+      "5-9%": 2
     },
     "buyable_stocks": [
       {
-        "code": "000560",
-        "name": "我爱我家",
-        "gap_pct": 5.17,
-        "score": 66.6,
-        "limit_days": 2
-      },
-      {
-        "code": "003018",
-        "name": "金富科技",
-        "gap_pct": 5.31,
-        "score": 59.9,
+        "code": "603221",
+        "name": "爱丽家居",
+        "gap_pct": 4.75,
+        "score": 66.7,
         "limit_days": 1
       },
       {
-        "code": "603058",
-        "name": "永吉股份",
-        "gap_pct": 4.17,
-        "score": 58.5,
+        "code": "605188",
+        "name": "国光连锁",
+        "gap_pct": 4.21,
+        "score": 61.5,
         "limit_days": 1
       },
       {
-        "code": "603269",
-        "name": "海鸥股份",
-        "gap_pct": 5.98,
-        "score": 55.4,
-        "limit_days": 3
-      },
-      {
-        "code": "601595",
-        "name": "上海电影",
-        "gap_pct": 5.02,
-        "score": 54.9,
+        "code": "002696",
+        "name": "百洋股份",
+        "gap_pct": 7.55,
+        "score": 57.7,
         "limit_days": 1
       },
       {
-        "code": "002909",
-        "name": "集泰股份",
-        "gap_pct": 4.32,
-        "score": 50.9,
+        "code": "002470",
+        "name": "金正大",
+        "gap_pct": 4.74,
+        "score": 55.1,
         "limit_days": 1
       },
       {
-        "code": "600551",
-        "name": "时代出版",
-        "gap_pct": 5.82,
-        "score": 42.8,
-        "limit_days": 2
-      },
-      {
-        "code": "605577",
-        "name": "龙版传媒",
-        "gap_pct": 7.34,
-        "score": 0,
+        "code": "601566",
+        "name": "九牧王",
+        "gap_pct": 4.14,
+        "score": 49.8,
         "limit_days": 1
       },
       {
-        "code": "603893",
-        "name": "瑞芯微",
-        "gap_pct": 5.35,
+        "code": "603207",
+        "name": "小方制药",
+        "gap_pct": 6.3,
         "score": 0,
         "limit_days": 1
       }
@@ -609,7 +588,20 @@
         "-3-0%": 16,
         "2-5%": 12
       }
+    },
+    {
+      "date": "2026-09-02",
+      "total": 76,
+      "buyable": 6,
+      "gap_distribution": {
+        "2-5%": 10,
+        "0-2%": 16,
+        "9%+": 12,
+        "<-3%": 10,
+        "-3-0%": 26,
+        "5-9%": 2
+      }
     }
   ],
-  "last_update": "2026-09-01"
+  "last_update": "2026-09-02"
 }
