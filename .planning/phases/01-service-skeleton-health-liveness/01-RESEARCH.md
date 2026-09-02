@@ -459,13 +459,13 @@ Quoted above in Pattern 2 from `scripts/daily/install_scheduled_task.ps1:17-33` 
 | A4 | Task-name charset: a CJK task name (e.g. "gogo API 服务") displays correctly in taskschd.msc | Pattern 2 | Existing CJK task names exist on this box, but console listing of them mojibakes in GBK; if the name must round-trip through scripts/greps, an ASCII name ("gogo-api") is safer — planner choice, flag for user only if it matters |
 | A5 | Python is resolvable as `python` in the scheduled task's environment | run_api.bat shape | Interactive-logon tasks inherit the user env, where `python` resolves (pip 25.0.1 lives in the user AppData install `[VERIFIED]`); if the task ever runs under a different principal this breaks — verification step catches it |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does the LB probe (D-08's "load-balancer probe contract") exist today, and does it require the service to answer before user logon?**
+1. **Does the LB probe (D-08's "load-balancer probe contract") exist today, and does it require the service to answer before user logon?** — RESOLVED (2026-09-03): proceeded per D-07 (logon-gated), adopted in 01-02 flagged assumption A2 with the end-of-phase reboot human-check fallback.
    - What we know: the contract points at `127.0.0.1:8000/health`; D-07 accepts "waits for logon" for a user-attended machine; no probe consumer was named in CONTEXT.md.
    - What's unclear: whether some external system already polls and would alarm during the no-logon window.
    - Recommendation: proceed per D-07 (logon-gated). If a real LB appears, revisit with a SYSTEM-level task decision (explicitly rejected in D-07 for this machine).
-2. **Should the SEC-03 refusal message text be user-facing Chinese or ASCII English?**
+2. **Should the SEC-03 refusal message text be user-facing Chinese or ASCII English?** — RESOLVED (2026-09-03): ASCII English, adopted in 01-01 Task 1's stderr wording (names the bound host + GOGO_API_TOKEN remedy).
    - What we know: D-05's success notice wording is pinned verbatim and ASCII; the refusal wording is Claude's discretion.
    - What's unclear: user preference for error text language.
    - Recommendation: ASCII English (encoding safety in bat-redirected logs, Pitfall 5); wording shown in Pattern 1 as a starting point.
