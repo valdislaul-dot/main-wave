@@ -27,7 +27,7 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 - [ ] HTTP API 服务：FastAPI 服务提供 GET /health 探活（status + uptime 秒）
 - [ ] 只读状态接口：持仓/温度/市场状态/候选等经 HTTP 暴露（读现有 JSON）
 - [ ] 操作触发接口：触发管线/竞价/回测等现有脚本（subprocess）
-- [ ] 写入接口鉴权：操作类接口受保护，只读接口可放开
+- [ ] 分级鉴权：行情/温度类只读放开；持仓/账本/候选与所有触发接口一律 token 保护（2026-09-02 用户确认）
 
 ### Out of Scope
 
@@ -59,6 +59,8 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 | .planning/ 移入 gogo 仓库 | 项目归属 gogo，随仓库提交 | ✓ Good |
 | 移除主目录空 .git | 误初始化（无提交），恢复原状 | ✓ Good |
 | API 复用现有 JSON 状态文件 | 不引入第二数据源，避免推测污染 | — Pending |
+| 数据分级鉴权：行情/温度放开，持仓/账本/候选/触发一律 token | 隐私红线（2026-08-31），仓库疑似公开 | ✓ Good |
+| 状态接口 raw 透传 + 新鲜度头（不用 data/meta 信封） | 与既有 JSON schema 零适配兼容 | — Pending |
 
 ## Evolution
 
