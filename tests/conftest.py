@@ -7,9 +7,25 @@ _no_network: 任何测试若试图连接真实网络(非回环目的地), 立即
 _clean_env: 删除开发 shell 可能遗留的 GOGO_API_* 变量, 防止泄漏进断言 (Pitfall 3)。
 """
 import ipaddress
+import os
 import socket
+import tempfile
 
 import pytest
+
+
+def pytest_configure(config):
+    """Windows 环境修复: 重定向 pytest temproot, 绕开 ACL 损坏的遗留目录。
+
+    本机 %TEMP%/pytest-of-Davis (2026-07 遗留) 拒绝枚举, 使默认 basetemp 的
+    清理 scandir 抛 PermissionError。PYTEST_DEBUG_TEMPROOT 是 pytest 官方
+    temproot 覆盖变量, 在首个 tmp_path 使用前(本钩子)设置即可生效;
+    对目录健康的机器无副作用 (仅换一个干净的根目录)。
+    """
+    if not os.environ.get("PYTEST_DEBUG_TEMPROOT"):
+        root = os.path.join(tempfile.gettempdir(), "pytest-temproot-gogo")
+        os.makedirs(root, exist_ok=True)
+        os.environ["PYTEST_DEBUG_TEMPROOT"] = root
 
 
 @pytest.fixture(autouse=True)
