@@ -1,0 +1,89 @@
+# gogo API 服务 (main-wave API)
+
+## What This Is
+
+gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡探活与外部消费方提供健康检查、状态数据与操作触发接口——是 gogo 现有 CLI 脚本和 Streamlit 面板之外的第三个入口。服务运行在 gogo 仓库内，直接复用 `data/` 与 `logs/` 的 JSON 状态数据。
+
+## Core Value
+
+外部系统通过一个稳定的 HTTP API 就能拿到 gogo 的实时状态（探活/持仓/温度/市场状态）并触发核心操作（管线/竞价/回测），且不干扰现有管线的运行。
+
+## Requirements
+
+### Validated
+
+<!-- Shipped and confirmed valuable. -->
+
+- ✓ 评分 V4 体系（10因子百分制加权，权重月度滚动更新）— existing
+- ✓ 温度三档开关（极弱/弱市/强市 → 空仓/半仓/全仓）— existing
+- ✓ 卖出引擎 V4.1（竞价观察/弱转强/硬止损/执行价公式）— existing
+- ✓ 每日管线 run_pipeline（涨停池→评分→候选）— existing
+- ✓ 竞价面板 morning_check（9:15-9:35 决策）— existing
+- ✓ 回测 V4（1年定形状+5个月定权重+3年检验）— existing
+- ✓ 数据获取层（腾讯K线/同花顺涨停池/Tushare校准/竞价行情）— existing
+- ✓ GET /health 探活（纯内存 always-200 + monotonic uptime）+ 常驻 FastAPI 服务（fail-closed 启动、Task Scheduler 开机自启、token at rest）— Phase 1
+- ✓ 仓库首套自动化测试（pytest 18+1，零网络，TestClient 契约）— Phase 1
+
+### Active
+
+- [ ] 只读状态接口：持仓/温度/市场状态/候选等经 HTTP 暴露（读现有 JSON）
+- [ ] 操作触发接口：触发管线/竞价/回测等现有脚本（subprocess）
+- [ ] 分级鉴权：行情/温度类只读放开；持仓/账本/候选与所有触发接口一律 token 保护（2026-09-02 用户确认）
+
+### Out of Scope
+
+- Node/Express 实现 — 已定 FastAPI，与 gogo 全 Python 栈一致
+- 自动实盘下单 — 安全边界；API 不含任何交易下单能力，另行明确授权才考虑
+- 替换现有 Streamlit GUI — 面板保留，API 是补充入口
+
+## Context
+
+- gogo：Python 27.5k LOC / 116 个 .py 文件，live-traded A股打板决策系统，Win 端为主（Mac 端存在，双端同步）
+- 数据形态：`data/` 下 kline_data、zt_pool、auction、market_state.json 等 JSON 状态文件；`logs/` 下 portfolio.json、trading_journal.json、candidates_*.json
+- GUI：gui_dashboard.py（本地）、gui_cloud.py（云端）均 Streamlit；sync_cloud.py 同步云端
+- 安全注意（.planning/codebase/CONCERNS.md）：远程仓库疑似公开（匿名访问 200）；交易记录存在于 git 历史；零自动化测试；仓库 JSON 数据膨胀（603MB pack）
+- 跨端同步规则：Mac 端推送到 GitHub 的修复必须先审查再应用（git diff HEAD..origin/main）
+- 定稿机制：V4 评分/温度/卖出引擎为定稿口径，改动需用户明确确认
+
+## Constraints
+
+- **Tech stack**: Python + FastAPI — gogo 全栈 Python，不引入 Node 运行时
+- **复用**: 只读 data/、logs/ 现有 JSON，不修改现有管线模块逻辑
+- **Compatibility**: Win 端为主，Mac 端需可用
+- **Security**: 操作触发接口必须鉴权；不含实盘下单
+
+## Key Decisions
+
+| Decision | Rationale | Outcome |
+|----------|-----------|---------|
+| FastAPI 而非 Express | gogo 全栈 Python，单一运行时 | — Pending |
+| .planning/ 移入 gogo 仓库 | 项目归属 gogo，随仓库提交 | ✓ Good |
+| 移除主目录空 .git | 误初始化（无提交），恢复原状 | ✓ Good |
+| API 复用现有 JSON 状态文件 | 不引入第二数据源，避免推测污染 | — Pending |
+| 数据分级鉴权：行情/温度放开，持仓/账本/候选/触发一律 token | 隐私红线（2026-08-31），仓库疑似公开 | ✓ Good |
+| 状态接口 raw 透传 + 新鲜度头（不用 data/meta 信封） | 与既有 JSON schema 零适配兼容 | — Pending |
+| SEC-03 检查先于 token 生成（Pitfall-2 顺序） | 非回环无 token 时拒绝启动且不生成 token 文件；生成只在回环/默认分支 | ✓ Good (Phase 1) |
+| Token at rest：data/api_token.txt，secrets.token_urlsafe(32)，env 优先文件兜底 | 与 tushare token 惯例一致；同 commit gitignore（D-06） | ✓ Good (Phase 1) |
+| 计划任务延迟用固定 Delay=PT5M 而非 RandomDelay | PS 5.1 BootTrigger 不支持 RandomDelay（CIM/XML 双验证）；惯例任务也从未真正携带随机延迟 | ✓ Good (Phase 1) |
+| 计划任务注册需提权（RESEARCH 假设 A1 被证伪） | 非提权 Register-ScheduledTask 返回 0x80070005 | ✓ Good (Phase 1) |
+| -ExecutionTimeLimit 无限（PT0S） | 默认 3 天上限会静默杀死常驻服务 | ✓ Good (Phase 1) |
+
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
+---
+*Last updated: 2026-09-03 after Phase 1*
