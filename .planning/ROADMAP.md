@@ -30,7 +30,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. After a Windows reboot the service is running without manual launch (Task Scheduler + run_api.bat) and is reachable on 127.0.0.1.
   3. Starting the service with a non-loopback bind (e.g. 0.0.0.0) and no API token configured makes it refuse to start with a clear error — it never boots reachable-but-unauthenticated.
   4. `pytest` passes the repo's first automated tests (TestClient) asserting the /health contract.
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — api/ package: /health liveness + fail-closed boot + token at rest + first pytest suite
+- [ ] 01-02-PLAN.md — Windows autostart: run_api.bat launcher + gogo-api Task Scheduler registration
 **Research**: skip — stack machine-verified on this machine (fastapi 0.115.14 / uvicorn 0.51.0 single process / Python 3.13.1); standard liveness + Task Scheduler autostart patterns (install_scheduled_task.ps1 convention); launchd plist for Mac parity.
 
 ### Phase 2: Read-Only State Endpoints + Defensive Read Layer
