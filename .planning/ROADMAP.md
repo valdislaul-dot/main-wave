@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Starting the service with a non-loopback bind (e.g. 0.0.0.0) and no API token configured makes it refuse to start with a clear error — it never boots reachable-but-unauthenticated.
   4. `pytest` passes the repo's first automated tests (TestClient) asserting the /health contract.
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans executed
 Plans:
 **Wave 1**
 
@@ -42,7 +42,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Windows autostart: run_api.bat launcher + gogo-api Task Scheduler registration
+- [x] 01-02-PLAN.md — Windows autostart: run_api.bat launcher + gogo-api Task Scheduler registration
 
 **Research**: skip — stack machine-verified on this machine (fastapi 0.115.14 / uvicorn 0.51.0 single process / Python 3.13.1); standard liveness + Task Scheduler autostart patterns (install_scheduled_task.ps1 convention); launchd plist for Mac parity.
 
@@ -118,7 +118,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Service Skeleton + /health Liveness | 1/2 | In Progress|  |
+| 1. Service Skeleton + /health Liveness | 2/2 | In Progress|  |
 | 2. Read-Only State Endpoints + Defensive Read Layer | 0/TBD | Not started | - |
 | 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 0/TBD | Not started | - |
 | 4. Exposure Hardening + Data Classification | 0/TBD | Not started | - |
