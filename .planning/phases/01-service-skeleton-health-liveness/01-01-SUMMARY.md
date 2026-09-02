@@ -199,3 +199,7 @@ None - no external service configuration required. Note: `data/api_token.txt` no
 ---
 *Phase: 01-service-skeleton-health-liveness*
 *Completed: 2026-09-03*
+
+## Self-Check: PASSED
+- All 7 source/infra files present; SUMMARY.md present
+- Commits verified: 240989f (feat), b9bc550 (test), 2531701 (test), 9b683ad (docs)
