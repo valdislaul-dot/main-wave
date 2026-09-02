@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 1
 current_phase_name: Service Skeleton + /health Liveness
 status: executing
-stopped_at: Phase 1 context gathered
-last_updated: "2026-09-02T16:07:26.063Z"
-last_activity: 2026-09-02
-last_activity_desc: ROADMAP.md created (5 phases, 14/14 v1 requirements mapped); traceability filled in REQUIREMENTS.md
-state_head: ab67cffad2977fd5e57e6d38c99704246f93ebbc
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-09-02T22:31:24.037Z"
+last_activity: 2026-09-03
+last_activity_desc: Phase 1 execution started
+state_head: 25317014b32b0c273f41506267781e619e0c941f
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-09-02)
 
 ## Current Position
 
-Phase: 1 (Service Skeleton + /health Liveness) — READY TO EXECUTE
-Plan: none yet (Plans TBD per phase)
+Phase: 1 (Service Skeleton + /health Liveness) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-09-02 — ROADMAP.md created (5 phases, 14/14 v1 requirements mapped); traceability filled in REQUIREMENTS.md
+Last activity: 2026-09-03 — Phase 1 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -54,6 +54,11 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P01-01 | 8min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -66,6 +71,7 @@ Recent decisions affecting current work:
 - [Roadmap] STA-02 (持仓/账本/候选 reads, token-gated) delivered in Phase 4 with the data-classification policy, not Phase 2 — Phase 2 stays public-safe only.
 - [Roadmap] Decision A (raw passthrough + X-Data-Mtime/X-Data-Age-S headers) recommended — user sign-off before Phase 2 coding.
 - [P3/P4] Data-classified auth confirmed 2026-09-02 (market/temperature open; 持仓/账本/候选/trigger token) — PROJECT.md wording revision pending in Phase 4 (定稿机制).
+- [Phase 1]: Phase 1 /health probe path is pure in-memory (monotonic uptime, no middleware/deps); any future auth must exempt /health (OPS-02 suite pins it)
 
 ### Pending Todos
 
@@ -88,6 +94,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-02T15:12:26.157Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-service-skeleton-health-liveness/01-CONTEXT.md
+Last session: 2026-09-02T22:31:24.015Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None

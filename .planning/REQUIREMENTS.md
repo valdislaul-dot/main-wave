@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### 健康检查 (HLT)
 
-- [ ] **HLT-01**: GET /health 探活——纯内存返回 `{"status":"ok","uptime_seconds":N}`，永远 200，不受鉴权拦截，数据过期绝不 503
+- [x] **HLT-01**: GET /health 探活——纯内存返回 `{"status":"ok","uptime_seconds":N}`，永远 200，不受鉴权拦截，数据过期绝不 503
 - [ ] **HLT-02**: GET /health/ready 就绪——stat 状态文件存在性/可读性，仅不可读时 503，不看数据新旧
 
 ### 只读状态 (STA)
@@ -28,12 +28,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **SEC-01**: X-API-Key 鉴权（constant-time 比较，header 传递，永不上日志）
 - [ ] **SEC-02**: 数据分级鉴权——行情/温度放开，持仓/账本/候选/触发一律 token
-- [ ] **SEC-03**: 默认绑 127.0.0.1，非回环无 token 拒绝启动（fail-closed）
+- [x] **SEC-03**: 默认绑 127.0.0.1，非回环无 token 拒绝启动（fail-closed）
 
 ### 运维 (OPS)
 
 - [ ] **OPS-01**: Windows 任务计划程序开机自启（run_api.bat，沿用 install_scheduled_task.ps1 惯例）
-- [ ] **OPS-02**: pytest+TestClient 种子测试（仓库首套自动化测试）
+- [x] **OPS-02**: pytest+TestClient 种子测试（仓库首套自动化测试）
 - [ ] **OPS-03**: 日志轮转 + 鉴权版 GET /health/details
 
 ## v2 Requirements
@@ -73,7 +73,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HLT-01 | Phase 1 | Pending |
+| HLT-01 | Phase 1 | Complete |
 | HLT-02 | Phase 2 | Pending |
 | STA-01 | Phase 2 | Pending |
 | STA-02 | Phase 4 | Pending |
@@ -83,12 +83,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ACT-03 | Phase 3 | Pending |
 | SEC-01 | Phase 3 | Pending |
 | SEC-02 | Phase 4 | Pending |
-| SEC-03 | Phase 1 | Pending |
+| SEC-03 | Phase 1 | Complete |
 | OPS-01 | Phase 1 | Pending |
-| OPS-02 | Phase 1 | Pending |
+| OPS-02 | Phase 1 | Complete |
 | OPS-03 | Phase 5 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 14 total (14 IDs enumerated: HLT 2 + STA 3 + ACT 3 + SEC 3 + OPS 3; prior "15 total" count was an off-by-one in the coverage block — corrected 2026-09-02 during roadmap creation)
 - Mapped to phases: 14
 - Unmapped: 0

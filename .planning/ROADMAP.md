@@ -34,11 +34,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Starting the service with a non-loopback bind (e.g. 0.0.0.0) and no API token configured makes it refuse to start with a clear error — it never boots reachable-but-unauthenticated.
   4. `pytest` passes the repo's first automated tests (TestClient) asserting the /health contract.
 
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — api/ package: /health liveness + fail-closed boot + token at rest + first pytest suite
+- [x] 01-01-PLAN.md — api/ package: /health liveness + fail-closed boot + token at rest + first pytest suite
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -118,7 +118,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Service Skeleton + /health Liveness | 0/TBD | Not started | - |
+| 1. Service Skeleton + /health Liveness | 1/2 | In Progress|  |
 | 2. Read-Only State Endpoints + Defensive Read Layer | 0/TBD | Not started | - |
 | 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 0/TBD | Not started | - |
 | 4. Exposure Hardening + Data Classification | 0/TBD | Not started | - |
