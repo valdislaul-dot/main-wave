@@ -13,7 +13,7 @@ Milestone v1 turns gogo's batch pipeline into a resident, queryable HTTP service
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Service Skeleton + /health Liveness** - Resident FastAPI service boots on Windows (autostart on reboot), serves always-200 /health, refuses to boot exposed without a token, seeds repo's first pytest suite
+- [x] **Phase 1: Service Skeleton + /health Liveness** - Resident FastAPI service boots on Windows (autostart on reboot), serves always-200 /health, refuses to boot exposed without a token, seeds repo's first pytest suite (completed 2026-09-03)
 - [ ] **Phase 2: Read-Only State Endpoints + Defensive Read Layer** - Market/temperature/zt-pool state served verbatim with freshness headers; half-written files never leak (retry + stale fallback); /health/ready
 - [ ] **Phase 3: Trigger Runner, Job Registry & Locks + Auth Enforcement** - POST triggers existing scripts as 202+job_id with durable jobs and single-flight 409s; X-API-Key enforced; event loop never blocked
 - [ ] **Phase 4: Exposure Hardening + Data Classification** - 持仓/账本/候选 reads go live token-gated under an explicit classification policy; logs/errors/params/git hardened
@@ -118,7 +118,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Service Skeleton + /health Liveness | 2/2 | In Progress|  |
+| 1. Service Skeleton + /health Liveness | 2/2 | Complete    | 2026-09-03 |
 | 2. Read-Only State Endpoints + Defensive Read Layer | 0/TBD | Not started | - |
 | 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 0/TBD | Not started | - |
 | 4. Exposure Hardening + Data Classification | 0/TBD | Not started | - |

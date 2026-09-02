@@ -1,44 +1,44 @@
 ---
 gsd_state_version: 1.0
-current_phase: 1
-current_phase_name: Service Skeleton + /health Liveness
-status: verifying
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-09-02T22:50:02.693Z"
+current_phase: 2
+current_phase_name: Read-Only State Endpoints + Defensive Read Layer
+status: planning
+stopped_at: Phase 1 complete, ready to plan Phase 2
+last_updated: "2026-09-02T23:23:46.083Z"
 last_activity: 2026-09-03
-last_activity_desc: Phase 1 execution started
-state_head: 10d462eb6ea1d7447501c3c33b316581715678f0
+last_activity_desc: Phase 1 complete, transitioned to Phase 2
+state_head: 147df275573e189a4e621c901b05c0e77cb55138
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
   completed_plans: 2
-  percent: 0
+  percent: 20
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-09-02)
+See: .planning/PROJECT.md (updated 2026-09-03)
 
 **Core value:** External systems get gogo's live state (health/持仓/温度/market status) and trigger core operations (pipeline/auction/backtest) through one stable HTTP API, without disturbing the existing pipeline.
-**Current focus:** Phase 1 — Service Skeleton + /health Liveness
+**Current focus:** Phase 2 — Read-Only State Endpoints + Defensive Read Layer
 
 ## Current Position
 
-Phase: 1 (Service Skeleton + /health Liveness) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
-Last activity: 2026-09-03 — Phase 1 execution started
+Phase: 2 — Read-Only State Endpoints + Defensive Read Layer
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-09-03 — Phase 1 complete, transitioned to Phase 2
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed: 2
 - Average duration: —
 - Total execution time: —
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1-5 | TBD | TBD | - |
+| 1 | 2 | - | - |
 
 **Recent Trend:**
 
@@ -75,6 +76,8 @@ Recent decisions affecting current work:
 - [Phase 1]: Phase 1 /health probe path is pure in-memory (monotonic uptime, no middleware/deps); any future auth must exempt /health (OPS-02 suite pins it)
 - [Phase 1]: Installer runs ELEVATED on this machine: non-elevated Register-ScheduledTask is denied (0x80070005) - RESEARCH assumption A1 disproven; header updated
 - [Phase 1]: Boot-trigger delay delivered as fixed Delay=PT5M not RandomDelay: PS 5.1 -RandomDelay silently dropped for AtStartup triggers (CIM class lacks the property; XML schema rejects it - legacy convention task never had it either)
+- [Phase 1]: SEC-03 boot check runs BEFORE any token generation (Pitfall-2); token at rest = data/api_token.txt (secrets, env-first-file-second, gitignored same-commit); -ExecutionTimeLimit PT0S so the resident service outlives the 3-day default
+- [Phase 1]: Repo's first test suite: pytest.ini pythonpath=. + tests/ (18 passed, 1 skipped, autouse network-block); import mechanics require `python -m api.main` from repo root
 
 ### Pending Todos
 
@@ -83,9 +86,10 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- [Roadmap] REQUIREMENTS.md coverage block said "15 total" but the file enumerates 14 IDs (HLT 2 + STA 3 + ACT 3 + SEC 3 + OPS 3). Coverage computed as 14/14; the count text was corrected — confirm no 15th requirement is missing.
 - [P4] PROJECT.md security-clause wording revision requires user sign-off (定稿机制).
 - [P3] GUI one-key refresh and the (likely defunct) 15:30 scheduled task are unlocked concurrent runners — single-flight competitor scope needs user decision.
+- [P1] REVIEW.md WR-01: SEC-03 是启动时意图检查，token 文件存在后 0.0.0.0 绑定不再拒绝——按请求鉴权是 Phase 3/4 范围，Phase 1 契约内不违反
+- [P1] REVIEW.md WR-02/WR-03/WR-04 非阻塞加固项（端口范围校验、$ErrorActionPreference='Stop'、config.py 导入副作用）— 记入后续阶段硬化清单
 
 ## Deferred Items
 
@@ -98,5 +102,5 @@ Items acknowledged and deferred at milestone close, most recent first:
 ## Session Continuity
 
 Last session: 2026-09-02T22:50:02.670Z
-Stopped at: Completed 01-02-PLAN.md
+Stopped at: Phase 1 complete, ready to plan Phase 2
 Resume file: None
