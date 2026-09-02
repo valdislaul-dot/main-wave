@@ -73,26 +73,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HLT-01 | | Pending |
-| HLT-02 | | Pending |
-| STA-01 | | Pending |
-| STA-02 | | Pending |
-| STA-03 | | Pending |
-| ACT-01 | | Pending |
-| ACT-02 | | Pending |
-| ACT-03 | | Pending |
-| SEC-01 | | Pending |
-| SEC-02 | | Pending |
-| SEC-03 | | Pending |
-| OPS-01 | | Pending |
-| OPS-02 | | Pending |
-| OPS-03 | | Pending |
+| HLT-01 | Phase 1 | Pending |
+| HLT-02 | Phase 2 | Pending |
+| STA-01 | Phase 2 | Pending |
+| STA-02 | Phase 4 | Pending |
+| STA-03 | Phase 2 | Pending |
+| ACT-01 | Phase 3 | Pending |
+| ACT-02 | Phase 3 | Pending |
+| ACT-03 | Phase 3 | Pending |
+| SEC-01 | Phase 3 | Pending |
+| SEC-02 | Phase 4 | Pending |
+| SEC-03 | Phase 1 | Pending |
+| OPS-01 | Phase 1 | Pending |
+| OPS-02 | Phase 1 | Pending |
+| OPS-03 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 15 total
-- Mapped to phases: 0
-- Unmapped: 15 ⚠️
+- v1 requirements: 14 total (14 IDs enumerated: HLT 2 + STA 3 + ACT 3 + SEC 3 + OPS 3; prior "15 total" count was an off-by-one in the coverage block — corrected 2026-09-02 during roadmap creation)
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-09-02*
-*Last updated: 2026-09-02 after initial definition*
+*Last updated: 2026-09-02 after roadmap creation (traceability filled, coverage count corrected)*
