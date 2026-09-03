@@ -1,19 +1,19 @@
----
+| Phase 02 P01 | 9 min | 3 tasks | 3 files |---
 gsd_state_version: 1.0
-current_phase: 02
-current_phase_name: Read-Only State Endpoints + Defensive Read Layer
-status: verifying
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-09-03T12:07:10.910Z"
+current_phase: 3
+current_phase_name: Trigger Runner, Job Registry & Locks + Auth Enforcement
+status: planning
+stopped_at: Phase 02 complete, ready to plan Phase 3
+last_updated: "2026-09-03T15:14:55.267Z"
 last_activity: 2026-09-03
-last_activity_desc: Phase 02 execution started
-state_head: ea2ea7a795c657011896cf39d03c1499b46e04e1
+last_activity_desc: Phase 02 complete, transitioned to Phase 3
+state_head: 3c6447b8a1e960969c98e12eca7e433cc9b24f63
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
   completed_plans: 3
-  percent: 20
+  percent: 40
 ---
 
 # Project State
@@ -23,22 +23,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-03)
 
 **Core value:** External systems get gogo's live state (health/持仓/温度/market status) and trigger core operations (pipeline/auction/backtest) through one stable HTTP API, without disturbing the existing pipeline.
-**Current focus:** Phase 02 — Read-Only State Endpoints + Defensive Read Layer
+**Current focus:** Phase 3 — Trigger Runner, Job Registry & Locks + Auth Enforcement
 
 ## Current Position
 
-Phase: 02 (Read-Only State Endpoints + Defensive Read Layer) — EXECUTING
-Plan: 1 of 1
-Status: Phase complete — ready for verification
-Last activity: 2026-09-03 — Phase 02 execution started
+Phase: 3 — Trigger Runner, Job Registry & Locks + Auth Enforcement
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-09-03 — Phase 02 complete, transitioned to Phase 3
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: —
 - Total execution time: —
 
@@ -48,6 +48,7 @@ Progress: [██░░░░░░░░] 20%
 |-------|-------|-------|----------|
 | 1-5 | TBD | TBD | - |
 | 1 | 2 | - | - |
+| 02 | 1 | - | - |
 
 **Recent Trend:**
 
@@ -73,7 +74,7 @@ Recent decisions affecting current work:
 
 - [Roadmap] Research 5-phase structure adopted (skeleton/health → read-only state → trigger runner/jobs/locks → data classification/hardening → ops polish); auth scaffold P1, enforcement P3, full policy P4.
 - [Roadmap] STA-02 (持仓/账本/候选 reads, token-gated) delivered in Phase 4 with the data-classification policy, not Phase 2 — Phase 2 stays public-safe only.
-- [Roadmap] Decision A (raw passthrough + X-Data-Mtime/X-Data-Age-S headers) recommended — user sign-off before Phase 2 coding.
+- [Roadmap] Decision A (raw passthrough + X-Data-Mtime/X-Data-Age-S headers) — implemented in Phase 2 (D-01/D-02/D-05), wire contract is the consumer integration surface.
 - [P3/P4] Data-classified auth confirmed 2026-09-02 (market/temperature open; 持仓/账本/候选/trigger token) — PROJECT.md wording revision pending in Phase 4 (定稿机制).
 - [Phase 1]: Phase 1 /health probe path is pure in-memory (monotonic uptime, no middleware/deps); any future auth must exempt /health (OPS-02 suite pins it)
 - [Phase 1]: Installer runs ELEVATED on this machine: non-elevated Register-ScheduledTask is denied (0x80070005) - RESEARCH assumption A1 disproven; header updated
@@ -88,12 +89,15 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 - Phase 3 is the deep-research phase: `/gsd-plan-phase --research-phase 3` (Windows subprocess governance on the real machine).
-- Collect Decision A/E sign-offs before Phase 2 planning; collect Phase 3 user sign-off gates (writer atomicization, GUI lock, 15:30 task liveness, --fast default) before Phase 3 planning.
+- Collect Phase 3 user sign-off gates (writer atomicization, GUI lock, 15:30 task liveness, --fast default) before Phase 3 planning.
 
 ### Blockers/Concerns
 
 - [P4] PROJECT.md security-clause wording revision requires user sign-off (定稿机制).
 - [P3] GUI one-key refresh and the (likely defunct) 15:30 scheduled task are unlocked concurrent runners — single-flight competitor scope needs user decision.
+- [P2] REVIEW.md WR-01: token gate 为存在性检查且自开启——非回环绑定只查 token 存在，回环默认运行会自动生成 token，误配 0.0.0.0 时静默服务 LAN。修复需 env 强制 token + 控制台警告，属 Phase 3/4 鉴权加固范围
+- [P2] REVIEW.md WR-02/WR-03 + UI-audit 3 项优先级修复（机器可读错误码、双 404 文案归一、openapi/README 契约）——涉及 D-01/D-04 定稿决策，采纳需用户确认
+- [P2] 会话清理现象：交互会话启动的服务实例随会话结束收到 Ctrl+C（2026-09-03 晚 4 次 ^C 观察，LastTaskResult 0xC000013A）；AtStartup 自启路径不受影响——部署生命周期关注项，记入 Phase 5 ops polish
 - [P1] REVIEW.md WR-01: SEC-03 是启动时意图检查，token 文件存在后 0.0.0.0 绑定不再拒绝——按请求鉴权是 Phase 3/4 范围，Phase 1 契约内不违反
 - [P1] REVIEW.md WR-02/WR-03/WR-04 非阻塞加固项（端口范围校验、$ErrorActionPreference='Stop'、config.py 导入副作用）— 记入后续阶段硬化清单
 
@@ -107,6 +111,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T12:05:18.867Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-09-03T15:20:00Z
+Stopped at: Phase 02 complete (UAT 2/2, nyquist+security+UI gates green), ready to plan Phase 3
 Resume file: None

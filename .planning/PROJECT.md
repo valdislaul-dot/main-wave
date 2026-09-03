@@ -23,11 +23,12 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 - ✓ 数据获取层（腾讯K线/同花顺涨停池/Tushare校准/竞价行情）— existing
 - ✓ GET /health 探活（纯内存 always-200 + monotonic uptime）+ 常驻 FastAPI 服务（fail-closed 启动、Task Scheduler 开机自启、token at rest）— Phase 1
 - ✓ 仓库首套自动化测试（pytest 18+1，零网络，TestClient 契约）— Phase 1
+- ✓ 公开状态接口（market/auction/zt-pool raw 透传 + X-Data-Mtime/Age-S/Stale 新鲜度头）+ 防御式读取层（validate-then-serve + 短重试 + last-good stale 缓存，写入期间 0×5xx）+ /health/ready（stat-only，与数据年龄解耦）— Phase 2
 
 ### Active
 
-- [ ] 只读状态接口：持仓/温度/市场状态/候选等经 HTTP 暴露（读现有 JSON）
-- [ ] 操作触发接口：触发管线/竞价/回测等现有脚本（subprocess）
+- [ ] 持仓/账本/候选 reads（token-gated，Phase 4 数据分级政策下交付，STA-02）
+- [ ] 操作触发接口：触发管线/竞价/回测等现有脚本（subprocess，202+job_id，单飞锁）— Phase 3
 - [ ] 分级鉴权：行情/温度类只读放开；持仓/账本/候选与所有触发接口一律 token 保护（2026-09-02 用户确认）
 
 ### Out of Scope
@@ -61,7 +62,11 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 | 移除主目录空 .git | 误初始化（无提交），恢复原状 | ✓ Good |
 | API 复用现有 JSON 状态文件 | 不引入第二数据源，避免推测污染 | — Pending |
 | 数据分级鉴权：行情/温度放开，持仓/账本/候选/触发一律 token | 隐私红线（2026-08-31），仓库疑似公开 | ✓ Good |
-| 状态接口 raw 透传 + 新鲜度头（不用 data/meta 信封） | 与既有 JSON schema 零适配兼容 | — Pending |
+| 状态接口 raw 透传 + 新鲜度头（不用 data/meta 信封） | 与既有 JSON schema 零适配兼容 | ✓ Good (Phase 2) |
+| 防御式读取层：validate-then-serve + 2×20ms 短重试 + last-good 缓存 | 半写 JSON 永不作为新鲜数据服务；冷缓存 503，绝无裸 500（STA-03） | ✓ Good (Phase 2) |
+| D-03 白名单：3 名固定映射，路径组合前检查 | 遍历结构性不可能；404 detail 钉死无路径（D-04） | ✓ Good (Phase 2) |
+| /health/ready 只用 stat/os.access，与数据年龄解耦 | 陈旧数据（夜间/周末）永不 503；WinError-5 证据使 handle-不跨重试成为硬约束 | ✓ Good (Phase 2) |
+| Phase 2 零新依赖 | 已装栈机器验证（fastapi 0.115.14/uvicorn 0.51.0）；包合法性门不触发 | ✓ Good (Phase 2) |
 | SEC-03 检查先于 token 生成（Pitfall-2 顺序） | 非回环无 token 时拒绝启动且不生成 token 文件；生成只在回环/默认分支 | ✓ Good (Phase 1) |
 | Token at rest：data/api_token.txt，secrets.token_urlsafe(32)，env 优先文件兜底 | 与 tushare token 惯例一致；同 commit gitignore（D-06） | ✓ Good (Phase 1) |
 | 计划任务延迟用固定 Delay=PT5M 而非 RandomDelay | PS 5.1 BootTrigger 不支持 RandomDelay（CIM/XML 双验证）；惯例任务也从未真正携带随机延迟 | ✓ Good (Phase 1) |
@@ -86,4 +91,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-03 after Phase 1*
+*Last updated: 2026-09-03 after Phase 2*
