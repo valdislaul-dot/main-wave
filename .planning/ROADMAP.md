@@ -81,7 +81,11 @@ Plans:
   4. Requests with a missing or wrong X-API-Key receive 401/403 (constant-time comparison) and never spawn a process; keys never appear in any log.
   5. After the API process is killed mid-run and restarted, the durable job registry (logs/api/jobs/) reloads and the interrupted job is queryable in a terminal state — no job is silently lost.
 
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 03-01-PLAN.md — Shared cross-platform single-flight lock helper + durable per-job registry + spawn governance (ACT-02/ACT-03 core)
+- [ ] 03-02-PLAN.md — X-API-Key auth gate + protected trigger/job HTTP surface, 409 single-flight contract (ACT-01/02/03/SEC-01)
+- [ ] 03-03-PLAN.md — GUI one-key refresh joins the same lock file, warning-when-held, finally-release (D-01)
+- [ ] 03-04-PLAN.md — Real-machine live gate: restart, SC1-SC5 smoke, SC5 kill/restart → interrupted, D-02 verify-only
 **Research**: DEEP-RESEARCH PHASE — run `/gsd-plan-phase --research-phase 3`. Verify Windows subprocess governance end-to-end on the real machine: thread+Popen vs create_subprocess_exec (bpo-37381), portalocker/msvcrt lock behavior on this drive, taskkill /F /T tree-kill + CREATE_NO_WINDOW, tasklist PID probes, GBK/UTF-8 output matrix. User sign-off gates (定稿机制) to collect before this phase: writer-side atomicization of the non-atomic write paths (touches pipeline modules — deferable via read-side defense), GUI one-key refresh joining the same lock, liveness of the 15:30 scheduled task (auto_start.bat stale BASE path), trigger default --fast (skips Step9 git push).
 
 ### Phase 4: Exposure Hardening + Data Classification
@@ -125,6 +129,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Service Skeleton + /health Liveness | 2/2 | Complete    | 2026-09-03 |
 | 2. Read-Only State Endpoints + Defensive Read Layer | 1/1 | Complete    | 2026-09-03 |
-| 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 0/TBD | Not started | - |
+| 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 0/4 | Not started | - |
 | 4. Exposure Hardening + Data Classification | 0/TBD | Not started | - |
 | 5. Recovery, Observability & Ops Polish | 0/TBD | Not started | - |
