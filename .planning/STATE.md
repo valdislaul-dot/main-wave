@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 4
 current_phase_name: Exposure Hardening + Data Classification
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-09-03T20:33:32.160Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-09-03T20:49:05.031Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 4 execution started
-state_head: dab80a3036387edbfba7517ce92e010bd4edb8c6
+state_head: c95880b96819afcfe83edfaff3deaff56dc306a8
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 14
-  completed_plans: 9
+  completed_plans: 10
   percent: 60
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 ## Current Position
 
 Phase: 4 (Exposure Hardening + Data Classification) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 4 execution started
 
@@ -70,6 +70,7 @@ Progress: [██████░░░░] 60%
 | Phase 03 P04 | 17 | 3 tasks | 1 files |
 | Phase 04 P01 | 16 | 3 tasks | 6 files |
 | Phase 04-exposure-hardening-data-classification P02 | 3 min | 2 tasks | 2 files |
+| Phase 04 P03 | 14 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,11 @@ Recent decisions affecting current work:
 - [Phase 4]: WR-03 pin = raw-ASGI scope call (server truth 404); httpx-collapsed 200 was a client artifact. WR-02 hammer: exception capture + progress + Barrier/60ms window -> stale branch deterministically exercised
 - [Phase 4]: openapi_url=/openapi.json public read-only (docs/redoc stay None); schema renders from existing docstrings, zero route edits
 - [Phase 4]: save_portfolio/save_journal atomic via same-dir .tmp + os.replace (D-04..D-06): byte-identical output (text-mode open semantics incl. Windows CRLF kept), zero schema mutation, module-global seam preserved; failure-path .tmp residue tolerated per zt_pool template, target-keeps-old-content is the load-bearing invariant (Test 3/4 pinned)
+- [Phase 4]: [P4 04-03] Private tier = router-level Depends(require_api_key) on a dedicated /v1/private/* namespace (SEC-02, D-13) — same dependency object as actions/jobs; SC2 audit asserts dependency identity (route.dependencies[].dependency is require_api_key) per route, set-equality non-vacuous, unclassified new routes fail the audit
+- [Phase 4]: [P4 04-03] get_private = documented twin of api/state.py get_state (retries=2 on ValueError/UnicodeDecodeError only, OSError immediate break, warm-cache stale fallback body+mtime version-unified, cold -> StateUnavailable) targeting LOG_DIR with (name[, date]) cache slots; state.py signature core NOT refactored to take a directory argument (04-PATTERNS discretion)
+- [Phase 4]: [P4 04-03] ?date= is candidates-only semantics: legal dates against fixed files (portfolio/journal) are ignored and serve the fixed file from the (name, None) slot; YYYYMMDD normalizes to dashed before filename composition; date gate = whitelist regex + generic month 1-12/day 1-31 range (2026-13-99 -> 422), per-calendar validity (02-31) out of whitelist semantics -> 503 missing file
+- [Phase 4]: [P4 04-03] Candidates selection mirrors morning_check.py:11-18 by rule only (candidates_ AND NOT candidates_v*, filename date part sort, newest) — endpoint never imports or reruns script logic; file bytes still go through read_state_file
+- [Phase 4]: [P4 04-03] Dot-segment literal paths (/v1/private/../portfolio) cannot route-match the 3-segment {name} pattern — framework 404 (not_found envelope) fires before any handler, zero file access; pinned via raw-ASGI scope call (WR-03 family; httpx collapses '..' pre-transport so TestClient answers are client artifacts)
 
 ### Pending Todos
 
@@ -137,6 +143,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T20:33:31.676Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-09-03T20:48:46.861Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
