@@ -1,7 +1,8 @@
-"""SEC-03 / D-03 / D-04 / D-05 启动决策测试。
+"""SEC-03 / D-03 / D-04 / D-05 / WR-01(D-12) 启动决策测试。
 
 纯函数 + tmp_path + monkeypatch: 不绑定真实 socket、不触碰真实 data/api_token.txt。
 case 5 是 Pitfall-2 回归测试(承重): 非回环 + 无 token 的拒绝分支绝不能被自动生成掩盖。
+case 8 是 WR-01 回归测试(承重): 文件 token 存在也绝不能满足非回环检查 (D-12 env 强制)。
 
 补丁机制说明: api/main.py 在 main() 内惰性 import uvicorn (函数局部名, 模块上无
 uvicorn 属性), 因此用伪模块预置 sys.modules["uvicorn"] 使 main() 的 import 拿到
@@ -168,4 +169,50 @@ def test_env_token_satisfies_non_loopback_check(monkeypatch, tmp_path, capsys):
     api.main.main()  # env token 满足检查 -> 不得 SystemExit
     assert not (tmp_path / "api_token.txt").exists()  # 已有 token, 不生成文件
     captured = capsys.readouterr()
-    assert captured.out == ""  # 未生成 -> 不打印 D-05 提示
+    assert captured.out == ""  # 未生成 -> 不打印 D-05 提示 (D-12 警告走 stderr, 不影响此钉)
+
+
+# ---------- case 8/9: WR-01/D-12 回归 (env 强制 token + 控制台警告) ----------
+
+def test_non_loopback_file_token_only_refuses_without_uvicorn(monkeypatch, tmp_path, capsys):
+    """WR-01 回归 (D-12): 文件 token 不再满足非回环检查。
+
+    旧行为 (WR-01): has_token 对 (自动生成的) 文件返回 True -> 0.0.0.0 绑定静默放行。
+    新行为: 非回环绑定只接受 env GOGO_API_TOKEN; 文件存在也必须拒绝, 且拒绝先于
+    ensure_token (文件不被改写) 与 uvicorn.run (boot 顺序, T-04-19)。
+    """
+    monkeypatch.delenv("GOGO_API_TOKEN", raising=False)
+    monkeypatch.setenv("GOGO_API_HOST", "0.0.0.0")
+    monkeypatch.setattr(api.main, "is_loopback", lambda host: False)
+    monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
+    token_file = tmp_path / "api_token.txt"
+    token_file.write_text("file-key\n", encoding="utf-8")  # 文件 token 已存在 (与自动生成等价)
+    uvicorn_calls = []
+    fake = types.ModuleType("uvicorn")
+    fake.run = lambda app=None, **kw: uvicorn_calls.append(app)
+    monkeypatch.setitem(sys.modules, "uvicorn", fake)
+    with pytest.raises(SystemExit) as excinfo:
+        api.main.main()
+    assert excinfo.value.code == 1
+    assert uvicorn_calls == []  # 拒绝先于 uvicorn.run
+    assert token_file.read_text(encoding="utf-8") == "file-key\n"  # 拒绝路径绝不改写文件
+    captured = capsys.readouterr()
+    assert "0.0.0.0" in captured.err  # 报错点名绑定主机
+    assert "GOGO_API_TOKEN" in captured.err  # 报错给出补救指引
+
+
+def test_env_token_non_loopback_proceeds_with_ascii_warning_no_token_echo(monkeypatch, tmp_path, capsys):
+    """D-12 警告钉 (T-04-18): env token 放行非回环绑定, 但警告绝不回显 token 值。"""
+    monkeypatch.setenv("GOGO_API_TOKEN", "boot-test-token-abc")
+    monkeypatch.setenv("GOGO_API_HOST", "0.0.0.0")
+    monkeypatch.setattr(api.main, "is_loopback", lambda host: False)
+    monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
+    _patch_uvicorn_run(monkeypatch)
+    api.main.main()  # env token 满足 -> 不得 SystemExit, 正常走到 uvicorn.run
+    assert not (tmp_path / "api_token.txt").exists()  # 非回环分支绝不生成文件
+    captured = capsys.readouterr()
+    assert captured.out == ""  # 无 D-05 生成提示
+    assert "0.0.0.0" in captured.err  # 警告点名绑定主机
+    assert "GOGO_API_TOKEN" in captured.err
+    assert "boot-test-token-abc" not in captured.out
+    assert "boot-test-token-abc" not in captured.err  # 绝不回显 token 值 (T-04-18)
