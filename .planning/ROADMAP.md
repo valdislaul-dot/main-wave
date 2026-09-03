@@ -126,9 +126,12 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [ ] 04-05-PLAN.md — WR-01/D-12 boot fix: env-forced GOGO_API_TOKEN for non-loopback binds + console warning, regression-tested (fail-closed SC2)
-- [ ] 04-06-PLAN.md — PROJECT.md 定稿 data-classification table + README known-limits + SC5 scan evidence
 
 **Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 04-06-PLAN.md — PROJECT.md 定稿 data-classification table + README known-limits + SC5 scan evidence (depends_on 04-05: documents its boot-posture outcome)
+
+**Wave 5** *(blocked on Wave 4 completion)*
 
 - [ ] 04-07-PLAN.md — Real-machine live gate: restart, SC1-SC5 live matrix, SC5 scans, end-of-phase human review (03-04 twin)
 
