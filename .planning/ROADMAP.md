@@ -111,11 +111,11 @@ Plans:
   4. Trigger date parameters accept only whitelisted formats (YYYY-MM-DD / YYYYMMDD) and reach scripts as argument lists — shell injection attempts are structurally impossible.
   5. Scans confirm data/api_token.txt appears in neither git history nor the sync_cloud whitelist; README documents the API's known limits (single-flight scope, remaining concurrent entry points).
 
-**Plans**: 7 plans
+**Plans**: 1/7 plans executed
 
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Unified machine-readable error envelope (frozen code table, handlers, openapi_url) + error-body pin sweep + P2 fidelity fixes (WR-02 hammer, WR-03 raw-ASGI 404)
+- [x] 04-01-PLAN.md — Unified machine-readable error envelope (frozen code table, handlers, openapi_url) + error-body pin sweep + P2 fidelity fixes (WR-02 hammer, WR-03 raw-ASGI 404)
 - [ ] 04-02-PLAN.md — Writer-side atomicity for save_portfolio/save_journal (tmp + os.replace, contract-suite driven) — STA-02 read go-live precondition (D-04..D-06)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -162,5 +162,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Service Skeleton + /health Liveness | 2/2 | Complete    | 2026-09-03 |
 | 2. Read-Only State Endpoints + Defensive Read Layer | 1/1 | Complete    | 2026-09-03 |
 | 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 4/4 | Complete    | 2026-09-04 |
-| 4. Exposure Hardening + Data Classification | 0/TBD | Not started | - |
+| 4. Exposure Hardening + Data Classification | 1/7 | In Progress|  |
 | 5. Recovery, Observability & Ops Polish | 0/TBD | Not started | - |

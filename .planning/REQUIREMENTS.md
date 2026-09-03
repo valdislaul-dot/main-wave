@@ -15,7 +15,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### 只读状态 (STA)
 
 - [x] **STA-01**: GET /v1/state/{name} 行情/温度透传（market_state/auction_state/zt_pool_state），原始文件体 + X-Data-Mtime/X-Data-Age-S 新鲜度头
-- [ ] **STA-02**: 持仓/账本/候选读取接口（数据分级：token 保护）
+- [x] **STA-02**: 持仓/账本/候选读取接口（数据分级：token 保护）
 - [x] **STA-03**: 防御性读层——开→读→关、JSONDecodeError 短重试、末次成功缓存回退带 stale 标记（半写文件防护）
 
 ### 触发接口 (ACT)
@@ -27,7 +27,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### 安全 (SEC)
 
 - [x] **SEC-01**: X-API-Key 鉴权（constant-time 比较，header 传递，永不上日志）
-- [ ] **SEC-02**: 数据分级鉴权——行情/温度放开，持仓/账本/候选/触发一律 token
+- [x] **SEC-02**: 数据分级鉴权——行情/温度放开，持仓/账本/候选/触发一律 token
 - [x] **SEC-03**: 默认绑 127.0.0.1，非回环无 token 拒绝启动（fail-closed）
 
 ### 运维 (OPS)
@@ -76,13 +76,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HLT-01 | Phase 1 | Complete |
 | HLT-02 | Phase 2 | Complete |
 | STA-01 | Phase 2 | Complete |
-| STA-02 | Phase 4 | Pending |
+| STA-02 | Phase 4 | Complete |
 | STA-03 | Phase 2 | Complete |
 | ACT-01 | Phase 3 | Complete |
 | ACT-02 | Phase 3 | Complete |
 | ACT-03 | Phase 3 | Complete |
 | SEC-01 | Phase 3 | Complete |
-| SEC-02 | Phase 4 | Pending |
+| SEC-02 | Phase 4 | Complete |
 | SEC-03 | Phase 1 | Complete |
 | OPS-01 | Phase 1 | Complete |
 | OPS-02 | Phase 1 | Complete |

@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 current_phase: 4
 current_phase_name: Exposure Hardening + Data Classification
 status: executing
-stopped_at: Phase 03 complete, ready to plan Phase 4
-last_updated: "2026-09-03T20:03:21.717Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-09-03T20:27:28.743Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 4 execution started
-state_head: 86b1966dfba712b23dca5536e3a2e6a7af16fee4
+state_head: 2ea9acbe7e91420512f67aaecfe607da42fa49f1
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 14
-  completed_plans: 7
-  percent: 50
+  completed_plans: 8
+  percent: 57
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 ## Current Position
 
 Phase: 4 (Exposure Hardening + Data Classification) — EXECUTING
-Plan: 1 of 7
-Status: Executing Phase 4
+Plan: 2 of 7
+Status: Ready to execute
 Last activity: 2026-09-04 — Phase 4 execution started
 
-Progress: [████████░░░░] 60%
+Progress: [██████░░░░] 57%
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [████████░░░░] 60%
 | Phase 03 P02 | 12 | 3 tasks | 6 files |
 | Phase 03 P03 | 6 | 2 tasks | 1 files |
 | Phase 03 P04 | 17 | 3 tasks | 1 files |
+| Phase 04 P01 | 16 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,12 @@ Recent decisions affecting current work:
 - [Phase 03]: [P3 03-04] 真管线运行会写 tracked data 文件 (data/official_check.json + data/zt_pool_state.json, 01:53 拉 09-03 收盘池 42 只官方校验一致) —— 设计内职能, 与既有 data/historical_zt_pool.json 用户运行修改同类; 不 stage 不还原
 - [Phase 03]: [P3 03-04] 快 kind (health-check 全程 1.0s) 也命中实况 409+running_job_id —— 计划容忍的竞态分支在本机未触发; D-02 复确认 verify-only (201 任务仅 gogo-api 匹配, 无提权命令)
 - [Phase 03]: GUI (streamlit gui_dashboard.py) 弃用——始终使用 CLI (run_pipeline.py / morning_check.py) 运行本项目 — 2026-09-04 用户拍板: 放弃 GUI 面板, 日常盘后/竞价全部走 CLI。影响: 03-03 锁接入代码保留(API 仍共用同一锁文件); 03-UAT GUI 3 项作废; Phase 4 范围剔除 GUI 修复(WR-05/IN-01); Mac GUI 对等验证取消; gogo CLAUDE.md 实盘操作段后续可清理 GUI 行
+- [Phase 4]: Envelope via app-level handlers + frozen text-keyed code table, zero raise-site edits (StarletteHTTPException key MRO-covers raise-site + framework 404/405; Exception key -> ServerErrorMiddleware 500)
+- [Phase 4]: 404 copy unified to Not Found API-wide; non-404 details byte-identical + code sibling; 405 framework detail passes through (only the 404 class is unified)
+- [Phase 4]: Code table frozen incl. 04-03/04-04 texts (unknown_private_name/private_data_unavailable/invalid_date_format/date_not_supported); unknown texts fall back http_{status}; later plans never append rows
+- [Phase 4]: [ASSUMED]#2 disproved: ServerErrorMiddleware re-raises after 500 handler sends -> 500-path pins use TestClient(raise_server_exceptions=False) mirroring real uvicorn wire (04-01 deviation 1)
+- [Phase 4]: WR-03 pin = raw-ASGI scope call (server truth 404); httpx-collapsed 200 was a client artifact. WR-02 hammer: exception capture + progress + Barrier/60ms window -> stale branch deterministically exercised
+- [Phase 4]: openapi_url=/openapi.json public read-only (docs/redoc stay None); schema renders from existing docstrings, zero route edits
 
 ### Pending Todos
 
@@ -128,6 +135,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T18:52:35Z
-Stopped at: Phase 03 complete, ready to plan Phase 4
+Last session: 2026-09-03T20:27:28.314Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
