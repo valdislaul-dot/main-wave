@@ -81,10 +81,10 @@ Plans:
   4. Requests with a missing or wrong X-API-Key receive 401/403 (constant-time comparison) and never spawn a process; keys never appear in any log.
   5. After the API process is killed mid-run and restarted, the durable job registry (logs/api/jobs/) reloads and the interrupted job is queryable in a terminal state — no job is silently lost.
 
-**Plans**: 4 plans
+**Plans**: 1/4 plans executed
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Shared cross-platform single-flight lock helper + durable per-job registry + spawn governance (ACT-02/ACT-03 core)
+- [x] 03-01-PLAN.md — Shared cross-platform single-flight lock helper + durable per-job registry + spawn governance (ACT-02/ACT-03 core)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -138,6 +138,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Service Skeleton + /health Liveness | 2/2 | Complete    | 2026-09-03 |
 | 2. Read-Only State Endpoints + Defensive Read Layer | 1/1 | Complete    | 2026-09-03 |
-| 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 0/4 | Not started | - |
+| 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 1/4 | In Progress|  |
 | 4. Exposure Hardening + Data Classification | 0/TBD | Not started | - |
 | 5. Recovery, Observability & Ops Polish | 0/TBD | Not started | - |

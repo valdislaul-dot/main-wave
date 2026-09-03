@@ -1,18 +1,18 @@
 ---
 gsd_state_version: 1.0
-current_phase: 3
+current_phase: 03
 current_phase_name: Trigger Runner, Job Registry & Locks + Auth Enforcement
 status: executing
-stopped_at: Phase 3 context gathered
-last_updated: "2026-09-03T16:46:01.389Z"
-last_activity: 2026-09-03
-last_activity_desc: Phase 02 complete, transitioned to Phase 3
-state_head: 1e3eb98b5fe69fa6e1cdd8ba9536c363cb0a5bb3
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-09-03T17:11:12.181Z"
+last_activity: 2026-09-04
+last_activity_desc: Phase 03 execution started
+state_head: b946f010d8e06db92593df5414142a34d2c28796
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 7
-  completed_plans: 3
+  completed_plans: 4
   percent: 40
 ---
 
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-03)
 
 **Core value:** External systems get gogo's live state (health/持仓/温度/market status) and trigger core operations (pipeline/auction/backtest) through one stable HTTP API, without disturbing the existing pipeline.
-**Current focus:** Phase 3 — Trigger Runner, Job Registry & Locks + Auth Enforcement
+**Current focus:** Phase 03 — Trigger Runner, Job Registry & Locks + Auth Enforcement
 
 ## Current Position
 
-Phase: 3 (Trigger Runner, Job Registry & Locks + Auth Enforcement) — READY TO EXECUTE
-Plan: Not started
+Phase: 03 (Trigger Runner, Job Registry & Locks + Auth Enforcement) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-09-03 — Phase 02 complete, transitioned to Phase 3
+Last activity: 2026-09-04 — Phase 03 execution started
 
 Progress: [████░░░░░░] 40%
 
@@ -63,6 +63,7 @@ Progress: [████░░░░░░] 40%
 | Phase 01 P01-01 | 8min | 3 tasks | 9 files |
 | Phase 01 P01-02 | 9min | 3 tasks | 2 files |
 | Phase 02 P01 | 9 min | 3 tasks | 3 files |
+| Phase 03 P01 | 11 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,9 @@ Recent decisions affecting current work:
 - [Phase 02]: get_state carries an injectable reader parameter (default read_state_file) as the deterministic test seam; retry constants pinned retries=2, retry_delay=0.02 — Timer-free unit tests via fake reader + retry_delay=0; RESEARCH design note line 237
 - [Phase 02]: api.main.py changed by exactly two lines (import + include_router after /health); boot sequence, SEC-03 ordering, __main__ guard untouched (diff-verified) — Phase 1 /health purity and SEC-03 fail-closed ordering are load-bearing; minimal-diff registration keeps the diff check trivially auditable
 - [Phase 02]: Zero new packages: stdlib-only defensive read layer on the installed fastapi 0.115.14 / starlette 0.46.2 stack — File sizes <= 48 KB single-user loopback service; package-legitimacy gate not triggered
+- [Phase 03]: [P3 03-01] write_job 重试 os.replace (4x10ms, WinError-5 读碰撞): 轮询读者绝不把迁移打成失败/不滞留 worker —— 实测 Windows 结论
+- [Phase 03]: [P3 03-01] run_job finally 每步隔离守卫: 终态写/释放/关锁/prune 各自独立, 磁盘级写失败绝不跳过硬释放
+- [Phase 03]: [P3 03-01] TestClient /health 延迟测试先预热 2 请求再计时 (框架暖启动不算延迟信号; 50ms p95 断言不变; 实测 p95=3.12ms)
 
 ### Pending Todos
 
@@ -110,6 +114,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T15:36:19.211Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-trigger-runner-job-registry-locks-auth-enforcement/03-CONTEXT.md
+Last session: 2026-09-03T17:11:11.870Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None
