@@ -6,15 +6,22 @@
   {"detail": "invalid API key", "code": "invalid_api_key"} 无挑战头。
 - env GOGO_API_TOKEN 优先于文件 (read_token 链路); 无 token 配置 -> fail-closed 403。
 - /health、/health/ready、GET /v1/state/{name} 结构豁免 (D-11) —— 公开路由,
-  无中间件, /health 纯度 (HLT-01)。
+  无中间件, /health 纯度 (HLT-01)。豁免名单封闭: /v1/private/* 不在其列
+  (SEC-02, 无 key 必 401)。
+- SC2 (04-03): 逐路由分级审计 —— 机密级 (actions/jobs/private) 必带
+  require_api_key 同一依赖对象身份 (route.dependencies[].dependency is),
+  公开级必不带; 任何未显式分级的新路由即失败 (SC2 漂移守卫, /probe/* 测试
+  设施与 /openapi.json 纯框架路由豁免)。
 - 401/403/404 拒绝路径零 spawn / 零 registry 写 (被拒请求永不干扰运行中 job)。
 - 密钥字节级缺席审计: job 日志、子进程 env dump、所有响应体 (T-03-09;
-  run_job 的 GOGO_API_TOKEN pop 是机械半边, 真机 console.log grep 归 03-04)。
+  run_job 的 GOGO_API_TOKEN pop 是机械半边, 真机 console.log grep 归 03-04);
+  /v1/private/* 全响应形态 (200/401/403/404/422/503) 同审计 (04-03 延伸)。
 - query 参数篡改不能改变 401/403/202 结局 (?token_path=<decoy> 钉 request-only
   签名 —— prohibition #2, FastAPI 不得把依赖参数暴露成查询参数)。
 
-CRITICAL 数据隔离 pin (同 test_actions.py): autouse fixture 把 jobs/auth/state
-三模块路径缝指到 tmp_path, 清空 _claims/_CACHE, 真实 data//logs/ 零触碰。
+CRITICAL 数据隔离 pin (同 test_actions.py): autouse fixture 把
+jobs/auth/state/private 四模块路径缝指到 tmp_path, 清空 _claims/_CACHE,
+真实 data//logs/ 零触碰。
 """
 import json
 import os
@@ -31,6 +38,7 @@ import api.actions  # noqa: F401  (被测模块; SCRIPTS_DIR 缝)
 import api.auth  # noqa: F401  (被测模块; DATA_DIR 缝)
 import api.jobs  # noqa: F401  (被测模块; _claims 清理)
 import api.main  # noqa: F401  (/health + state 路由 —— 模块级 client 依赖)
+import api.private  # noqa: F401  (SEC-02 私密面; LOG_DIR 缝)
 import api.state  # noqa: F401  (公开面断言用; DATA_DIR 缝)
 from api.main import app
 
@@ -46,9 +54,11 @@ def _isolated(tmp_path, monkeypatch):
     monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setattr(api.auth, "DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setattr(api.state, "DATA_DIR", str(tmp_path / "data"))
+    monkeypatch.setattr(api.private, "LOG_DIR", str(tmp_path / "logs"))  # SEC-02
     with api.jobs._claims_lock:
         api.jobs._claims.clear()
     api.state._CACHE.clear()
+    api.private._CACHE.clear()  # 503-cold 腿确定性 (同 test_private.py 惯例)
     write_token(tmp_path / "data", TOKEN)
     return tmp_path
 
@@ -183,6 +193,12 @@ def test_public_exemptions_no_key_needed(tmp_path):
     assert r.status_code == 404  # state 路由自己的 404 —— 不是 401/403
     assert r.json() == {"detail": "Not Found", "code": "unknown_state_name"}
 
+    # SEC-02 豁免名单封闭: 私密命名空间不在 D-11 豁免之列 —— 无 key 必 401
+    # (公开豁免列表的边界断言: 加列 = 私密数据滑入公开面)
+    r = client.get("/v1/private/portfolio")
+    assert r.status_code == 401
+    assert r.json() == {"detail": "missing API key", "code": "missing_api_key"}
+
 
 # ---------- 测试 6: 拒绝路径零副作用 (无 spawn / 无 registry / 无锁) ----------
 
@@ -242,6 +258,35 @@ def test_token_never_leaks_to_log_env_or_bodies(tmp_path, monkeypatch):
     term = wait_terminal(job_id, key=secret)
     _seen(client.get(f"/v1/jobs/{job_id}", headers=_headers(secret)))
 
+    # SEC-02/04-03 延伸: /v1/private/* 全响应形态 (200/401/403/404/422/503)
+    # 同密钥缺席审计。portfolio/candidates 落盘 (真实 logs/ 布局镜像),
+    # journal 文件故意缺席 -> 冷缓存 503 腿。
+    logs_dir = Path(tmp_path) / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    portfolio_raw = b'{"cash": 1415.5, "positions": [{"code": "003040"}]}\n'
+    (logs_dir / "portfolio.json").write_bytes(portfolio_raw)
+    cand_raw = b'{"date": "2026-09-03", "pool": []}\n'
+    (logs_dir / "candidates_2026-09-03.json").write_bytes(cand_raw)
+
+    r = _seen(client.get("/v1/private/portfolio"))  # 无头 -> 401
+    assert r.status_code == 401
+    assert r.json() == {"detail": "missing API key", "code": "missing_api_key"}
+    r = _seen(client.get("/v1/private/portfolio", headers={"X-API-Key": "nope"}))
+    assert r.status_code == 403  # 错 key -> 403
+    r = _seen(client.get("/v1/private/portfolio", headers=_headers(secret)))
+    assert r.status_code == 200 and r.content == portfolio_raw  # 透传字节入审计
+    r = _seen(client.get("/v1/private/candidates", headers=_headers(secret)))
+    assert r.status_code == 200 and r.content == cand_raw
+    r = _seen(client.get("/v1/private/bogus", headers=_headers(secret)))
+    assert r.status_code == 404  # 白名单外 -> 404 (错误体入审计)
+    r = _seen(
+        client.get("/v1/private/candidates", params={"date": "abc"},
+                   headers=_headers(secret))
+    )
+    assert r.status_code == 422  # 非法日期 -> 422 (错误体入审计)
+    r = _seen(client.get("/v1/private/journal", headers=_headers(secret)))
+    assert r.status_code == 503  # journal 缺席 + 冷缓存 -> 503 (错误体入审计)
+
     log_bytes = Path(term["log_path"]).read_bytes()
     env_bytes = Path(env_out).read_bytes()
 
@@ -280,3 +325,49 @@ def test_query_param_tamper_cannot_alter_gate(tmp_path, monkeypatch):
     assert r.status_code == 202
     term = wait_terminal(r.json()["job_id"], key="real-token")
     assert term["status"] == "succeeded"
+
+
+# ---------- SC2 (04-03): 逐路由分级审计 (分类漂移守卫) ----------
+
+def test_sc2_route_by_route_classification_audit():
+    """SC2: 每条 APIRoute 必须显式归入 机密级(带 require_api_key)/公开级(不带)。
+
+    断言用同一依赖对象身份 (route.dependencies[].dependency is require_api_key,
+    router 级 Depends 会逐条注入 route.dependencies) —— 靠 detail 文本/状态码
+    反推是空洞断言。新路由不显式归级即失败 (防"加路由忘挂门"的 SC2 漂移)。
+    /probe/* (test_errors.py 模块导入期注册的测试设施, include_in_schema=False)
+    与 /openapi.json (纯 starlette Route, 无 APIRoute 依赖面) 豁免, 并各自
+    断言形态 (probe 缺席容忍 —— 单独跑本文件时 test_errors 未导入)。
+    """
+    from fastapi.routing import APIRoute
+
+    gate = api.auth.require_api_key
+
+    def _gated(route):
+        return any(getattr(d, "dependency", None) is gate for d in route.dependencies)
+
+    expected_secret = {"/v1/private/{name}", "/v1/actions/{kind}", "/v1/jobs/{job_id}"}
+    expected_public = {"/health", "/health/ready", "/v1/state/{name}"}
+    seen_secret = set()
+    seen_public = set()
+
+    for route in app.routes:
+        path = getattr(route, "path", "")
+        if path.startswith("/probe"):  # 测试设施豁免 (形态: APIRoute 无门)
+            assert isinstance(route, APIRoute)
+            continue
+        if not isinstance(route, APIRoute):  # 纯 starlette Route
+            assert path == "/openapi.json", f"未预期框架路由: {path!r}"
+            continue
+        if path in expected_secret:
+            assert _gated(route), f"{path} 机密级缺 require_api_key (SEC-02 滑落)"
+            seen_secret.add(path)
+        elif path in expected_public:
+            assert not _gated(route), f"{path} 公开级竟带 require_api_key (D-11 越界)"
+            seen_public.add(path)
+        else:
+            raise AssertionError(f"SC2 未分类路由: {path} (须显式归入 secret/public)")
+
+    # 非空洞: 每一级全部真实路由命中审计 (集合相等, 非计数 >= n 的弱断言)
+    assert seen_secret == expected_secret
+    assert seen_public == expected_public
