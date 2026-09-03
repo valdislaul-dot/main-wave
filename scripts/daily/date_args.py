@@ -38,3 +38,37 @@ def parse_date(value):
         return _date(int(value[:4]), int(value[4:6]), int(value[6:8]))
     except ValueError:
         raise ValueError(_ERR_MSG) from None
+
+
+def resolve_date_arg(argv):
+    """扫描 argv 的 date token -> datetime.date | None; 歧义/非法 -> ValueError。
+
+    接受两种形态 (04-04 Flagged Assumptions, data_health_check.py:102-110
+    空格惯例 + CONTEXT D-28 字面单 token): "--date=YYYY-MM-DD" (API 附加形)
+    与 "--date YYYYMMDD" (手动 CLI 空格形)。收集全部命中: 0 个 -> None;
+    >1 个 -> ValueError (首匹配歧义拒绝); 单个值经 parse_date 校验。
+    """
+    values = []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == "--date":
+            if i + 1 >= len(argv):
+                raise ValueError(_ERR_MSG)  # "--date" 悬空无值
+            values.append(argv[i + 1])
+            i += 2
+        elif a.startswith("--date="):
+            values.append(a[len("--date="):])
+            i += 1
+        else:
+            i += 1
+    if not values:
+        return None
+    if len(values) > 1:
+        raise ValueError(_ERR_MSG)  # 两种形态/多 token 并存 -> 歧义
+    return parse_date(values[0])
+
+
+def format_token(d):
+    """date -> "--date=YYYY-MM-DD" (规范单 token 形态, API 附加形态 D-28)。"""
+    return f"--date={d:%Y-%m-%d}"
