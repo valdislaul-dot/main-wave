@@ -4,10 +4,10 @@ current_phase: 03
 current_phase_name: Trigger Runner, Job Registry & Locks + Auth Enforcement
 status: verifying
 stopped_at: Completed 03-04-PLAN.md
-last_updated: "2026-09-03T17:57:12.104Z"
+last_updated: "2026-09-03T18:29:45.335Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 03 execution started
-state_head: ef90aaca689ea82e1fef4426b7140ada0844202a
+state_head: 9fe9cb497d3dab02de7402fbe50e8aff567880cd
 progress:
   total_phases: 5
   completed_phases: 2
@@ -101,6 +101,7 @@ Recent decisions affecting current work:
 - [Phase 03]: [P3 03-04] 实况 SC2/SC3/SC5 全过: 409 携带 running_job_id 逐字节吻合; /health p95=17.14ms (120 样本, 真管线运行中, 界 50ms); taskkill /F /T 35864 树杀 (Step 1.5 运行中被杀) → 重启 → interrupted+finished_at+部分日志 753B 留存 → job_lock.acquire 即时成功 (OS 自动释放经真崩溃验证) → 新 health-check 触发成功
 - [Phase 03]: [P3 03-04] 真管线运行会写 tracked data 文件 (data/official_check.json + data/zt_pool_state.json, 01:53 拉 09-03 收盘池 42 只官方校验一致) —— 设计内职能, 与既有 data/historical_zt_pool.json 用户运行修改同类; 不 stage 不还原
 - [Phase 03]: [P3 03-04] 快 kind (health-check 全程 1.0s) 也命中实况 409+running_job_id —— 计划容忍的竞态分支在本机未触发; D-02 复确认 verify-only (201 任务仅 gogo-api 匹配, 无提权命令)
+- [Phase 03]: GUI (streamlit gui_dashboard.py) 弃用——始终使用 CLI (run_pipeline.py / morning_check.py) 运行本项目 — 2026-09-04 用户拍板: 放弃 GUI 面板, 日常盘后/竞价全部走 CLI。影响: 03-03 锁接入代码保留(API 仍共用同一锁文件); 03-UAT GUI 3 项作废; Phase 4 范围剔除 GUI 修复(WR-05/IN-01); Mac GUI 对等验证取消; gogo CLAUDE.md 实盘操作段后续可清理 GUI 行
 
 ### Pending Todos
 
