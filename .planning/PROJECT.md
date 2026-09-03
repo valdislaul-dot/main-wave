@@ -53,6 +53,13 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 - **Compatibility**: Win 端为主，Mac 端需可用
 - **Security**: 操作触发接口必须鉴权；不含实盘下单
 
+**Security / 数据分级分类表（定稿）**：新增或审计任何 API 端点前先查本表（SEC-02 常驻参考，勿凭记忆）——端点字符串与 api/main.py + 路由文件的装饰器逐字节核对过，路由来源列可直接 grep 表 → 码。定稿机制：数据分级政策 2026-09-02 用户确认 + Phase 4 定稿 2026-09-04，改动需用户明确确认。隐私红线（2026-08-31）：持仓/账目/日志与项目说明一律不上传 GitHub（仅本地）。已知限制（single-flight 范围/残余并发入口/boot 姿态）见 README「API 已知限制」。
+
+| 数据类别 | 端点 | 保护级别 | 路由来源（grep 起点） |
+|----------|------|----------|------------------------|
+| 公开级 | `/health`、`/health/ready`、`/v1/state/*`、`/openapi.json` | 无需 key（无持仓/无策略暴露面） | api/main.py、api/state.py |
+| 机密级 | `/v1/private/*`（portfolio/journal/candidates）、`POST /v1/actions/*`、`GET /v1/jobs/*` | X-API-Key 必填（持仓/操作/任务状态） | api/private.py、api/actions.py |
+
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
