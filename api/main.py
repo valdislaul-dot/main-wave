@@ -15,6 +15,7 @@ from fastapi import FastAPI
 
 from scripts.daily.config import DATA_DIR
 from api.boot import ensure_token, has_token, is_loopback
+from api.state import router as state_router
 
 # uptime 锚点: 模块导入时刻 (对 uvicorn.run 即进程启动时刻)。
 # 用 monotonic —— 免疫 NTP/手动改钟导致的墙钟跳变 (T-01-04)。
@@ -28,6 +29,9 @@ app = FastAPI(title="gogo API", docs_url=None, redoc_url=None, openapi_url=None)
 def health():
     """探活 (HLT-01): 纯内存返回, 不读文件、不碰网络、不依赖交易日历 —— 任何时刻恒 200。"""
     return {"status": "ok", "uptime_seconds": int(time.monotonic() - _START)}
+
+
+app.include_router(state_router)
 
 
 def main() -> None:
