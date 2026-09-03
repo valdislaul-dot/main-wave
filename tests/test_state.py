@@ -7,6 +7,10 @@ STA-03: 防御性读层 —— 解码失败短重试 (注入 reader, 免计时)�
         交替执行截断写与原子 os.replace 重写 (真实管线的两种写者风格), 主线程
         ~150 次 GET —— 0 x 5xx、每体可解析、stale 体必等于末次已知良好字节;
         是真实管线人工观察的确定性套内孪生 (本仓库首个 threading 测试)。
+        WR-02 (04-01): 线程异常捕获表断言空 + 迭代进度 >= 1 + Barrier 使 60ms
+        撕裂窗 (> 读者 2x20ms 重试预算) 与首个 GET 确定重叠 —— 锤静默死/空转
+        不再假绿。WR-03 (04-01): 字面 dot-segment 路径经原样 scope 直呼 ASGI app
+        钉真机 404 —— httpx 传输前折叠 "..", TestClient 的 200 是客户端伪影。
 HLT-02: /health/ready 200/503 矩阵 (缺失/目录不可读/远古 mtime 仍 200)。
 SC4:    源扫描回归 —— api/state.py + api/main.py 无网络能力 token。
 
@@ -14,6 +18,7 @@ CRITICAL 数据隔离 pin: 本文件绝不触碰真实 data/ —— autouse fixt
 api.state.DATA_DIR 指到 tmp_path 并在每个测试前清空 api.state._CACHE,
 否则模块级 TestClient 会命中真实被跟踪的 data/*.json 且暖缓存跨测试泄漏。
 """
+import asyncio
 import json
 import os
 import re
@@ -45,6 +50,47 @@ def _write_state(tmp_path, name, raw, mtime):
     path.write_bytes(raw)
     os.utime(path, (mtime, mtime))
     return path
+
+
+def _asgi_get(path):
+    """原样 path 直呼 ASGI app (绕过 httpx 客户端规范化), 返回 (statuses, body_parts)。
+
+    WR-03 (04-01): TestClient 的 httpx 在传输前把字面 ".." 段折叠成规范化 URL,
+    拿不到真机 uvicorn 的路由答案; 本 helper 按服务器收到 scope 的原样 path
+    调用 app (与 test_actions %2F 注释同族: 服务器侧解码/不折叠才是路由真值)。
+    """
+    scope = {
+        "type": "http",
+        "asgi": {"version": "3.0", "spec_version": "2.3"},
+        "http_version": "1.1",
+        "method": "GET",
+        "scheme": "http",
+        "path": path,
+        "raw_path": path.encode("ascii"),
+        "query_string": b"",
+        "headers": [],
+        "client": ("127.0.0.1", 50000),
+        "server": ("testserver", 80),
+        "root_path": "",
+        "state": {},
+    }
+    statuses = []
+    body_parts = []
+
+    async def receive():
+        return {"type": "http.request", "body": b"", "more_body": False}
+
+    async def send(message):
+        if message["type"] == "http.response.start":
+            statuses.append(message["status"])
+        elif message["type"] == "http.response.body":
+            body_parts.append(message.get("body", b""))
+
+    async def run():
+        await app(scope, receive, send)
+
+    asyncio.run(run())
+    return statuses, body_parts
 
 
 # ---------- STA-01: 逐字透传 + 精确头 ----------
@@ -108,11 +154,14 @@ def test_state_unknown_names_404_whitelist_only(tmp_path):
         assert response.status_code == 404
         bodies.append(response.content)
 
-    # c. dot-segment 别名被规范化进白名单 -> 按解析后的白名单名服务 200
-    response = client.get("/v1/state/market_state/../auction_state")
-    assert response.status_code == 200
-    assert response.content == auction
-    bodies.append(response.content)
+    # c. WR-03 (04-01): 字面 dot-segment 路径的真实服务器答案是框架 404 —— httpx
+    # 传输前把 ".." 折叠 (client-side), 旧钉的 200 auction 内容是客户端伪影; 真机
+    # uvicorn 原样把 scope path 交给路由, {name} 单段不匹配含斜杠的名字 -> 404
+    # (零文件访问、绝不穿到 auction_state)。原样 scope 直呼 ASGI app 钉服务器真值。
+    statuses, parts = _asgi_get("/v1/state/market_state/../auction_state")
+    assert statuses == [404]
+    assert json.loads(b"".join(parts)) == {"detail": "Not Found", "code": "not_found"}
+    bodies.append(b"".join(parts))  # 信封体照入 decoy guard (非白名单文件内容)
 
     # Decoy guard: 任何响应的 body 都不得等于白名单外文件内容
     for body in bodies:
@@ -292,36 +341,51 @@ def test_state_live_rewrite_zero_5xx_hammer(tmp_path):
         assert warm.status_code == 200 and warm.content == goods[name]
 
     stop = {"go": True}
+    errors = []  # WR-02: 线程异常捕获表 (join 后断言空 —— 写者静默死不再假绿)
+    progress = []  # WR-02: 完成迭代数 (join 后断言 >= 1 —— 锤空转不再假绿)
+    first_window = {"done": False}  # 首个撕裂窗加长至 60ms (见下)
+
+    barrier = threading.Barrier(2)  # WR-02: 首个 GET 与首个撕裂窗确定对齐
 
     def writer_loop():
         iteration = 0
-        while stop["go"]:
-            style = iteration % 2  # 0 = 截断写, 1 = 原子 os.replace
-            for name in names:
-                path = tmp_path / api.state.STATE_FILES[name]
-                good = goods[name]
-                if style == 0:
-                    # 真实直接写者 (auction_pool/capture_market_state/recalc_seal):
-                    # open('wb') 截断 -> 写撕裂前缀 -> sleep -> 补全 -> close
-                    cut = good.index(b"}")  # 前缀缺闭合 -> 必为无效 JSON
-                    with open(path, "wb") as f:
-                        f.write(good[:cut])
-                        time.sleep(0.005)
-                        f.write(good[cut:])
-                else:
-                    # 真实原子写者 (zt_pool.save_state): tmp 全量写 + os.replace
-                    tmp = tmp_path / (api.state.STATE_FILES[name] + ".tmp")
-                    tmp.write_bytes(good)
-                    try:
-                        os.replace(tmp, path)
-                    except OSError:
-                        # 罕见碰撞 (读句柄恰好挡 replace, WinError 5) —— 本轮放弃,
-                        # 文件仍是旧版 good, 断言集合 (0x5xx/可解析/stale==good) 不受影响
-                        pass
-            iteration += 1
+        try:
+            barrier.wait()  # 与主线程同刻起跑 -> 首 GET 落入下方 60ms 撕裂窗
+            while stop["go"]:
+                style = iteration % 2  # 0 = 截断写, 1 = 原子 os.replace
+                for name in names:
+                    path = tmp_path / api.state.STATE_FILES[name]
+                    good = goods[name]
+                    if style == 0:
+                        # 真实直接写者 (auction_pool/capture_market_state/recalc_seal):
+                        # open('wb') 截断 -> 写撕裂前缀 -> sleep -> 补全 -> close
+                        cut = good.index(b"}")  # 前缀缺闭合 -> 必为无效 JSON
+                        with open(path, "wb") as f:
+                            f.write(good[:cut])
+                            # 首个窗 60ms > 读者 2x20ms 重试预算: 窗内起跑的 GET
+                            # 必耗尽重试 -> stale 回退分支被真正锻炼; 后续窗 5ms
+                            time.sleep(0.06 if not first_window["done"] else 0.005)
+                            first_window["done"] = True
+                            f.write(good[cut:])
+                    else:
+                        # 真实原子写者 (zt_pool.save_state): tmp 全量写 + os.replace
+                        tmp = tmp_path / (api.state.STATE_FILES[name] + ".tmp")
+                        tmp.write_bytes(good)
+                        try:
+                            os.replace(tmp, path)
+                        except OSError:
+                            # 罕见碰撞 (读句柄恰好挡 replace, WinError 5) —— 本轮放弃,
+                            # 文件仍是旧版 good, 断言集合 (0x5xx/可解析/stale==good) 不受影响
+                            pass
+                iteration += 1
+                progress.append(iteration)
+        except BaseException as exc:  # WR-02: 任何死因都记录, 由主线程断言暴露
+            errors.append(exc)
 
     writer = threading.Thread(target=writer_loop)
     writer.start()
+    barrier.wait()  # 与写者的 60ms 撕裂窗对齐后开始 GET
+    stale_hits = 0
     try:
         for i in range(150):  # 主线程 ~150 次 GET, 三名单轮转
             name = names[i % len(names)]
@@ -330,7 +394,11 @@ def test_state_live_rewrite_zero_5xx_hammer(tmp_path):
             json.loads(response.content)  # 每个体都必须可解析 (撕裂绝不新鲜出网)
             if response.headers.get("x-data-stale") == "true":
                 assert response.content == goods[name]  # stale 体 == 末次已知良好
+                stale_hits += 1
     finally:
         stop["go"] = False
         writer.join(timeout=10)
     assert not writer.is_alive()
+    assert errors == [], f"写线程异常 (WR-02: 不再静默): {errors!r}"
+    assert progress, "写线程零完成迭代 —— 锤空转 (WR-02)"
+    assert stale_hits >= 1, "首个撕裂窗未被 GET 命中 —— stale 分支未真正锻炼 (WR-02)"
