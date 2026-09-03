@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 current_phase: 4
 current_phase_name: Exposure Hardening + Data Classification
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-09-03T20:27:28.743Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-09-03T20:33:32.160Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 4 execution started
-state_head: 2ea9acbe7e91420512f67aaecfe607da42fa49f1
+state_head: dab80a3036387edbfba7517ce92e010bd4edb8c6
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 14
-  completed_plans: 8
-  percent: 57
+  completed_plans: 9
+  percent: 60
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 ## Current Position
 
 Phase: 4 (Exposure Hardening + Data Classification) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 4 execution started
 
-Progress: [██████░░░░] 57%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Progress: [██████░░░░] 57%
 | Phase 03 P03 | 6 | 2 tasks | 1 files |
 | Phase 03 P04 | 17 | 3 tasks | 1 files |
 | Phase 04 P01 | 16 | 3 tasks | 6 files |
+| Phase 04-exposure-hardening-data-classification P02 | 3 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -110,6 +111,7 @@ Recent decisions affecting current work:
 - [Phase 4]: [ASSUMED]#2 disproved: ServerErrorMiddleware re-raises after 500 handler sends -> 500-path pins use TestClient(raise_server_exceptions=False) mirroring real uvicorn wire (04-01 deviation 1)
 - [Phase 4]: WR-03 pin = raw-ASGI scope call (server truth 404); httpx-collapsed 200 was a client artifact. WR-02 hammer: exception capture + progress + Barrier/60ms window -> stale branch deterministically exercised
 - [Phase 4]: openapi_url=/openapi.json public read-only (docs/redoc stay None); schema renders from existing docstrings, zero route edits
+- [Phase 4]: save_portfolio/save_journal atomic via same-dir .tmp + os.replace (D-04..D-06): byte-identical output (text-mode open semantics incl. Windows CRLF kept), zero schema mutation, module-global seam preserved; failure-path .tmp residue tolerated per zt_pool template, target-keeps-old-content is the load-bearing invariant (Test 3/4 pinned)
 
 ### Pending Todos
 
@@ -135,6 +137,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T20:27:28.314Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-09-03T20:33:31.676Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None

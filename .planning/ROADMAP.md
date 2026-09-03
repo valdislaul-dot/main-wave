@@ -116,7 +116,7 @@ Plans:
 **Wave 1**
 
 - [x] 04-01-PLAN.md — Unified machine-readable error envelope (frozen code table, handlers, openapi_url) + error-body pin sweep + P2 fidelity fixes (WR-02 hammer, WR-03 raw-ASGI 404)
-- [ ] 04-02-PLAN.md — Writer-side atomicity for save_portfolio/save_journal (tmp + os.replace, contract-suite driven) — STA-02 read go-live precondition (D-04..D-06)
+- [x] 04-02-PLAN.md — Writer-side atomicity for save_portfolio/save_journal (tmp + os.replace, contract-suite driven) — STA-02 read go-live precondition (D-04..D-06)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
