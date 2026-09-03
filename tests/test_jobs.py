@@ -340,3 +340,85 @@ def test_reload_sweep_missing_dir_creates_and_returns(tmp_path):
     api.jobs.reload_registry(str(base))  # makedirs exist_ok -> 无错返回
     assert base.is_dir()
     assert api.jobs.read_job("f" * 32, str(base)) is None  # 空目录可正常读
+
+
+# ---------- 行为 11: 跨进程锁 —— 持有时父进程被拒, 杀死持有者 OS 立即释放 ----------
+
+# 真实子进程: importlib 从 argv[1] 加载 job_lock.py, acquire(argv[2] kind, argv[3]
+# lock_dir), 成功则打印 HELD 并睡 60s (期间锁一直持有) —— probe V2 kill 证据的套内孪生。
+_CROSS_PROC_CHILD = (
+    "import importlib.util, sys, time\n"
+    "spec = importlib.util.spec_from_file_location('job_lock', sys.argv[1])\n"
+    "m = importlib.util.module_from_spec(spec)\n"
+    "spec.loader.exec_module(m)\n"
+    "fd = m.acquire(sys.argv[2], sys.argv[3])\n"
+    "if fd is None:\n"
+    "    sys.exit(3)\n"
+    "print('HELD', flush=True)\n"
+    "time.sleep(60)\n"
+)
+
+
+def _job_lock_path():
+    """job_lock.py 绝对路径: repo/scripts/daily/job_lock.py (由 api/jobs.py 上溯两级)。"""
+    return str(Path(api.jobs.__file__).resolve().parent.parent / "scripts" / "daily" / "job_lock.py")
+
+
+def test_job_lock_cross_process_hold_and_kill_releases(tmp_path):
+    lock_dir = tmp_path / "locks"
+    flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+    proc = subprocess.Popen(
+        [sys.executable, "-c", _CROSS_PROC_CHILD, _job_lock_path(), "pipeline", str(lock_dir)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        creationflags=flags,
+    )
+    try:
+        # 子进程只输出一行 HELD (小管道读一行安全), 读完即不再读它的 stdout
+        line = proc.stdout.readline()
+        assert line.strip() == b"HELD", (
+            f"子进程未能持有锁 (stderr: {proc.stderr.read()!r})"
+        )
+        # 跨进程拒绝: 父进程 acquire 同 kind 必 None
+        assert job_lock.acquire("pipeline", str(lock_dir)) is None
+        # 杀死持有者 -> OS 自动释放 (probe V2 发现, 套内钉死)
+        proc.kill()
+        proc.wait(timeout=10)
+        fd = job_lock.acquire("pipeline", str(lock_dir))
+        assert fd is not None  # 无需任何 stale-lock 清理协议
+        fd.close()
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=10)
+
+
+# ---------- 行为 12: SC3 —— job 运行期间 /health P95 < 50ms (TestClient 锤) ----------
+
+def test_health_latency_during_running_job(tmp_path, monkeypatch):
+    """活子进程 + worker 线程运行期间, /health 必须持续亚 50ms P95 应答 (SC3)。
+
+    TestClient 是进程内客户端: 钉的是"活子进程 + 线程永不拖慢请求处理"的模块侧
+    半场; 真 uvicorn 的 P95 确认在 03-04 smoke (A2/thread+Popen 治理)。
+    """
+    fake = fake_script(tmp_path, rc=0, sleep=2.0)
+    monkeypatch.setenv("FAKE_OUT", str(tmp_path / "out.json"))
+    lock_fd = job_lock.acquire("pipeline", api.jobs.locks_dir())
+    assert lock_fd is not None
+    job = api.jobs.start_job("pipeline", [sys.executable, fake], lock_fd)
+    try:
+        wait_status(job["job_id"], api.jobs.jobs_dir(), "running")
+        client.get("/health")  # 预热: 首次 in-process 请求含框架暖启动, 不计时
+        client.get("/health")
+        times = []
+        for _ in range(60):
+            t0 = time.perf_counter()
+            response = client.get("/health")
+            times.append(time.perf_counter() - t0)
+            assert response.status_code == 200
+            assert response.json()["status"] == "ok"
+        times.sort()
+        assert times[57] < 0.05, f"p95 = {times[57]:.4f}s >= 0.05s 在 job 运行期间 (SC3)"
+    finally:
+        term = wait_terminal(job["job_id"], api.jobs.jobs_dir())
+        assert term["status"] == "succeeded"  # worker 在自身 finally 释放锁与 claim
