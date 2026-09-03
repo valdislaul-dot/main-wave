@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 03
 current_phase_name: Trigger Runner, Job Registry & Locks + Auth Enforcement
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-09-03T17:11:12.181Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-09-03T17:30:11.401Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 03 execution started
-state_head: b946f010d8e06db92593df5414142a34d2c28796
+state_head: 613d004c991f8c82e11f636a2f31102ee7ca2612
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
   percent: 40
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 ## Current Position
 
 Phase: 03 (Trigger Runner, Job Registry & Locks + Auth Enforcement) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 03 execution started
 
@@ -64,6 +64,7 @@ Progress: [████░░░░░░] 40%
 | Phase 01 P01-02 | 9min | 3 tasks | 2 files |
 | Phase 02 P01 | 9 min | 3 tasks | 3 files |
 | Phase 03 P01 | 11 | 3 tasks | 4 files |
+| Phase 03 P02 | 12 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,10 @@ Recent decisions affecting current work:
 - [Phase 03]: [P3 03-01] write_job 重试 os.replace (4x10ms, WinError-5 读碰撞): 轮询读者绝不把迁移打成失败/不滞留 worker —— 实测 Windows 结论
 - [Phase 03]: [P3 03-01] run_job finally 每步隔离守卫: 终态写/释放/关锁/prune 各自独立, 磁盘级写失败绝不跳过硬释放
 - [Phase 03]: [P3 03-01] TestClient /health 延迟测试先预热 2 请求再计时 (框架暖启动不算延迟信号; 50ms p95 断言不变; 实测 p95=3.12ms)
+- [Phase 03]: start_job 返回接受时刻 dict(job) 快照而非活引用: worker 线程在 Thread.start 后立即把同一 dict 迁成 running, 活引用会让 202 响应体竞态出现 running/succeeded (Rule 1 实测修复, api/jobs.py)
+- [Phase 03]: 409 双形态按 OQ1 定稿: 内存 claim 命中带 running_job_id, OS 锁独占(另一入口)不带 job_id 键
+- [Phase 03]: %2F 编码穿越 id 由 Starlette 路由层 404 拦截 (uvicorn/httpx 解码 %2F 成字面斜杠, {job_id} 无法跨段) — 同一闸门更早一层: 404、零文件访问、永不 500; handler 级 ^[0-9a-f]{32}$ 闸门钉全部无斜杠畸形 id
+- [Phase 03]: Task 2 tdd RED 结构性满足于 Task 1: 生产代码先于套件存在, 首跑全绿即无漂移证明 (修生产不弱化测试纪律保持)
 
 ### Pending Todos
 
@@ -114,6 +119,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T17:11:11.870Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-09-03T17:30:11.096Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
