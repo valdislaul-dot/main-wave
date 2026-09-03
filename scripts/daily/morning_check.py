@@ -427,7 +427,7 @@ def stock_scoring_meta(code):
             from zt_pool import get_prev_pool_file
             _pfn = get_prev_pool_file()
             if _pfn and meta['klines']:
-                _pdate = f'{_pfn[:4]}-{_pfn[4:6]}-{_pfn[6:]}'
+                _pdate = f'{_pfn[:4]}-{_pfn[4:6]}-{_pfn[6:8]}'
                 meta['kline_fresh'] = meta['klines'][-1]['date'] >= _pdate
         except Exception:
             pass
