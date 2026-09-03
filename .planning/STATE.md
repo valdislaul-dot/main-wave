@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 current_phase: 4
 current_phase_name: Exposure Hardening + Data Classification
-status: executing
-stopped_at: Completed 04-06-PLAN.md
-last_updated: "2026-09-03T21:22:20.487Z"
+status: verifying
+stopped_at: Completed 04-07-PLAN.md (live gate; human verdict pending at phase close)
+last_updated: "2026-09-03T21:32:39.720Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 4 execution started
-state_head: b8e9169038e2c5f5d9396b047270dd8e34370f55
+state_head: 65d3497d7f6cf288b0b6239b9d5b751af715cee2
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
   percent: 60
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 
 Phase: 4 (Exposure Hardening + Data Classification) — EXECUTING
 Plan: 7 of 7
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-04 — Phase 4 execution started
 
 Progress: [██████░░░░] 60%
@@ -74,6 +74,7 @@ Progress: [██████░░░░] 60%
 | Phase 04-exposure-hardening-data-classification P04 | 13min | 3 tasks | 6 files |
 | Phase 04-exposure-hardening-data-classification P05 | 6min | 2 tasks | 2 files |
 | Phase 04 P06 | 20 min | 2 tasks | 2 files |
+| Phase 04-exposure-hardening-data-classification P04-07 | 6min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -129,6 +130,10 @@ Recent decisions affecting current work:
 - [Phase 4]: P4 04-05: file-token refusal test seeds sentinel file and asserts bytes unchanged + uvicorn.run never called (recorder fake) — pins refusal precedes ensure_token/uvicorn without file-creation races
 - [Phase 04]: README.md content written local-only, NOT committed: repo CLAUDE.md + .gitignore (2026-08-31 用户定) keep 项目说明 (README/CLAUDE/CONTEXT) 不上传 GitHub; plan task-2 commit step waived (CLAUDE.md precedence) — SC5 documented-limits satisfied on the local file the 04-07 gate reads
 - [Phase 04]: README single-flight wording scoped to byte-checked facts (api/actions.py raise sites): per-kind lock, same-API overlap 409 already_running + running_job_id; other-entry hold already_running_other_entry no job_id — no invented locks/rate-limits/ETags in docs
+- [Phase 4]: [P4 04-07] 真机重启路径 = Start-ScheduledTask 'gogo-api' 免沙箱 (03-04 环境事实复确认): /health 200 ~2s, bind 127.0.0.1:8000 pid 30508, loopback 姿态 + 文件 token 原样 —— D-12 门从未触发(无 launcher 绑非回环)也从未被削弱
+- [Phase 4]: [P4 04-07] 实况矩阵 13 行全过且零偏差: 私密读 200 字节级一致 + x-data-mtime/x-data-age-s (h11 线上小写头名, 大写 dict 查询得 None —— 后续 live gate 用 http.client getheaders 读线上真值); 401+WWW-Authenticate/403/404 unknown_private_name/date 422 信封与套件预测逐字节吻合; 唯一 POST = 无 auth 401 探针, 注册表 10->10 零 spawn (禁真跑禁令守住)
+- [Phase 4]: [P4 04-07] 假设-truth 行 (a) 启动路径绑回环 (b) 无文件-token 非回环消费者 (c) 任务名 gogo-api —— 真机全 TRUE; SC5 三扫描复跑与 04-06 基线逐字节同; 全套件 148 passed 1 skipped; 服务留 RUNNING 待用户下一交易日
+- [Phase 4]: [P4 04-07] Phase 4 人类门 (03-04 孪生): SC1-SC5 证据映射表 + 04-04 fail-loud session-date 语义签认在 SUMMARY 底部待用户裁决 (ACCEPT/DELTA) —— end-of-phase 收割, executor 不代答
 
 ### Pending Todos
 
@@ -154,6 +159,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T21:21:53.226Z
-Stopped at: Completed 04-06-PLAN.md
+Last session: 2026-09-03T21:31:59.539Z
+Stopped at: Completed 04-07-PLAN.md (live gate; human verdict pending at phase close)
 Resume file: None

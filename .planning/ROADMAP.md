@@ -133,7 +133,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 04-07-PLAN.md — Real-machine live gate: restart, SC1-SC5 live matrix, SC5 scans, end-of-phase human review (03-04 twin)
+- [x] 04-07-PLAN.md — Real-machine live gate: restart, SC1-SC5 live matrix, SC5 scans, end-of-phase human review (03-04 twin)
 
 **Research**: skip — standard security patterns; the phase deliverable includes a PROJECT.md wording revision (data-classification auth clause) requiring user sign-off under 定稿机制.
 
