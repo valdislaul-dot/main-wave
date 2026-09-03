@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Service Skeleton + /health Liveness** - Resident FastAPI service boots on Windows (autostart on reboot), serves always-200 /health, refuses to boot exposed without a token, seeds repo's first pytest suite (completed 2026-09-03)
 - [x] **Phase 2: Read-Only State Endpoints + Defensive Read Layer** - Market/temperature/zt-pool state served verbatim with freshness headers; half-written files never leak (retry + stale fallback); /health/ready (completed 2026-09-03)
-- [ ] **Phase 3: Trigger Runner, Job Registry & Locks + Auth Enforcement** - POST triggers existing scripts as 202+job_id with durable jobs and single-flight 409s; X-API-Key enforced; event loop never blocked
+- [x] **Phase 3: Trigger Runner, Job Registry & Locks + Auth Enforcement** - POST triggers existing scripts as 202+job_id with durable jobs and single-flight 409s; X-API-Key enforced; event loop never blocked (completed 2026-09-04)
 - [ ] **Phase 4: Exposure Hardening + Data Classification** - 持仓/账本/候选 reads go live token-gated under an explicit classification policy; logs/errors/params/git hardened
 - [ ] **Phase 5: Recovery, Observability & Ops Polish** - Auth-gated /health/details, automatic log rotation, completed test suite passing with Win/Mac parity
 
@@ -111,7 +111,27 @@ Plans:
   4. Trigger date parameters accept only whitelisted formats (YYYY-MM-DD / YYYYMMDD) and reach scripts as argument lists — shell injection attempts are structurally impossible.
   5. Scans confirm data/api_token.txt appears in neither git history nor the sync_cloud whitelist; README documents the API's known limits (single-flight scope, remaining concurrent entry points).
 
-**Plans**: TBD
+**Plans**: 7 plans
+
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Unified machine-readable error envelope (frozen code table, handlers, openapi_url) + error-body pin sweep + P2 fidelity fixes (WR-02 hammer, WR-03 raw-ASGI 404)
+- [ ] 04-02-PLAN.md — Writer-side atomicity for save_portfolio/save_journal (tmp + os.replace, contract-suite driven) — STA-02 read go-live precondition (D-04..D-06)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04-03-PLAN.md — /v1/private/* token-gated raw read endpoints (portfolio/journal/candidates, freshness headers) + SC2 route-by-route classification audit
+- [ ] 04-04-PLAN.md — Date parameter whitelist (YYYY-MM-DD/YYYYMMDD): single-token arg-list append, date_args.py single-source validator, script-side session-date gates
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 04-05-PLAN.md — WR-01/D-12 boot fix: env-forced GOGO_API_TOKEN for non-loopback binds + console warning, regression-tested (fail-closed SC2)
+- [ ] 04-06-PLAN.md — PROJECT.md 定稿 data-classification table + README known-limits + SC5 scan evidence
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 04-07-PLAN.md — Real-machine live gate: restart, SC1-SC5 live matrix, SC5 scans, end-of-phase human review (03-04 twin)
+
 **Research**: skip — standard security patterns; the phase deliverable includes a PROJECT.md wording revision (data-classification auth clause) requiring user sign-off under 定稿机制.
 
 ### Phase 5: Recovery, Observability & Ops Polish
@@ -138,6 +158,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Service Skeleton + /health Liveness | 2/2 | Complete    | 2026-09-03 |
 | 2. Read-Only State Endpoints + Defensive Read Layer | 1/1 | Complete    | 2026-09-03 |
-| 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 4/4 | In Progress|  |
+| 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 4/4 | Complete    | 2026-09-04 |
 | 4. Exposure Hardening + Data Classification | 0/TBD | Not started | - |
 | 5. Recovery, Observability & Ops Polish | 0/TBD | Not started | - |
