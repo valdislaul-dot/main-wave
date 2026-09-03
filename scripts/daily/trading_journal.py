@@ -1,5 +1,6 @@
 """
 模拟交易日志：记录每笔买卖、持仓、盈亏
+Phase 4 (D-04..D-06): save_portfolio/save_journal 原子写 —— 同目录 .tmp + os.replace
 """
 import json, os
 import os
@@ -43,8 +44,13 @@ def load_portfolio():
 
 
 def save_portfolio(pf):
-    with open(PORTFOLIO_FILE, 'w', encoding='utf-8') as f:
+    # 原子写 (D-04..D-06, zt_pool save_state 模板): 同目录 .tmp 保证同卷, os.replace 原子替换
+    # (Windows 上 os.rename 对已存在目标会失败, 禁用); 读者永不 observe 半写 JSON。
+    # 不注入 last_updated 等字段 —— 账本 schema 是用户的 (与旧写者字节一致)。
+    tmp = PORTFOLIO_FILE + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
         json.dump(pf, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, PORTFOLIO_FILE)
 
 
 def load_journal():
@@ -55,8 +61,11 @@ def load_journal():
 
 
 def save_journal(journal):
-    with open(JOURNAL_FILE, 'w', encoding='utf-8') as f:
+    # 原子写 (D-04..D-06, zt_pool save_state 模板): 同上 —— 同目录 .tmp + os.replace
+    tmp = JOURNAL_FILE + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
         json.dump(journal, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, JOURNAL_FILE)
 
 
 def record_buy(name, code, price, shares, cost, note=''):
