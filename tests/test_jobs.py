@@ -64,6 +64,19 @@ def fake_script(tmp_path, rc=0, sleep=0.3):
     return str(path)
 
 
+def _read_tolerant(job_id, base):
+    """轮询式读: 与写者 os.replace 的瞬时竞态 (WinError 5 类) 视为"未就绪", 下轮再试。
+
+    os.replace 在 Windows 上以独占删除访问短暂持有目标, 恰好同刻的 open 会撞
+    PermissionError —— µs 级窗口; 轮询语义下吞掉重试是确定性行为 (读侧契约
+    "OSError 上抛" 由 read_job 直接调用方承担, 见 test_read_job_present_missing_corrupt)。
+    """
+    try:
+        return api.jobs.read_job(job_id, base)
+    except OSError:
+        return None
+
+
 def _wait_for(predicate, what, timeout=8.0):
     """轮询 predicate() 直到真或超时; 返回末次值 (None 且超时 -> AssertionError)。"""
     deadline = time.time() + timeout
@@ -77,20 +90,20 @@ def _wait_for(predicate, what, timeout=8.0):
 
 
 def wait_status(job_id, base, status, timeout=8.0):
-    """轮询 read_job 直到 registry JSON 到达指定 status。"""
+    """轮询 registry JSON 直到到达指定 status。"""
 
     def _probe():
-        job = api.jobs.read_job(job_id, base)
+        job = _read_tolerant(job_id, base)
         return job if job and job.get("status") == status else None
 
     return _wait_for(_probe, f"job {job_id} 到达 {status!r}", timeout)
 
 
 def wait_terminal(job_id, base, timeout=8.0):
-    """轮询 read_job 直到 status 进入终态 (succeeded/failed/interrupted); 返回终态 dict。"""
+    """轮询 registry JSON 直到 status 进入终态 (succeeded/failed/interrupted)。"""
 
     def _probe():
-        job = api.jobs.read_job(job_id, base)
+        job = _read_tolerant(job_id, base)
         if job and job.get("status") in ("succeeded", "failed", "interrupted"):
             return job
         return None
@@ -132,12 +145,16 @@ def test_lifecycle_succeeded_utf8_log_argv_cwd(tmp_path, monkeypatch):
     # durable-at-accept: claim 同步写 pending 文件后才 start 线程 -> 返回时文件必在
     job_file = os.path.join(base, job["job_id"] + ".json")
     assert os.path.isfile(job_file)
-    first = api.jobs.read_job(job["job_id"], base)
+    first = _read_tolerant(job["job_id"], base)
     assert first is not None and first["status"] in ("pending", "running")
 
-    # running 迁移 (子进程 sleep 0.3s 的窗口内必被观察到) + pid 落盘
-    running = wait_status(job["job_id"], base, "running")
-    assert running["pid"] is not None
+    # running 迁移 (子进程 sleep 0.3s 的窗口内必被观察到) + pid 落盘。
+    # 注: running 写两次 —— Popen 前 (pid=None) 与 Popen 后 (pid=实际值), 轮询须等 pid。
+    def _running_with_pid():
+        j = _read_tolerant(job["job_id"], base)
+        return j if j and j.get("status") == "running" and j.get("pid") is not None else None
+
+    running = _wait_for(_running_with_pid, f"job {job['job_id']} running + pid")
     assert running["started_at"] is not None
 
     term = wait_terminal(job["job_id"], base)
@@ -215,3 +232,111 @@ def test_read_job_present_missing_corrupt(tmp_path):
     (base / "corrupt.json").write_text("{not json", encoding="utf-8")
     with pytest.raises(ValueError):  # 损坏 -> ValueError 上抛 (分类归 03-02 HTTP 层)
         api.jobs.read_job("corrupt", str(base))
+
+
+# ---------- 行为 6-10: 崩溃恢复套 (SC5; reload sweep + 终端修剪上限) ----------
+
+def _seed_job_file(base, job_id, status, mtime=None, pid=None):
+    """直接 open('w') 手写 fixture job JSON (模拟崩溃遗留文件, 不走被测的 write_job)。
+
+    可选: json 的 mtime (prune 按 json mtime 计龄) 与 .log 陪衬文件 (修剪成对删)。
+    """
+    job = {
+        "job_id": job_id,
+        "kind": "pipeline",
+        "status": status,
+        "pid": pid,
+        "exit_code": None,
+        "log_path": None,
+        "cmd": ["python", "x.py"],
+        "created_at": 1,
+        "started_at": None,
+        "finished_at": None,
+    }
+    p = base / f"{job_id}.json"
+    p.write_text(json.dumps(job, ensure_ascii=False), encoding="utf-8")
+    (base / f"{job_id}.log").write_bytes(b"")
+    if mtime is not None:
+        os.utime(p, (mtime, mtime))
+    return job
+
+
+def test_reload_sweep_interrupts_inflight_keeps_terminal(tmp_path):
+    base = tmp_path / "jobs"
+    base.mkdir()
+    _seed_job_file(base, "a" * 32, "pending")
+    _seed_job_file(base, "b" * 32, "running", pid=4242)
+    _seed_job_file(base, "c" * 32, "succeeded")
+    succ_bytes = (base / ("c" * 32 + ".json")).read_bytes()
+
+    api.jobs.reload_registry(str(base))
+
+    swept_pending = api.jobs.read_job("a" * 32, str(base))
+    assert swept_pending["status"] == "interrupted"
+    assert swept_pending["finished_at"] is not None  # 确定性终态带时间戳
+    assert swept_pending["pid"] is None  # 原地重写, 其余字段保留
+    swept_running = api.jobs.read_job("b" * 32, str(base))
+    assert swept_running["status"] == "interrupted"
+    assert swept_running["finished_at"] is not None
+    assert swept_running["pid"] == 4242  # 原 running 的 pid 保留 (只改状态+finished_at)
+    assert (base / ("c" * 32 + ".json")).read_bytes() == succ_bytes  # 终态文件不动
+
+
+def test_reload_sweep_idempotent_second_sweep(tmp_path):
+    base = tmp_path / "jobs"
+    base.mkdir()
+    _seed_job_file(base, "a" * 32, "pending")
+    api.jobs.reload_registry(str(base))
+    path = base / ("a" * 32 + ".json")
+    after_first = path.read_bytes()
+    assert api.jobs.read_job("a" * 32, str(base))["status"] == "interrupted"
+    api.jobs.reload_registry(str(base))  # 第二次扫描
+    assert path.read_bytes() == after_first  # interrupted 不再重写 (无 finished_at churn)
+
+
+def test_reload_sweep_tolerates_corrupt_and_dotfiles(tmp_path):
+    base = tmp_path / "jobs"
+    base.mkdir()
+    _seed_job_file(base, "a" * 32, "running")
+    (base / "corrupt.json").write_text("{not json", encoding="utf-8")
+    (base / ".DS_Store").write_bytes(b"dotfile")  # .DS_Store 风格点文件
+
+    api.jobs.reload_registry(str(base))  # 不得中断扫描
+
+    assert api.jobs.read_job("a" * 32, str(base))["status"] == "interrupted"
+    assert (base / "corrupt.json").exists()  # 不可解析 -> 跳过, 不删
+    assert (base / ".DS_Store").exists()  # 点文件 -> 跳过
+
+
+def test_reload_sweep_prune_cap_keeps_500_newest_terminal(tmp_path):
+    base = tmp_path / "jobs"
+    base.mkdir()
+    terminal_ids = []
+    for i in range(505):
+        jid = f"{i:032x}"
+        _seed_job_file(base, jid, "succeeded", mtime=1_700_000_000 + i)
+        terminal_ids.append(jid)
+    inflight = ["f" * 32, "e" * 32, "d" * 32]
+    for jid in inflight:  # 非终态 (seed 时) —— sweep 会先收成 interrupted
+        _seed_job_file(base, jid, "running")
+
+    api.jobs.reload_registry(str(base))
+
+    remaining = [p.name[: -len(".json")] for p in base.glob("*.json")]
+    assert len(remaining) == 500  # 505 终态 - 8 最旧 + 3 刚收编 = 500
+    for jid in inflight:
+        assert jid in remaining  # 非终态文件在 sweep 后存活 (interrupted, 未删)
+        assert api.jobs.read_job(jid, str(base))["status"] == "interrupted"
+    for i in range(8):
+        assert f"{i:032x}" not in remaining  # 最旧 8 对 (json+log) 被删
+    for i in range(8, 505):
+        assert f"{i:032x}" in remaining  # 最新 497 对存活
+    assert not (base / f"{0:032x}.log").exists()  # log 与 json 成对删除
+    assert not (base / f"{0:032x}.json").exists()
+
+
+def test_reload_sweep_missing_dir_creates_and_returns(tmp_path):
+    base = tmp_path / "does" / "not" / "exist"
+    api.jobs.reload_registry(str(base))  # makedirs exist_ok -> 无错返回
+    assert base.is_dir()
+    assert api.jobs.read_job("f" * 32, str(base)) is None  # 空目录可正常读
