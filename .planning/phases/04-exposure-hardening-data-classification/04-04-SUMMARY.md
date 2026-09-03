@@ -229,6 +229,10 @@ None - no external service configuration required.
 - 04-05/04-06/04-07 can extend the same patterns: four-gate ordering (kind 404 precedes parameter logic), single-source validator modules consumed by API + scripts + tests, and pre-network subprocess pins as the standard proof shape for "refusal before side effects".
 - The `data_health_check.py --date` space-form idiom and the manual-CLI path remain untouched (dispatch on argv[1] != --fast still routes to --status/--buy/--sell/--value; a date token can never occupy argv[1] because the API appends after fixed args).
 
+## Self-Check: PASSED
+
+All 6 created/modified files verified present on disk; all 6 production commits (11a0d05, 0174cbd, 693523a, bd1bd44, 11f5a08, 463f8d2) verified in git log; full suite 146 passed + 1 skipped; data//logs/ hygiene clean.
+
 ---
 *Phase: 04-exposure-hardening-data-classification*
 *Completed: 2026-09-03*
