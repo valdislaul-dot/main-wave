@@ -173,14 +173,19 @@ def run_job(job, lock_fd, base=None):
 
 
 def start_job(kind, cmd, lock_fd, base=None):
-    """认领 + 起 daemon worker, 立即返回 pending job dict (202 语义的模块侧)。
+    """认领 + 起 daemon worker, 返回"接受时刻"的 pending job 快照 (202 语义的模块侧)。
 
     调用方 (03-02 POST handler) 必须先取得 OS 锁再调本函数; worker 在 finally 释放。
+    返回 dict(job) 快照而非活引用: worker 线程在 Thread.start 后立即把同一 dict
+    迁移成 running —— 活引用会让 202 响应体 (序列化发生在 start 之后) 竞态地
+    出现 running/succeeded, 违反 202 {status: pending} 契约 (03-02 实测发现,
+    Rule 1 修复); 快照即"接受即持久"的文件内容, 语义诚实。
     """
     job = new_job(kind, cmd)
     claim(kind, job, base)
+    snapshot = dict(job)  # 浅拷贝: 字段全为标量 + 无人再改的 cmd 列表
     threading.Thread(target=run_job, args=(job, lock_fd, base), daemon=True).start()
-    return job
+    return snapshot
 
 
 def reload_registry(base=None, cap=PRUNE_CAP):

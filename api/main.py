@@ -16,6 +16,8 @@ from fastapi import FastAPI
 from scripts.daily.config import DATA_DIR
 from api.boot import ensure_token, has_token, is_loopback
 from api.state import router as state_router
+from api import jobs  # boot 序列用; import 无副作用 (03-02 D-12)
+from api.actions import router as actions_router
 
 # uptime 锚点: 模块导入时刻 (对 uvicorn.run 即进程启动时刻)。
 # 用 monotonic —— 免疫 NTP/手动改钟导致的墙钟跳变 (T-01-04)。
@@ -32,6 +34,7 @@ def health():
 
 
 app.include_router(state_router)
+app.include_router(actions_router)  # 03-02: 受保护触发/job 路由 (D-11 豁免之外)
 
 
 def main() -> None:
@@ -66,6 +69,11 @@ def main() -> None:
         if not has_token(token_path):
             ensure_token(token_path)
             print("API token generated at data/api_token.txt")
+
+    # 启动恢复扫描 (SC5, 03-01 交付): pending/running job -> interrupted。
+    # 放在 SEC-03/token 块之后、uvicorn.run 之前 —— Phase 1 boot 顺序不变
+    # (Pattern 4; 必须在 main() 内, 测试用模块级 TestClient 无 lifespan)。
+    jobs.reload_registry()
 
     # 惰性导入: 测试 import api.main 时无需 uvicorn 依赖, 也不触发任何绑定。
     import uvicorn
