@@ -139,10 +139,14 @@ def compute_position_decision(pos):
 
 def compute_environment(pf):
     """静默计算市场环境评级+买入开关 (2026-08-20: 供决策摘要先行打印)
-    分档: <60或最高≤2板=弱市(空仓,升温例外1/3) | 60-109=正常(半仓) | ≥110=强势(全仓)
-    返回 {env, switch, pos_pct, warming, zt_n, max_cons, zt_prev, avg_gap, downgraded}"""
-    r = {'env': None, 'switch': None, 'pos_pct': 0, 'warming': False,
-         'zt_n': 0, 'max_cons': 1, 'zt_prev': None, 'avg_gap': None, 'downgraded': False}
+    分档(2026-09-03用户拍板): 极弱<40或最高≤2板=空仓(升温例外半仓) |
+    弱市下沿40-64=1/3仓 | 弱市65-109=半仓 | 强市≥110=全仓
+    降档(任一条触发降一档, 只降一次): 骤降防线 | 竞价二次确认 | 赚钱效应转负
+    返回 {env, switch, pos_pct, warming, collapse, zt_n, max_cons, zt_prev, max_cons_prev,
+          avg_gap, money_effect, downgraded, downgrade_reason}"""
+    r = {'env': None, 'switch': None, 'pos_pct': 0, 'warming': False, 'collapse': False,
+         'zt_n': 0, 'max_cons': 1, 'zt_prev': None, 'max_cons_prev': None,
+         'avg_gap': None, 'money_effect': None, 'downgraded': False, 'downgrade_reason': None}
     try:
         _pp = _load_prev_pool()
         if not _pp:
@@ -150,7 +154,7 @@ def compute_environment(pf):
         _stocks, _ = _pp
         r['zt_n'] = len(_stocks)
         r['max_cons'] = max((int(x.get('limit_days', 1) or 1) for x in _stocks), default=1)
-        # 前日涨停数(升温判断)
+        # 前日涨停数+最高板 (升温/骤降判断)
         try:
             _zt_dir = os.path.join(BASE, 'data', 'zt_pool')
             _pool_files = sorted(f for f in os.listdir(_zt_dir) if f.endswith('.json'))
@@ -164,22 +168,9 @@ def compute_environment(pf):
                         _pp2 = json.load(_f)
                 _p2stocks = _pp2 if isinstance(_pp2, list) else _pp2.get('stocks', _pp2.get('data', []))
                 r['zt_prev'] = len(_p2stocks)
+                r['max_cons_prev'] = max((int(x.get('limit_days', 1) or 1) for x in _p2stocks), default=None)
         except Exception:
             pass
-        r['warming'] = r['zt_prev'] is not None and r['zt_n'] > r['zt_prev']
-
-        # 温度分档(2026-08-25用户定稿): 极弱<40空仓(升温例外半仓) | 弱市40-109半仓 | 强市≥110全仓
-        if r['zt_n'] < 40 or r['max_cons'] <= 2:
-            r['env'] = '🌡️ 极弱'
-            if r['warming']:
-                r['switch'], r['pos_pct'] = '🟡 买入开关: 半仓(升温日例外)', 0.5
-            else:
-                r['switch'], r['pos_pct'] = '🛑 买入开关: 关闭(空仓)', 0.0
-        elif r['zt_n'] >= 110:
-            r['env'], r['switch'], r['pos_pct'] = '🌡️ 强势', '🟢 买入开关: 全仓', 1.0
-        else:
-            r['env'], r['switch'], r['pos_pct'] = '🌡️ 弱市', '🟢 买入开关: 半仓', 0.5
-
         # 竞价二次确认: 池均gap ≤ -0.5% → 降一档 (3年724日校准)
         try:
             _astate_path = os.path.join(BASE, 'data', 'auction_state.json')
@@ -187,31 +178,21 @@ def compute_environment(pf):
                 with open(_astate_path, encoding='utf-8') as _f:
                     _astate = json.load(_f)
                 r['avg_gap'] = (_astate.get('current') or {}).get('avg_gap')
-                if r['avg_gap'] is not None and r['avg_gap'] <= -0.5:
-                    _downgrade = {'🌡️ 极弱': ('🌡️ 极弱', '🛑 买入开关: 关闭(空仓)', 0.0),
-                                  '🌡️ 弱市': ('🌡️ 极弱↓', '🛑 买入开关: 关闭(空仓, 竞价二次确认降档)', 0.0),
-                                  '🌡️ 强势': ('🌡️ 弱市↓', '🟢 买入开关: 半仓(竞价二次确认降档)', 0.5)}
-                    if r['env'] in _downgrade:
-                        r['env'], r['switch'], r['pos_pct'] = _downgrade[r['env']]
-                        r['downgraded'] = True
         except Exception:
             pass
-        # 盘后赚钱效应校准 (2026-08-25, 斯皮尔曼+0.403最强指标): 昨日<-2% → 降一档
+        # 盘后赚钱效应 (斯皮尔曼+0.403最强指标, capture_market_state盘后写入)
         try:
             _ms_path = os.path.join(BASE, 'data', 'market_state.json')
             if os.path.exists(_ms_path):
                 with open(_ms_path, encoding='utf-8') as _f:
                     _ms = json.load(_f)
                 r['money_effect'] = _ms.get('money_effect')
-                if r['money_effect'] is not None and r['money_effect'] < -2.0 and not r['downgraded']:
-                    _downgrade_me = {'🌡️ 极弱': ('🌡️ 极弱', '🛑 买入开关: 关闭(空仓)', 0.0),
-                                     '🌡️ 弱市': ('🌡️ 极弱↓', '🛑 买入开关: 关闭(空仓, 赚钱效应-2%校准)', 0.0),
-                                     '🌡️ 强势': ('🌡️ 弱市↓', '🟢 买入开关: 半仓(赚钱效应-2%校准)', 0.5)}
-                    if r['env'] in _downgrade_me:
-                        r['env'], r['switch'], r['pos_pct'] = _downgrade_me[r['env']]
-                        r['downgraded'] = True
         except Exception:
             pass
+        # 档位决策走纯函数 (2026-09-03, 可离线单测/历史回放)
+        from temperature import decide_temp_switch
+        r.update(decide_temp_switch(r['zt_n'], r['max_cons'], r['zt_prev'], r['max_cons_prev'],
+                                    r['avg_gap'], r['money_effect']))
     except Exception:
         pass
     return r
@@ -678,18 +659,28 @@ def main():
         print(f'\n  {env_info["env"]}: 昨日涨停{env_info["zt_n"]}只, 最高{env_info["max_cons"]}板'
               + (f', 较前日{env_info["zt_prev"]}只{"回升" if env_info["warming"] else "回落"}' if env_info["zt_prev"] is not None else ''))
         print(f'  {env_info["switch"]} (仓位由个人交易情况决定, 仅温度建议)')
-        if env_info.get('downgraded'):
-            print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5% → 环境降档'
-                  f' (3年724日: 该档当日-2.87%/上涨31%)')
-        elif env_info.get('avg_gap') is not None:
-            print(f'  ✓ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% > -0.5%, 维持评级')
+        # 三条降档规则状态 (2026-09-03)
+        _dr = env_info.get('downgrade_reason')
+        if env_info.get('zt_prev') is not None:
+            _dpct = round((env_info['zt_prev'] - env_info['zt_n']) / env_info['zt_prev'] * 100)
+            if env_info.get('collapse'):
+                _col_txt = '已降档' if _dr and _dr.startswith('骤降防线') else '触发(开关已关闭)'
+                print(f'  ⚠ 骤降防线: 昨日{env_info["zt_n"]}只 较前日{env_info["zt_prev"]}只 ({-_dpct:+d}%) → {_col_txt}')
+            else:
+                print(f'  ✓ 骤降防线: 昨日{env_info["zt_n"]}只 较前日{env_info["zt_prev"]}只 ({-_dpct:+d}%), 未触发')
+        if env_info.get('avg_gap') is not None:
+            if env_info['avg_gap'] <= -0.5:
+                print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5% → 环境降档'
+                      f' (3年724日: 该档当日-2.87%/上涨31%)')
+            else:
+                print(f'  ✓ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% > -0.5%, 维持评级')
         if env_info.get('money_effect') is not None:
             _me = env_info['money_effect']
-            if _me < -2.0 and env_info.get('downgraded'):
-                print(f'  ⚠ 盘后赚钱效应: 昨日{_me:+.1f}% < -2% → 已降档')
+            if _me < 0 and _dr and _dr.startswith('赚钱效应转负'):
+                print(f'  ⚠ 盘后赚钱效应: 昨日{_me:+.1f}% 转负 → 已降档')
             else:
                 _me_mark = '⚠' if _me < 0 else '✓'
-                print(f'  {_me_mark} 盘后赚钱效应: 昨日{_me:+.1f}% (关联最强指标, <-2%降档)')
+                print(f'  {_me_mark} 盘后赚钱效应: 昨日{_me:+.1f}% (关联最强指标, 转负降档)')
 
     # ── 📊 表1: 当日可买前三 ──
     from scoring import get_score_min as _gsm
