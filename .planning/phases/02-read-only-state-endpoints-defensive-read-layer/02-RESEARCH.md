@@ -461,18 +461,21 @@ grep -nE "(requests|urllib|httpx|aiohttp|socket)(\.|[[:space:]]*import|import)" 
 | A7 | `os.access(path, os.R_OK)` is an honest readability check for HLT-02 without opening the file | Patterns 4 | A file that passes stat+access but fails actual open (exotic ACL/lock) would yield ready=200 then state=503 — rare, self-correcting on next probe |
 | A8 | `/health/ready` 200 body `{"status": "ready"}` is an acceptable "最小 JSON" reading | Patterns 4 | Discretion zone — planner picks final wording |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Retry budget numbers** — research recommends `retries=2`, `retry_delay≈0.02–0.05 s` (total worst-case added latency ≈ 40–100 ms, well within polling expectations). No user gate needed (Claude's discretion), but the plan should pin the constants and test them.
    - What we know: torn windows are ms-scale (probe P2); files ≤ 48 KB.
    - What's unclear: none blocking — pick within the range.
    - Recommendation: 2 retries × 0.02 s as the initial constant; revisit if live-run verification ever shows 503s with a warm cache.
+   - RESOLVED: 02-01-PLAN.md task 1 pins `retries=2, retry_delay=0.02` in the `get_state` signature (action step 5 and acceptance criteria), and the injected-reader unit tests + rewrite hammer (tasks 2-3) exercise the budget.
 2. **Cold-start 503 residual window (SC2 "0×5xx")** — a server restarted mid-write with an empty cache can 503 once.
    - What we know: after any successful read the cache is warm for process life; retry budget makes the window improbable.
    - What's unclear: whether SC2's live-run verification will restart the service mid-run.
    - Recommendation: document in the plan's verification notes; do not complicate the design (no disk cache — restart cold-start from files is a feature).
+   - RESOLVED: 02-01-PLAN.md documents the residual in the Flagged Assumptions note and task 3 action step 6 + the end-of-phase human-check, which scope 0×5xx evidence to cache-warm reads (a cold-window 503 is a documented residual, not a failure).
 3. **detail wording** — `"unknown state name"` / `"state temporarily unavailable"` / `"state file unavailable"` (no file paths, D-04).
    - Recommendation: ASCII wording above; planner may adjust.
+   - RESOLVED: 02-01-PLAN.md pins the exact wording above in task 1's acceptance criteria and live probes plus the 404/503 contract tests (task 2 tests 3-4, 10, 12-13).
 
 ## Environment Availability
 
