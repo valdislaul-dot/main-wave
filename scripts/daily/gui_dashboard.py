@@ -14,6 +14,7 @@ from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import morning_check as mc
+import job_lock
 from scoring import load_config, compute_score, score_v4
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -84,12 +85,25 @@ c2.markdown(f"<div style='text-align:center;font-size:1.3rem;font-weight:bold;ma
 c2.caption(f"V3评分 | ≥{cfg['score_min']}分 | 竞价4-8%")
 
 if c3.button("🔄 刷新数据", width='stretch'):
-    with st.spinner("拉涨停池+评分(轻量)..."):
-        r = subprocess.run(
-            [sys.executable, 'scripts/daily/run_pipeline.py', '--fast'],
-            cwd=BASE, capture_output=True, text=True, timeout=180)
-        st.success("完成!" if r.returncode == 0 else f"部分失败(见日志)")
-    st.rerun()
+    # D-01: 一键刷新加入单飞锁 — 与API同 data/locks/pipeline.lock (kind=pipeline), 锁被占不抢跑 (ACT-03)
+    fd = job_lock.acquire("pipeline", os.path.join(BASE, "data", "locks"))
+    if fd is None:
+        st.warning("流水线正在运行中(API或其他入口),本次刷新已跳过")
+    else:
+        done = False
+        try:
+            with st.spinner("拉涨停池+评分(轻量)..."):
+                r = subprocess.run(
+                    [sys.executable, 'scripts/daily/run_pipeline.py', '--fast'],
+                    cwd=BASE, capture_output=True, text=True, timeout=180)
+                st.success("完成!" if r.returncode == 0 else f"部分失败(见日志)")
+            done = True
+        except subprocess.TimeoutExpired:
+            st.warning("刷新超时——管线可能仍在后台运行,请查看日志后再试")
+        finally:
+            fd.close()
+        if done:
+            st.rerun()
 
 # ══════ 持仓 (多持仓) ══════
 pf = _load_json(os.path.join(LOG_DIR, 'portfolio.json'))
