@@ -125,7 +125,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 04-05-PLAN.md — WR-01/D-12 boot fix: env-forced GOGO_API_TOKEN for non-loopback binds + console warning, regression-tested (fail-closed SC2)
+- [x] 04-05-PLAN.md — WR-01/D-12 boot fix: env-forced GOGO_API_TOKEN for non-loopback binds + console warning, regression-tested (fail-closed SC2)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 

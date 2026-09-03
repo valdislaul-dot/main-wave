@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 4
 current_phase_name: Exposure Hardening + Data Classification
 status: executing
-stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-09-03T21:04:55.394Z"
+stopped_at: Completed 04-05-PLAN.md
+last_updated: "2026-09-03T21:12:58.173Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 4 execution started
-state_head: 463f8d2fdf781f4969ef0550222c21476e738193
+state_head: 8d505b7b2b3f9561e9cb57e946672eef576d53d8
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 14
-  completed_plans: 11
+  completed_plans: 12
   percent: 60
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 ## Current Position
 
 Phase: 4 (Exposure Hardening + Data Classification) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 4 execution started
 
@@ -72,6 +72,7 @@ Progress: [██████░░░░] 60%
 | Phase 04-exposure-hardening-data-classification P02 | 3 min | 2 tasks | 2 files |
 | Phase 04 P03 | 14 | 3 tasks | 4 files |
 | Phase 04-exposure-hardening-data-classification P04 | 13min | 3 tasks | 6 files |
+| Phase 04-exposure-hardening-data-classification P05 | 6min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,10 @@ Recent decisions affecting current work:
 - [Phase 4]: [P4 04-03] Dot-segment literal paths (/v1/private/../portfolio) cannot route-match the 3-segment {name} pattern — framework 404 (not_found envelope) fires before any handler, zero file access; pinned via raw-ASGI scope call (WR-03 family; httpx collapses '..' pre-transport so TestClient answers are client artifacts)
 - [Phase 4]: date_args.py single-source validator consumed by API gate, script gates and tests — no duplicated regex anywhere (T-04-15); argv token always built from a parsed date object (T-04-13)
 - [Phase 4]: Script session-date gates share ASCII refusal substring 'session date' on stderr with exit 2 before any capture/file write/network; subprocess pins spawn only past/invalid dates (never today — child bypasses conftest network patch)
+- [Phase 4]: P4 04-05: refusal message retains case-5 pinned substrings (host via {host}, GOGO_API_TOKEN) and drops the old remedy naming data/api_token.txt — env-var-only + file-token-not-accepted, no paths beyond the host; case 5 needed zero assertion deltas
+- [Phase 4]: P4 04-05: D-12 warning goes to stderr (not stdout) — case 7's stdout-only pin survives byte-unchanged; comment appended explaining why
+- [Phase 4]: P4 04-05: main() docstring paragraph refreshed from 'env+file 现存状态' to env-only WR-01/D-12 semantics (old text documented the buggy behavior — Rule 1 stale-doc fix)
+- [Phase 4]: P4 04-05: file-token refusal test seeds sentinel file and asserts bytes unchanged + uvicorn.run never called (recorder fake) — pins refusal precedes ensure_token/uvicorn without file-creation races
 
 ### Pending Todos
 
@@ -146,6 +151,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T21:04:54.992Z
-Stopped at: Completed 04-04-PLAN.md
+Last session: 2026-09-03T21:12:57.772Z
+Stopped at: Completed 04-05-PLAN.md
 Resume file: None
