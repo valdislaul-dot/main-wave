@@ -280,6 +280,8 @@ def sell_signal(position, today_auction, config=None):
     yest_lu = was_limit_up(klines, yesterday_idx)
     board_num = get_board_count(klines, yesterday_idx)
     yest_vol = yesterday.get('volume', 0)
+    # 昨收浮盈(利润垫判断, A体系: 加速上板后浮盈>10%则无固定卖点)
+    float_pnl = (yesterday['close'] - buy_price) / buy_price * 100 if buy_price > 0 else 0
 
     # ── 硬止损 (2026-08-20调整: 炸板缓冲, 按当日收盘跌幅分级) ──
     # 数据(3年, 炸板股T日收盘分档×次日):
@@ -345,12 +347,14 @@ def sell_signal(position, today_auction, config=None):
                     return _signal('sell_half', 'urgent',
                         f'前日爆量+昨缩量加速, 竞价{gap:+.1f}%未达5%强高开预期 → 半仓减',
                         auction_price,
-                        '剩余: 拉升量能<爆量日→格局; 量能放大逼近爆量或破5%→清')
+                        '剩余: 拉升量能<爆量日→格局; 量能放大逼近爆量或破5%→清; '
+                        '14:45前未确认弱转强→市价兜底(A执行纪律)')
                 else:
                     return _signal('hold', 'normal',
                         f'前日爆量+昨缩量加速, 竞价{gap:+.1f}%达标 → 开盘关注量能',
                         yesterday['close'] * 1.10,
-                        '量能<爆量日→格局; 量能放大逼近爆量→减仓')
+                        '量能<爆量日→格局; 量能放大逼近爆量→减仓; '
+                        f'今日若封板加速且浮盈已垫厚(现{float_pnl:+.0f}%)→A体系: 利润垫>10%后无固定卖点, 格局看量能, 破VWAP黄线才走')
 
             # ② 连续正常量 → 分歧日预期 (A独有)
             elif prev_vol_class == 'normal' and yest_vol_class == 'normal':
@@ -369,7 +373,8 @@ def sell_signal(position, today_auction, config=None):
                 return _signal('watch', 'normal',
                     f'昨爆量分歧日(第{board_num}板), 今高开{gap:+.1f}% → 弱转强待确认',
                     auction_price,
-                    '开盘拉升>7%→真弱转强格局; 下杀破0%→走')
+                    '开盘拉升>7%→真弱转强格局; 下杀破0%→走; '
+                    '今日若封板: 量能<昨爆量日→加速板, 格局; 量能≥昨爆量日→连续两日爆量→板砸(挂涨停价)')
 
             # ④ 正常持有
             else:
@@ -385,12 +390,15 @@ def sell_signal(position, today_auction, config=None):
                     f'今强高开{gap:+.1f}% → 弱转强信号',
                     auction_price,
                     f'开盘拉升>7%=弱转强→格局; '
-                    f'量超烂板日→板砸; 下杀破0%或破今日VWAP→走')
+                    f'今日若封板: 量能<昨烂板爆量日→加速板, 格局(浮盈{float_pnl:+.0f}%, '
+                    f'垫厚>10%后无固定卖点); 量能≥昨爆量日→连续两日爆量→板砸(挂涨停价); '
+                    f'下杀破0%或破今日VWAP→走')
             elif gap > 0:
                 return _signal('watch', 'normal',
                     f'昨烂板+小高开{gap:+.1f}% → 弱转强待确认',
                     auction_price,
-                    '开盘拉升>7%→格局; 下杀→0%底线走')
+                    '开盘拉升>7%→格局; 下杀→0%底线走; '
+                    '今日若封板: 量能<昨爆量日→加速格局; 量能≥昨爆量日→连续爆量→板砸(挂涨停价)')
             else:
                 return _signal('sell', 'urgent',
                     f'昨烂板+低开{gap:+.1f}% → 竞价走',
