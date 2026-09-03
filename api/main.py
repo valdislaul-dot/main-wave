@@ -57,8 +57,9 @@ app.include_router(actions_router)  # 03-02: 受保护触发/job 路由 (D-11 �
 def main() -> None:
     """启动序列: env 解析 -> SEC-03 fail-closed 检查 -> (回环分支) D-03 生成 -> uvicorn 绑定。
 
-    顺序 CRITICAL (Pitfall 2): 非回环分支的 token 检查基于 env+文件现存状态,
-    先于任何 ensure_token 调用 —— 该分支绝不生成 token, 否则拒绝逻辑永不可达。
+    顺序 CRITICAL (Pitfall 2): 非回环分支的 token 检查只认 env 现存状态
+    (WR-01/D-12: 文件 token 不再满足非回环检查), 先于任何 ensure_token 调用 ——
+    该分支绝不生成 token, 否则拒绝逻辑永不可达。
     """
     sys.stdout.reconfigure(encoding="utf-8")  # repo CLI 惯例
 
@@ -71,15 +72,24 @@ def main() -> None:
     token_path = os.path.join(DATA_DIR, "api_token.txt")
 
     if not is_loopback(host):
-        # SEC-03: 非回环绑定必须有已配置 token, 否则拒绝启动 (exit non-zero)。
-        # 只评估 env/file 状态 —— 本分支绝不调用 ensure_token。
-        if not has_token(token_path):
+        # SEC-03 (WR-01/D-12): 非回环绑定只接受环境变量 GOGO_API_TOKEN (strip 后非空)。
+        # 文件 token (data/api_token.txt, 含自动生成) 不再满足检查 —— 自动生成的文件与
+        # 误配无从区分 (WR-01 根因: has_token 曾被两种姿态共享)。本分支只评估 env 状态,
+        # 绝不调用 ensure_token / 绝不创建任何文件 (fail-closed 检查先于一切 token 生成)。
+        if not os.environ.get("GOGO_API_TOKEN", "").strip():
             print(
-                f"ERROR: refusing to bind {host} without an API token. "
-                "Set GOGO_API_TOKEN or create data/api_token.txt",
+                f"ERROR: refusing to bind {host}: GOGO_API_TOKEN is required for "
+                "non-loopback binds. A file token is not accepted - set the "
+                "GOGO_API_TOKEN environment variable to authorize exposure",
                 file=sys.stderr,
             )
             sys.exit(1)
+        # D-12: 绑定暴露总是大声 —— 每次非回环启动都打印 ASCII 警告, 绝不回显 token 值。
+        print(
+            f"WARNING: binding {host} with API token from GOGO_API_TOKEN "
+            "(non-loopback exposure)",
+            file=sys.stderr,
+        )
     else:
         # D-03: 回环/默认分支, 首次启动自动生成 token (写入 data/api_token.txt)。
         # D-05: 生成后只打印这一句固定 ASCII 提示, 绝不打印 token 值。
