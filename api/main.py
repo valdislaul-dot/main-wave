@@ -12,19 +12,34 @@ import sys
 import time
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from scripts.daily.config import DATA_DIR
 from api.boot import ensure_token, has_token, is_loopback
 from api.state import router as state_router
 from api import jobs  # boot 序列用; import 无副作用 (03-02 D-12)
 from api.actions import router as actions_router
+from api.errors import (
+    http_exception_handler,
+    unhandled_exception_handler,
+    validation_error_handler,
+)
 
 # uptime 锚点: 模块导入时刻 (对 uvicorn.run 即进程启动时刻)。
 # 用 monotonic —— 免疫 NTP/手动改钟导致的墙钟跳变 (T-01-04)。
 _START = time.monotonic()
 
-# docs/openapi 关闭 (discretion)。无中间件、无路由依赖 (HLT-01 纯度, Pitfall 6)。
-app = FastAPI(title="gogo API", docs_url=None, redoc_url=None, openapi_url=None)
+# openapi 公开只读 (04-01): schema 服务自描述契约; docs 交互面仍关闭 (CLI-only)。
+# 无中间件、无路由依赖 (HLT-01 纯度, Pitfall 6)。
+app = FastAPI(title="gogo API", docs_url=None, redoc_url=None, openapi_url="/openapi.json")
+
+# 统一错误信封 (04-01): 4xx/5xx 一律 {"detail", "code"}。StarletteHTTPException 键
+# 经 MRO 同时罩住 fastapi.HTTPException raise sites 与框架 404/405; Exception 键
+# 由 ServerErrorMiddleware 接管 -> 500 固定体, traceback 只进服务端 stderr。
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_error_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
 
 
 @app.get("/health")
