@@ -168,6 +168,37 @@ def start_job(kind, cmd, lock_fd, base=None):
     return job
 
 
+def reload_registry(base=None, cap=PRUNE_CAP):
+    """启动恢复扫描 (SC5, RESEARCH Pattern 4): pending/running -> interrupted。
+
+    deterministic-interrupted 是"API 在 job 飞行中死亡"的诚实终态 —— failed 意味着
+    脚本真的跑过并出错; 无 PID 探针 (孤儿收养归 ACT-05 v2)。逐文件原子重写,
+    不可解析文件与点文件跳过 (绝不中断扫描); 结尾 prune(base, cap) —— 刚收编的
+    interrupted 与任何终态一样计入上限。纯函数, 由 03-02 在 main() 启动序列调用,
+    绝不在 import 时执行。
+    """
+    base = base or jobs_dir()
+    os.makedirs(base, exist_ok=True)
+    try:
+        names = os.listdir(base)
+    except OSError:
+        return
+    for name in names:
+        if not name.endswith(".json") or name.startswith("."):
+            continue
+        stem = name[: -len(".json")]
+        try:
+            job = read_job(stem, base)
+        except (OSError, ValueError):
+            continue  # 撕裂/损坏 -> 跳过, 不删不动
+        if job is None or job.get("status") not in ("pending", "running"):
+            continue
+        job["status"] = "interrupted"
+        job["finished_at"] = int(time.time())
+        write_job(job, base)  # 原地原子重写 (Pattern 2)
+    prune(base, cap)
+
+
 def prune(base=None, cap=PRUNE_CAP):
     """只删终态 job 的 json+log 对, 按 json mtime 保留最新 cap 个; 缺文件跳过 (ENOENT 容忍)。
 
