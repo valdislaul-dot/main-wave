@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
-current_phase: 03
-current_phase_name: Trigger Runner, Job Registry & Locks + Auth Enforcement
-status: verifying
-stopped_at: Completed 03-04-PLAN.md
-last_updated: "2026-09-03T18:29:45.335Z"
+current_phase: 4
+current_phase_name: Exposure Hardening + Data Classification
+status: planning
+stopped_at: Phase 03 complete, ready to plan Phase 4
+last_updated: "2026-09-03T18:50:51.991Z"
 last_activity: 2026-09-04
-last_activity_desc: Phase 03 execution started
-state_head: 9fe9cb497d3dab02de7402fbe50e8aff567880cd
+last_activity_desc: Phase 03 complete, transitioned to Phase 4
+state_head: 4383ba62f6c6bc6ccc2a38c82b57f4ce7ee75192
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
   completed_plans: 7
-  percent: 40
+  percent: 60
 ---
 
 # Project State
@@ -23,22 +23,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-03)
 
 **Core value:** External systems get gogo's live state (health/持仓/温度/market status) and trigger core operations (pipeline/auction/backtest) through one stable HTTP API, without disturbing the existing pipeline.
-**Current focus:** Phase 03 — Trigger Runner, Job Registry & Locks + Auth Enforcement
+**Current focus:** Phase 04 — Exposure Hardening + Data Classification
 
 ## Current Position
 
-Phase: 03 (Trigger Runner, Job Registry & Locks + Auth Enforcement) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-09-04 — Phase 03 execution started
+Phase: 4 — Exposure Hardening + Data Classification
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-09-04 — Phase 03 complete, transitioned to Phase 4
 
-Progress: [████░░░░░░] 40%
+Progress: [████████░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 3
+- Total plans completed: 7
 - Average duration: —
 - Total execution time: —
 
@@ -49,6 +49,7 @@ Progress: [████░░░░░░] 40%
 | 1-5 | TBD | TBD | - |
 | 1 | 2 | - | - |
 | 02 | 1 | - | - |
+| 03 | 4 | - | - |
 
 **Recent Trend:**
 
@@ -105,13 +106,12 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Phase 3 is the deep-research phase: `/gsd-plan-phase --research-phase 3` (Windows subprocess governance on the real machine).
-- Collect Phase 3 user sign-off gates (writer atomicization, GUI lock, 15:30 task liveness, --fast default) before Phase 3 planning.
+- *(none — Phase 4 planning next)*
 
 ### Blockers/Concerns
 
 - [P4] PROJECT.md security-clause wording revision requires user sign-off (定稿机制).
-- [P3] GUI one-key refresh and the (likely defunct) 15:30 scheduled task are unlocked concurrent runners — single-flight competitor scope needs user decision.
+- [P3→P5] 15:30 定时任务疑似失效（likely defunct）——GUI 已弃用（2026-09-04），无 GUI 并发跑者；API/CLI 由同一锁文件仲裁；任务存废待 Phase 5 ops polish 确认
 - [P2] REVIEW.md WR-01: token gate 为存在性检查且自开启——非回环绑定只查 token 存在，回环默认运行会自动生成 token，误配 0.0.0.0 时静默服务 LAN。修复需 env 强制 token + 控制台警告，属 Phase 3/4 鉴权加固范围
 - [P2] REVIEW.md WR-02/WR-03 + UI-audit 3 项优先级修复（机器可读错误码、双 404 文案归一、openapi/README 契约）——涉及 D-01/D-04 定稿决策，采纳需用户确认
 - [P2] 会话清理现象：交互会话启动的服务实例随会话结束收到 Ctrl+C（2026-09-03 晚 4 次 ^C 观察，LastTaskResult 0xC000013A）；AtStartup 自启路径不受影响——部署生命周期关注项，记入 Phase 5 ops polish
@@ -128,6 +128,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T17:57:11.781Z
-Stopped at: Completed 03-04-PLAN.md
+Last session: 2026-09-03T18:52:35Z
+Stopped at: Phase 03 complete, ready to plan Phase 4
 Resume file: None
