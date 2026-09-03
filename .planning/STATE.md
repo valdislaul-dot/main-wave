@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 03
 current_phase_name: Trigger Runner, Job Registry & Locks + Auth Enforcement
 status: executing
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-09-03T17:30:11.401Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-09-03T17:41:34.237Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 03 execution started
-state_head: 613d004c991f8c82e11f636a2f31102ee7ca2612
+state_head: d0df7a3bc69e8b92c99b3616410d86640a73cf59
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 40
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 ## Current Position
 
 Phase: 03 (Trigger Runner, Job Registry & Locks + Auth Enforcement) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 03 execution started
 
@@ -65,6 +65,7 @@ Progress: [████░░░░░░] 40%
 | Phase 02 P01 | 9 min | 3 tasks | 3 files |
 | Phase 03 P01 | 11 | 3 tasks | 4 files |
 | Phase 03 P02 | 12 | 3 tasks | 6 files |
+| Phase 03 P03 | 6 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,8 @@ Recent decisions affecting current work:
 - [Phase 03]: 409 双形态按 OQ1 定稿: 内存 claim 命中带 running_job_id, OS 锁独占(另一入口)不带 job_id 键
 - [Phase 03]: %2F 编码穿越 id 由 Starlette 路由层 404 拦截 (uvicorn/httpx 解码 %2F 成字面斜杠, {job_id} 无法跨段) — 同一闸门更早一层: 404、零文件访问、永不 500; handler 级 ^[0-9a-f]{32}$ 闸门钉全部无斜杠畸形 id
 - [Phase 03]: Task 2 tdd RED 结构性满足于 Task 1: 生产代码先于套件存在, 首跑全绿即无漂移证明 (修生产不弱化测试纪律保持)
+- [Phase 03]: [P3 03-03] st.rerun 置于 try/except/finally 之后并加 done 门控: 计划自身结构门要求 finally/fd.close/TimeoutExpired 文本先于分支内首个 st.rerun, 且超时路径无条件 rerun 会抹掉必须的「管线可能仍在运行」警告 — 释放保证不变 (finally 全路径关锁, gui_dashboard.py)
+- [Phase 03]: [P3 03-03] 超时路径不 st.stop(): 让本次运行完整渲染 (警告留在面板顶, 按钮下方区块照常显示); TimeoutExpired 子进程可能存活 (probe V4), 清理归 v2 ACT-04
 
 ### Pending Todos
 
@@ -119,6 +122,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T17:30:11.096Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-09-03T17:41:33.926Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
