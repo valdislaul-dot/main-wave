@@ -59,7 +59,12 @@ Plans:
   3. Consumer GETs /health/ready and receives 200 while all served files exist and are readable; only a missing/unreadable file produces 503. Stale data (night/weekend/holiday) never 503s.
   4. A code audit (grep) proves no GET handler makes an external network call — reads are pure local file reads that open, load and close fast.
 
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — api/state.py read-only passthrough (verbatim + X-Data-Mtime/Age-S) + defensive read layer (retry/stale fallback) + /health/ready + contract suite
+
 **Research**: skip — no research phase; spec decisions pinned in requirements before coding: Decision A (raw passthrough + X-Data-* headers, recommended, vs envelope) and Decision E (/health purity wording).
 
 ### Phase 3: Trigger Runner, Job Registry & Locks + Auth Enforcement
