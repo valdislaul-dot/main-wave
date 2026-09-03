@@ -12,7 +12,7 @@ from datetime import datetime
 from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from backtest_common import parse_window, has_window_args
+from backtest_common import parse_window, has_window_args, temp_position
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
@@ -187,13 +187,13 @@ def main():
                 'dt_risk': max(10, min(100, 100 - (dt_p - 5) * 3)),
                 'turnover': norm.get('turnover', {}).get(to_b, 50),
             }
-            day_map[code] = (f, board_type, cons, k)
+            day_map[code] = (f, board_type, cons, k, vr)
         factor_days[date_fmt] = day_map
     print(f'因子预计算: {len(factor_days)}天')
 
     # ===== 交易模拟(score_min参数化, gap_mode硬边界/平滑, sort_mode排序组合) =====
     def simulate(dates_fmt, score_min, pos_pct_fn, gap_mode='hard', band=1.0,
-                 sort_mode='mul', add_k=10.0, buy_allow_fn=None):
+                 sort_mode='mul', add_k=10.0, buy_allow_fn=None, select_mode='v4'):
         cash = INIT
         pos = None
         trades = []
@@ -237,12 +237,21 @@ def main():
             if pos is None and i > 0 and (buy_allow_fn is None or buy_allow_fn(d)):
                 prev_d = dates_fmt[i - 1]
                 cands = []
-                for code, (f, btype, cons, k) in factor_days.get(prev_d, {}).items():
+                for code, (f, btype, cons, k, vr_raw) in factor_days.get(prev_d, {}).items():
                     if btype == '一字' or (cons >= 4 and btype in ('一字', 'T字')):
                         continue
-                    score = sum(weights[fac] * f[fac] for fac in FACTORS) / 100.0
-                    if score < score_min:
-                        continue
+                    if select_mode == 'a_shrink':
+                        # A式选股(2026-09-04对比验证): 回避爆量>=2x, 缩量优先(vr升序)
+                        if vr_raw >= 2.0:
+                            continue
+                        score = sum(weights[fac] * f[fac] for fac in FACTORS) / 100.0
+                        if score < score_min:
+                            continue
+                        key = -vr_raw
+                    else:
+                        score = sum(weights[fac] * f[fac] for fac in FACTORS) / 100.0
+                        if score < score_min:
+                            continue
                     kls = ktbl.get(code)
                     if not kls:
                         continue
@@ -255,17 +264,19 @@ def main():
                         w = gap_weight(gap, band=band)
                         if w <= 0:
                             continue
-                        if sort_mode == 'qual':
-                            key = score          # w仅作资格, 纯评分排序
-                        elif sort_mode == 'add':
-                            key = score + add_k * w   # 加法: gap权重只作有限加分
-                        else:
-                            key = score * w      # 乘法(数据裁决最优)
+                        if select_mode != 'a_shrink':
+                            if sort_mode == 'qual':
+                                key = score          # w仅作资格, 纯评分排序
+                            elif sort_mode == 'add':
+                                key = score + add_k * w   # 加法: gap权重只作有限加分
+                            else:
+                                key = score * w      # 乘法(数据裁决最优)
                     else:
                         if not (4.0 <= gap <= 8.0):
                             continue
-                        key = score
                         w = 1.0
+                        if select_mode != 'a_shrink':
+                            key = score
                     cands.append((key, code, gap, score, cons, w))
                 cands.sort(key=lambda x: -x[0])
                 for key, code, gap, score, cons, w in cands:
@@ -370,11 +381,12 @@ def main():
         from openpyxl import Workbook
         from openpyxl.styles import Font, PatternFill
         from openpyxl.utils import get_column_letter
-        # 窗口参数: --excel [start_ymd] [end_ymd], 默认 20250601 ~ 20250901
+        # 窗口参数: --excel [start_ymd] [end_ymd] [v4|a_shrink], 默认 20250601 ~ 20250901 v4
         _ai = sys.argv.index('--excel')
         _ws_, _we_ = '20250601', '20250901'
         if len(sys.argv) > _ai + 2:
             _ws_, _we_ = sys.argv[_ai + 1], sys.argv[_ai + 2]
+        _sm_ = sys.argv[_ai + 3] if len(sys.argv) > _ai + 3 else 'v4'
         win_fmt = [f'{y[:4]}-{y[4:6]}-{y[6:]}' for y in trade_dates if _ws_ <= y <= _we_]
         print(f'Excel回测窗口: {win_fmt[0]} ~ {win_fmt[-1]} ({len(win_fmt)}个交易日)')
         # 名称映射(全ths文件)
@@ -383,47 +395,40 @@ def main():
             with open(os.path.join(THS_DIR, f'{ymd}.json'), encoding='utf-8') as f:
                 for s in json.load(f):
                     name_map[str(s.get('code', ''))] = s.get('name', '')
-        # 温度四档动态仓位(2026-09-03定稿): 强市>=110全仓 / 弱市65-109半仓 / 下沿40-64三分之一 / 极弱<40空仓
+        # 温度分档动态仓位(2026-09-04拍板): <40空仓, 每10只一档仓位从40%起步, ≥100全仓
         def pos_pct(d):
-            n = temp_of.get(d, 0)
-            if n >= 110:
-                return 1.0
-            if n >= 65:
-                return 0.5
-            if n >= 40:
-                return 1/3
-            return 0.0
-        final, trades, end_pos = simulate(win_fmt, 0, pos_pct, gap_mode='smooth', band=1.0, sort_mode='mul')
+            return temp_position(temp_of.get(d, 0))
+        final, trades, end_pos = simulate(win_fmt, 0, pos_pct, gap_mode='smooth', band=1.0,
+                                          sort_mode='mul', select_mode=_sm_)
         wr = sum(1 for t in trades if t['pnl'] > 0) / len(trades) * 100 if trades else 0
         avg = sum(t['pnl'] for t in trades) / len(trades) if trades else 0
         edges = [t for t in trades if t.get('gap') is not None and (t['gap'] < 4 or t['gap'] > 8)]
-        n_days = {'强市>=110': 0, '弱市65-109': 0, '下沿40-64': 0, '极弱<40': 0}
+        n_days = {'强势>=100': 0, '弱市40-99': 0, '极弱<40': 0}
         for d in win_fmt:
             n = temp_of.get(d, 0)
-            if n >= 110:
-                n_days['强市>=110'] += 1
-            elif n >= 65:
-                n_days['弱市65-109'] += 1
+            if n >= 100:
+                n_days['强势>=100'] += 1
             elif n >= 40:
-                n_days['下沿40-64'] += 1
+                n_days['弱市40-99'] += 1
             else:
                 n_days['极弱<40'] += 1
         results_dir = os.path.dirname(BASE)   # 桌面(2026-09-04用户要求结果放桌面)
         os.makedirs(results_dir, exist_ok=True)
-        xlsx_path = os.path.join(results_dir, f'gap_smooth_backtest_{win_fmt[0].replace("-","")}_{win_fmt[-1].replace("-","")}.xlsx')
+        xlsx_path = os.path.join(results_dir, f'gap_smooth_backtest_{win_fmt[0].replace("-","")}_{win_fmt[-1].replace("-","")}_{_sm_}.xlsx')
         wb = Workbook()
         ws = wb.active
         ws.title = '汇总'
         head_font = Font(bold=True, color='FFFFFF')
         head_fill = PatternFill('solid', fgColor='4472C4')
+        _sm_label = 'A式缩量选股(回避爆量>=2x, 缩量优先)' if _sm_ == 'a_shrink' else 'V4综合分(评分xgap权重)'
         rows = [
-            [f'新规则回测汇总 ({win_fmt[0]} ~ {win_fmt[-1]}, 本金10万)'],
-            ['买入规则', '无评分门槛 | gap平滑窗4-8%+-1%边缘带 | 综合分=评分xgap权重(乘法) Top1优先 | 过滤一字/4板+一字/300·688'],
+            [f'新规则回测汇总 ({win_fmt[0]} ~ {win_fmt[-1]}, 本金10万, 选股={_sm_label})'],
+            ['买入规则', '无评分门槛 | gap平滑窗4-8%+-1%边缘带 | 过滤一字/4板+一字/300·688 | 排序: ' + _sm_label],
             ['卖出规则', '决策树定卖/留: 硬止损-10%盘中兜底 | 昨涨停低开弱转强失败卖 | 昨断板gap<4卖 | 否则留; 决定卖→开盘价成交'],
-            ['仓位规则', '温度四档: 强市>=110全仓 | 弱市65-109半仓 | 下沿40-64三分之一仓 | 极弱<40空仓'],
+            ['仓位规则', '温度分档: <40空仓 | 每10只一档仓位从40%起步 | >=100全仓'],
             ['数据说明', '池数据全部来自同花顺真实拉取(2026-09-04补齐缺失日期); 部分日期API无炸板次数/封板时间字段走缺省档'],
             ['窗口', f'{win_fmt[0]} ~ {win_fmt[-1]}', f'{len(win_fmt)}个交易日'],
-            ['温度分布', f"强市{n_days['强市>=110']}天", f"弱市{n_days['弱市65-109']}天", f"下沿{n_days['下沿40-64']}天", f"极弱{n_days['极弱<40']}天"],
+            ['温度分布', f"强势{n_days['强势>=100']}天", f"弱市{n_days['弱市40-99']}天", f"极弱{n_days['极弱<40']}天"],
             [''],
             ['指标', '数值'],
             ['期末资金', f'{final:,.0f}'],
@@ -459,13 +464,12 @@ def main():
             cell.font = head_font
             cell.fill = head_fill
         def _tlabel(n):
-            if n >= 110:
-                return '强市'
-            if n >= 65:
-                return '弱市'
-            if n >= 40:
-                return '下沿'
-            return '极弱'
+            p = temp_position(n)
+            if p >= 1.0:
+                return '强势'
+            if p <= 0:
+                return '极弱'
+            return f'{int(p*100)}%仓'
         di = {d: i for i, d in enumerate(win_fmt)}
         pnl_rows = []
         for i, t in enumerate(trades, 1):
@@ -500,7 +504,7 @@ def main():
             wb.save(xlsx_path)
         except PermissionError:
             import time
-            xlsx_path = os.path.join(results_dir, f'gap_smooth_backtest_{win_fmt[0].replace("-","")}_{win_fmt[-1].replace("-","")}_{time.strftime("%H%M%S")}.xlsx')
+            xlsx_path = os.path.join(results_dir, f'gap_smooth_backtest_{win_fmt[0].replace("-","")}_{win_fmt[-1].replace("-","")}_{_sm_}_{time.strftime("%H%M%S")}.xlsx')
             wb.save(xlsx_path)
             print('⚠ 原文件名被占用, 已改用时间戳文件名')
         print(f'✓ Excel已生成: {xlsx_path}')
@@ -508,15 +512,8 @@ def main():
     print('\n====================================================================================================')
     _wf = [f'{y[:4]}-{y[4:6]}-{y[6:]}' for y in trade_dates]
     def _pp(d):
-        n = temp_of.get(d, 0)
-        if n >= 110:
-            return 1.0
-        if n >= 65:
-            return 0.5
-        if n >= 40:
-            return 1/3
-        return 0.0
-    print(f'score_min 门槛扫描 (窗口 {_wf[0]} ~ {_wf[-1]}, 温度四档仓位, 决策树+开盘价卖出)')
+        return temp_position(temp_of.get(d, 0))
+    print(f'score_min 门槛扫描 (窗口 {_wf[0]} ~ {_wf[-1]}, 温度分档仓位, 决策树+开盘价卖出)')
     print('=' * 100)
     for ms in (30, 40, 50, 60, 70):
         final, trades, _pos = simulate(_wf, ms, _pp, gap_mode='smooth', band=1.0, sort_mode='mul')

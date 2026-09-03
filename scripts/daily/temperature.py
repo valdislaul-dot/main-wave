@@ -1,34 +1,49 @@
-"""温度开关纯函数模块 (2026-09-03用户拍板)
+"""温度开关纯函数模块 (2026-09-04用户拍板新分档, 替代09-03四档)
 档位决策与IO剥离, 供morning_check调用 + 离线单测/历史回放
-四档: 极弱(空仓, 升温例外半仓) | 弱市下沿40-64(1/3仓) | 弱市65-109(半仓) | 强市≥110(全仓)
-降档(任一条触发降一档, 只降一次, 下限空仓):
+分档(涨停数, 每10只一档, 仓位从40%起步):
+  <40: 空仓(极弱, 升温日例外半仓) | 40-49: 40% | 50-59: 50% | ... | 90-99: 90% | ≥100: 100%(强势)
+  极弱附加条件(09-03拍板保留): 最高板≤2 → 空仓
+降档(任一条触发降一档=减10%仓位, 只降一次, 下限空仓):
   a. 骤降防线: 涨停数降≥30% 或 最高板降≥2级
   b. 竞价二次确认: 池均gap ≤ -0.5%
   c. 赚钱效应转负: <0 (原<-2.0, 2026-09-03收紧)
+数据背景(2026-09-04检验, 用户已知晓仍拍板此方案): 298天重建序列上涨停数分档
+对次日赚效区分度弱, 极弱档次日赚效最高(+1.89%)存在冰点反抽; 本分档为用户裁决口径。
 """
 
-# 阈值常量 (2026-09-03用户拍板)
-ZT_WEAK = 40          # 极弱线: 涨停<40 或 最高≤2板 → 空仓
-ZT_SUB = 65           # 弱市细分线: 40≤涨停<65 → 1/3仓, 65≤涨停<110 → 半仓
-ZT_STRONG = 110       # 强市线: 涨停≥110 → 全仓
+# 阈值常量 (2026-09-04用户拍板: 40以下空仓, 每10一档, 仓位从40%开始)
+ZT_WEAK = 40          # 极弱线: 涨停<40 → 空仓
+ZT_STRONG = 100       # 强势线: 涨停≥100 → 全仓
 COLLAPSE_RATIO = 0.7  # 骤降防线: 涨停数 ≤ 前日×0.7 (降≥30%)
 COLLAPSE_CONS = 2     # 骤降防线: 最高板较前日降≥2级
 GAP_CONFIRM = -0.5    # 竞价二次确认: 池均gap ≤ -0.5% → 降档
+WARMING_HALF = 0.5    # 极弱+升温日例外: 半仓
+POS_STEP = 0.1        # 每档仓位步长10%
 
-# 仓位阶梯: 全仓→半仓→1/3→空仓, 降档沿此下移一级
-LADDER = (1.0, 0.5, 0.33, 0.0)
 
-# 档位开关文案(降档时按新仓位重建, 避免"1/3仓(降档)"误导)
-_SWITCH_TXT = {
-    1.0: '🟢 买入开关: 全仓',
-    0.5: '🟢 买入开关: 半仓',
-    0.33: '🟡 买入开关: 1/3仓',
-    0.0: '🛑 买入开关: 关闭(空仓)',
-}
+def base_position(zt_n):
+    """基础仓位: zt_n//10×10% 封顶100%; <40空仓"""
+    if zt_n < ZT_WEAK:
+        return 0.0
+    return round(min(1.0, (zt_n // 10) * POS_STEP), 2)
+
+
+# 档位开关文案
+def _switch_txt(pos):
+    if pos <= 0:
+        return '🛑 买入开关: 关闭(空仓)'
+    if pos >= 1.0:
+        return '🟢 买入开关: 全仓'
+    label = {0.4: '四成', 0.5: '半仓', 0.6: '六成', 0.7: '七成', 0.8: '八成', 0.9: '九成'}
+    return f'🟢 买入开关: {label.get(pos, f"{int(pos*100)}%")}仓'
+
+
+# 合法仓位阶梯 (2026-09-04拍板: 40%起步每档+10%), 降档沿此下移一级, 40%降档→空仓
+LADDER = (1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.0)
 
 
 def _ladder_down(pos_pct):
-    """pos_pct 沿 LADDER 降一级, 已是地板则原地不动"""
+    """沿 LADDER 降一档, 已是地板则原地不动"""
     if pos_pct <= 0:
         return 0.0
     for i, p in enumerate(LADDER):
@@ -45,25 +60,20 @@ def decide_temp_switch(zt_n, max_cons, zt_prev=None, max_cons_prev=None,
     返回 {env, switch, pos_pct, warming, collapse, downgraded, downgrade_reason}"""
     warming = zt_prev is not None and zt_n > zt_prev
 
-    # ① 基础档 (2026-09-03定稿)
-    if zt_n < ZT_WEAK or max_cons <= 2:
+    # ① 基础档 (2026-09-04新分档)
+    if zt_n < ZT_WEAK or max_cons <= 2:   # 极弱(09-03附加条件保留): 涨停<40 或 最高板≤2
         if warming:
-            env, pos = '🌡️ 极弱', 0.5
+            env, pos = '🌡️ 极弱', WARMING_HALF
             switch = '🟡 买入开关: 半仓(升温日例外)'
         else:
             env, pos = '🌡️ 极弱', 0.0
-            switch = _SWITCH_TXT[0.0]
-    elif zt_n >= ZT_STRONG:
-        env, pos = '🌡️ 强势', 1.0
-        switch = _SWITCH_TXT[1.0]
-    elif zt_n < ZT_SUB:
-        env, pos = '🌡️ 弱市(下沿)', 0.33
-        switch = _SWITCH_TXT[0.33]
+            switch = _switch_txt(0.0)
     else:
-        env, pos = '🌡️ 弱市', 0.5
-        switch = _SWITCH_TXT[0.5]
+        pos = base_position(zt_n)
+        env = '🌡️ 强势' if pos >= 1.0 else '🌡️ 弱市'
+        switch = _switch_txt(pos)
 
-    # ② 降档规则 (仓位>0才评估; 任一条触发降一级, 只降一次)
+    # ② 降档规则 (仓位>0才评估; 任一条触发降一档, 只降一次)
     collapse_parts = []
     if zt_prev is not None and zt_n <= zt_prev * COLLAPSE_RATIO:
         collapse_parts.append(f'{zt_prev}→{zt_n}只')
@@ -85,10 +95,10 @@ def decide_temp_switch(zt_n, max_cons, zt_prev=None, max_cons_prev=None,
         pos = _ladder_down(pos)
         downgraded = True
         env += '↓'
-        if pos == 0.0:
+        if pos <= 0.0:
             switch = f'🛑 买入开关: 关闭(空仓, {reason}降档)'
         else:
-            switch = f'{_SWITCH_TXT[pos]}({reason}降档)'
+            switch = f'{_switch_txt(pos)}({reason}降档)'
 
     return {'env': env, 'switch': switch, 'pos_pct': pos,
             'warming': warming, 'collapse': collapse,

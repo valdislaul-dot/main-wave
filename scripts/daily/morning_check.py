@@ -145,9 +145,9 @@ def compute_position_decision(pos):
 
 def compute_environment(pf):
     """静默计算市场环境评级+买入开关 (2026-08-20: 供决策摘要先行打印)
-    分档(2026-09-03用户拍板): 极弱<40或最高≤2板=空仓(升温例外半仓) |
-    弱市下沿40-64=1/3仓 | 弱市65-109=半仓 | 强市≥110=全仓
-    降档(任一条触发降一档, 只降一次): 骤降防线 | 竞价二次确认 | 赚钱效应转负
+    分档(2026-09-04用户拍板): 极弱<40或最高≤2板=空仓(升温例外半仓) |
+    每10只一档仓位从40%起步(40-49=40%...90-99=90%) | 涨停≥100=全仓
+    降档(任一条触发沿阶梯降一档, 只降一次): 骤降防线 | 竞价二次确认 | 赚钱效应转负
     返回 {env, switch, pos_pct, warming, collapse, zt_n, max_cons, zt_prev, max_cons_prev,
           avg_gap, money_effect, downgraded, downgrade_reason}"""
     r = {'env': None, 'switch': None, 'pos_pct': 0, 'warming': False, 'collapse': False,
