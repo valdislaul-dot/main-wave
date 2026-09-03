@@ -111,7 +111,7 @@ Plans:
   4. Trigger date parameters accept only whitelisted formats (YYYY-MM-DD / YYYYMMDD) and reach scripts as argument lists — shell injection attempts are structurally impossible.
   5. Scans confirm data/api_token.txt appears in neither git history nor the sync_cloud whitelist; README documents the API's known limits (single-flight scope, remaining concurrent entry points).
 
-**Plans**: 4/7 plans executed
+**Plans**: 6/7 plans executed
 
 **Wave 1**
 
@@ -129,7 +129,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 04-06-PLAN.md — PROJECT.md 定稿 data-classification table + README known-limits + SC5 scan evidence (depends_on 04-05: documents its boot-posture outcome)
+- [x] 04-06-PLAN.md — PROJECT.md 定稿 data-classification table + README known-limits + SC5 scan evidence (depends_on 04-05: documents its boot-posture outcome)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -162,5 +162,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Service Skeleton + /health Liveness | 2/2 | Complete    | 2026-09-03 |
 | 2. Read-Only State Endpoints + Defensive Read Layer | 1/1 | Complete    | 2026-09-03 |
 | 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 4/4 | Complete    | 2026-09-04 |
-| 4. Exposure Hardening + Data Classification | 4/7 | In Progress|  |
+| 4. Exposure Hardening + Data Classification | 6/7 | In Progress|  |
 | 5. Recovery, Observability & Ops Polish | 0/TBD | Not started | - |

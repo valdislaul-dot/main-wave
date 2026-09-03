@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 4
 current_phase_name: Exposure Hardening + Data Classification
 status: executing
-stopped_at: Completed 04-05-PLAN.md
-last_updated: "2026-09-03T21:12:58.173Z"
+stopped_at: Completed 04-06-PLAN.md
+last_updated: "2026-09-03T21:22:20.487Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 4 execution started
-state_head: 8d505b7b2b3f9561e9cb57e946672eef576d53d8
+state_head: b8e9169038e2c5f5d9396b047270dd8e34370f55
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 14
-  completed_plans: 12
+  completed_plans: 13
   percent: 60
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 ## Current Position
 
 Phase: 4 (Exposure Hardening + Data Classification) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-09-04 — Phase 4 execution started
 
@@ -73,6 +73,7 @@ Progress: [██████░░░░] 60%
 | Phase 04 P03 | 14 | 3 tasks | 4 files |
 | Phase 04-exposure-hardening-data-classification P04 | 13min | 3 tasks | 6 files |
 | Phase 04-exposure-hardening-data-classification P05 | 6min | 2 tasks | 2 files |
+| Phase 04 P06 | 20 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -126,6 +127,8 @@ Recent decisions affecting current work:
 - [Phase 4]: P4 04-05: D-12 warning goes to stderr (not stdout) — case 7's stdout-only pin survives byte-unchanged; comment appended explaining why
 - [Phase 4]: P4 04-05: main() docstring paragraph refreshed from 'env+file 现存状态' to env-only WR-01/D-12 semantics (old text documented the buggy behavior — Rule 1 stale-doc fix)
 - [Phase 4]: P4 04-05: file-token refusal test seeds sentinel file and asserts bytes unchanged + uvicorn.run never called (recorder fake) — pins refusal precedes ensure_token/uvicorn without file-creation races
+- [Phase 04]: README.md content written local-only, NOT committed: repo CLAUDE.md + .gitignore (2026-08-31 用户定) keep 项目说明 (README/CLAUDE/CONTEXT) 不上传 GitHub; plan task-2 commit step waived (CLAUDE.md precedence) — SC5 documented-limits satisfied on the local file the 04-07 gate reads
+- [Phase 04]: README single-flight wording scoped to byte-checked facts (api/actions.py raise sites): per-kind lock, same-API overlap 409 already_running + running_job_id; other-entry hold already_running_other_entry no job_id — no invented locks/rate-limits/ETags in docs
 
 ### Pending Todos
 
@@ -151,6 +154,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T21:12:57.772Z
-Stopped at: Completed 04-05-PLAN.md
+Last session: 2026-09-03T21:21:53.226Z
+Stopped at: Completed 04-06-PLAN.md
 Resume file: None
