@@ -10,13 +10,13 @@ Requirements for initial release. Each maps to roadmap phases.
 ### 健康检查 (HLT)
 
 - [x] **HLT-01**: GET /health 探活——纯内存返回 `{"status":"ok","uptime_seconds":N}`，永远 200，不受鉴权拦截，数据过期绝不 503
-- [ ] **HLT-02**: GET /health/ready 就绪——stat 状态文件存在性/可读性，仅不可读时 503，不看数据新旧
+- [x] **HLT-02**: GET /health/ready 就绪——stat 状态文件存在性/可读性，仅不可读时 503，不看数据新旧
 
 ### 只读状态 (STA)
 
-- [ ] **STA-01**: GET /v1/state/{name} 行情/温度透传（market_state/auction_state/zt_pool_state），原始文件体 + X-Data-Mtime/X-Data-Age-S 新鲜度头
+- [x] **STA-01**: GET /v1/state/{name} 行情/温度透传（market_state/auction_state/zt_pool_state），原始文件体 + X-Data-Mtime/X-Data-Age-S 新鲜度头
 - [ ] **STA-02**: 持仓/账本/候选读取接口（数据分级：token 保护）
-- [ ] **STA-03**: 防御性读层——开→读→关、JSONDecodeError 短重试、末次成功缓存回退带 stale 标记（半写文件防护）
+- [x] **STA-03**: 防御性读层——开→读→关、JSONDecodeError 短重试、末次成功缓存回退带 stale 标记（半写文件防护）
 
 ### 触发接口 (ACT)
 
@@ -74,10 +74,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | HLT-01 | Phase 1 | Complete |
-| HLT-02 | Phase 2 | Pending |
-| STA-01 | Phase 2 | Pending |
+| HLT-02 | Phase 2 | Complete |
+| STA-01 | Phase 2 | Complete |
 | STA-02 | Phase 4 | Pending |
-| STA-03 | Phase 2 | Pending |
+| STA-03 | Phase 2 | Complete |
 | ACT-01 | Phase 3 | Pending |
 | ACT-02 | Phase 3 | Pending |
 | ACT-03 | Phase 3 | Pending |

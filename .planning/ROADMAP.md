@@ -63,7 +63,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — api/state.py read-only passthrough (verbatim + X-Data-Mtime/Age-S) + defensive read layer (retry/stale fallback) + /health/ready + contract suite
+- [x] 02-01-PLAN.md — api/state.py read-only passthrough (verbatim + X-Data-Mtime/Age-S) + defensive read layer (retry/stale fallback) + /health/ready + contract suite
 
 **Research**: skip — no research phase; spec decisions pinned in requirements before coding: Decision A (raw passthrough + X-Data-* headers, recommended, vs envelope) and Decision E (/health purity wording).
 

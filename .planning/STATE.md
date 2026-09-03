@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 current_phase: 02
 current_phase_name: Read-Only State Endpoints + Defensive Read Layer
-status: "Phase 1 shipped — PR #1"
-stopped_at: Phase 2 context gathered
-last_updated: "2026-09-03T00:34:06.385Z"
+status: verifying
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-09-03T12:07:10.910Z"
 last_activity: 2026-09-03
-last_activity_desc: Phase 1 complete, transitioned to Phase 2
-state_head: 36557251e8c9c914d9277c2a85ac10e408f2ebe9
+last_activity_desc: Phase 02 execution started
+state_head: ea2ea7a795c657011896cf39d03c1499b46e04e1
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 20
 ---
 
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-03)
 
 **Core value:** External systems get gogo's live state (health/持仓/温度/market status) and trigger core operations (pipeline/auction/backtest) through one stable HTTP API, without disturbing the existing pipeline.
-**Current focus:** Phase 2 — Read-Only State Endpoints + Defensive Read Layer
+**Current focus:** Phase 02 — Read-Only State Endpoints + Defensive Read Layer
 
 ## Current Position
 
-Phase: 02 (Read-Only State Endpoints + Defensive Read Layer) — READY TO EXECUTE
-Plan: Not started
-Status: Phase 1 shipped — PR #1
-Last activity: 2026-09-03 — Phase 1 complete, transitioned to Phase 2
+Phase: 02 (Read-Only State Endpoints + Defensive Read Layer) — EXECUTING
+Plan: 1 of 1
+Status: Phase complete — ready for verification
+Last activity: 2026-09-03 — Phase 02 execution started
 
 Progress: [██░░░░░░░░] 20%
 
@@ -61,6 +61,8 @@ Progress: [██░░░░░░░░] 20%
 |------|----------|-------|-------|
 | Phase 01 P01-01 | 8min | 3 tasks | 9 files |
 | Phase 01 P01-02 | 9min | 3 tasks | 2 files |
+| Phase 02 P01 | 35 min | 3 tasks | 3 files |
+| Phase 02 P01 | 9 min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -78,6 +80,10 @@ Recent decisions affecting current work:
 - [Phase 1]: Boot-trigger delay delivered as fixed Delay=PT5M not RandomDelay: PS 5.1 -RandomDelay silently dropped for AtStartup triggers (CIM class lacks the property; XML schema rejects it - legacy convention task never had it either)
 - [Phase 1]: SEC-03 boot check runs BEFORE any token generation (Pitfall-2); token at rest = data/api_token.txt (secrets, env-first-file-second, gitignored same-commit); -ExecutionTimeLimit PT0S so the resident service outlives the 3-day default
 - [Phase 1]: Repo's first test suite: pytest.ini pythonpath=. + tests/ (18 passed, 1 skipped, autouse network-block); import mechanics require `python -m api.main` from repo root
+- [Phase 02]: Followed D-01..D-05 locked decisions verbatim: raw byte passthrough (never re-serialize), same-handle fstat mtime, 3-name whitelist with 404 before path composition, 404-client/503-server error split with path-free details, stale marker only on the fallback path — Discuss-phase sign-off carried; wire contract (byte-verbatim + X-Data-* headers) is the consumer integration surface
+- [Phase 02]: get_state carries an injectable reader parameter (default read_state_file) as the deterministic test seam; retry constants pinned retries=2, retry_delay=0.02 — Timer-free unit tests via fake reader + retry_delay=0; RESEARCH design note line 237
+- [Phase 02]: api.main.py changed by exactly two lines (import + include_router after /health); boot sequence, SEC-03 ordering, __main__ guard untouched (diff-verified) — Phase 1 /health purity and SEC-03 fail-closed ordering are load-bearing; minimal-diff registration keeps the diff check trivially auditable
+- [Phase 02]: Zero new packages: stdlib-only defensive read layer on the installed fastapi 0.115.14 / starlette 0.46.2 stack — File sizes <= 48 KB single-user loopback service; package-legitimacy gate not triggered
 
 ### Pending Todos
 
@@ -101,6 +107,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-02T23:39:52.990Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-read-only-state-endpoints-defensive-read-layer/02-CONTEXT.md
+Last session: 2026-09-03T12:05:18.867Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None
