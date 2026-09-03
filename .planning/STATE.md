@@ -1,4 +1,4 @@
-| Phase 02 P01 | 9 min | 3 tasks | 3 files |---
+---
 gsd_state_version: 1.0
 current_phase: 3
 current_phase_name: Trigger Runner, Job Registry & Locks + Auth Enforcement
@@ -62,7 +62,6 @@ Progress: [████░░░░░░] 40%
 |------|----------|-------|-------|
 | Phase 01 P01-01 | 8min | 3 tasks | 9 files |
 | Phase 01 P01-02 | 9min | 3 tasks | 2 files |
-| Phase 02 P01 | 35 min | 3 tasks | 3 files |
 | Phase 02 P01 | 9 min | 3 tasks | 3 files |
 
 ## Accumulated Context
