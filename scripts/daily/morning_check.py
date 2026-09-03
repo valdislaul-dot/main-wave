@@ -2,7 +2,7 @@
 集成A的卖点引擎: 量能三态 + 封板质量 + 弱转强
 """
 import json, os, sys, time
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LOG_DIR = os.path.join(BASE, 'logs')
@@ -456,6 +456,22 @@ def stock_scoring_meta(code):
 
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
+    # SC4 会话日期门 (04-04, T-04-14): 先于候选加载/快照采集/网络 —— --date
+    # 存在且 != 本地会话日期 -> ASCII 拒绝 + exit 2 (fail-loud, PATTERNS)。
+    # 解析单源 date_args (T-04-15); 无 token = 今日运行, 与 Phase 3 行为相同。
+    try:
+        from date_args import resolve_date_arg
+        _session = resolve_date_arg(sys.argv)
+    except ValueError:
+        print('ERROR: invalid --date value: expected YYYY-MM-DD or YYYYMMDD '
+              '(a real calendar date) as the session date', file=sys.stderr)
+        sys.exit(2)
+    if _session is not None and _session != date.today():
+        print(f'ERROR: --date={_session:%Y-%m-%d} is not the current session '
+              f'date; refusing to label a live run under another date',
+              file=sys.stderr)
+        sys.exit(2)
+
     quick = '--quick' in sys.argv
     data = load_latest_candidates()
     pf = load_portfolio()

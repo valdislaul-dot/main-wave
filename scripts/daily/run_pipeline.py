@@ -14,6 +14,8 @@ BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 from update_data import main as update_data
 from screen_candidates import main as screen_candidates
 from trading_journal import print_status, record_buy, record_sell, record_hold_valuation
+from date_args import resolve_date_arg  # SC4 会话日期门单源解析 (04-04, 零副作用)
+from datetime import date
 
 
 def main():
@@ -42,6 +44,21 @@ def main():
         else:
             print('Usage: python run_pipeline.py [--status|--buy|--sell|--value]')
     else:
+        # SC4 会话日期门 (04-04, T-04-14): --date 存在且 != 本地会话日期 ->
+        # ASCII 拒绝 + exit 2, 先于任何采集/写文件/网络 (fail-loud, PATTERNS)。
+        # 解析单源 date_args (T-04-15); 无 token = 今日运行, 与 Phase 3 行为相同。
+        try:
+            _session = resolve_date_arg(sys.argv)
+        except ValueError:
+            print('ERROR: invalid --date value: expected YYYY-MM-DD or YYYYMMDD '
+                  '(a real calendar date) as the session date', file=sys.stderr)
+            sys.exit(2)
+        if _session is not None and _session != date.today():
+            print(f'ERROR: --date={_session:%Y-%m-%d} is not the current session '
+                  f'date; refusing to label a live run under another date',
+                  file=sys.stderr)
+            sys.exit(2)
+
         print('=' * 60)
         print('  每日选股流水线')
         print('=' * 60)
