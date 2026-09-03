@@ -12,7 +12,7 @@ BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 from scoring import (
     score_v4, load_config as load_scoring_config,
-    get_buy_window, get_score_min,
+    get_buy_window,
     load_config, sector_resonance_count,
 )
 LOG_DIR = os.path.join(BASE, 'logs')
@@ -295,9 +295,7 @@ def main():
             print(f'{r["code"]:<8} {r["name"]:<8} {cons:>3}板 {r["turnover"]:>5.1f}% {r["industry"]:<10} {warn} 区间{lo}-{hi}')
         print(f'{"="*85}')
 
-    min_score = get_score_min()
-    filtered_count = sum(1 for r in results if r['score'] >= min_score)
-    print(f'\n[Screen] 评分≥{min_score}: {filtered_count}/{len(results)}只 | 缺K线/评分失败: {score_fail}只')
+    print(f'\n[Screen] 评分完成: {len(results)}只 | 缺K线/评分失败: {score_fail}只')
     if fail_reasons:
         print(f'[Screen] 评分失败原因: {fail_reasons}')
 

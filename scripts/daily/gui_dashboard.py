@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import morning_check as mc
 import job_lock
-from scoring import load_config, compute_score, score_v4
+from scoring import load_config, compute_score, score_v4, gap_weight
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
@@ -82,7 +82,7 @@ c1, c2, c3 = st.columns([3, 1.2, 1])
 c1.title("📈 主升浪 V4.1")
 c2.markdown(f"<div style='text-align:center;font-size:1.3rem;font-weight:bold;margin-top:14px'>"
             f"{now.strftime('%m月%d日')} {wd}</div>", unsafe_allow_html=True)
-c2.caption(f"V3评分 | ≥{cfg['score_min']}分 | 竞价4-8%")
+c2.caption(f"V4评分 | 竞价4-8% | 评分排序")
 
 if c3.button("🔄 刷新数据", width='stretch'):
     # D-01: 一键刷新加入单飞锁 — 与API同 data/locks/pipeline.lock (kind=pipeline), 锁被占不抢跑 (ACT-03)
@@ -159,7 +159,7 @@ if auc:
     astocks = auc.get('stocks', [])
     captured = auc.get('captured', '?')
 
-    # 可买前三 (评分≥10, 竞价4-8%, 已过滤一字/4板+一字/300·688)
+    # 可买前三 (gap平滑窗口, 已过滤一字/4板+一字/300·688)
     buyable = []
     for s in astocks:
         code = s.get('code', '')
@@ -168,7 +168,8 @@ if auc:
             continue
         if s.get('one_line') or s.get('high_risk'):
             continue
-        if not (4.0 <= gap <= 8.0):
+        w = gap_weight(gap)
+        if w <= 0:
             continue
         # 现场评分(复用morning_check, 消除盲区), 失败退回快照分
         score = s.get('score', 0)
@@ -178,24 +179,23 @@ if auc:
                 score = meta['score']
         except Exception:
             pass
-        if score < cfg['score_min']:
-            continue
         buyable.append({'code': code, 'name': s.get('name', ''), 'gap': gap,
-                        'score': score, 'limit_days': s.get('limit_days', '?')})
-    buyable.sort(key=lambda x: x['score'], reverse=True)
+                        'score': score, 'weighted': score * w,
+                        'limit_days': s.get('limit_days', '?')})
+    buyable.sort(key=lambda x: x['weighted'], reverse=True)
 
     c1, c2 = st.columns([2, 1])
     with c1:
         if buyable:
             top3 = buyable[:3]
-            st.markdown(f"**可买前三**（采集 {captured}，评分≥{cfg['score_min']}）")
+            st.markdown(f"**可买前三**（采集 {captured}，按综合分排序）")
             rows = [{'#': i + 1, '名称': b['name'], '代码': b['code'],
                      '评分': f"{b['score']:.0f}", '竞价gap': f"{b['gap']:+.1f}%",
                      '连板': b['limit_days']}
                     for i, b in enumerate(top3)]
             st.dataframe(rows, width='stretch', hide_index=True)
         else:
-            st.caption("无可买标的（评分≥10 且竞价4-8%）")
+            st.caption("无可买标的（竞价4-8%窗口内）")
     with c2:
         st.markdown("**盘中买点参考**")
         st.caption("半路: 拉升破7%才追\n\n低吸①: 开盘价-7%急跌\n\n低吸②: 较开盘-10%\n\n⚠9:25后挂单受价格笼子(卖一×102%)")
@@ -251,8 +251,7 @@ if zt_stocks:
 
     scored.sort(key=lambda x: x['score'], reverse=True)
     filtered = [r for r in scored if not r['true_one']
-                and not (r['one_line'] and r['limit_days'] >= 4)
-                and r['score'] >= cfg['score_min']]
+                and not (r['one_line'] and r['limit_days'] >= 4)]
 
     st.caption(f"池 {len(zt_stocks)} 只 | 有K线 {len(scored)} 只 | 缺K线 {no_kline} 只")
     tab1, tab2 = st.tabs([f"✅ 可买({len(filtered)})", f"📋 全部({len(scored)})"])

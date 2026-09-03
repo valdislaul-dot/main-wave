@@ -99,13 +99,8 @@ def main():
         except Exception as e:
             print(f'[Warning] 封板重算失败: {e}')
 
-        # Step 1.6: 资金流采集 (新浪日频, 观察数据不进评分, 待N≥50回看检验)
-        print('\n[Step 1.6] 采集涨停池资金流...')
-        try:
-            from capture_money_flow import main as capture_money_flow
-            capture_money_flow()
-        except Exception as e:
-            print(f'[Warning] 资金流采集失败: {e}')
+        # Step 1.6 已弃用(2026-09-04): 资金流采集移除 — N≥50检验+大样本四象限裁决: 无预测力
+        # (历史: 新浪日频观察数据, 待N≥50回看检验独立预测力再解冻, 2026-09-04大样本否决)
 
         # Step 2: Update K-line (only ZT pool stocks, Tencent fqkline + Sina fallback)
         print('\n[Step 2/7] 更新K线数据(涨停池标的)...')

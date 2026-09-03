@@ -5,7 +5,6 @@
     4.0,
     8.0
   ],
-  "score_min": 50,
   "filters": {
     "true_one_line_skip": true,
     "board4_one_line_skip": true
@@ -134,6 +133,7 @@
         ">=20": 33
       }
     },
-    "searched_obj": 1214.0
-  }
+    "searched_obj": 1231.3
+  },
+  "gap_band": 1.0
 }

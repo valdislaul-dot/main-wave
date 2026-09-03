@@ -12,7 +12,7 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DESKTOP = os.path.join(os.path.expanduser("~"), "Desktop")
 
 EXCLUDE_DIRS = {
-    'kline_data', 'backtest_kline', 'minute_kline',   # K线数据(1.3G+25M+24M)
+    'kline_data', 'minute_kline',   # K线数据(1.3G+24M)
     '.git', '__pycache__', '.claude',
     'zt_pool_history',    # 东财历史缓存(95/110空文件, 已弃用)
 }

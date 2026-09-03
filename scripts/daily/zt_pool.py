@@ -164,10 +164,9 @@ def prune_stale(state, days=10):
 # ============================================================
 
 def _load_klines(code, name=None):
-    """加载K线: 兼容新旧两种格式"""
+    """加载K线: 兼容新旧两种格式 (2026-09-04写死: 只读 data/kline_data, backtest_kline已删除)"""
     search_dirs = [
         os.path.join(BASE, 'data', 'kline_data'),
-        os.path.join(BASE, 'data', 'backtest_kline'),
     ]
 
     for sdir in search_dirs:

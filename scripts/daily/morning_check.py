@@ -661,6 +661,7 @@ def main():
             candidate_scores[c['code']] = c
 
     # ── 今日竞价池买入候选（现场打分, 解决流水线评分盲区） ──
+    from scoring import gap_weight as _gw_fn
     buyable = []
     _stale_cnt = 0
     for s in auction_stocks:
@@ -675,7 +676,9 @@ def main():
         # 4板+一字/T字高危过滤 (2026-09-03修复: 定稿2026-08-24裁决, T字次日开盘买入-1.17%)
         if int(cand.get('cons', 0) or 0) >= 4 and cand.get('one_line', False):
             continue
-        if 4.0 <= gap <= 8.0:
+        # gap平滑窗口 (2026-09-04拍板: 3-4%/8-9%边缘带衰减, 4-8%核心, 带外=0)
+        _gw = _gw_fn(gap)
+        if _gw > 0:
             meta = stock_scoring_meta(code)
             if not meta.get('kline_fresh', True):
                 _stale_cnt += 1
@@ -688,6 +691,7 @@ def main():
             buyable.append({
                 'code': code, 'name': s.get('name', ''),
                 'gap': gap, 'score': final_score,
+                'weighted': final_score * _gw, 'gap_w': _gw,
                 'limit_days': meta['cons'] if meta['cons'] != '?' else s.get('limit_days', cand.get('cons', 1)),
                 'industry': meta['industry'] or cand.get('industry', ''),
                 'sector': meta['sector'],
@@ -697,7 +701,7 @@ def main():
 
     if _stale_cnt:
         print(f'  ⚠ K线滞后跳过 {_stale_cnt} 只候选(未覆盖T-1涨停bar, 防错日评分)')
-    buyable.sort(key=lambda x: x['score'], reverse=True)
+    buyable.sort(key=lambda x: x['weighted'], reverse=True)
 
     # ── 🌡️ 市场环境评级详情 (结论已在摘要, 此处解释) ──
     if env_info.get('env'):
@@ -736,11 +740,10 @@ def main():
                 print(f'  {_me_mark} 盘后赚钱效应: 昨日{_me:+.1f}% (关联最强指标, 转负降档)')
 
     # ── 📊 表1: 当日可买前三 ──
-    from scoring import get_score_min as _gsm
-    top3 = [b for b in buyable if b['score'] >= _gsm()][:3]
+    top3 = buyable[:3]
     if not quick:
         print(f'\n{"=" * 65}')
-        print(f'  📊 表1: 当日可买前三 (评分≥50, 竞价4-8%, 已过滤一字/4板+一字/300·688)')
+        print(f'  📊 表1: 当日可买前三 (gap平滑窗4-8%±1%边缘带, 按综合分=评分×gap权重排序, 已过滤一字/4板+一字/300·688)')
         print(f'{"=" * 65}')
     if top3 and not quick:
         print(f'  {"#":<3}{"标的":<14}{"评分":>6}{"竞价gap":>8}{"连板":>5}{"板块":>9}{"⚠跌停风险":>10}')
@@ -763,17 +766,17 @@ def main():
             print(f'  {i:<3}{b["name"]}({b["code"]}){b["score"]:>8.0f}{b["gap"]:>+7.1f}%'
                   f'{str(_cons) + "板":>6}{str(b["sector"]) + "只":>6}{_dt_str:>14}')
     elif not top3 and not quick:
-        print(f'  (无评分≥50的可买标的)')
+        print(f'  (无可买标的)')
 
     # quick模式: 一行式可买前三 (2026-08-31用户定死: 持仓建议与可买标的必出, 开关关闭也列并标注仅参考)
     if quick:
         _note = '' if env_info.get('pos_pct', 0) > 0 else ' ⚠买入开关关闭, 以下仅参考'
-        print(f'\n  ⚡ 可买前三(quick, 评分≥50 竞价4-8%){_note}:')
+        print(f'\n  ⚡ 可买前三(quick, gap平滑窗 按综合分排序){_note}:')
         for i, b in enumerate(top3, 1):
             print(f'    #{i} {b["name"]}({b["code"]}) {b["score"]:.0f}分 '
                   f'gap{b["gap"]:+.1f}% {int(b.get("limit_days") or 1)}板 板块{b["sector"]}只')
         if not top3:
-            print('    (无评分≥50的可买标的)')
+            print('    (无可买标的)')
 
     # ── 📊 表2: 前三名得分细则 ──
     if top3 and not quick:

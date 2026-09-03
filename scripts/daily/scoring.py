@@ -129,7 +129,6 @@ def default_scoring_config():
             "position": [[40, 100], [20, 50], [-99, 33]]
         },
         "buy_window": [4.0, 8.0],
-        "score_min":  10,
         "filters": {
             "true_one_line_skip":  True,
             "board4_one_line_skip": True
@@ -576,10 +575,24 @@ def get_buy_window(config=None):
     return config['buy_window']
 
 
-def get_score_min(config=None):
+def gap_weight(gap, config=None):
+    """竞价gap平滑窗口权重 (2026-09-04用户拍板: 硬边界改平滑)
+    梯形: [lo,hi]核心=1, 边缘带[lo-band,lo)/(hi,hi+band]线性衰减, 带外=0
+    配置: buy_window=[lo,hi], gap_band=band (band<=0时退化为硬边界)
+    回测依据: 一年234交易日, smooth±1.0% 均笔+5.76% vs 硬边界+5.44%, 边缘带8笔+3.33%"""
     if config is None:
         config = load_config()
-    return config['score_min']
+    lo, hi = config['buy_window']
+    band = config.get('gap_band', 1.0)
+    if band <= 0:
+        return 1.0 if lo <= gap <= hi else 0.0
+    if gap < lo - band or gap > hi + band:
+        return 0.0
+    if gap < lo:
+        return (gap - (lo - band)) / band
+    if gap > hi:
+        return (hi + band - gap) / band
+    return 1.0
 
 
 def should_filter(one_line, true_one_line, cons, config=None):
@@ -744,7 +757,7 @@ if __name__ == '__main__':
     print(f"V2 VR tiers:  {cfg['tables']['v2']['vr_tiers']}")
     print(f"V3 VR anchors: {cfg['tables']['v3']['vr_anchors'][:5]}...")
     print(f"V3 Gap anchors: {cfg['tables']['v3']['gap_anchors'][:5]}...")
-    print(f"Buy window: {cfg['buy_window']}, Score min: {cfg['score_min']}")
+    print(f"Buy window: {cfg['buy_window']}")
 
     # Test interpolation
     for x in [0.2, 0.4, 0.6, 1.0, 2.0, 5.0]:

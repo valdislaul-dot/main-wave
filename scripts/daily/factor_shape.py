@@ -41,7 +41,7 @@ def main():
                 continue
         if j is None:
             continue
-        name = (j.get('metadata') or {}).get('name', '')
+        name = (j.get('metadata') or {}).get('name', '') if isinstance(j, dict) else ''
         rows = j.get('data', j) if isinstance(j, dict) else j
         t = {}
         for r in rows:

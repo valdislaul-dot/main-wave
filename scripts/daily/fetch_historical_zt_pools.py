@@ -140,13 +140,7 @@ def main():
     print(f'完成! 成功:{success} 跳过:{skipped} 失败:{failed}')
     print(f'历史池唯一标的: {len(unique_codes)} 只')
     print(f'当前缓存标的: 242 只 → 覆盖提升 {len(unique_codes)/242:.1f}x')
-
-    # Save code manifest for K-line fetch
-    manifest = sorted(unique_codes)
-    manifest_path = os.path.join(BASE, 'data', 'backtest_codes.json')
-    with open(manifest_path, 'w', encoding='utf-8') as f:
-        json.dump(manifest, f, ensure_ascii=False)
-    print(f'标的清单已保存: {manifest_path}')
+    # 2026-09-04: backtest_codes.json 已随 backtest_kline 删除, K线唯一数据源=data/kline_data
 
 
 if __name__ == '__main__':
