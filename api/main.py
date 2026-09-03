@@ -20,6 +20,7 @@ from api.boot import ensure_token, has_token, is_loopback
 from api.state import router as state_router
 from api import jobs  # boot 序列用; import 无副作用 (03-02 D-12)
 from api.actions import router as actions_router
+from api.private import router as private_router
 from api.errors import (
     http_exception_handler,
     unhandled_exception_handler,
@@ -49,6 +50,7 @@ def health():
 
 
 app.include_router(state_router)
+app.include_router(private_router)  # 04-03: 机密级私密读 /v1/private/* (router 自带 auth, SEC-02)
 app.include_router(actions_router)  # 03-02: 受保护触发/job 路由 (D-11 豁免之外)
 
 
