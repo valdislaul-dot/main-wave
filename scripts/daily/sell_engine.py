@@ -411,18 +411,9 @@ def sell_signal(position, today_auction, config=None):
 
         is_minor_loss = loss_pct > soft_stop  # 浮亏在软止损范围内=小亏
 
-        # ── 大亏+平开/高开 → 等修复冲高 (2026-08-20新增, 仅温和炸板适用) ──
-        # 数据: 炸板股T日收盘分档×次日 — 温和档(-3%内)次日-1.5%, 收红档+2.8%;
-        #       深炸档(≤-7%)次日-8.8%~-15%, 正收益0%, 不适用缓冲(硬止损已在前面拦截)
-        hard_stop = config['loss_feedback']['hard_stop_pct']
-        if loss_pct <= hard_stop and gap > cfg_gap['deep_low_open'] + 1:
-            return _signal('watch', 'urgent',
-                f'昨浮亏{loss_pct:+.1f}%超硬止损+今{gap:+.1f}%平开/高开 → 等修复冲高减亏',
-                yesterday.get('high', auction_price),
-                '3年数据: 温和炸板次日平开76%上涨+2.18%, 比开盘止损平均少亏约1.6%; '
-                '盘中破-4%或冲高乏力→走')
-
         # ── 弱转强高开 (gap≥5%) — A体系 ──
+        # (2026-09-04定稿: 大高开优先于大亏等修复, 与CLAUDE.md树序一致;
+        #  深炸+大高开属极端形态, 反包确认+VWAP纪律比平开验证的等修复更适用)
         if gap >= cfg_gap['strong_high_open']:
             vwap_info = check_vwap_breach(yesterday)
             vwap_note = f'昨VWAP={vwap_info["vwap"]:.2f}, 昨低={vwap_info["low"]:.2f}'
@@ -440,6 +431,17 @@ def sell_signal(position, today_auction, config=None):
                 f'昨断板+gap{gap:+.1f}%≥4% → 持有观察 (V3.2规则)',
                 yesterday.get('high', auction_price),
                 'V3.2回测验证: 断板日gap≥4%持有收益为正')
+
+        # ── 大亏+平开/小高开 → 等修复冲高 (2026-08-20新增, 仅温和炸板适用) ──
+        # 数据: 炸板股T日收盘分档×次日 — 温和档(-3%内)次日-1.5%, 收红档+2.8%;
+        #       深炸档(≤-7%)次日-8.8%~-15%, 正收益0%, 不适用缓冲(硬止损已在前面拦截)
+        hard_stop = config['loss_feedback']['hard_stop_pct']
+        if loss_pct <= hard_stop and gap > cfg_gap['deep_low_open'] + 1:
+            return _signal('watch', 'urgent',
+                f'昨浮亏{loss_pct:+.1f}%超硬止损+今{gap:+.1f}%平开/小高开 → 等修复冲高减亏',
+                yesterday.get('high', auction_price),
+                '3年数据: 温和炸板次日平开76%上涨+2.18%, 比开盘止损平均少亏约1.6%; '
+                '盘中破-4%或冲高乏力→走')
 
         # ── 低开分支 — A体系 (2026-08-24修正: 跌停开按3年数据拆分) ──
         # 数据(v3跌停分析): 跌停开盘开板率仅30.1%(69.9%封死), 封死次日-2.1%~-5.75%;
