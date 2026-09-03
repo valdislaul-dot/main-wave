@@ -334,21 +334,30 @@ with open(log_path, "wb", buffering=0) as fh:               # no pipes -> no pip
 
 **What:** one dependency used at the router level; exemption is structural (public router vs protected router), not per-route middleware — no middleware touches /health at all.
 
+**Signature rule (hard, SEC-01):** the dependency takes ONLY `request: Request` — it must never declare an optional string parameter. FastAPI would surface such a parameter as an attacker-controllable query parameter (e.g. `?token_path=<file>` would let a caller redirect token resolution at an arbitrary path); 03-02 prohibition #2 pins the request-only shape and its auth suite asserts a `?token_path=` query cannot alter the 401/403/202 outcome.
+
 ```python
 # api/auth.py — reuses the Phase 1 token chain; nothing is logged, nothing echoes the token
+import hmac
+import os
 from fastapi import HTTPException, Request
 from api.boot import read_token
-def require_api_key(request: Request, token_path=None):
+from scripts.daily.config import DATA_DIR            # module attr = monkeypatch seam, read at call time
+
+def require_api_key(request: Request) -> str:
+    """X-API-Key gate (SEC-01, D-10). Request-only signature — no optional parameters
+    (FastAPI would expose them as attacker-controllable query parameters)."""
     provided = request.headers.get("X-API-Key")            # D: header name per REQUIREMENTS.md literal
     if provided is None:
         raise HTTPException(401, detail="missing API key",
                             headers={"WWW-Authenticate": "ApiKey"})   # D-10
-    expected = read_token(token_path)                      # env GOGO_API_TOKEN first, file second
+    expected = read_token(os.path.join(DATA_DIR, "api_token.txt"))     # env GOGO_API_TOKEN first, file second
     if expected is None or not hmac.compare_digest(expected.encode(), provided.encode()):
         raise HTTPException(403, detail="invalid API key") # D-10: present-but-wrong -> 403
+    return provided                                         # validated key string; no handler consumes it
 ```
 - Missing header → **401 + WWW-Authenticate**; present-but-wrong → **403** (D-10). Both constant-time via `hmac.compare_digest` (stdlib, locally docstring-verified). No token configured at all → fail-closed 403 (never 200; loopback boot auto-generates, so this is defensive only).
-- `token_path = os.path.join(DATA_DIR, "api_token.txt")` resolved at call time (Phase 2 monkeypatch seam convention — tests point DATA_DIR at tmp_path and write their own token file).
+- The token path `os.path.join(DATA_DIR, "api_token.txt")` is resolved **inside the function** at call time from the module `DATA_DIR` attribute (Phase 2 monkeypatch seam convention — tests point DATA_DIR at tmp_path and write their own token file). Never pass it in as a parameter: a `def require_api_key(request: Request, token_path=None)` shape would make FastAPI treat `token_path` as a caller-controlled query parameter (an attacker-controllable token-file path) — the request-only signature above is mandatory.
 - Exemption list (D-11): /health, /health/ready, GET /v1/state/{name} stay on the public routers; the new router (all POST /v1/actions/*, GET /v1/jobs/*) carries the dependency.
 - Key hygiene: uvicorn `access_log=False` already set ([VERIFIED: api/main.py:73]) — no access log to leak headers; children never receive the key (not in spawn env, not in argv); error details never echo the token. Executor adds a grep-audit test asserting the token value appears nowhere in `logs/api/console.log` and in no job log after a real trigger.
 
@@ -521,12 +530,13 @@ FAKE = "import json,sys,time;json.dump(sys.argv[1:],open(sys.argv[1],'w'));time.
 | A5 | The 4 fake-script test approach fully exercises spawn/409/auth without touching real pipelines or network | Validation | Wrong → real-machine smoke verify step (per SC1-SC5) catches integration gaps before phase gate |
 | A6 | Registry JSON files written by this phase remain readable by consumers across restarts even if a future phase changes the schema (schema is additive-tolerant) | Pattern 2 | Wrong → schema change breaks pollers; keep field set additive; documented as consumer surface |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **409 response body shape for the "running job" case**
+1. **409 response body shape for the "running job" case — (RESOLVED 2026-09-04, planner revision; pinned in 03-02-PLAN.md prohibition #7 and mirrored in its tests)**
    - What we know: D-10 pins 401/403 detail style to minimal `{"detail": ...}`; ACT-02/SC2 require the 409 to carry the running job_id; Phase 2 used plain-string details; WR-02 (machine-readable error codes) is deferred pending user confirmation.
    - What's unclear: whether 409's detail should be a plain string with the id interpolated, or an object `{"message": ..., "running_job_id": ...}`.
-   - Recommendation: object detail on 409 only (`{"detail": {"message": "pipeline already running", "running_job_id": "..."}}`) — the id is a machine-consumed value (the consumer polls it), which a prose string would force consumers to parse; 401/403 stay plain-string per D-10. Planner should pin this in the plan and mirror it in tests; no user sign-off needed (discretion area).
+   - Recommendation: object detail on 409 only (`{"detail": {"message": "pipeline already running", "running_job_id": "..."}}`) — the id is a machine-consumed value (the consumer polls it), which a prose string would force consumers to parse; 401/403 stay plain-string per D-10.
+   - **Resolution adopted:** 409 detail is an object in **both** branches — `{"message": "<kind> already running", "running_job_id": "<id>"}` when the in-memory claim holds the kind, and `{"message": "<kind> already running (another entry point)"}` (no `running_job_id` key — no job_id exists to report) when only the OS lock is held by the GUI/manual runner. 401/403/404 stay plain-string per D-10. This was a planner-discretion area; no user sign-off needed.
 
 ## Environment Availability
 
@@ -619,7 +629,7 @@ FAKE = "import json,sys,time;json.dump(sys.argv[1:],open(sys.argv[1],'w'));time.
 - Local stdlib docstrings/constants (Python 3.13.1): `subprocess.CREATE_NO_WINDOW == 0x8000000`, `msvcrt.locking` semantics ("The locked region of the file extends from the current file position for nbytes bytes"), `hmac.compare_digest` ("uses an approach designed to prevent timing analysis")
 
 ### Tertiary (LOW confidence — flagged)
-- None used for load-bearing claims; remaining unknowns are in the Assumptions Log / Open Questions.
+- None used for load-bearing claims; remaining unknowns are in the Assumptions Log (the single Open Question was resolved — 409 object detail shape, see the Open Questions (RESOLVED) section above).
 
 ## Metadata
 
