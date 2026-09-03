@@ -459,3 +459,88 @@ def test_404_and_503_edges_no_side_effects(tmp_path, monkeypatch):
     r = client.get(f"/v1/jobs/{'0' * 32}", headers=_headers())
     assert r.status_code == 503
     assert r.json() == {"detail": "job temporarily unavailable", "code": "job_temporarily_unavailable"}
+
+
+# ---------- 04-04 (SC4, D-26..D-28): 触发 date 白名单参数 ----------
+# 行为 1: 白名单格式 date 达脚本 = 固定 arg-list 尾部单一 token (注入结构性不可能);
+# 行为 2: 非法格式 -> 422 invalid_date_format, registry 恒空 (零 spawn);
+# 行为 3: 零参数 kind + date -> 422 date_not_supported (固定命令不变, 无回归由
+#         test_all_four_kinds_spawn_fixed_commands 等既有 no-date 钉保证);
+# 行为 4: 未知 kind 先于任何 date 逻辑 -> 404 (D-09 白名单门).
+
+def test_date_param_valid_delivery_appended_argv_pins(tmp_path, monkeypatch):
+    """?date= 白名单格式 -> 202; date 以单 token 附加在固定参数尾部 (argv 字节钉)。
+
+    pipeline ?date=2026-09-03 -> [..., --fast, --date=2026-09-03];
+    morning-check ?date=20260903 (compact) -> [..., --quick, --date=2026-09-03]
+    (归一化为 dashed)。registry cmd 与假脚本自身记录的 argv 双钉。
+    """
+    scripts = fake_script_tree(tmp_path, {"pipeline": ("run_pipeline.py", 0.3)})
+    monkeypatch.setattr(api.actions, "SCRIPTS_DIR", scripts)
+    out1 = tmp_path / "out-date1.json"
+    monkeypatch.setenv("FAKE_OUT", str(out1))
+
+    r = client.post("/v1/actions/pipeline?date=2026-09-03", headers=_headers())
+    assert r.status_code == 202
+    term1 = wait_terminal(r.json()["job_id"])
+    assert term1["status"] == "succeeded"
+    # registry cmd == [sys.executable, 假脚本, --fast, --date=2026-09-03] (D-09 固定参数原样 + 尾部附加)
+    assert term1["cmd"][0] == sys.executable
+    assert term1["cmd"][2:] == ["--fast", "--date=2026-09-03"]
+    recorded1 = json.loads(Path(out1).read_text(encoding="utf-8"))
+    assert recorded1["argv"] == [term1["cmd"][1], "--fast", "--date=2026-09-03"]
+
+    # morning-check compact 格式 -> 归一化 dashed 单 token (CONTEXT 字面形态)
+    scripts2 = fake_script_tree(tmp_path, {"morning-check": ("morning_check.py", 0.3)})
+    monkeypatch.setattr(api.actions, "SCRIPTS_DIR", scripts2)
+    out2 = tmp_path / "out-date2.json"
+    monkeypatch.setenv("FAKE_OUT", str(out2))
+    r2 = client.post("/v1/actions/morning-check?date=20260903", headers=_headers())
+    assert r2.status_code == 202
+    term2 = wait_terminal(r2.json()["job_id"])
+    assert term2["status"] == "succeeded"
+    assert term2["cmd"][2:] == ["--quick", "--date=2026-09-03"]
+    recorded2 = json.loads(Path(out2).read_text(encoding="utf-8"))
+    assert recorded2["argv"] == [term2["cmd"][1], "--quick", "--date=2026-09-03"]
+
+
+def test_date_invalid_formats_422_zero_spawn(tmp_path, monkeypatch):
+    """非法格式 (格式/历法) -> 422 信封; registry 每次 422 后恒空 (无 lock/claim/spawn)。"""
+    scripts = fake_script_tree(tmp_path, {"pipeline": ("run_pipeline.py", 0.3)})
+    monkeypatch.setattr(api.actions, "SCRIPTS_DIR", scripts)
+    monkeypatch.setenv("FAKE_OUT", str(tmp_path / "out-invalid.json"))
+    for bad in ("2026/09/03", "2026093", "abc", "2026-13-99", "2026-02-30"):
+        r = client.post(f"/v1/actions/pipeline?date={bad}", headers=_headers())
+        assert r.status_code == 422, f"{bad!r} -> {r.status_code} (must be 422)"
+        assert r.json() == {
+            "detail": "date must be YYYY-MM-DD or YYYYMMDD",
+            "code": "invalid_date_format",
+        }
+        assert _registry_files() == []  # 422 先于 lock/claim/spawn (SC4)
+
+
+def test_date_on_zero_param_kinds_422_not_supported(tmp_path, monkeypatch):
+    """backtest-weights/health-check 零参数不变: 带 date -> 422 date_not_supported。"""
+    for kind, script_name in (
+        ("backtest-weights", "backtest_v4.py"),
+        ("health-check", "data_health_check.py"),
+    ):
+        scripts = fake_script_tree(tmp_path, {kind: (script_name, 0.2)})
+        monkeypatch.setattr(api.actions, "SCRIPTS_DIR", scripts)
+        monkeypatch.setenv("FAKE_OUT", str(tmp_path / f"out-{kind}.json"))
+        r = client.post(f"/v1/actions/{kind}?date=2026-09-03", headers=_headers())
+        assert r.status_code == 422, f"{kind}?date -> {r.status_code} (must be 422)"
+        assert r.json() == {
+            "detail": "date not supported for this action kind",
+            "code": "date_not_supported",
+        }
+        assert _registry_files() == []  # 422 先于任何 spawn
+    # 无 date 回归钉由既有 test_all_four_kinds_spawn_fixed_commands 承担 (本文件未动)
+
+
+def test_unknown_kind_with_date_404_kind_gate_first(tmp_path, monkeypatch):
+    """未知 kind + date -> 404 unknown_action_kind (kind 白名单先于一切 date 逻辑)。"""
+    r = client.post("/v1/actions/nonsense?date=2026-09-03", headers=_headers())
+    assert r.status_code == 404
+    assert r.json() == {"detail": "Not Found", "code": "unknown_action_kind"}
+    assert _registry_files() == []
