@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 current_phase: 03
 current_phase_name: Trigger Runner, Job Registry & Locks + Auth Enforcement
-status: executing
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-09-03T17:41:34.237Z"
+status: verifying
+stopped_at: Completed 03-04-PLAN.md
+last_updated: "2026-09-03T17:57:12.104Z"
 last_activity: 2026-09-04
 last_activity_desc: Phase 03 execution started
-state_head: d0df7a3bc69e8b92c99b3616410d86640a73cf59
+state_head: ef90aaca689ea82e1fef4426b7140ada0844202a
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
   percent: 40
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 
 Phase: 03 (Trigger Runner, Job Registry & Locks + Auth Enforcement) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-04 — Phase 03 execution started
 
 Progress: [████░░░░░░] 40%
@@ -66,6 +66,7 @@ Progress: [████░░░░░░] 40%
 | Phase 03 P01 | 11 | 3 tasks | 4 files |
 | Phase 03 P02 | 12 | 3 tasks | 6 files |
 | Phase 03 P03 | 6 | 2 tasks | 1 files |
+| Phase 03 P04 | 17 | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,10 @@ Recent decisions affecting current work:
 - [Phase 03]: Task 2 tdd RED 结构性满足于 Task 1: 生产代码先于套件存在, 首跑全绿即无漂移证明 (修生产不弱化测试纪律保持)
 - [Phase 03]: [P3 03-03] st.rerun 置于 try/except/finally 之后并加 done 门控: 计划自身结构门要求 finally/fd.close/TimeoutExpired 文本先于分支内首个 st.rerun, 且超时路径无条件 rerun 会抹掉必须的「管线可能仍在运行」警告 — 释放保证不变 (finally 全路径关锁, gui_dashboard.py)
 - [Phase 03]: [P3 03-03] 超时路径不 st.stop(): 让本次运行完整渲染 (警告留在面板顶, 按钮下方区块照常显示); TimeoutExpired 子进程可能存活 (probe V4), 清理归 v2 ACT-04
+- [Phase 03]: [P3 03-04] 真机重启路径 = Start-ScheduledTask 'gogo-api'(需免沙箱启动): 沙箱化启动的实例在调用收尾时收到 Ctrl+C 死亡 (LastTaskResult 0xC000013A), 免沙箱后常驻 (0x41301 running); boot 期 reload_registry 在 /health 200 后数秒内把被杀 pipeline job 标为 interrupted —— main() 装载的真机证明 (03-02 wiring)
+- [Phase 03]: [P3 03-04] 实况 SC2/SC3/SC5 全过: 409 携带 running_job_id 逐字节吻合; /health p95=17.14ms (120 样本, 真管线运行中, 界 50ms); taskkill /F /T 35864 树杀 (Step 1.5 运行中被杀) → 重启 → interrupted+finished_at+部分日志 753B 留存 → job_lock.acquire 即时成功 (OS 自动释放经真崩溃验证) → 新 health-check 触发成功
+- [Phase 03]: [P3 03-04] 真管线运行会写 tracked data 文件 (data/official_check.json + data/zt_pool_state.json, 01:53 拉 09-03 收盘池 42 只官方校验一致) —— 设计内职能, 与既有 data/historical_zt_pool.json 用户运行修改同类; 不 stage 不还原
+- [Phase 03]: [P3 03-04] 快 kind (health-check 全程 1.0s) 也命中实况 409+running_job_id —— 计划容忍的竞态分支在本机未触发; D-02 复确认 verify-only (201 任务仅 gogo-api 匹配, 无提权命令)
 
 ### Pending Todos
 
@@ -122,6 +127,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T17:41:33.926Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-09-03T17:57:11.781Z
+Stopped at: Completed 03-04-PLAN.md
 Resume file: None

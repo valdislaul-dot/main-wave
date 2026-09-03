@@ -20,13 +20,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### 触发接口 (ACT)
 
-- [ ] **ACT-01**: POST /v1/actions/{kind} 四种触发：管线(pipeline)/竞价(morning-check)/回测(backtest-weights)/体检(health-check)，只启动现有脚本，不改其逻辑
-- [ ] **ACT-02**: 202+job_id 异步契约 + 持久化 job registry（logs/api/jobs/，重启可恢复）
-- [ ] **ACT-03**: 单飞锁防并发（进程内+锁文件+PID 探活，重叠返回 409）
+- [x] **ACT-01**: POST /v1/actions/{kind} 四种触发：管线(pipeline)/竞价(morning-check)/回测(backtest-weights)/体检(health-check)，只启动现有脚本，不改其逻辑
+- [x] **ACT-02**: 202+job_id 异步契约 + 持久化 job registry（logs/api/jobs/，重启可恢复）
+- [x] **ACT-03**: 单飞锁防并发（进程内+锁文件+PID 探活，重叠返回 409）
 
 ### 安全 (SEC)
 
-- [ ] **SEC-01**: X-API-Key 鉴权（constant-time 比较，header 传递，永不上日志）
+- [x] **SEC-01**: X-API-Key 鉴权（constant-time 比较，header 传递，永不上日志）
 - [ ] **SEC-02**: 数据分级鉴权——行情/温度放开，持仓/账本/候选/触发一律 token
 - [x] **SEC-03**: 默认绑 127.0.0.1，非回环无 token 拒绝启动（fail-closed）
 
@@ -78,10 +78,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STA-01 | Phase 2 | Complete |
 | STA-02 | Phase 4 | Pending |
 | STA-03 | Phase 2 | Complete |
-| ACT-01 | Phase 3 | Pending |
-| ACT-02 | Phase 3 | Pending |
-| ACT-03 | Phase 3 | Pending |
-| SEC-01 | Phase 3 | Pending |
+| ACT-01 | Phase 3 | Complete |
+| ACT-02 | Phase 3 | Complete |
+| ACT-03 | Phase 3 | Complete |
+| SEC-01 | Phase 3 | Complete |
 | SEC-02 | Phase 4 | Pending |
 | SEC-03 | Phase 1 | Complete |
 | OPS-01 | Phase 1 | Complete |
