@@ -184,22 +184,22 @@ def test_missing_and_wrong_key_rejected(tmp_path):
     """缺 X-API-Key -> 401 + WWW-Authenticate: ApiKey; 带错 key -> 403 (D-10)。"""
     r = client.post("/v1/actions/pipeline")  # 无头
     assert r.status_code == 401
-    assert r.json() == {"detail": "missing API key"}
+    assert r.json() == {"detail": "missing API key", "code": "missing_api_key"}
     assert r.headers.get("www-authenticate") == "ApiKey"  # 挑战头只在 401
 
     r = client.post("/v1/actions/pipeline", headers={"X-API-Key": "wrong-key"})
     assert r.status_code == 403
-    assert r.json() == {"detail": "invalid API key"}
+    assert r.json() == {"detail": "invalid API key", "code": "invalid_api_key"}
     assert "www-authenticate" not in r.headers  # 403 无挑战头 (D-10)
 
 
 # ---------- 行为 3 (tracer): 未知 kind -> 404, 且任何副作用都不发生 ----------
 
 def test_unknown_kind_404_no_side_effects(tmp_path, monkeypatch):
-    """白名单外 kind -> 404 unknown action kind, registry 目录保持空 (无 spawn)。"""
+    """白名单外 kind -> 404 信封 (code unknown_action_kind), registry 保持空 (无 spawn)。"""
     r = client.post("/v1/actions/nonsense", headers=_headers())
     assert r.status_code == 404
-    assert r.json() == {"detail": "unknown action kind"}
+    assert r.json() == {"detail": "Not Found", "code": "unknown_action_kind"}
     assert _registry_files() == []  # 404 先于 lock/claim/spawn (ACT-01 白名单门)
 
 
@@ -220,7 +220,7 @@ def test_public_endpoints_unguarded(tmp_path):
 
     r = client.get("/v1/state/unknown_name")
     assert r.status_code == 404  # state 路由自己的 404, 不是鉴权 401/403
-    assert r.json() == {"detail": "unknown state name"}
+    assert r.json() == {"detail": "Not Found", "code": "unknown_state_name"}
 
 
 # ---------- ACT-01: 四种 kind 全走 D-09 固定命令 (经真实 KIND_CMDS 表) ----------
@@ -316,11 +316,12 @@ def test_409_map_hit_object_shape_and_retrigger_after_terminal(tmp_path, monkeyp
         what="running+pid",
     )
 
-    # (a) 同 kind 运行中再触发: 409 体 == {"detail": {"message": ..., "running_job_id": id1}}
+    # (a) 同 kind 运行中再触发: 409 信封, 对象 detail 逐字节保留 + code 兄弟键
     r2 = client.post("/v1/actions/pipeline", headers=_headers())
     assert r2.status_code == 409
     assert r2.json() == {
-        "detail": {"message": "pipeline already running", "running_job_id": id1}
+        "detail": {"message": "pipeline already running", "running_job_id": id1},
+        "code": "already_running",
     }
 
     # (d) 终态后可再触发 (re-trigger after completion -> 202)
@@ -409,7 +410,8 @@ def test_409_cross_process_holder_object_shape(tmp_path, monkeypatch):
         assert r.status_code == 409
         body = r.json()
         assert body == {
-            "detail": {"message": "pipeline already running (another entry point)"}
+            "detail": {"message": "pipeline already running (another entry point)"},
+            "code": "already_running_other_entry",
         }
         assert "running_job_id" not in body["detail"]  # GUI/手动持有, 无 job_id 可报
         proc.kill()  # 杀持有者 -> OS 自动释放锁
@@ -429,11 +431,11 @@ def test_404_and_503_edges_no_side_effects(tmp_path, monkeypatch):
     """404 边界零副作用 + 损坏 registry 文件 -> 503 (绝不 500)。"""
     r = client.post("/v1/actions/unknown", headers=_headers())
     assert r.status_code == 404
-    assert r.json() == {"detail": "unknown action kind"}
+    assert r.json() == {"detail": "Not Found", "code": "unknown_action_kind"}
 
     r = client.get(f"/v1/jobs/{'e' * 32}", headers=_headers())  # 合规形状但缺失
     assert r.status_code == 404
-    assert r.json() == {"detail": "job not found"}
+    assert r.json() == {"detail": "Not Found", "code": "job_not_found"}
 
     # 越界形状 (无斜杠, 必达 handler): 短 id / 31-hex / 非小写 32-hex / 33-hex
     # —— 正则门 ^[0-9a-f]{32}$ 先于任何路径组合 (T-03-11)。
@@ -441,7 +443,7 @@ def test_404_and_503_edges_no_side_effects(tmp_path, monkeypatch):
     for bad in ("abc", "f" * 31, "A" * 32, "f" * 33):
         r = client.get(f"/v1/jobs/{bad}", headers=_headers())
         assert r.status_code == 404, f"{bad!r} -> {r.status_code} (must be 404)"
-        assert r.json() == {"detail": "job not found"}
+        assert r.json() == {"detail": "Not Found", "code": "job_not_found"}
     # 穿越形状 (..%2F..%2Fdata%2Fapi_token): httpx/uvicorn 把 %2F 解码成字面
     # 斜杠 -> scope path 含斜杠, Starlette 路由先 404 ({job_id} 不含 /) ——
     # 同一道门的更早一层: 仍 404、零文件访问、绝不 500 (T-03-11 字面达成)
@@ -456,4 +458,4 @@ def test_404_and_503_edges_no_side_effects(tmp_path, monkeypatch):
     (Path(registry) / ("0" * 32 + ".json")).write_text("{not json", encoding="utf-8")
     r = client.get(f"/v1/jobs/{'0' * 32}", headers=_headers())
     assert r.status_code == 503
-    assert r.json() == {"detail": "job temporarily unavailable"}
+    assert r.json() == {"detail": "job temporarily unavailable", "code": "job_temporarily_unavailable"}

@@ -95,11 +95,11 @@ def test_state_unknown_names_404_whitelist_only(tmp_path):
 
     bodies = []
 
-    # a. 路由能匹配白名单外名字 (命中 /v1/state/{name}) -> handler 404, detail 钉死
+    # a. 路由能匹配白名单外名字 (命中 /v1/state/{name}) -> handler 404 信封钉死
     for name in ("portfolio", "logs", "market_state.json"):
         response = client.get(f"/v1/state/{name}")
         assert response.status_code == 404
-        assert response.json()["detail"] == "unknown state name"
+        assert response.json() == {"detail": "Not Found", "code": "unknown_state_name"}
         bodies.append(response.content)
 
     # b. 形状根本不匹配路由 (handler 之前框架 404) —— 只钉状态码, 不钉 body
@@ -124,7 +124,10 @@ def test_state_unknown_names_404_whitelist_only(tmp_path):
 def test_state_missing_file_503_detail_contains_no_path(tmp_path):
     response = client.get("/v1/state/market_state")  # 已知名但文件不存在
     assert response.status_code == 503
-    assert response.json()["detail"] == "state temporarily unavailable"
+    assert response.json() == {
+        "detail": "state temporarily unavailable",
+        "code": "state_temporarily_unavailable",
+    }
     assert str(tmp_path) not in response.text  # D-04: 绝不泄露文件路径
     assert "\\" not in response.text
 
@@ -201,7 +204,10 @@ def test_state_persistent_torn_cold_cache_503(tmp_path):
 
     response = client.get("/v1/state/market_state")
     assert response.status_code == 503
-    assert response.json()["detail"] == "state temporarily unavailable"
+    assert response.json() == {
+        "detail": "state temporarily unavailable",
+        "code": "state_temporarily_unavailable",
+    }
 
 
 # ---------- HLT-02: /health/ready 矩阵 (stat-only, 永不 open, 永不看新旧) ----------
@@ -222,7 +228,7 @@ def test_ready_missing_file_503(tmp_path):
     missing.unlink()
     response = client.get("/health/ready")
     assert response.status_code == 503
-    assert response.json()["detail"] == "state file unavailable"
+    assert response.json() == {"detail": "state file unavailable", "code": "state_file_unavailable"}
     _write_state(tmp_path, "auction_state", b'{"ok": true}\r\n', 1_700_000_000)
     assert client.get("/health/ready").status_code == 200  # 恢复 -> 200
 
@@ -235,7 +241,7 @@ def test_ready_directory_not_readable_503(tmp_path):
     dir_path.mkdir()  # 目录同名 -> isfile False -> 503 (可移植变体)
     response = client.get("/health/ready")
     assert response.status_code == 503
-    assert response.json()["detail"] == "state file unavailable"
+    assert response.json() == {"detail": "state file unavailable", "code": "state_file_unavailable"}
 
     if os.name != "nt":  # Windows chmod 语义不同, 静默跳过 (目录变体已覆盖)
         dir_path.rmdir()

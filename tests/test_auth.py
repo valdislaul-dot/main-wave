@@ -1,8 +1,9 @@
 """SEC-01 契约套: X-API-Key 鉴权 + 密钥卫生 (D-10/D-11, RESEARCH Pattern 5)。
 
 本文件钉 api/auth.py + api/actions.py 的鉴权合同:
-- 缺失 X-API-Key 头 -> 401 {"detail": "missing API key"} + WWW-Authenticate:
-  ApiKey 挑战头 (只在 401); 带错 key -> 403 {"detail": "invalid API key"} 无挑战头。
+- 缺失 X-API-Key 头 -> 401 {"detail": "missing API key", "code": "missing_api_key"} +
+  WWW-Authenticate: ApiKey 挑战头 (只在 401); 带错 key -> 403
+  {"detail": "invalid API key", "code": "invalid_api_key"} 无挑战头。
 - env GOGO_API_TOKEN 优先于文件 (read_token 链路); 无 token 配置 -> fail-closed 403。
 - /health、/health/ready、GET /v1/state/{name} 结构豁免 (D-11) —— 公开路由,
   无中间件, /health 纯度 (HLT-01)。
@@ -110,12 +111,12 @@ def wait_terminal(job_id, key=TOKEN, timeout=12.0):
 def test_missing_key_401_post_and_get(tmp_path):
     r = client.post("/v1/actions/pipeline")  # 无 X-API-Key 头
     assert r.status_code == 401
-    assert r.json() == {"detail": "missing API key"}
+    assert r.json() == {"detail": "missing API key", "code": "missing_api_key"}
     assert r.headers.get("www-authenticate") == "ApiKey"  # D-10 挑战头精确值
 
     r = client.get(f"/v1/jobs/{'a' * 32}")  # 合规形状 id, 无头
     assert r.status_code == 401
-    assert r.json() == {"detail": "missing API key"}
+    assert r.json() == {"detail": "missing API key", "code": "missing_api_key"}
     assert r.headers.get("www-authenticate") == "ApiKey"
 
 
@@ -124,7 +125,7 @@ def test_missing_key_401_post_and_get(tmp_path):
 def test_wrong_key_403_without_challenge(tmp_path):
     r = client.post("/v1/actions/pipeline", headers={"X-API-Key": "definitely-wrong"})
     assert r.status_code == 403
-    assert r.json() == {"detail": "invalid API key"}
+    assert r.json() == {"detail": "invalid API key", "code": "invalid_api_key"}
     assert "www-authenticate" not in r.headers  # 挑战头只在 401 (D-10)
 
 
@@ -140,7 +141,7 @@ def test_env_token_precedence_over_file(tmp_path, monkeypatch):
 
     r = client.post("/v1/actions/pipeline", headers=_headers("file-token"))
     assert r.status_code == 403  # 文件 token 在 env 存在时不生效
-    assert r.json() == {"detail": "invalid API key"}
+    assert r.json() == {"detail": "invalid API key", "code": "invalid_api_key"}
 
     r = client.post("/v1/actions/pipeline", headers=_headers("env-token"))
     assert r.status_code == 202  # env token 生效
@@ -159,7 +160,7 @@ def test_fail_closed_when_no_token_configured(tmp_path, monkeypatch):
     for headers in (_headers("whatever"), _headers(""), _headers(TOKEN)):
         r = client.post("/v1/actions/pipeline", headers=headers)
         assert r.status_code == 403, f"no-token 配置必须 fail-closed, got {r.status_code}"
-        assert r.json() == {"detail": "invalid API key"}
+        assert r.json() == {"detail": "invalid API key", "code": "invalid_api_key"}
         r = client.get(f"/v1/jobs/{'b' * 32}", headers=headers)
         assert r.status_code == 403  # 永不 200/202
 
@@ -180,7 +181,7 @@ def test_public_exemptions_no_key_needed(tmp_path):
 
     r = client.get("/v1/state/not_in_whitelist")
     assert r.status_code == 404  # state 路由自己的 404 —— 不是 401/403
-    assert r.json() == {"detail": "unknown state name"}
+    assert r.json() == {"detail": "Not Found", "code": "unknown_state_name"}
 
 
 # ---------- 测试 6: 拒绝路径零副作用 (无 spawn / 无 registry / 无锁) ----------
@@ -269,11 +270,11 @@ def test_query_param_tamper_cannot_alter_gate(tmp_path, monkeypatch):
     # (b) decoy 文件 key + query 指向 decoy -> 403 (decoy 永不成为比较源)
     r = client.post(f"/v1/actions/pipeline{qs}", headers={"X-API-Key": "evil-token"})
     assert r.status_code == 403
-    assert r.json() == {"detail": "invalid API key"}
+    assert r.json() == {"detail": "invalid API key", "code": "invalid_api_key"}
     # (c) 无头 + query -> 401
     r = client.post(f"/v1/actions/pipeline{qs}")
     assert r.status_code == 401
-    assert r.json() == {"detail": "missing API key"}
+    assert r.json() == {"detail": "missing API key", "code": "missing_api_key"}
     # (a) 真 token + query -> 202 (query 被忽略, 有效 key 不受影响)
     r = client.post(f"/v1/actions/pipeline{qs}", headers={"X-API-Key": "real-token"})
     assert r.status_code == 202
