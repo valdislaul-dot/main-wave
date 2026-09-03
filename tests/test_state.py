@@ -3,6 +3,10 @@
 STA-01: /v1/state/{name} 逐字节透传 + X-Data-Mtime/X-Data-Age-S 精确头 + content-type。
 STA-03: 防御性读层 —— 解码失败短重试 (注入 reader, 免计时)、末次成功缓存回退
         (X-Data-Stale: true + 缓存 mtime 一致)、冷缓存 503、OSError 不重试。
+        集成锤 (test_state_live_rewrite_zero_5xx_hammer): 后台写线程对三个文件
+        交替执行截断写与原子 os.replace 重写 (真实管线的两种写者风格), 主线程
+        ~150 次 GET —— 0 x 5xx、每体可解析、stale 体必等于末次已知良好字节;
+        是真实管线人工观察的确定性套内孪生 (本仓库首个 threading 测试)。
 HLT-02: /health/ready 200/503 矩阵 (缺失/目录不可读/远古 mtime 仍 200)。
 SC4:    源扫描回归 —— api/state.py + api/main.py 无网络能力 token。
 
@@ -13,6 +17,8 @@ api.state.DATA_DIR 指到 tmp_path 并在每个测试前清空 api.state._CACHE,
 import json
 import os
 import re
+import threading
+import time
 from pathlib import Path
 
 import pytest
@@ -260,3 +266,65 @@ def test_sc4_source_scan_no_network_tokens():
         assert match is None, (
             f"SC4 违规: {mod.__file__} 含网络能力 token {match.group(0)!r}"
         )
+
+
+# ---------- STA-03/SC2: 0x5xx 重写锤 (真实管线两种写者风格, 断言与时机无关) ----------
+
+def test_state_live_rewrite_zero_5xx_hammer(tmp_path):
+    names = ("market_state", "auction_state", "zt_pool_state")
+    goods = {
+        "market_state": b'{\r\n  "ok": true, "seq": 1\r\n}\r\n',
+        "auction_state": b'{"auction": true, "seq": 2}\r\n',
+        "zt_pool_state": ('{\r\n  "name": "涨停",\r\n  "up": true\r\n}\r\n').encode("utf-8"),
+    }
+    for name in names:
+        _write_state(tmp_path, name, goods[name], 1_700_000_000)
+
+    # 暖缓存: 每名一次 GET, 断言新鲜 200 且体 == good (此后缓存只可能持有 good)
+    for name in names:
+        warm = client.get(f"/v1/state/{name}")
+        assert warm.status_code == 200 and warm.content == goods[name]
+
+    stop = {"go": True}
+
+    def writer_loop():
+        iteration = 0
+        while stop["go"]:
+            style = iteration % 2  # 0 = 截断写, 1 = 原子 os.replace
+            for name in names:
+                path = tmp_path / api.state.STATE_FILES[name]
+                good = goods[name]
+                if style == 0:
+                    # 真实直接写者 (auction_pool/capture_market_state/recalc_seal):
+                    # open('wb') 截断 -> 写撕裂前缀 -> sleep -> 补全 -> close
+                    cut = good.index(b"}")  # 前缀缺闭合 -> 必为无效 JSON
+                    with open(path, "wb") as f:
+                        f.write(good[:cut])
+                        time.sleep(0.005)
+                        f.write(good[cut:])
+                else:
+                    # 真实原子写者 (zt_pool.save_state): tmp 全量写 + os.replace
+                    tmp = tmp_path / (api.state.STATE_FILES[name] + ".tmp")
+                    tmp.write_bytes(good)
+                    try:
+                        os.replace(tmp, path)
+                    except OSError:
+                        # 罕见碰撞 (读句柄恰好挡 replace, WinError 5) —— 本轮放弃,
+                        # 文件仍是旧版 good, 断言集合 (0x5xx/可解析/stale==good) 不受影响
+                        pass
+            iteration += 1
+
+    writer = threading.Thread(target=writer_loop)
+    writer.start()
+    try:
+        for i in range(150):  # 主线程 ~150 次 GET, 三名单轮转
+            name = names[i % len(names)]
+            response = client.get(f"/v1/state/{name}")
+            assert response.status_code == 200, (name, response.status_code)  # 0 x 5xx
+            json.loads(response.content)  # 每个体都必须可解析 (撕裂绝不新鲜出网)
+            if response.headers.get("x-data-stale") == "true":
+                assert response.content == goods[name]  # stale 体 == 末次已知良好
+    finally:
+        stop["go"] = False
+        writer.join(timeout=10)
+    assert not writer.is_alive()
