@@ -59,15 +59,30 @@ def new_job(kind, cmd):
 def write_job(job, base=None):
     """原子迁移写 (Pattern 2): 同目录 tmp + os.replace, 永不截断写。
 
-    tmp 名带 pid 后缀, 跨线程/跨进程不碰撞; 读侧 open->read->close 绝不持句柄,
-    因此 replace 不会被读句柄挡 (WinError 5 类, api/state.py:62-63)。
+    tmp 名带 pid 后缀, 跨线程/跨进程不碰撞。读侧 open->read->close 的句柄窗口是
+    µs 级, 但 Windows 上恰好同刻的 os.replace 会撞 PermissionError (WinError 5 类,
+    api/state.py:62-63) —— 轮询读者 (GET 轮询/本套测试) 不得能把一次迁移打成失败:
+    replace 短重试 (tmp 仍在, 重试幂等); 持久失败清理 tmp 后上抛, 由调用方兜底。
     """
     base = base or jobs_dir()
     os.makedirs(base, exist_ok=True)
     tmp = os.path.join(base, f".{job['job_id']}.tmp-{os.getpid()}")
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(job, f, ensure_ascii=False)
-    os.replace(tmp, os.path.join(base, job["job_id"] + ".json"))
+    dst = os.path.join(base, job["job_id"] + ".json")
+    for attempt in range(4):  # 3 次重试, 每次让出 10ms (读句柄窗口 µs 级, 远够)
+        try:
+            os.replace(tmp, dst)
+            return
+        except PermissionError:
+            if attempt < 3:
+                time.sleep(0.01)
+                continue
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+            raise
 
 
 def read_job(job_id, base=None):
