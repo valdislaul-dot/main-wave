@@ -1,12 +1,20 @@
-"""04-04 date_args 单源校验矩阵 (SC4, D-26..D-28; 04-CONTEXT 触发 date 参数面)。
+"""04-04 date_args 单源校验矩阵 + 脚本会话日期门 subprocess 钉 (SC4, D-26..D-28)。
 
 parse_date/resolve_date_arg/format_token —— 白名单格式 + 真历法校验、argv
 两种形态解析与歧义拒绝、规范 token 形态、import 纯度 (零副作用: 无 config
 import、导入不打印/不建文件)。所有校验单源在 scripts/daily/date_args.py,
 任何调用方不得手写重复正则 (T-04-15)。
+
+Task 3 (T-04-14): run_pipeline.py / morning_check.py 的真实拒绝路径 ——
+非会话日期 (过去日期/非法值) 经 --date token 传入时, 子进程 exit 2、
+stderr ASCII 拒绝消息含 "session date"、零 traceback、data/ 与 logs/ 零写。
+只钉过去日期与非法值, 绝不 spawn 今日日期 (会跑实盘流水线/采集)。
 """
+import os
+import subprocess
 import sys
 from datetime import date
+from pathlib import Path
 
 import pytest
 
@@ -68,15 +76,86 @@ def test_format_token_canonical_shape():
 # ---------- Task 2 行为 4: import 纯度 (零副作用) ----------
 
 def test_import_purity_no_side_effects(capsys):
-    """导入 date_args 不拉 config (已知副作用模块)、不打印、不产生文件副作用。
+    """导入 date_args 只拉自己的命名空间链 (不碰 config 等副作用模块)、不打印。
 
     防止后续编辑加入 config import / import 期 print (T-04-15 单源纯度钉)。
+    测量 sys.modules 增量而非绝对状态: 全套件先跑时 config 可能已被他文件
+    合法导入, 绝对断言会误报 —— 只断言 date_args 导入本身没新增任何
+    scripts.* 模块 (命名空间父包 scripts/scripts.daily 除外)。
     """
     sys.modules.pop("scripts.daily.date_args", None)  # 强制从磁盘重新导入
+    before = set(sys.modules)
     import scripts.daily.date_args  # noqa: F401
-    assert "scripts.daily.config" not in sys.modules  # 零 config import
+    added = set(sys.modules) - before
+    # 命名空间父包 (scripts/scripts.daily 无 __init__.py) 随子模块导入而缓存,
+    # 属正常; 除此之外任何 scripts.* 增量 (如 scripts.daily.config) 即违规
+    extra = {
+        m for m in added
+        if m.startswith("scripts.")
+        and m not in ("scripts", "scripts.daily", "scripts.daily.date_args")
+    }
+    assert not extra, f"date_args 导入拉入了额外 scripts 模块: {sorted(extra)}"
+    assert "scripts.daily.config" not in added  # config 有 os.makedirs 副作用
     out, err = capsys.readouterr()
     assert out == "" and err == ""  # 导入期零输出
     # 导入后公共面齐备 (Task 2 GREEN 后断言; 缺 resolve/format 时下方 ImportError)
     from scripts.daily.date_args import DATE_RE, format_token, parse_date, resolve_date_arg
     assert DATE_RE.fullmatch("2026-09-03") and DATE_RE.fullmatch("20260903")
+
+
+# ---------- Task 3: 脚本侧会话日期门拒绝路径 (真实子进程, T-04-14) ----------
+# 只 spawn 过去日期/非法值 —— 子进程无 conftest 网络猴补丁, 今日日期会跑
+# 实盘流水线/竞价采集, 绝对禁止出现在本段。
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS_DAILY = REPO_ROOT / "scripts" / "daily"
+
+
+def _git_data_logs_clean():
+    """data/ 与 logs/ 无 git 可见变更 (拒绝路径先于任何写文件/网络的证据)。"""
+    out = subprocess.run(
+        ["git", "status", "--porcelain", "--", "data/", "logs/"],
+        capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=30,
+    )
+    return out.returncode == 0 and out.stdout.strip() == ""
+
+
+def _spawn_refusal(script, argv_extra):
+    """spawn 真实脚本 + 拒绝态 argv; 返回 subprocess.CompletedProcess。"""
+    return subprocess.run(
+        [sys.executable, str(SCRIPTS_DAILY / script), *argv_extra],
+        capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=90,
+        encoding="utf-8", errors="replace",
+    )
+
+
+@pytest.mark.parametrize("script,flag", [
+    ("run_pipeline.py", "--fast"),
+    ("morning_check.py", "--quick"),
+])
+def test_real_script_refuses_past_session_date_exit2(script, flag):
+    """过去会话日期 -> exit 2 + ASCII 拒绝 (含 "session date") + 零 traceback。
+
+    消息必须在 stderr (stdout 零污染: 拒绝发生在任何 banner/采集之前)。
+    """
+    assert _git_data_logs_clean(), "前置: data/logs 必须干净"
+    proc = _spawn_refusal(script, [flag, "--date=2026-01-01"])
+    assert proc.returncode == 2, f"{script} rc={proc.returncode}: {proc.stdout!r}"
+    assert proc.stdout == "", f"{script} stdout 应有零输出, 得: {proc.stdout!r}"
+    assert "session date" in proc.stderr, f"{script} stderr: {proc.stderr!r}"
+    assert "Traceback" not in proc.stderr and "Traceback" not in proc.stdout
+    assert _git_data_logs_clean(), f"{script} 拒绝路径不得写 data/ 或 logs/"
+
+
+@pytest.mark.parametrize("script,flag", [
+    ("run_pipeline.py", "--fast"),
+    ("morning_check.py", "--quick"),
+])
+def test_real_script_refuses_invalid_date_exit2(script, flag):
+    """非法 --date 值 -> 同一 exit-2 拒绝路径 (parse 阶段, 先于会话比较)。"""
+    assert _git_data_logs_clean(), "前置: data/logs 必须干净"
+    proc = _spawn_refusal(script, [flag, "--date=not-a-date"])
+    assert proc.returncode == 2, f"{script} rc={proc.returncode}: {proc.stdout!r}"
+    assert "session date" in proc.stderr, f"{script} stderr: {proc.stderr!r}"
+    assert "Traceback" not in proc.stderr
+    assert _git_data_logs_clean(), f"{script} 拒绝路径不得写 data/ 或 logs/"
