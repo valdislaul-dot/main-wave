@@ -4,7 +4,7 @@
   python run_pipeline.py              # 盘后运行
   python run_pipeline.py --fast       # 轻量模式(仅涨停池+评分)
   python run_pipeline.py --status     # 查看持仓
-  python run_pipeline.py --buy CODE PRICE SHARES
+  python run_pipeline.py --buy NAME CODE PRICE [SHARES]   # 2026-09-03: 修正文档(实现按此序解析)
   python run_pipeline.py --sell CODE PRICE
 """
 import sys, os, json
@@ -28,16 +28,9 @@ def main():
             from trading_journal import load_portfolio
             pf = load_portfolio()
             if shares == 0:
-                import json
-                candidates_file = None
-                for f in sorted(os.listdir(os.path.join(BASE,'logs'))):
-                    if f.startswith('candidates_'): candidates_file = os.path.join(BASE,'logs',f)
+                # 2026-09-03修复: 原候选查找循环pos_pct恒0.5属死代码;
+                # 仓位由温度开关(temperature.py)管, 此处保持半仓近似仅用于自动股数
                 pos_pct = 0.5
-                if candidates_file:
-                    with open(candidates_file, 'r', encoding='utf-8') as cf:
-                        data = json.load(cf)
-                        for c in data.get('candidates',[]):
-                            if c['code'] == code: pos_pct = 0.5; break
                 deploy = pf['cash'] * pos_pct
                 shares = int(deploy / price / 100) * 100
             cost = shares * price
@@ -57,9 +50,15 @@ def main():
         print('\n[Step 1/7] 更新当日涨停池...')
         try:
             from zt_pool import update_zt_pool
-            update_zt_pool()
+            _res = update_zt_pool()
+            # 2026-09-03修复: 双源失败(返回None)时中止流水线, 原继续跑会用旧state
+            # 覆写当日候选, 次日早晨面板基于滞后一日的池且无任何告警
+            if _res is None:
+                print('⚠⚠ 涨停池更新失败(双源均无数据), 中止流水线 — 检查网络后重跑')
+                sys.exit(1)
         except Exception as e:
-            print(f'[Warning] ZT pool update failed: {e}')
+            print(f'⚠⚠ ZT pool update failed: {e}, 中止流水线')
+            sys.exit(1)
 
         # Step 1.1: 官方API双源校验 (2026-08-31, 仅警告不改数据)
         try:
@@ -183,6 +182,13 @@ def main():
                 capture_market_state()
             except Exception as e:
                 print(f'[Warning] 市场状态采集失败: {e}')
+
+            # Step 8.6: 卖点规则月度跟踪 (2026-09-02, 断板低开持有vs卖, 盘后运行不影响竞价)
+            try:
+                from backtest_sell_exit import watch_summary
+                watch_summary()
+            except Exception as e:
+                print(f'[Warning] 卖点规则跟踪失败: {e}')
 
             # Step 9: 数据上云同步 (2026-08-16新增, 自动push关键快照到GitHub)
             print('\n[Step 9] 数据上云同步...')

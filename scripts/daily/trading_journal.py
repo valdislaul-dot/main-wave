@@ -71,13 +71,15 @@ def record_buy(name, code, price, shares, cost, note=''):
         'buy_price': price, 'shares': shares
     }
     positions = pf.get('positions')
-    if positions is not None:
+    if positions:
         positions.append(pos)
     elif pf.get('position'):
         positions = [pf['position'], pos]
-        pf['positions'] = positions
     else:
-        pf['positions'] = [pos]
+        # 2026-09-03修复: 原pf['positions']=[pos]但局部变量未更新,
+        # 下一行positions[0]崩溃且买入未落盘
+        positions = [pos]
+    pf['positions'] = positions
     pf['position'] = positions[0]  # 主持仓=第一只(兼容旧读取方)
 
     entry = {
@@ -97,35 +99,37 @@ def record_buy(name, code, price, shares, cost, note=''):
 
 
 def record_sell(name, code, price, note=''):
-    """Record a sell trade"""
+    """Record a sell trade (2026-09-03修复: 同码多笔加仓整仓卖时合并全部批次,
+    原只删第一笔致残仓滞留+现金少记)"""
     pf = load_portfolio()
     journal = load_journal()
 
     positions = pf.get('positions')
-    pos = None
     if positions:
-        for p in positions:
-            if p['name'] == name or p['code'] == code:
-                pos = p
-                break
-        if pos is None:
+        matched = [p for p in positions if p['name'] == name or p['code'] == code]
+        if not matched:
             print(f'[Journal] WARNING: No position in {name}')
             return pf
-        positions.remove(pos)
-        pf['position'] = positions[0] if positions else None
+        for p in matched:
+            positions.remove(p)
     else:
         pos = pf['position']
         if pos is None or (pos['name'] != name and pos['code'] != code):
             print(f'[Journal] WARNING: No position in {name}')
             return pf
-        pf['position'] = None
+        matched = [pos]
 
-    proceeds = price * pos['shares']
-    pnl = (price - pos['buy_price']) / pos['buy_price'] * 100
-    pnl_amt = proceeds - pos['buy_price'] * pos['shares']
+    total_sh = sum(p['shares'] for p in matched)
+    avg_cost = sum(p['buy_price'] * p['shares'] for p in matched) / total_sh
+    proceeds = price * total_sh
+    pnl = (price - avg_cost) / avg_cost * 100
+    pnl_amt = proceeds - avg_cost * total_sh
+    buy_date = min(p['buy_date'] for p in matched)
 
     pf['cash'] += proceeds
-    pf['position'] = None
+    pf['positions'] = positions
+    # 2026-09-03修复: 原无条件置None, 剩余持仓被盘后报告/估值漏掉
+    pf['position'] = positions[0] if positions else None
     pf['total_trades'] += 1
     if pnl > 0:
         pf['winning_trades'] += 1
@@ -135,12 +139,12 @@ def record_sell(name, code, price, note=''):
         'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'action': 'SELL',
         'name': name, 'code': code,
-        'price': price, 'shares': pos['shares'],
+        'price': price, 'shares': total_sh,
         'proceeds': proceeds, 'pnl_pct': round(pnl, 2),
         'pnl_amt': round(pnl_amt, 2),
-        'buy_date': pos['buy_date'],
-        'buy_price': pos['buy_price'],
-        'hold_days': (datetime.now() - datetime.strptime(pos['buy_date'], '%Y-%m-%d')).days,
+        'buy_date': buy_date,
+        'buy_price': round(avg_cost, 3),
+        'hold_days': (datetime.now() - datetime.strptime(buy_date, '%Y-%m-%d')).days,
         'cash_after': pf['cash'],
         'note': note
     }

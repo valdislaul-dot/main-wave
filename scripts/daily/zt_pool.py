@@ -343,7 +343,11 @@ def update_zt_pool(date_str=None, verbose=True):
     5. 不涨停 → 移出池子
     """
     if date_str is None:
-        date_str = datetime.now().strftime('%Y-%m-%d')
+        # 2026-09-03修复: 与update_data/screen_candidates口径对齐, 15:00前盘中运行回退昨日,
+        # 否则state(当日盘中池, 午后涨停缺失/炸板未剔)与K线/候选(昨日)日期错位
+        _now = datetime.now()
+        date_str = (_now - timedelta(days=1)).strftime('%Y-%m-%d') if _now.hour < 15 \
+            else _now.strftime('%Y-%m-%d')
 
     if verbose:
         print(f'\n[ZT Pool] 更新涨停池 → {date_str}')

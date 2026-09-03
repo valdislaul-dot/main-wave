@@ -36,7 +36,7 @@ def fetch_live_quote(code):
         resp = urllib.request.urlopen(req, timeout=10)
         data = resp.read().decode('gbk')
         fields = data.split('~')
-        return {
+        quote = {
             'name': fields[1],
             'open': float(fields[5]),
             'prev_close': float(fields[4]),
@@ -46,6 +46,12 @@ def fetch_live_quote(code):
             'change_pct': float(fields[32]),
             'limit_up': float(fields[47]) if len(fields) > 47 else 0,
         }
+        # 2026-09-03修复: open/prev_close=0(竞价未撮合/停牌)视为行情未就绪,
+        # 否则gap=-100%会触发"跌停排队卖"类假结论
+        if quote['open'] <= 0 or quote['prev_close'] <= 0:
+            print(f'  [WARN] {code} 行情未就绪(open={quote["open"]}), 需9:25后重跑')
+            return None
+        return quote
     except Exception as e:
         print(f'  [WARN] 无法获取{code}实时行情: {e}')
         return None
@@ -146,7 +152,8 @@ def compute_environment(pf):
           avg_gap, money_effect, downgraded, downgrade_reason}"""
     r = {'env': None, 'switch': None, 'pos_pct': 0, 'warming': False, 'collapse': False,
          'zt_n': 0, 'max_cons': 1, 'zt_prev': None, 'max_cons_prev': None,
-         'avg_gap': None, 'money_effect': None, 'downgraded': False, 'downgrade_reason': None}
+         'avg_gap': None, 'money_effect': None, 'downgraded': False, 'downgrade_reason': None,
+         'gap_stale': False, 'me_stale': False}
     try:
         _pp = _load_prev_pool()
         if not _pp:
@@ -169,24 +176,38 @@ def compute_environment(pf):
                 _p2stocks = _pp2 if isinstance(_pp2, list) else _pp2.get('stocks', _pp2.get('data', []))
                 r['zt_prev'] = len(_p2stocks)
                 r['max_cons_prev'] = max((int(x.get('limit_days', 1) or 1) for x in _p2stocks), default=None)
+                r['_p2_date'] = _pool_files[-2][:8]  # T-2池文件日期(YYYYMMDD, 供赚效陈旧校验)
         except Exception:
             pass
         # 竞价二次确认: 池均gap ≤ -0.5% → 降一档 (3年724日校准)
+        # 2026-09-03修复: current必须为今日采集, 否则昨日gap冒充今日参与降档
         try:
             _astate_path = os.path.join(BASE, 'data', 'auction_state.json')
             if os.path.exists(_astate_path):
                 with open(_astate_path, encoding='utf-8') as _f:
                     _astate = json.load(_f)
-                r['avg_gap'] = (_astate.get('current') or {}).get('avg_gap')
+                _cur = _astate.get('current') or {}
+                _today = datetime.now().strftime('%Y-%m-%d')
+                if _cur.get('date') == _today:
+                    r['avg_gap'] = _cur.get('avg_gap')
+                else:
+                    r['gap_stale'] = True
         except Exception:
             pass
         # 盘后赚钱效应 (斯皮尔曼+0.403最强指标, capture_market_state盘后写入)
+        # 2026-09-03修复: 记录日期必须=T-2池日期, 滞后(未跑盘后流水线)则跳过转负降档
         try:
             _ms_path = os.path.join(BASE, 'data', 'market_state.json')
             if os.path.exists(_ms_path):
                 with open(_ms_path, encoding='utf-8') as _f:
                     _ms = json.load(_f)
-                r['money_effect'] = _ms.get('money_effect')
+                _ms_date = _ms.get('date')
+                _p2d = r.get('_p2_date')
+                _exp = f'{_p2d[:4]}-{_p2d[4:6]}-{_p2d[6:]}' if _p2d else None
+                if _ms_date and _exp and _ms_date != _exp:
+                    r['me_stale'] = True
+                else:
+                    r['money_effect'] = _ms.get('money_effect')
         except Exception:
             pass
         # 档位决策走纯函数 (2026-09-03, 可离线单测/历史回放)
@@ -352,6 +373,8 @@ def stock_scoring_meta(code):
                     'final_seal_time': str(p.get('last_seal', '')).replace(':', ''),
                     'zhaban': int(p.get('break_times', 0) or 0),
                     'sector_count': meta['sector'],
+                    # 2026-09-03修复: 主分支漏传turnover, 缺失默认57分虚高
+                    'turnover': p.get('turnover', 0),
                     # V4题材热度分档(池级词频)
                     'sector_bucket': _sector_bucket_of(p.get('industry', ''), stocks),
                 }
@@ -398,6 +421,16 @@ def stock_scoring_meta(code):
                     meta['detail'] = {'sector_bucket': '<3'}
             except Exception:
                 pass
+        # K线新鲜度守卫 (2026-09-03修复): 末bar须覆盖T-1池日期, 否则错日bar×错日明细混评
+        meta['kline_fresh'] = True
+        try:
+            from zt_pool import get_prev_pool_file
+            _pfn = get_prev_pool_file()
+            if _pfn and meta['klines']:
+                _pdate = f'{_pfn[:4]}-{_pfn[4:6]}-{_pfn[6:]}'
+                meta['kline_fresh'] = meta['klines'][-1]['date'] >= _pdate
+        except Exception:
+            pass
         if meta['klines']:
             from scoring import score_v4
             sc, _ = score_v4(code, meta['klines'], meta['detail'] or {})
@@ -488,7 +521,10 @@ def main():
             elif act == 'watch':
                 print(f'  ║  🟡 观察 {pos["name"]}({pos["code"]}) — {sig["reason"]}')
             else:
-                print(f'  ║  ⚪ 持有 {pos["name"]}({pos["code"]}) — {sig["reason"]}')
+                # 2026-09-03修复: 无K线/数据不足是引擎失败态, 不能呈现为"持有"
+                _fail = sig['reason'] in ('无K线数据', 'K线数据不足')
+                _mark, _act = ('⚠', '需手动判断') if _fail else ('⚪', '持有')
+                print(f'  ║  {_mark} {_act} {pos["name"]}({pos["code"]}) — {sig["reason"]}')
     else:
         print(f'  ║  空仓')
     if env_info.get('env'):
@@ -626,17 +662,24 @@ def main():
 
     # ── 今日竞价池买入候选（现场打分, 解决流水线评分盲区） ──
     buyable = []
+    _stale_cnt = 0
     for s in auction_stocks:
         code = s.get('code', '')
         gap = s.get('gap_pct', 0)
         is_one_line = s.get('one_line', False)
         is_300 = code.startswith(('300', '301', '688', '8', '9'))
+        cand = candidate_scores.get(code, {})
 
         if is_300 or is_one_line or s.get('high_risk', False):
             continue
+        # 4板+一字/T字高危过滤 (2026-09-03修复: 定稿2026-08-24裁决, T字次日开盘买入-1.17%)
+        if int(cand.get('cons', 0) or 0) >= 4 and cand.get('one_line', False):
+            continue
         if 4.0 <= gap <= 8.0:
-            cand = candidate_scores.get(code, {})
             meta = stock_scoring_meta(code)
+            if not meta.get('kline_fresh', True):
+                _stale_cnt += 1
+                continue
             auction_score = s.get('score', 0)
             cand_score = cand.get('score', 0)
             # 现场评分优先(与表2细则同源), 失败则退回快照分/候选分
@@ -652,6 +695,8 @@ def main():
                 'in_candidates': code in candidate_scores
             })
 
+    if _stale_cnt:
+        print(f'  ⚠ K线滞后跳过 {_stale_cnt} 只候选(未覆盖T-1涨停bar, 防错日评分)')
     buyable.sort(key=lambda x: x['score'], reverse=True)
 
     # ── 🌡️ 市场环境评级详情 (结论已在摘要, 此处解释) ──
@@ -661,20 +706,28 @@ def main():
         print(f'  {env_info["switch"]} (仓位由个人交易情况决定, 仅温度建议)')
         # 三条降档规则状态 (2026-09-03)
         _dr = env_info.get('downgrade_reason')
-        if env_info.get('zt_prev') is not None:
+        if env_info.get('zt_prev'):
             _dpct = round((env_info['zt_prev'] - env_info['zt_n']) / env_info['zt_prev'] * 100)
             if env_info.get('collapse'):
                 _col_txt = '已降档' if _dr and _dr.startswith('骤降防线') else '触发(开关已关闭)'
                 print(f'  ⚠ 骤降防线: 昨日{env_info["zt_n"]}只 较前日{env_info["zt_prev"]}只 ({-_dpct:+d}%) → {_col_txt}')
             else:
                 print(f'  ✓ 骤降防线: 昨日{env_info["zt_n"]}只 较前日{env_info["zt_prev"]}只 ({-_dpct:+d}%), 未触发')
-        if env_info.get('avg_gap') is not None:
+        if env_info.get('gap_stale'):
+            print(f'  ⚠ 竞价二次确认: 竞价快照非今日采集, 已跳过 (需9:25-9:30重跑采集)')
+        elif env_info.get('avg_gap') is not None:
             if env_info['avg_gap'] <= -0.5:
-                print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5% → 环境降档'
-                      f' (3年724日: 该档当日-2.87%/上涨31%)')
+                if _dr and _dr.startswith('竞价二次确认'):
+                    print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5% → 环境降档'
+                          f' (3年724日: 该档当日-2.87%/上涨31%)')
+                else:
+                    print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5%'
+                          f' → 触发(开关已关闭或他规则已降档, 不叠加)')
             else:
                 print(f'  ✓ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% > -0.5%, 维持评级')
-        if env_info.get('money_effect') is not None:
+        if env_info.get('me_stale'):
+            print(f'  ⚠ 盘后赚钱效应: 数据日期滞后(未跑盘后流水线), 已跳过转负降档')
+        elif env_info.get('money_effect') is not None:
             _me = env_info['money_effect']
             if _me < 0 and _dr and _dr.startswith('赚钱效应转负'):
                 print(f'  ⚠ 盘后赚钱效应: 昨日{_me:+.1f}% 转负 → 已降档')

@@ -123,7 +123,8 @@ def main():
     # Save snapshot
     snap_dir = os.path.join(BASE, 'data', 'zt_pool')
     os.makedirs(snap_dir, exist_ok=True)
-    with open(os.path.join(snap_dir, f'{today_yyyymmdd}.json'), 'w') as fh:
+    # 2026-09-03修复: 显式utf-8, 原Windows默认cp936致池文件GBK与全项目其他JSON不一致
+    with open(os.path.join(snap_dir, f'{today_yyyymmdd}.json'), 'w', encoding='utf-8') as fh:
         json.dump(pool, fh, ensure_ascii=False, indent=1)
 
     print(f'[Screen] Today LU stocks (eligible): {len(pool)}')
@@ -166,7 +167,7 @@ def main():
             'zhaban': s['break_times'],
             'sector_count': sector_counts.get(s['industry'], 1),
             'industry': s['industry'], 'turnover': s['turnover'],
-            'sector_bucket': _sector_bucket_map.get(s['industry'], '>=10'),
+            'sector_bucket': _sector_bucket_map.get(s['industry'], '<3'),
         }
 
         score, details = score_v4(code, klines, details_raw)
@@ -198,7 +199,8 @@ def main():
             'code': code, 'name': name,
             'score': score, 'vr20': details.get('vr', 0),
             'gap': details.get('gap', 0), 'cons': details.get('cons', 1),
-            'one_line': details.get('board_type') == '一字',
+            # 2026-09-03修复: 4板+一字/T字过滤定稿(2026-08-24)含T字, 原只写真一字致T字漏网
+            'one_line': details.get('board_type') in ('一字', 'T字'),
             'true_one_line': details.get('board_type') == '一字',
             'open': k['open'], 'close': k['close'],
             'seal_time': s['first_seal'], 'seal_dur': seal_duration,

@@ -404,9 +404,10 @@ def sell_signal(position, today_auction, config=None):
         if buy_date and buy_date == buy_dt:
             loss_pct = (yesterday['close'] - buy_price) / buy_price * 100
         else:
-            # 前日收盘作为参考
+            # 前日收盘作为参考 (2026-09-03修复: 原用prev_k['open']与注释/定稿矛盾,
+            # T-2高开涨停日会把大亏算成小亏 → 该"等冲高减亏"的被"竞价走")
             prev_k = klines[yesterday_idx - 1] if yesterday_idx > 0 else yesterday
-            loss_pct = (yesterday['close'] - prev_k['open']) / prev_k['open'] * 100 if prev_k['open'] > 0 else 0
+            loss_pct = (yesterday['close'] - prev_k['close']) / prev_k['close'] * 100 if prev_k['close'] > 0 else 0
 
         is_minor_loss = loss_pct > soft_stop  # 浮亏在软止损范围内=小亏
 

@@ -520,7 +520,8 @@ def score_v4(code, klines, details_raw=None, config=None):
         '10-30min' if seal <= '1000' else ('30-60min' if seal <= '1030' else '>60min')))
     zh = int(details_raw.get('zhaban', 0) or 0)
     zh_b = '0' if zh == 0 else ('1' if zh == 1 else ('2' if zh == 2 else '3+'))
-    sec_b = str(details_raw.get('sector_bucket', '>=10'))
+    # 2026-09-03修复: 题材数据缺失不得默认最高档(85分虚高14.7), 诚实低档
+    sec_b = str(details_raw.get('sector_bucket', '<3'))
     div_b = '分歧' if (zh >= 1 and vr >= 1.5) else '非分歧'
     if cons >= 3:
         dt_p = 30.5

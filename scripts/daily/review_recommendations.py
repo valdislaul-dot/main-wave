@@ -131,6 +131,10 @@ def simulate(buy, t_limit_up, t_close, t1):
     if t_limit_up:
         if gap1 < 0:
             return round(t1['open'], 3), f'昨涨停低开{gap1:+.2f}%→竞价全卖'
+        # 2026-09-03修复: 大高开≥5%按V4.1分歧卖点(执行价公式)结算, 原一律持有收盘系统性偏高
+        if gap1 >= 5:
+            exec_px = round(0.7 * (t1['high'] + t1['open']) / 2 + 0.3 * t1['close'], 3)
+            return exec_px, f'昨涨停大高开{gap1:+.2f}%→分歧卖点(执行价{exec_px:.2f})'
         return round(t1['close'], 3), f'昨涨停高开{gap1:+.2f}%→持有至收盘'
     if gap1 >= 4:
         return round(t1['close'], 3), f'断板高开{gap1:+.2f}%≥4%→持有至收盘'
@@ -197,13 +201,21 @@ def review_date(date_str, verbose=True):
         # ── 有实际交易 → 按真实买卖价统计; 无实际交易 → 模型模拟 ──
         buys, sells = _find_trades(st['code'])
         act_buys = [b for b in buys if b['date'] == date_str]
-        act_sells = [s for s in sells if s['date'] <= t1_str]
+        # 2026-09-03修复: 卖单限[T, T+1]窗口+按T日买入股数FIFO封顶,
+        # 原跨日卖单(T-1旧仓)被重复归属, remain_sh可为负致盈亏彻底失真
+        act_sells = [s for s in sells if date_str <= s['date'] <= t1_str]
         if act_buys:
             total_cost = sum(b['price'] * b['shares'] for b in act_buys)
             total_sh = sum(b['shares'] for b in act_buys)
             avg_buy = round(total_cost / total_sh, 3) if total_sh else 0
-            realized = sum(s['price'] * s['shares'] for s in act_sells)
-            sold_sh = sum(s['shares'] for s in act_sells)
+            realized = 0.0
+            sold_sh = 0
+            for s in act_sells:
+                take = min(s['shares'], total_sh - sold_sh)
+                if take <= 0:
+                    break
+                realized += s['price'] * take
+                sold_sh += take
             remain_sh = total_sh - sold_sh
             value = realized + remain_sh * t1_bar['close']
             pnl = round((value - total_cost) / total_cost * 100, 2)

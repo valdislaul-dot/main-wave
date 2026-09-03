@@ -59,8 +59,11 @@ def main():
             ok += 1
         time.sleep(0.3)  # 限速防封
 
-    with open(ZT_STATE_PATH, 'w', encoding='utf-8') as f:
+    # 2026-09-03修复: 原子写入(tmp+replace), 防与GUI刷新等并发写进程窗口内截断
+    _tmp = ZT_STATE_PATH + '.tmp'
+    with open(_tmp, 'w', encoding='utf-8') as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
+    os.replace(_tmp, ZT_STATE_PATH)
     print(f'[MoneyFlow] 写入 {ok}/{len(stocks)} 只 → {ZT_STATE_PATH}')
 
 
