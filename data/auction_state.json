@@ -1,62 +1,34 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 42,
+  "total_sessions": 43,
   "current": {
-    "date": "2026-09-02",
-    "captured": "2026-09-02 09:25:36",
-    "total": 76,
-    "buyable": 6,
-    "avg_gap": 1.35,
+    "date": "2026-09-03",
+    "captured": "2026-09-03 09:25:38",
+    "total": 49,
+    "buyable": 2,
+    "avg_gap": 1.34,
     "gap_distribution": {
+      "-3-0%": 12,
+      "5-9%": 3,
+      "<-3%": 6,
+      "9%+": 4,
       "2-5%": 10,
-      "0-2%": 16,
-      "9%+": 12,
-      "<-3%": 10,
-      "-3-0%": 26,
-      "5-9%": 2
+      "0-2%": 14
     },
     "buyable_stocks": [
       {
-        "code": "603221",
-        "name": "爱丽家居",
-        "gap_pct": 4.75,
-        "score": 66.7,
-        "limit_days": 1
+        "code": "000635",
+        "name": "英力特",
+        "gap_pct": 6.42,
+        "score": 57.5,
+        "limit_days": 2
       },
       {
-        "code": "605188",
-        "name": "国光连锁",
-        "gap_pct": 4.21,
-        "score": 61.5,
-        "limit_days": 1
-      },
-      {
-        "code": "002696",
-        "name": "百洋股份",
-        "gap_pct": 7.55,
-        "score": 57.7,
-        "limit_days": 1
-      },
-      {
-        "code": "002470",
-        "name": "金正大",
-        "gap_pct": 4.74,
-        "score": 55.1,
-        "limit_days": 1
-      },
-      {
-        "code": "601566",
-        "name": "九牧王",
-        "gap_pct": 4.14,
-        "score": 49.8,
-        "limit_days": 1
-      },
-      {
-        "code": "603207",
-        "name": "小方制药",
-        "gap_pct": 6.3,
-        "score": 0,
-        "limit_days": 1
+        "code": "000892",
+        "name": "欢瑞世纪",
+        "gap_pct": 5.19,
+        "score": 55.5,
+        "limit_days": 3
       }
     ]
   },
@@ -601,7 +573,20 @@
         "-3-0%": 26,
         "5-9%": 2
       }
+    },
+    {
+      "date": "2026-09-03",
+      "total": 49,
+      "buyable": 2,
+      "gap_distribution": {
+        "-3-0%": 12,
+        "5-9%": 3,
+        "<-3%": 6,
+        "9%+": 4,
+        "2-5%": 10,
+        "0-2%": 14
+      }
     }
   ],
-  "last_update": "2026-09-02"
+  "last_update": "2026-09-03"
 }
