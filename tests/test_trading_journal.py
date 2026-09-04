@@ -235,4 +235,45 @@ def test_record_sell_typo_code_falls_back_to_unambiguous_name(ledger_files):
 
     rest = tj.load_portfolio()
     assert [p['code'] for p in rest['positions']] == ['003040']
-    assert tj.load_journal()[0]['code'] == '000428'
+    assert tj.load_journal()[0]['code'] == '000428'  # SELL 记实际持仓码, 非手滑 argv
+
+
+# ---------- WR-03 (04 修复): 读者碰撞 PermissionError 短重试 (api/jobs.py write_job 模板) ----------
+
+def test_replace_permissionerror_collision_retries_then_succeeds(ledger_files, monkeypatch):
+    """首 2 次 replace 撞读者句柄 (PermissionError) -> 重试后成功, 内容完整, 零 .tmp。"""
+    pf_path, _ = ledger_files
+    real_replace = os.replace
+    state = {"calls": 0}
+
+    def flaky_replace(src, dst):
+        state["calls"] += 1
+        if state["calls"] <= 2:
+            raise PermissionError("simulated reader collision (WR-03)")
+        return real_replace(src, dst)
+
+    monkeypatch.setattr(os, "replace", flaky_replace)
+
+    pf = {"positions": [{"code": "003040", "name": "楚天龙"}], "cash": 1415.5}
+    tj.save_portfolio(pf)
+
+    assert state["calls"] == 3  # 两次碰撞 + 一次成功
+    assert json.loads(pf_path.read_text(encoding="utf-8")) == pf
+    assert list(pf_path.parent.glob("*.tmp")) == []  # 成功路径零 .tmp 残留
+
+
+def test_replace_persistent_permissionerror_exhausts_keeps_old_target(ledger_files, monkeypatch):
+    """4 次全撞 -> PermissionError 上抛 (不无限重试); 目标保持上次已提交内容。"""
+    pf_path, _ = ledger_files
+    good = {"positions": [], "cash": 1000.0}
+    pf_path.write_bytes(_serialize(good))
+
+    def always_permission_error(src, dst):
+        raise PermissionError("persistent reader collision (WR-03)")
+
+    monkeypatch.setattr(os, "replace", always_permission_error)
+
+    with pytest.raises(PermissionError):
+        tj.save_portfolio({"positions": [{"code": "003040", "name": "楚天龙"}], "cash": 1415.5})
+
+    assert pf_path.read_bytes() == _serialize(good)  # 目标 = 旧内容 (D-04 失败语义不变)

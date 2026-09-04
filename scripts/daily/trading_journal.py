@@ -4,6 +4,7 @@ Phase 4 (D-04..D-06): save_portfolio/save_journal 原子写 —— 同目录 .tm
 """
 import json, os
 import os
+import time
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime
 
@@ -43,14 +44,33 @@ def load_portfolio():
     }
 
 
+def _replace_retry(tmp, dst):
+    """os.replace 短重试 (WR-03, 04 修复; api/jobs.py write_job L73-85 模板):
+    读者 (GET /v1/private/*) 的 open 句柄撞上 replace 的 µs 窗口在 Windows 抛
+    PermissionError (WinError-5 类) —— 账本两文件写序 (portfolio 先 journal 后)
+    不容许 journal 一次碰撞丢条目 (两文件对 API 永久不一致)。4 次尝试、10ms 退避
+    (读句柄窗口 µs 级, 远够); 非 PermissionError (真盘满/权限) 立即上抛, 目标
+    保持上次已提交内容 (D-04 失败语义不变, Test 3/4 钉 OSError 首调即抛)。"""
+    for attempt in range(4):  # 3 次重试, 每次让出 10ms
+        try:
+            os.replace(tmp, dst)
+            return
+        except PermissionError:
+            if attempt < 3:
+                time.sleep(0.01)
+                continue
+            raise
+
+
 def save_portfolio(pf):
     # 原子写 (D-04..D-06, zt_pool save_state 模板): 同目录 .tmp 保证同卷, os.replace 原子替换
     # (Windows 上 os.rename 对已存在目标会失败, 禁用); 读者永不 observe 半写 JSON。
+    # WR-03 (04 修复): replace 碰撞 PermissionError 短重试 (见 _replace_retry)。
     # 不注入 last_updated 等字段 —— 账本 schema 是用户的 (与旧写者字节一致)。
     tmp = PORTFOLIO_FILE + '.tmp'
     with open(tmp, 'w', encoding='utf-8') as f:
         json.dump(pf, f, ensure_ascii=False, indent=2)
-    os.replace(tmp, PORTFOLIO_FILE)
+    _replace_retry(tmp, PORTFOLIO_FILE)
 
 
 def load_journal():
@@ -62,10 +82,11 @@ def load_journal():
 
 def save_journal(journal):
     # 原子写 (D-04..D-06, zt_pool save_state 模板): 同上 —— 同目录 .tmp + os.replace
+    # WR-03 (04 修复): replace 碰撞 PermissionError 短重试 (见 _replace_retry)。
     tmp = JOURNAL_FILE + '.tmp'
     with open(tmp, 'w', encoding='utf-8') as f:
         json.dump(journal, f, ensure_ascii=False, indent=2)
-    os.replace(tmp, JOURNAL_FILE)
+    _replace_retry(tmp, JOURNAL_FILE)
 
 
 def record_buy(name, code, price, shares, cost, note=''):
