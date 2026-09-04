@@ -212,11 +212,11 @@ The five success criteria above are each mapped to live evidence rows. The servi
 **Verdict record (filled by the user's review):**
 
 ```
-Verdict: (ACCEPT | DELTA — pending user review, never auto-accepted)
+Verdict: ACCEPT
 Date:   2026-09-04
-Reason: (DELTA only)
-04-04 session-date gate sign-off: (signed | not signed — pending)
-Notes:
+Reason: —
+04-04 session-date gate sign-off: signed
+Notes: 用户 2026-09-04 终审：SC1-SC5 证据全部成立；fail-loud session-date 语义签字确认（非当日 --date 拒绝 + exit 2，API date 参数对非当日日期刻意失效，直至定义更丰富历史语义）。
 ```
 
 ## Files Created/Modified
