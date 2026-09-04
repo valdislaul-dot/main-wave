@@ -111,13 +111,21 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DAILY = REPO_ROOT / "scripts" / "daily"
 
 
-def _git_data_logs_clean():
-    """data/ 与 logs/ 无 git 可见变更 (拒绝路径先于任何写文件/网络的证据)。"""
+def _git_porcelain():
+    """data/ 与 logs/ 的 git 可见变更行 (拒绝路径零写 = spawn 前后 diff 钉)。
+
+    WR-01 (04 修复): 每交易日晨跑 (morning_check 9:25-9:35) 会留下已跟踪
+    data/auction_state.json 改动与未跟踪 data/auction/YYYY-MM-DD.json ——
+    绝对干净的前置断言 (原 _git_data_logs_clean) 在未推送日恒红, 把 4 个
+    spawn 钉乃至整套件带红。改为返回 porcelain 文本, 由测试比对 spawn
+    前后相等: 起点脏不脏无所谓, 拒绝路径零新增变更即通过 (repo 常态绿)。
+    """
     out = subprocess.run(
         ["git", "status", "--porcelain", "--", "data/", "logs/"],
         capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=30,
     )
-    return out.returncode == 0 and out.stdout.strip() == ""
+    assert out.returncode == 0, f"git status failed: {out.stderr!r}"
+    return out.stdout.strip()
 
 
 def _spawn_refusal(script, argv_extra):
@@ -137,14 +145,18 @@ def test_real_script_refuses_past_session_date_exit2(script, flag):
     """过去会话日期 -> exit 2 + ASCII 拒绝 (含 "session date") + 零 traceback。
 
     消息必须在 stderr (stdout 零污染: 拒绝发生在任何 banner/采集之前)。
+    WR-01 (04 修复): 零写证据改为 spawn 前后 porcelain diff —— 晨跑留下的
+    data/ 改动是 repo 常态, 不要求绝对干净起点, 只钉拒绝路径零新增变更。
     """
-    assert _git_data_logs_clean(), "前置: data/logs 必须干净"
+    before = _git_porcelain()
     proc = _spawn_refusal(script, [flag, "--date=2026-01-01"])
     assert proc.returncode == 2, f"{script} rc={proc.returncode}: {proc.stdout!r}"
     assert proc.stdout == "", f"{script} stdout 应有零输出, 得: {proc.stdout!r}"
     assert "session date" in proc.stderr, f"{script} stderr: {proc.stderr!r}"
     assert "Traceback" not in proc.stderr and "Traceback" not in proc.stdout
-    assert _git_data_logs_clean(), f"{script} 拒绝路径不得写 data/ 或 logs/"
+    after = _git_porcelain()
+    assert after == before, (f"{script} 拒绝路径不得改 data/ 或 logs/ "
+                             f"(before={before!r}, after={after!r})")
 
 
 @pytest.mark.parametrize("script,flag", [
@@ -152,10 +164,15 @@ def test_real_script_refuses_past_session_date_exit2(script, flag):
     ("morning_check.py", "--quick"),
 ])
 def test_real_script_refuses_invalid_date_exit2(script, flag):
-    """非法 --date 值 -> 同一 exit-2 拒绝路径 (parse 阶段, 先于会话比较)。"""
-    assert _git_data_logs_clean(), "前置: data/logs 必须干净"
+    """非法 --date 值 -> 同一 exit-2 拒绝路径 (parse 阶段, 先于会话比较)。
+
+    WR-01 (04 修复): 零写证据 = spawn 前后 porcelain diff (见上)。
+    """
+    before = _git_porcelain()
     proc = _spawn_refusal(script, [flag, "--date=not-a-date"])
     assert proc.returncode == 2, f"{script} rc={proc.returncode}: {proc.stdout!r}"
     assert "session date" in proc.stderr, f"{script} stderr: {proc.stderr!r}"
     assert "Traceback" not in proc.stderr
-    assert _git_data_logs_clean(), f"{script} 拒绝路径不得写 data/ 或 logs/"
+    after = _git_porcelain()
+    assert after == before, (f"{script} 拒绝路径不得改 data/ 或 logs/ "
+                             f"(before={before!r}, after={after!r})")
