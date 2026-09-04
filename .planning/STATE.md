@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 5
 current_phase_name: Recovery, Observability & Ops Polish
 status: executing
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-09-04T16:57:21.902Z"
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-09-04T17:03:56.889Z"
 last_activity: 2026-09-05
 last_activity_desc: Phase 5 execution started
-state_head: 498545a63d6d2643b7bae0a206fa3c5ad6a7c276
+state_head: ea58d8c97f008a073f8190d2a66e06816ec05978
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 18
-  completed_plans: 16
+  completed_plans: 17
   percent: 80
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 ## Current Position
 
 Phase: 5 (Recovery, Observability & Ops Polish) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-09-05 — Phase 5 execution started
 
@@ -78,6 +78,7 @@ Progress: [████████░░] 80%
 | Phase 04-exposure-hardening-data-classification P04-07 | 6min | 3 tasks | 1 files |
 | Phase 05 P01 | 6 | 3 tasks | 4 files |
 | Phase 05 P02 | 10 | 3 tasks | 6 files |
+| Phase 05 P03 | 4min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -148,6 +149,9 @@ Recent decisions affecting current work:
 - [Phase 5]: log_housekeep is zero-config pure-function: defaults (console.log path, registry dir, cap) resolve via api.jobs module attrs at call time - one LOG_DIR monkeypatch isolates the whole module; primitives never raise and never print
 - [Phase 5]: Boot failure discipline: first-repoint error still attempts rotate; at most ONE ascii WARNING to stderr; never exit/raise on housekeeping failure - SEC-03 fatal-exit paths untouched
 - [Phase 5]: Boot-test isolation via a single api.main.LOG_DIR patch: every path the housekeeping block touches derives from main's own LOG_DIR attr (never module-default bare calls, which would dup2 the real logs tree onto pytest fds)
+- [Phase 5]: PROJECT.md 定稿分类表 /health/details 行以独立新行落表 (3 insertions 0 deletions): 定稿行文本逐字节未动, 列语义 (级/端点/门/路由源) 保持; in-cell 追加会使 diff 出现行级删除, 违反 additive-only verify
+- [Phase 5]: D-36 实况审计 (2026-09-05) = 确认不在册: Get-ScheduledTask 名过滤 pipeline|流水线|主升浪 输出为空 (exit 0), 对照枚举 201 任务仅 gogo-api 在册 Ready — 15:30 任务无需停用命令, [P3→P5] 行已闭环
+- [Phase 5]: README 本地化记录遵守 2026-08-31 上传范围规则: git check-ignore 通过, 提交范围排除 README; Mac 清单经用户 git pull 代码后在 Mac 端执行并回填 (Phase 3 跨机模式)
 
 ### Pending Todos
 
@@ -173,6 +177,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-04T16:57:21.350Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-09-04T17:03:56.325Z
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None
