@@ -15,10 +15,11 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from scripts.daily.config import DATA_DIR
+from scripts.daily.config import DATA_DIR, LOG_DIR
 from api.boot import ensure_token, has_token, is_loopback
 from api.state import router as state_router
 from api import jobs  # boot 序列用; import 无副作用 (03-02 D-12)
+from api import log_housekeep  # 05-02: boot 日志看护 (D-34, M-A); import 无副作用
 from api.actions import router as actions_router
 from api.private import router as private_router
 from api.health import router as health_router  # 05-01: 机密级 /health/details (OPS-03 SC1)
@@ -112,6 +113,25 @@ def main() -> None:
     # 放在 SEC-03/token 块之后、uvicorn.run 之前 —— Phase 1 boot 顺序不变
     # (Pattern 4; 必须在 main() 内, 测试用模块级 TestClient 无 lifespan)。
     jobs.reload_registry()
+
+    # 日志看护 (05-02, D-32/D-34, M-A): repoint -> rotate -> repoint -> prune。
+    # cmd `>>` 继承的 console.log 句柄没有 FILE_SHARE_DELETE (实机验证 2026-09-04):
+    # 第一次 repoint (dup2 替换) 释放继承句柄 -> rename 才成功; 第二次 repoint
+    # 把 fd 1/2 指到新文件, 否则 uvicorn stderr 会落进 console.log.1。失败至多
+    # 一条 ASCII WARNING, 绝不阻断 boot (SEC-03 的 fatal-exit 纪律不动)。
+    console_log = os.path.join(LOG_DIR, "api", "console.log")
+    jobs_dir_path = os.path.join(LOG_DIR, "api", "jobs")
+    try:
+        os.makedirs(os.path.dirname(console_log), exist_ok=True)
+    except OSError:
+        pass  # 目录建不出来 -> 原语各自容错告警, boot 照常继续
+    repoint_err1 = log_housekeep.repoint_std_streams(console_log)
+    _rotated, rotate_err = log_housekeep.rotate_console_log(console_log)
+    repoint_err2 = log_housekeep.repoint_std_streams(console_log)
+    log_housekeep.prune_job_logs(base=jobs_dir_path)
+    if repoint_err1 or rotate_err or repoint_err2:
+        detail = "; ".join(e for e in (repoint_err1, rotate_err, repoint_err2) if e)
+        print(f"WARNING: log housekeeping failed - {detail} - continuing boot", file=sys.stderr)
 
     # 惰性导入: 测试 import api.main 时无需 uvicorn 依赖, 也不触发任何绑定。
     import uvicorn
