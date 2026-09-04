@@ -165,7 +165,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 05-04-PLAN.md — Real-machine live gate: boot-rotation proof + /health/details live matrix + final suite + end-of-phase human review (03-04/04-07 twin)
+- [x] 05-04-PLAN.md — Real-machine live gate: boot-rotation proof + /health/details live matrix + final suite + end-of-phase human review (03-04/04-07 twin)
 
 **Research**: skip — standard ops/recovery patterns.
 
