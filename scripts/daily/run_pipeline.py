@@ -5,7 +5,7 @@
   python run_pipeline.py --fast       # 轻量模式(仅涨停池+评分)
   python run_pipeline.py --status     # 查看持仓
   python run_pipeline.py --buy NAME CODE PRICE [SHARES]   # 2026-09-03: 修正文档(实现按此序解析)
-  python run_pipeline.py --sell CODE PRICE
+  python run_pipeline.py --sell NAME CODE PRICE   # 2026-09-04 WR-06: 修正文档(实现按此序解析; 原2参形从未可用)
 """
 import sys, os, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -37,7 +37,11 @@ def main():
                 shares = int(deploy / price / 100) * 100
             cost = shares * price
             record_buy(name, code, price, shares, cost)
-        elif cmd == '--sell' and len(sys.argv) >= 4:
+        elif cmd == '--sell' and len(sys.argv) >= 5:
+            # WR-06 (04 修复): 文档 2 参形 (--sell CODE PRICE) 从未可用 —— 原 len>=4
+            # 守卫下 2 参 argv 长度恰为 4, argv[4] 越界崩溃 (按文档敲即 traceback)。
+            # 实际形态与 --buy 及 record_trader.py --sell 同形: NAME CODE PRICE
+            # (2026-09-03 buy 文档已按同口径修正); 收紧守卫至 >= 5, 缺参落 Usage。
             record_sell(sys.argv[2], sys.argv[3], float(sys.argv[4]))
         elif cmd == '--value' and len(sys.argv) >= 3:
             record_hold_valuation(float(sys.argv[2]))
