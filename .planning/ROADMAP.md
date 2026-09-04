@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Service Skeleton + /health Liveness** - Resident FastAPI service boots on Windows (autostart on reboot), serves always-200 /health, refuses to boot exposed without a token, seeds repo's first pytest suite (completed 2026-09-03)
 - [x] **Phase 2: Read-Only State Endpoints + Defensive Read Layer** - Market/temperature/zt-pool state served verbatim with freshness headers; half-written files never leak (retry + stale fallback); /health/ready (completed 2026-09-03)
 - [x] **Phase 3: Trigger Runner, Job Registry & Locks + Auth Enforcement** - POST triggers existing scripts as 202+job_id with durable jobs and single-flight 409s; X-API-Key enforced; event loop never blocked (completed 2026-09-04)
-- [ ] **Phase 4: Exposure Hardening + Data Classification** - 持仓/账本/候选 reads go live token-gated under an explicit classification policy; logs/errors/params/git hardened
+- [x] **Phase 4: Exposure Hardening + Data Classification** - 持仓/账本/候选 reads go live token-gated under an explicit classification policy; logs/errors/params/git hardened (completed 2026-09-04)
 - [ ] **Phase 5: Recovery, Observability & Ops Polish** - Auth-gated /health/details, automatic log rotation, completed test suite passing with Win/Mac parity
 
 ## Phase Details
@@ -149,7 +149,20 @@ Plans:
   2. uvicorn and per-run job logs rotate automatically so the API's disk footprint stays bounded through weeks of continuous running with no manual cleanup.
   3. The pytest suite (seeded in Phase 1, grown through Phases 2-5) passes on Windows and Mac with a network-blocking fixture proving no test touches the network.
 
-**Plans**: TBD
+**Plans**: 4/4 plans planned
+Plans:
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — Auth-gated GET /health/details (api/health.py D-29..D-31 shape + uptime_seconds anchor + SC2 audit pin) + contract suite
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 05-02-PLAN.md — PRUNE_CAP 500→20 (D-33) + api/log_housekeep.py rotation primitives (D-34) + main() M-A boot dance (D-32)
+- [ ] 05-03-PLAN.md — README known-limits + Mac checklist (D-37/D-35) + PROJECT.md /health/details classification row + D-36 15:30 task audit record
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 05-04-PLAN.md — Real-machine live gate: boot-rotation proof + /health/details live matrix + final suite + end-of-phase human review (03-04/04-07 twin)
 **Research**: skip — standard ops/recovery patterns.
 
 ## Progress
@@ -162,5 +175,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Service Skeleton + /health Liveness | 2/2 | Complete    | 2026-09-03 |
 | 2. Read-Only State Endpoints + Defensive Read Layer | 1/1 | Complete    | 2026-09-03 |
 | 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 4/4 | Complete    | 2026-09-04 |
-| 4. Exposure Hardening + Data Classification | 6/7 | In Progress|  |
-| 5. Recovery, Observability & Ops Polish | 0/TBD | Not started | - |
+| 4. Exposure Hardening + Data Classification | 7/7 | Complete    | 2026-09-04 |
+| 5. Recovery, Observability & Ops Polish | 0/4 | Not started | - |
