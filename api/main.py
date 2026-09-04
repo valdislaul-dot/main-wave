@@ -19,7 +19,7 @@ from scripts.daily.config import DATA_DIR, LOG_DIR
 from api.boot import ensure_token, has_token, is_loopback
 from api.state import router as state_router
 from api import jobs  # boot 序列用; import 无副作用 (03-02 D-12)
-from api import log_housekeep  # 05-02: boot 日志看护 (D-34, M-A); import 无副作用
+from api import log_housekeep  # 05-02/05-04: boot 日志看护 (D-32/D-34, M-B); import 无副作用
 from api.actions import router as actions_router
 from api.private import router as private_router
 from api.health import router as health_router  # 05-01: 机密级 /health/details (OPS-03 SC1)
@@ -114,24 +114,32 @@ def main() -> None:
     # (Pattern 4; 必须在 main() 内, 测试用模块级 TestClient 无 lifespan)。
     jobs.reload_registry()
 
-    # 日志看护 (05-02, D-32/D-34, M-A): repoint -> rotate -> repoint -> prune。
-    # cmd `>>` 继承的 console.log 句柄没有 FILE_SHARE_DELETE (实机验证 2026-09-04):
-    # 第一次 repoint (dup2 替换) 释放继承句柄 -> rename 才成功; 第二次 repoint
-    # 把 fd 1/2 指到新文件, 否则 uvicorn stderr 会落进 console.log.1。失败至多
-    # 一条 ASCII WARNING, 绝不阻断 boot (SEC-03 的 fatal-exit 纪律不动)。
+    # 日志看护 (05-02/05-04, D-32/D-34): 探测分流 + prune。
+    # cmd `>>` 句柄 (含 cmd 自持副本, 子进程生命周期内不释放) 既无 FILE_SHARE_WRITE
+    # 也无 FILE_SHARE_DELETE (05-04 真机实测): 继承句柄存活期间进程内 open 撞
+    # Errno 13、rename 撞 WinError 32 —— 真机轮转只能由启动器 run_api.bat (M-B)
+    # 在 python 启动前完成。故: fd 1/2 指向 console.log (cmd >> 启动) 时继承句柄
+    # 已指向 M-B 轮转后的新文件, 进程内零动作最安全 (仅当文件仍超阈值 —— M-B 未
+    # 生效 —— rotate 失败报一句警告); 手动/测试启动 (fd 未指向) 时文件无人持有,
+    # rotate -> repoint 全可行。失败至多一条 ASCII WARNING, 绝不阻断 boot
+    # (SEC-03 的 fatal-exit 纪律不动)。
     console_log = os.path.join(LOG_DIR, "api", "console.log")
     jobs_dir_path = os.path.join(LOG_DIR, "api", "jobs")
     try:
         os.makedirs(os.path.dirname(console_log), exist_ok=True)
     except OSError:
         pass  # 目录建不出来 -> 原语各自容错告警, boot 照常继续
-    repoint_err1 = log_housekeep.repoint_std_streams(console_log)
-    _rotated, rotate_err = log_housekeep.rotate_console_log(console_log)
-    repoint_err2 = log_housekeep.repoint_std_streams(console_log)
+    if log_housekeep.std_streams_on(console_log):
+        _rotated, rotate_err = log_housekeep.rotate_console_log(console_log)
+        if rotate_err:
+            print(f"WARNING: console.log rotation skipped - {rotate_err} - continuing boot", file=sys.stderr)
+    else:
+        _rotated, rotate_err = log_housekeep.rotate_console_log(console_log)
+        repoint_err = log_housekeep.repoint_std_streams(console_log)
+        if rotate_err or repoint_err:
+            detail = "; ".join(e for e in (rotate_err, repoint_err) if e)
+            print(f"WARNING: log housekeeping failed - {detail} - continuing boot", file=sys.stderr)
     log_housekeep.prune_job_logs(base=jobs_dir_path)
-    if repoint_err1 or rotate_err or repoint_err2:
-        detail = "; ".join(e for e in (repoint_err1, rotate_err, repoint_err2) if e)
-        print(f"WARNING: log housekeeping failed - {detail} - continuing boot", file=sys.stderr)
 
     # 惰性导入: 测试 import api.main 时无需 uvicorn 依赖, 也不触发任何绑定。
     import uvicorn

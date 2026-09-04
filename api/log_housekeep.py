@@ -6,10 +6,14 @@
 api/main.py 的 boot 块打印, ASCII-only); 导入零副作用; 原语永不 raise ——
 OSError 一律转成 ascii 错误串返回, 调用方决定是否告警。
 
-Windows 硬约束 (2026-09-04 实机验证): cmd `>>` 继承的 console.log 句柄未授
-FILE_SHARE_DELETE —— 进程内 rename 必撞 WinError 32。因此 rename 前必须先由调用方
-执行 repoint (dup2 替换, 释放继承句柄), rename 后再 repoint 一次把流指到新文件;
-本模块只提供可测原语, repoint -> rotate -> repoint 的 dance 编排归 api/main.py。
+Windows 硬约束 (2026-09-04/05 实机验证): cmd `>>` 的 console.log 句柄既未授
+FILE_SHARE_WRITE 也未授 FILE_SHARE_DELETE, 且 cmd 自持副本在 python 整个
+生命周期内不释放 (05-04 实测: 子进程关掉自己的 fd 后 rename 仍撞 WinError 32)
+—— 继承句柄存活期间 open-for-write 撞 Errno 13, rename 撞 WinError 32, 进程内
+轮转不可行。因此真机轮转的唯一落点是启动器 (run_api.bat M-B, python 启动前);
+main() 的 boot 块先经 std_streams_on 探测: fd 1/2 指向 console.log (cmd >>
+启动) 时继承句柄已指向 M-B 轮转后的新文件, 进程内零动作最安全; 未指向 (手动/
+测试启动) 时才执行 rotate -> repoint。本模块只提供可测原语, 编排归 api/main.py。
 """
 import os
 import sys
@@ -44,12 +48,16 @@ def rotate_console_log(path=None, max_bytes=MAX_CONSOLE_LOG_BYTES):
 
 
 def repoint_std_streams(path=None):
-    """把进程 fd 1/2 重指向 path 的追加句柄 (M-A dance: dup2 替换释放继承句柄)。
+    """把进程 fd 1/2 重指向 path 的追加句柄 (非重定向启动的收尾步)。
 
     flush 先落当前缓冲; os.open(O_WRONLY | O_APPEND | O_CREAT) 后 dup2 到 fd 1/2,
     关闭多余 fd。绝不重建 sys.stdout/sys.stderr 对象、绝不碰 logging —— 打印对象
     归属不变, 只换落点。path 缺省 = jobs.LOG_DIR/api/console.log (调用时解析)。
     失败: 返回 ascii 错误串, 不还原 (流保持失败前指向), 永不 raise。
+
+    05-04 适配: 若调用前 fd 1/2 已被关掉, os.open 会拿到最低空闲 fd (即 1 或 2)
+    —— 此时绝不能再 os.close(fd), 否则刚 dup2 好的新流被自己关掉; 只有 fd > 2
+    (dup2 前没碰过 std fd 的常规路径) 才需要关闭多余 fd。
     """
     if path is None:
         path = os.path.join(jobs.LOG_DIR, "api", "console.log")
@@ -61,10 +69,36 @@ def repoint_std_streams(path=None):
             os.dup2(fd, 1)
             os.dup2(fd, 2)
         finally:
-            os.close(fd)
+            if fd not in (1, 2):
+                os.close(fd)
         return None
     except OSError as exc:
         return _ascii_error(exc)
+
+
+def std_streams_on(path=None):
+    """探测 fd 1/2 是否指向 path (cmd `>>` 启动检测, 05-04 M-B 适配)。
+
+    os.path.samestat(os.fstat(fd), os.stat(path)) 自持检测: 任一 std fd 与
+    path 同文件 -> True (继承句柄启动, 文件被启动器 deny-share 持有, 进程内
+    open/rename 均不可行 —— main() 据此走零动作分支)。手动控制台/测试管道
+    启动的 fd 1/2 不是日志文件句柄 -> False。永不 raise: stat/fstat 失败
+    一律按 False 处理 (fd 无效或文件缺失都不可能是"指向"状态)。
+    path 缺省 = jobs.LOG_DIR/api/console.log (调用时解析)。
+    """
+    if path is None:
+        path = os.path.join(jobs.LOG_DIR, "api", "console.log")
+    try:
+        st_path = os.stat(path)
+    except OSError:
+        return False
+    for fd in (1, 2):
+        try:
+            if os.path.samestat(os.fstat(fd), st_path):
+                return True
+        except OSError:
+            continue
+    return False
 
 
 def prune_job_logs(base=None, cap=None):
