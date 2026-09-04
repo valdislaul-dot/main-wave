@@ -42,7 +42,10 @@ def main():
             # 守卫下 2 参 argv 长度恰为 4, argv[4] 越界崩溃 (按文档敲即 traceback)。
             # 实际形态与 --buy 及 record_trader.py --sell 同形: NAME CODE PRICE
             # (2026-09-03 buy 文档已按同口径修正); 收紧守卫至 >= 5, 缺参落 Usage。
-            record_sell(sys.argv[2], sys.argv[3], float(sys.argv[4]))
+            # WR-07 (04 修复): record_sell 拒绝 (错配/空仓) 返回 None —— 原返回 pf
+            # 且本行忽略返回值, 脚本/包装方把"被拒"当"已卖" (进程退出码 0)。
+            if record_sell(sys.argv[2], sys.argv[3], float(sys.argv[4])) is None:
+                sys.exit(1)  # 卖出被拒: 名码错配/空仓, 非零退出防静默漏卖
         elif cmd == '--value' and len(sys.argv) >= 3:
             record_hold_valuation(float(sys.argv[2]))
         else:

@@ -177,9 +177,10 @@ def test_record_sell_mismatch_name_code_refused_no_double_sell(ledger_files, cap
     tj.save_portfolio(pf)
     tj.save_journal([])
 
-    tj.record_sell('楚天龙', '000428', 5.0)  # 楚天龙名 + 华天酒店码
+    result = tj.record_sell('楚天龙', '000428', 5.0)  # 楚天龙名 + 华天酒店码
 
     assert 'WARNING' in capsys.readouterr().out
+    assert result is None  # WR-07: 拒绝返回 None (run_pipeline --sell 映射为非零退出)
     assert tj.load_portfolio() == pf  # 拒绝 = 零改动 (文件内容不变)
     assert tj.load_journal() == []
 
@@ -190,8 +191,9 @@ def test_record_sell_correct_pair_sells_only_that_stock(ledger_files):
     tj.save_portfolio(pf)
     tj.save_journal([])
 
-    tj.record_sell('华天酒店', '000428', 5.0)
+    result = tj.record_sell('华天酒店', '000428', 5.0)
 
+    assert result is not None  # WR-07: 成功返回 pf (与拒绝的 None 区分)
     rest = tj.load_portfolio()
     assert [p['code'] for p in rest['positions']] == ['003040']  # 楚天龙保留
     assert rest['cash'] == 10000.0 + 5.0 * 100
@@ -215,8 +217,9 @@ def test_record_sell_same_code_merges_all_lots_keeps_other_stock(ledger_files):
     tj.save_portfolio(pf)
     tj.save_journal([])
 
-    tj.record_sell('楚天龙', '003040', 18.0)
+    result = tj.record_sell('楚天龙', '003040', 18.0)
 
+    assert result is not None  # WR-07: 成功返回 pf (与拒绝的 None 区分)
     rest = tj.load_portfolio()
     assert [p['code'] for p in rest['positions']] == ['000428']
     sells = [e for e in tj.load_journal() if e['action'] == 'SELL']
@@ -231,11 +234,44 @@ def test_record_sell_typo_code_falls_back_to_unambiguous_name(ledger_files):
     tj.save_portfolio(pf)
     tj.save_journal([])
 
-    tj.record_sell('华天酒店', '00042', 5.0)  # 码缺位 -> 无 code 命中
+    result = tj.record_sell('华天酒店', '00042', 5.0)  # 码缺位 -> 无 code 命中
 
+    assert result is not None  # WR-07: name 回退成功同样返回 pf
     rest = tj.load_portfolio()
     assert [p['code'] for p in rest['positions']] == ['003040']
     assert tj.load_journal()[0]['code'] == '000428'  # SELL 记实际持仓码, 非手滑 argv
+
+
+def test_record_sell_refusal_returns_none_no_match_and_legacy(ledger_files, capsys):
+    """WR-07: 其余两条拒绝路径同样返回 None (调用方以 None 判定拒绝 -> 非零退出):
+    ① positions 列表内名码双不中 (无该股)  ② 旧格式单仓 (无 positions 键) 名码双不中。
+    两条路径都零落账 (文件字节不变, 日志零 SELL)。
+    """
+    # ① positions 列表: code 无命中 + name 无命中 -> 拒绝
+    pf = _two_position_pf()
+    tj.save_portfolio(pf)
+    tj.save_journal([])
+
+    result = tj.record_sell('楚天隆', '999999', 5.0)  # 名码都打不中任何持仓
+
+    assert result is None  # WR-07: 拒绝返回 None
+    assert 'WARNING' in capsys.readouterr().out
+    assert tj.load_portfolio() == pf  # 拒绝 = 零改动 (文件内容不变)
+    assert tj.load_journal() == []
+
+    # ② 旧格式 (仅 position 单仓, 无 positions 键): 名码双不中 -> 拒绝
+    legacy = {'cash': 10000.0, 'total_trades': 0, 'winning_trades': 0, 'total_pnl': 0.0,
+              'position': {'name': '楚天龙', 'code': '003040', 'buy_date': '2026-09-01',
+                           'buy_price': 15.0, 'shares': 100}}
+    tj.save_portfolio(legacy)
+    tj.save_journal([])
+
+    result = tj.record_sell('不存在名', '999999', 5.0)
+
+    assert result is None  # WR-07: 旧格式拒绝同样返回 None
+    assert 'WARNING' in capsys.readouterr().out
+    assert tj.load_portfolio() == legacy  # 拒绝 = 零改动 (文件内容不变)
+    assert tj.load_journal() == []
 
 
 # ---------- WR-03 (04 修复): 读者碰撞 PermissionError 短重试 (api/jobs.py write_job 模板) ----------

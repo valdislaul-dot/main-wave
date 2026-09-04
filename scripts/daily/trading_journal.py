@@ -131,7 +131,9 @@ def record_buy(name, code, price, shares, cost, note=''):
 def record_sell(name, code, price, note=''):
     """Record a sell trade (2026-09-03修复: 同码多笔加仓整仓卖时合并全部批次,
     原只删第一笔致残仓滞留+现金少记; 2026-09-04 WR-02修复: code 优先精确匹配,
-    name/code 错配拒绝, 原 name-OR-code 并集会把两只持仓一并卖出记双卖)"""
+    name/code 错配拒绝, 原 name-OR-code 并集会把两只持仓一并卖出记双卖;
+    WR-07: 拒绝路径 (错配/无持仓) 打印 WARNING 并返回 None —— 成功返回 pf,
+    调用方须以 None 判定卖出被拒 (run_pipeline --sell 映射为 sys.exit(1)))"""
     pf = load_portfolio()
     journal = load_journal()
 
@@ -147,20 +149,20 @@ def record_sell(name, code, price, note=''):
             if name and name != code and name not in {p['name'] for p in by_code}:
                 print(f'[Journal] WARNING: {name}/{code} 错配: code 属于 '
                       f'{[p["name"] for p in by_code]}, 拒绝卖出(防错配双卖)')
-                return pf
+                return None  # WR-07: 拒绝信号 (None = 未卖出, 调用方非零退出)
             matched = by_code
         else:
             matched = [p for p in positions if p['name'] == name]
         if not matched:
             print(f'[Journal] WARNING: No position in {name}')
-            return pf
+            return None  # WR-07: 拒绝信号 (None = 未卖出, 调用方非零退出)
         for p in matched:
             positions.remove(p)
     else:
         pos = pf['position']
         if pos is None or (pos['name'] != name and pos['code'] != code):
             print(f'[Journal] WARNING: No position in {name}')
-            return pf
+            return None  # WR-07: 拒绝信号 (None = 未卖出, 调用方非零退出)
         matched = [pos]
 
     total_sh = sum(p['shares'] for p in matched)
