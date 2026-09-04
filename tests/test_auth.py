@@ -6,12 +6,13 @@
   {"detail": "invalid API key", "code": "invalid_api_key"} 无挑战头。
 - env GOGO_API_TOKEN 优先于文件 (read_token 链路); 无 token 配置 -> fail-closed 403。
 - /health、/health/ready、GET /v1/state/{name} 结构豁免 (D-11) —— 公开路由,
-  无中间件, /health 纯度 (HLT-01)。豁免名单封闭: /v1/private/* 不在其列
-  (SEC-02, 无 key 必 401)。
-- SC2 (04-03): 逐路由分级审计 —— 机密级 (actions/jobs/private) 必带
-  require_api_key 同一依赖对象身份 (route.dependencies[].dependency is),
-  公开级必不带; 任何未显式分级的新路由即失败 (SC2 漂移守卫, /probe/* 测试
-  设施与 /openapi.json 纯框架路由豁免)。
+  无中间件, /health 纯度 (HLT-01)。豁免名单封闭且逐路径枚举 (无前缀通配):
+  /v1/private/* 不在其列 (SEC-02, 无 key 必 401); /health/details (05-01)
+  同为机密级 —— 加入 expected_secret 审计集, 不在 D-11 豁免名单。
+- SC2 (04-03; 05-01 延伸): 逐路由分级审计 —— 机密级 (actions/jobs/private/
+  health.details) 必带 require_api_key 同一依赖对象身份
+  (route.dependencies[].dependency is), 公开级必不带; 任何未显式分级的新
+  路由即失败 (SC2 漂移守卫, /probe/* 测试设施与 /openapi.json 纯框架路由豁免)。
 - 401/403/404 拒绝路径零 spawn / 零 registry 写 (被拒请求永不干扰运行中 job)。
 - 密钥字节级缺席审计: job 日志、子进程 env dump、所有响应体 (T-03-09;
   run_job 的 GOGO_API_TOKEN pop 是机械半边, 真机 console.log grep 归 03-04);
@@ -346,7 +347,12 @@ def test_sc2_route_by_route_classification_audit():
     def _gated(route):
         return any(getattr(d, "dependency", None) is gate for d in route.dependencies)
 
-    expected_secret = {"/v1/private/{name}", "/v1/actions/{kind}", "/v1/jobs/{job_id}"}
+    expected_secret = {
+        "/v1/private/{name}",
+        "/v1/actions/{kind}",
+        "/v1/jobs/{job_id}",
+        "/health/details",  # 05-01: OPS-03 SC1 机密级详情 (与 private/actions/jobs 同门)
+    }
     expected_public = {"/health", "/health/ready", "/v1/state/{name}"}
     seen_secret = set()
     seen_public = set()
