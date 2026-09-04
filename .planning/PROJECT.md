@@ -62,6 +62,9 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 |----------|------|----------|------------------------|
 | 公开级 | `/health`、`/health/ready`、`/v1/state/*`、`/openapi.json` | 无需 key（无持仓/无策略暴露面） | api/main.py、api/state.py |
 | 机密级 | `/v1/private/*`（portfolio/journal/candidates）、`POST /v1/actions/*`、`GET /v1/jobs/*` | X-API-Key 必填（持仓/操作/任务状态） | api/private.py、api/actions.py |
+| 机密级 | `GET /health/details` | X-API-Key 必填（版本/uptime/最近检查详情；router 级 `Depends(require_api_key)`，与 `/v1/private/*` 同一依赖对象） | api/health.py |
+
+注：`GET /health/details` 行于 2026-09-05 Phase 5 追加（OPS-03），契约源 05-CONTEXT D-29/D-31，as-built 见 05-01-SUMMARY；README 端点表同行逐字节核对。
 
 ## Key Decisions
 

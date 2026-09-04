@@ -156,7 +156,7 @@ Recent decisions affecting current work:
 ### Blockers/Concerns
 
 - [P4] PROJECT.md security-clause wording revision requires user sign-off (定稿机制).
-- [P3→P5] 15:30 定时任务疑似失效（likely defunct）——GUI 已弃用（2026-09-04），无 GUI 并发跑者；API/CLI 由同一锁文件仲裁；任务存废待 Phase 5 ops polish 确认
+- [P3→P5] ✅ CLOSED 2026-09-05（D-36 实况复审计, 结果=确认不在册）: `Get-ScheduledTask | Where-Object { $_.TaskName -match "pipeline|流水线|主升浪" } | Select-Object -ExpandProperty TaskName` → **输出为空（0 匹配, exit 0）**；对照枚举正常（全量 201 任务, 本项目相关仅 gogo-api 在册 Ready）。15:30 任务已不在册 → **无需停用命令**；Phase 3 D-02 停用/移除结论复确认（背景: GUI 2026-09-04 弃用后无 GUI 并发跑者, API/CLI 由同一锁文件仲裁）
 - [P2] REVIEW.md WR-01: token gate 为存在性检查且自开启——非回环绑定只查 token 存在，回环默认运行会自动生成 token，误配 0.0.0.0 时静默服务 LAN。修复需 env 强制 token + 控制台警告，属 Phase 3/4 鉴权加固范围
 - [P2] REVIEW.md WR-02/WR-03 + UI-audit 3 项优先级修复（机器可读错误码、双 404 文案归一、openapi/README 契约）——涉及 D-01/D-04 定稿决策，采纳需用户确认
 - [P2] 会话清理现象：交互会话启动的服务实例随会话结束收到 Ctrl+C（2026-09-03 晚 4 次 ^C 观察，LastTaskResult 0xC000013A）；AtStartup 自启路径不受影响——部署生命周期关注项，记入 Phase 5 ops polish
