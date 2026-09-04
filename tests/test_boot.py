@@ -118,6 +118,7 @@ def test_ensure_token_never_prints(tmp_path, monkeypatch, capsys):
 def test_loopback_boot_prints_only_notice_and_creates_token(monkeypatch, tmp_path, capsys):
     monkeypatch.delenv("GOGO_API_TOKEN", raising=False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
     _patch_uvicorn_run(monkeypatch)
     api.main.main()  # 不得抛 SystemExit
     assert (tmp_path / "api_token.txt").exists()
@@ -135,6 +136,7 @@ def test_non_loopback_without_token_refuses_and_creates_no_file(monkeypatch, tmp
     monkeypatch.setenv("GOGO_API_HOST", "0.0.0.0")
     monkeypatch.setattr(api.main, "is_loopback", lambda host: False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
     with pytest.raises(SystemExit) as excinfo:
         api.main.main()
     assert excinfo.value.code != 0
@@ -149,6 +151,7 @@ def test_non_loopback_without_token_refuses_and_creates_no_file(monkeypatch, tmp
 def test_loopback_boot_generates_token_and_exits_normally(monkeypatch, tmp_path, capsys):
     monkeypatch.delenv("GOGO_API_TOKEN", raising=False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
     _patch_uvicorn_run(monkeypatch)
     api.main.main()  # 默认 host=127.0.0.1 -> 回环分支, 不得 SystemExit
     assert (tmp_path / "api_token.txt").exists()  # D-03 在回环分支生成
@@ -165,6 +168,7 @@ def test_env_token_satisfies_non_loopback_check(monkeypatch, tmp_path, capsys):
     monkeypatch.setenv("GOGO_API_HOST", "0.0.0.0")
     monkeypatch.setattr(api.main, "is_loopback", lambda host: False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
     _patch_uvicorn_run(monkeypatch)
     api.main.main()  # env token 满足检查 -> 不得 SystemExit
     assert not (tmp_path / "api_token.txt").exists()  # 已有 token, 不生成文件
@@ -185,6 +189,7 @@ def test_non_loopback_file_token_only_refuses_without_uvicorn(monkeypatch, tmp_p
     monkeypatch.setenv("GOGO_API_HOST", "0.0.0.0")
     monkeypatch.setattr(api.main, "is_loopback", lambda host: False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
     token_file = tmp_path / "api_token.txt"
     token_file.write_text("file-key\n", encoding="utf-8")  # 文件 token 已存在 (与自动生成等价)
     uvicorn_calls = []
@@ -207,6 +212,7 @@ def test_env_token_non_loopback_proceeds_with_ascii_warning_no_token_echo(monkey
     monkeypatch.setenv("GOGO_API_HOST", "0.0.0.0")
     monkeypatch.setattr(api.main, "is_loopback", lambda host: False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
     _patch_uvicorn_run(monkeypatch)
     api.main.main()  # env token 满足 -> 不得 SystemExit, 正常走到 uvicorn.run
     assert not (tmp_path / "api_token.txt").exists()  # 非回环分支绝不生成文件
