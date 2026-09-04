@@ -21,6 +21,7 @@ from api.state import router as state_router
 from api import jobs  # boot 序列用; import 无副作用 (03-02 D-12)
 from api.actions import router as actions_router
 from api.private import router as private_router
+from api.health import router as health_router  # 05-01: 机密级 /health/details (OPS-03 SC1)
 from api.errors import (
     http_exception_handler,
     unhandled_exception_handler,
@@ -30,6 +31,15 @@ from api.errors import (
 # uptime 锚点: 模块导入时刻 (对 uvicorn.run 即进程启动时刻)。
 # 用 monotonic —— 免疫 NTP/手动改钟导致的墙钟跳变 (T-01-04)。
 _START = time.monotonic()
+
+
+def uptime_seconds() -> int:
+    """进程存活秒数 (monotonic): /health 与 /health/details (05-01, D-30) 共享。
+
+    公开读取口紧邻锚点 —— 跨模块复用不碰私有下划线名; 定义于导入区之后,
+    模块级 import api.health 的循环依赖因此不成立 (health 在 handler 内惰性取用)。
+    """
+    return int(time.monotonic() - _START)
 
 # openapi 公开只读 (04-01): schema 服务自描述契约; docs 交互面仍关闭 (CLI-only)。
 # 无中间件、无路由依赖 (HLT-01 纯度, Pitfall 6)。
@@ -46,12 +56,13 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 @app.get("/health")
 def health():
     """探活 (HLT-01): 纯内存返回, 不读文件、不碰网络、不依赖交易日历 —— 任何时刻恒 200。"""
-    return {"status": "ok", "uptime_seconds": int(time.monotonic() - _START)}
+    return {"status": "ok", "uptime_seconds": uptime_seconds()}
 
 
 app.include_router(state_router)
 app.include_router(private_router)  # 04-03: 机密级私密读 /v1/private/* (router 自带 auth, SEC-02)
 app.include_router(actions_router)  # 03-02: 受保护触发/job 路由 (D-11 豁免之外)
+app.include_router(health_router)  # 05-01: 机密级 /health/details (router 自带 auth, SEC-02)
 
 
 def main() -> None:
