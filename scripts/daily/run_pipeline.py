@@ -163,7 +163,10 @@ def main():
             try:
                 from generate_report import generate
                 generate()
-            except: pass
+            except Exception as e:
+                # WR-04 (04 修复): 原 bare except: pass 把报告失败静默吞掉 —
+                # 流水线报成功且零诊断; bare except 还吞 KeyboardInterrupt (Ctrl-C 失效)
+                print(f'[Warning] 报告生成失败: {e}')
 
             # Step 6: Review yesterday's top-3 recommendations
             print('\n[Step 6/7] 回看昨日推荐前三...')
@@ -178,7 +181,9 @@ def main():
             try:
                 from capture_tboard_minute import main as capture_tboard
                 capture_tboard()
-            except: pass
+            except Exception as e:
+                # WR-04 (04 修复): 同 Step 5 —— 原 bare except: pass 静默吞失败
+                print(f'[Warning] T字板分钟捕获失败: {e}')
 
             # Step 8: Data health check
             print('\n[Step 8/8] 数据体检...')
