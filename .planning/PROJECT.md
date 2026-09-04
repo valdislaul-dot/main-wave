@@ -25,11 +25,14 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 - ✓ 仓库首套自动化测试（pytest 18+1，零网络，TestClient 契约）— Phase 1
 - ✓ 公开状态接口（market/auction/zt-pool raw 透传 + X-Data-Mtime/Age-S/Stale 新鲜度头）+ 防御式读取层（validate-then-serve + 短重试 + last-good stale 缓存，写入期间 0×5xx）+ /health/ready（stat-only，与数据年龄解耦）— Phase 2
 - ✓ 操作触发接口（trigger/health-check/kill，subprocess，202+job_id，单飞锁：内存 claim 带 running_job_id + OS 文件锁双形态 409）— Phase 3
+- ✓ 持仓/账本/候选读取（GET /v1/private/*，token-gated，raw 透传 + X-Data-* 新鲜度头，candidates 可选 date 白名单）— Phase 4
+- ✓ 数据分级鉴权（公开级/机密级两档分级表定稿，PROJECT.md Constraints/Security 常驻参考）— Phase 4
+- ✓ 错误信封（机器可读 `{"detail","code"}` + 404 文案归一 + openapi）与暴露面硬化（WR-01 env 强制 token、date 白名单、SC5 扫描）— Phase 4
 
 ### Active
 
-- [ ] 持仓/账本/候选 reads（token-gated，Phase 4 数据分级政策下交付，STA-02）
-- [ ] 分级鉴权：行情/温度类只读放开；持仓/账本/候选与所有触发接口一律 token 保护（2026-09-02 用户确认）
+- [ ] 日志轮转 + 鉴权版 /health/details（OPS-03）— Phase 5
+- [ ] 双机测试套件全绿（Win/Mac 网络封锁证明）— Phase 5
 
 ### Out of Scope
 
@@ -83,6 +86,11 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 | write_job 迁移 4×10ms os.replace 重试 | Windows WinError-5 读碰撞实测；轮询读者绝不把迁移打成失败 | ✓ Good (Phase 3) |
 | start_job 202 响应体 = 接受时刻 dict 快照 | worker 线程启动后即迁移状态，活引用会让 202 竞态出现 running/succeeded | ✓ Good (Phase 3) |
 | GUI 弃用（CLI-only） | 2026-09-04 用户拍板：日常盘后/竞价全走 CLI；API 侧锁接入保留 | ✓ Good (Phase 3) |
+| 错误信封：冻结文本键码表 + 3 个 app-level handler + 404 归一 + openapi | 统一 `{"detail","code"}` 形状在 app 层强制，raise site 零改动；openapi 契约同步 | ✓ Good (Phase 4) |
+| 写侧原子化：save_portfolio/save_journal tmp+os.replace + PermissionError 4×10ms 重试 | D-04..D-06 前置；半写账本永不服务；与 api/jobs.py write_job 同族 | ✓ Good (Phase 4) |
+| WR-01 修复：非回环绑定 env 强制 token（文件 token 不再满足）+ 控制台警告 | 自动生成 token 文件与误配无法区分；fail-closed boot check 有测试覆盖（SC2） | ✓ Good (Phase 4) |
+| date 白名单（YYYY-MM-DD/YYYYMMDD）+ fail-loud session-date 门 | 用户 2026-09-04 签字：非当日合法日期脚本拒绝 exit 2，API 参数对非当日刻意失效 | ✓ Good (Phase 4) |
+| 分级表定稿（公开级/机密级两档） | 2026-09-02 用户确认 + Phase 4 定稿 2026-09-04；端点字符串逐字节核对 | ✓ Good (Phase 4) |
 
 ## Evolution
 
@@ -102,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-04 after Phase 3*
+*Last updated: 2026-09-04 after Phase 4*
