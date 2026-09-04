@@ -153,7 +153,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Auth-gated GET /health/details (api/health.py D-29..D-31 shape + uptime_seconds anchor + SC2 audit pin) + contract suite
+- [x] 05-01-PLAN.md — Auth-gated GET /health/details (api/health.py D-29..D-31 shape + uptime_seconds anchor + SC2 audit pin) + contract suite
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -166,6 +166,7 @@ Plans:
 **Wave 4** *(blocked on Wave 3 completion)*
 
 - [ ] 05-04-PLAN.md — Real-machine live gate: boot-rotation proof + /health/details live matrix + final suite + end-of-phase human review (03-04/04-07 twin)
+
 **Research**: skip — standard ops/recovery patterns.
 
 ## Progress

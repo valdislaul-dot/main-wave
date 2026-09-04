@@ -34,7 +34,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **OPS-01**: Windows 任务计划程序开机自启（run_api.bat，沿用 install_scheduled_task.ps1 惯例）
 - [x] **OPS-02**: pytest+TestClient 种子测试（仓库首套自动化测试）
-- [ ] **OPS-03**: 日志轮转 + 鉴权版 GET /health/details
+- [x] **OPS-03**: 日志轮转 + 鉴权版 GET /health/details
 
 ## v2 Requirements
 
@@ -86,7 +86,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEC-03 | Phase 1 | Complete |
 | OPS-01 | Phase 1 | Complete |
 | OPS-02 | Phase 1 | Complete |
-| OPS-03 | Phase 5 | Pending |
+| OPS-03 | Phase 5 | Complete |
 
 **Coverage:**
 

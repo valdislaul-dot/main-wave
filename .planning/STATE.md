@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 current_phase: 5
 current_phase_name: Recovery, Observability & Ops Polish
 status: executing
-stopped_at: Phase 4 complete, ready to plan Phase 5
-last_updated: "2026-09-04T16:29:01.774Z"
-last_activity: 2026-09-04
-last_activity_desc: Phase 4 complete, transitioned to Phase 5
-state_head: 51bfc198b0655c4c557c0c9433f7aa206fd0bd59
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-09-04T16:40:44.721Z"
+last_activity: 2026-09-05
+last_activity_desc: Phase 5 execution started
+state_head: 6079be0e9f9aa1611ffd4d8ea5a0031151aeba9f
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 18
-  completed_plans: 14
-  percent: 78
+  completed_plans: 15
+  percent: 80
 ---
 
 # Project State
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-03)
 
 **Core value:** External systems get gogo's live state (health/持仓/温度/market status) and trigger core operations (pipeline/auction/backtest) through one stable HTTP API, without disturbing the existing pipeline.
-**Current focus:** Phase 4 — Exposure Hardening + Data Classification
+**Current focus:** Phase 5 — Recovery, Observability & Ops Polish
 
 ## Current Position
 
-Phase: 5 (Recovery, Observability & Ops Polish) — READY TO EXECUTE
-Plan: Not started
+Phase: 5 (Recovery, Observability & Ops Polish) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-09-04 — Phase 4 complete, transitioned to Phase 5
+Last activity: 2026-09-05 — Phase 5 execution started
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ Progress: [██████░░░░] 60%
 | Phase 04-exposure-hardening-data-classification P05 | 6min | 2 tasks | 2 files |
 | Phase 04 P06 | 20 min | 2 tasks | 2 files |
 | Phase 04-exposure-hardening-data-classification P04-07 | 6min | 3 tasks | 1 files |
+| Phase 05 P01 | 6 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,12 @@ Recent decisions affecting current work:
 - [Phase 4]: [P4 04-07] 实况矩阵 13 行全过且零偏差: 私密读 200 字节级一致 + x-data-mtime/x-data-age-s (h11 线上小写头名, 大写 dict 查询得 None —— 后续 live gate 用 http.client getheaders 读线上真值); 401+WWW-Authenticate/403/404 unknown_private_name/date 422 信封与套件预测逐字节吻合; 唯一 POST = 无 auth 401 探针, 注册表 10->10 零 spawn (禁真跑禁令守住)
 - [Phase 4]: [P4 04-07] 假设-truth 行 (a) 启动路径绑回环 (b) 无文件-token 非回环消费者 (c) 任务名 gogo-api —— 真机全 TRUE; SC5 三扫描复跑与 04-06 基线逐字节同; 全套件 148 passed 1 skipped; 服务留 RUNNING 待用户下一交易日
 - [Phase 4]: [P4 04-07] Phase 4 人类门 (03-04 孪生): SC1-SC5 证据映射表 + 04-04 fail-loud session-date 语义签认在 SUMMARY 底部待用户裁决 (ACCEPT/DELTA) —— end-of-phase 收割, executor 不代答
+- [Phase 5]: [05-01] market_state.json missing/unreadable -> market_state_mtime null (200-with-null, never 5xx) — ASSUMED row ACCEPT
+- [Phase 5]: [05-01] uptime wiring = public uptime_seconds() in api/main.py + handler-level lazy import in route (module-level import would circular-fail) — ASSUMED row ACCEPT
+- [Phase 5]: [05-01] newest succeeded health-check = max finished_at among kind health-check + status succeeded registry jsons — ASSUMED row ACCEPT
+- [Phase 5]: [05-01] ISO output = datetime.fromtimestamp(value, timezone.utc).isoformat(), suite asserts frozen-value equality — ASSUMED row ACCEPT
+- [Phase 5]: [05-01] Registry located via api.jobs.jobs_dir() single source; DATA_DIR on health module only (no duplicated path logic, zero unused imports)
+- [Phase 5]: [05-01] importlib.metadata imported as module attribute (not from-import) to keep versions-fallback monkeypatch seam
 
 ### Pending Todos
 
@@ -160,6 +167,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-03T21:31:59.539Z
-Stopped at: Phase 4 complete, ready to plan Phase 5
+Last session: 2026-09-04T16:40:44.162Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
