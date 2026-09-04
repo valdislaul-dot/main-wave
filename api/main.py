@@ -9,7 +9,6 @@ app 与 /health 路由在模块层创建, 启动逻辑全部在 main() 内, 由 
 """
 import os
 import sys
-import time
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
@@ -20,6 +19,7 @@ from api.boot import ensure_token, has_token, is_loopback
 from api.state import router as state_router
 from api import jobs  # boot 序列用; import 无副作用 (03-02 D-12)
 from api import log_housekeep  # 05-02/05-04: boot 日志看护 (D-32/D-34, M-B); import 无副作用
+from api.uptime import uptime_seconds  # D-30 单一锚点 (05-04: 双身份陷阱修复, 详见 uptime.py)
 from api.actions import router as actions_router
 from api.private import router as private_router
 from api.health import router as health_router  # 05-01: 机密级 /health/details (OPS-03 SC1)
@@ -29,18 +29,9 @@ from api.errors import (
     validation_error_handler,
 )
 
-# uptime 锚点: 模块导入时刻 (对 uvicorn.run 即进程启动时刻)。
-# 用 monotonic —— 免疫 NTP/手动改钟导致的墙钟跳变 (T-01-04)。
-_START = time.monotonic()
-
-
-def uptime_seconds() -> int:
-    """进程存活秒数 (monotonic): /health 与 /health/details (05-01, D-30) 共享。
-
-    公开读取口紧邻锚点 —— 跨模块复用不碰私有下划线名; 定义于导入区之后,
-    模块级 import api.health 的循环依赖因此不成立 (health 在 handler 内惰性取用)。
-    """
-    return int(time.monotonic() - _START)
+# uptime 锚点已移入 api/uptime.py (零依赖叶子模块): `python -m api.main` 启动时
+# 本文件以 __main__ 身份执行、不注册进 sys.modules —— 锚点若留在本模块, health 的
+# 惰性 import 会把本模块二次执行、重置锚点 (05-04 实机分叉, 详见 uptime.py 模块 docstring)。
 
 # openapi 公开只读 (04-01): schema 服务自描述契约; docs 交互面仍关闭 (CLI-only)。
 # 无中间件、无路由依赖 (HLT-01 纯度, Pitfall 6)。

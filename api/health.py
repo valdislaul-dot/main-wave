@@ -5,9 +5,12 @@ require_api_key 门 (与 private/actions/jobs 同一依赖对象身份, SC2 审�
 
 - versions: python 取 sys.version, uvicorn/fastapi 取 importlib.metadata.version
   (惰性读; PackageNotFoundError -> "unknown") —— 绝不硬编码版本串 (双机漂移容忍)。
-- uptime_seconds: 复用 api/main.py uptime_seconds() —— 与 /health 同一模块导入
-  monotonic 锚点。handler 内惰性 import (请求时 api.main 已完整加载, sys.modules
-  命中; 模块级 import 会环形失败 —— main.py 在本模块被 import 时 _START 尚未定义)。
+- uptime_seconds: 复用 api/uptime.py uptime_seconds() —— 与 /health 同一 monotonic
+  锚点 (模块级 import, 零依赖叶子模块无环形风险)。05-04 实机修复: `python -m
+  api.main` 启动时 main.py 的文件身份是 __main__, 不会以 "api.main" 注册进
+  sys.modules —— handler 内惰性 import api.main 会把整个 main.py 二次执行并重置
+  锚点 (实机: details uptime 从 0 重计, 与 /health 分叉); 锚点移入 uptime.py 后
+  该陷阱在结构上不可能 (详见 uptime.py 模块 docstring)。
 - last_check.health_job: logs/api/jobs registry 中 kind == "health-check" 且
   status == "succeeded" 的最新 finished_at 的 ISO-8601 UTC; 无匹配 -> null。
   registry 经 api.jobs.jobs_dir()/read_job 只读 (单一事实源); 扫描镜像
@@ -31,6 +34,7 @@ from fastapi import APIRouter, Depends
 
 from api import jobs  # registry 只读 (jobs_dir/read_job); import 无副作用 (jobs.py:12-14)
 from api.auth import require_api_key  # D-10 同一依赖对象 (router 级, 永不中间件)
+from api.uptime import uptime_seconds  # D-30 单一锚点 (05-04 双身份修复; 叶子模块零环形)
 from scripts.daily.config import DATA_DIR  # 调用时组合 (monkeypatch 缝)
 
 router = APIRouter(dependencies=[Depends(require_api_key)])  # SEC-02 机密级
@@ -99,8 +103,6 @@ def health_details():
     200 体 = {"versions", "uptime_seconds", "last_check"}; 数据缺席以 null 诚实回答,
     永不以 5xx 掩盖 (缺失的 state 文件正是本端点要报告的条件之一)。
     """
-    from api.main import uptime_seconds  # 惰性 import: 请求时 main 已完整加载
-
     job = _latest_succeeded_health_check()
     try:
         market_mtime = os.stat(os.path.join(DATA_DIR, "market_state.json")).st_mtime

@@ -19,7 +19,8 @@ SEC-02 分级表):
 - versions 兜底: importlib.metadata PackageNotFoundError -> "unknown"; 自洽断言
   (测试内同源 importlib.metadata.version 计算, 不硬编码版本串)。
 - 泄漏卫生: 401/403/200 响应体永不含 str(tmp_path) 与 token 字节。
-- uptime_seconds 与 /health 同一 monotonic 锚点 (api.main.uptime_seconds), 非降。
+- uptime_seconds 与 /health 同一 monotonic 锚点 (api.uptime 单一锚点, 05-04 双身份
+  修复后 main/health 同源), 非降。
 - 公开面: 裸 /health 无 key 照常 200, 键集 {"status","uptime_seconds"} 不动 (HLT-01)。
 
 CRITICAL 数据隔离 pin (同 test_private/test_auth 惯例): autouse fixture 把
@@ -176,7 +177,22 @@ def test_uptime_anchored_to_health(tmp_path):
     up = r.json()["uptime_seconds"]
     assert isinstance(up, int)
     assert up >= 0
-    assert up >= h_up  # 同一锚点 (api.main.uptime_seconds), 读数非降
+    assert up >= h_up  # 同一锚点 (api.uptime), 读数非降
+
+
+def test_uptime_single_anchor_identity(tmp_path):
+    """锚点单一身份 pin (05-04 实机修复): 两端点必须共用 api.uptime 同一函数对象。
+
+    `python -m api.main` 启动时 main.py 以 __main__ 身份执行、不注册进 sys.modules
+    —— health 若在 handler 内惰性 import api.main, 会触发整个 main.py 二次执行,
+    模块级锚点被重置 (/health/details 与 /health 的 uptime 实机分叉 70s+)。断言
+    main 与 health 的 uptime_seconds 是 api.uptime 的同一对象, 结构性杜绝再犯
+    (TestClient 路径下旧惰性 import 恰好 sys.modules 命中, 套件测不出该陷阱)。
+    """
+    import api.uptime
+
+    assert api.main.uptime_seconds is api.uptime.uptime_seconds
+    assert api.health.uptime_seconds is api.uptime.uptime_seconds
 
 
 # ---------- tracer 行为 5: 公开 /health 面不受扰 (HLT-01) ----------
