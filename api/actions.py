@@ -111,7 +111,18 @@ def trigger_action(kind: str, date: str = None):
             409,
             detail={"message": f"{kind} already running (another entry point)"},
         )
-    job = jobs.start_job(kind, cmd, fd)  # 202 语义: claim 落盘后才起 worker
+    # WR-05 (04 修复): start_job 内 claim 落盘失败 (write_job OSError, 磁盘满/权限)
+    # 或 Thread.start 失败会向上抛 —— 已持有的 OS 锁 fd 必须关, 否则 kind 永久假占用
+    # (后续触发恒 409 already_running_other_entry, 无 registry 条目可查)。worker 侧
+    # run_job 的 finally 无条件关锁 (api/jobs.py L165-168), 本侧异常路径补同一纪律。
+    try:
+        job = jobs.start_job(kind, cmd, fd)  # 202 语义: claim 落盘后才起 worker
+    except Exception:
+        try:
+            fd.close()
+        except OSError:
+            pass
+        raise
     return {"job_id": job["job_id"], "kind": job["kind"], "status": job["status"]}
 
 

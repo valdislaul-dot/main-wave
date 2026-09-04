@@ -28,6 +28,7 @@ import api.jobs  # noqa: F401  (被测模块; _claims 清理)
 import api.main  # noqa: F401  (/health + state 路由 —— 模块级 client 依赖)
 import api.state  # noqa: F401  (公开面断言用; DATA_DIR 缝)
 from api.main import app
+from scripts.daily import job_lock  # WR-05: OS 单飞锁释放断言 (import 零副作用)
 
 client = TestClient(app)  # 模块级, 无 context manager (test_state.py 惯例)
 
@@ -544,3 +545,46 @@ def test_unknown_kind_with_date_404_kind_gate_first(tmp_path, monkeypatch):
     assert r.status_code == 404
     assert r.json() == {"detail": "Not Found", "code": "unknown_action_kind"}
     assert _registry_files() == []
+
+
+# ---------- WR-05 (04 修复): start_job 抛错 -> 已持有的 OS 单飞锁 fd 必须释放 ----------
+
+def test_start_job_claim_failure_releases_os_lock_and_retrigger_ok(tmp_path, monkeypatch):
+    """claim 落盘失败 (write_job OSError, 磁盘满/权限) -> 500 信封 + 锁 fd 已关。
+
+    修复前: trigger_action 拿到 fd 后 start_job 抛错, fd 无人关 (CPython 帧回收
+    不保证) -> 该 kind 假占用: 重触发恒 409 already_running_other_entry, 且 registry
+    无任何条目可查 (WR-05)。修复后: except 关 fd -> OS 锁自由, 重触发 202 到终态。
+    """
+    scripts = fake_script_tree(tmp_path, {"pipeline": ("run_pipeline.py", 0.2)})
+    monkeypatch.setattr(api.actions, "SCRIPTS_DIR", scripts)
+    monkeypatch.setenv("FAKE_OUT", str(tmp_path / "out.json"))
+
+    real_write_job = api.jobs.write_job
+    state = {"calls": 0}
+
+    def flaky_write_job(job, base=None):
+        state["calls"] += 1
+        if state["calls"] == 1:
+            raise OSError("simulated claim write failure (WR-05)")
+        return real_write_job(job, base)
+
+    monkeypatch.setattr(api.jobs, "write_job", flaky_write_job)
+
+    no_raise = TestClient(app, raise_server_exceptions=False)  # 500 信封断言 (test_errors 惯例)
+    r = no_raise.post("/v1/actions/pipeline", headers=_headers())
+    assert r.status_code == 500
+    assert r.json() == {"detail": "internal server error", "code": "internal_error"}
+    # claim 未落盘 -> registry 无 job json (write_job 的非 PermissionError 上抛会留点 tmp,
+    # 模板语义: 失败残留被容忍 —— 只钉零 job 文件)
+    assert not any(f.endswith(".json") for f in _registry_files())
+
+    # OS 单飞锁必须已释放: 修复前 fd 泄漏 -> acquire 返回 None, 本行红
+    fd = job_lock.acquire("pipeline", api.jobs.locks_dir())
+    assert fd is not None, "start_job 失败后单飞锁仍被持有 (fd 泄漏, WR-05)"
+    fd.close()
+
+    # write_job 放行后重触发同 kind -> 202 -> succeeded (无假占用)
+    r2 = client.post("/v1/actions/pipeline", headers=_headers())
+    assert r2.status_code == 202
+    assert wait_terminal(r2.json()["job_id"])["status"] == "succeeded"
