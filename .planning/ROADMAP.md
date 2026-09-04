@@ -158,9 +158,12 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [ ] 05-02-PLAN.md — PRUNE_CAP 500→20 (D-33) + api/log_housekeep.py rotation primitives (D-34) + main() M-A boot dance (D-32)
+
+**Wave 3** *(blocked on Wave 2 completion — 05-03 documents 05-02's as-built rotation/cap facts from its SUMMARY)*
+
 - [ ] 05-03-PLAN.md — README known-limits + Mac checklist (D-37/D-35) + PROJECT.md /health/details classification row + D-36 15:30 task audit record
 
-**Wave 3** *(blocked on Wave 2 completion)*
+**Wave 4** *(blocked on Wave 3 completion)*
 
 - [ ] 05-04-PLAN.md — Real-machine live gate: boot-rotation proof + /health/details live matrix + final suite + end-of-phase human review (03-04/04-07 twin)
 **Research**: skip — standard ops/recovery patterns.
