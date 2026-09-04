@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 5
 current_phase_name: Recovery, Observability & Ops Polish
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-09-04T16:40:44.721Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-09-04T16:57:21.902Z"
 last_activity: 2026-09-05
 last_activity_desc: Phase 5 execution started
-state_head: 6079be0e9f9aa1611ffd4d8ea5a0031151aeba9f
+state_head: 498545a63d6d2643b7bae0a206fa3c5ad6a7c276
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 18
-  completed_plans: 15
+  completed_plans: 16
   percent: 80
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-03)
 ## Current Position
 
 Phase: 5 (Recovery, Observability & Ops Polish) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-09-05 — Phase 5 execution started
 
@@ -77,6 +77,7 @@ Progress: [████████░░] 80%
 | Phase 04 P06 | 20 min | 2 tasks | 2 files |
 | Phase 04-exposure-hardening-data-classification P04-07 | 6min | 3 tasks | 1 files |
 | Phase 05 P01 | 6 | 3 tasks | 4 files |
+| Phase 05 P02 | 10 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -142,6 +143,11 @@ Recent decisions affecting current work:
 - [Phase 5]: [05-01] ISO output = datetime.fromtimestamp(value, timezone.utc).isoformat(), suite asserts frozen-value equality — ASSUMED row ACCEPT
 - [Phase 5]: [05-01] Registry located via api.jobs.jobs_dir() single source; DATA_DIR on health module only (no duplicated path logic, zero unused imports)
 - [Phase 5]: [05-01] importlib.metadata imported as module attribute (not from-import) to keep versions-fallback monkeypatch seam
+- [Phase 5]: Cap-20 boundary seed: 25 terminal + 3 inflight -> reload_registry sweeps inflight to interrupted (in-place rewrite = newest mtimes) then tail-prune deletes the 8 oldest terminal pairs -> exactly 20 .json (17 newest terminal + 3 interrupted); interrupted counts toward the cap
+- [Phase 5]: Windows two-repoint dance order repoint -> rotate -> repoint is the only working order (cmd >> inherited handle lacks FILE_SHARE_DELETE, machine-verified 2026-09-04); uniform dance even under threshold; live proof deferred to the 05-04 gate
+- [Phase 5]: log_housekeep is zero-config pure-function: defaults (console.log path, registry dir, cap) resolve via api.jobs module attrs at call time - one LOG_DIR monkeypatch isolates the whole module; primitives never raise and never print
+- [Phase 5]: Boot failure discipline: first-repoint error still attempts rotate; at most ONE ascii WARNING to stderr; never exit/raise on housekeeping failure - SEC-03 fatal-exit paths untouched
+- [Phase 5]: Boot-test isolation via a single api.main.LOG_DIR patch: every path the housekeeping block touches derives from main's own LOG_DIR attr (never module-default bare calls, which would dup2 the real logs tree onto pytest fds)
 
 ### Pending Todos
 
@@ -167,6 +173,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-04T16:40:44.162Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-09-04T16:57:21.350Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None

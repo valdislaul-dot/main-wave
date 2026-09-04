@@ -149,7 +149,7 @@ Plans:
   2. uvicorn and per-run job logs rotate automatically so the API's disk footprint stays bounded through weeks of continuous running with no manual cleanup.
   3. The pytest suite (seeded in Phase 1, grown through Phases 2-5) passes on Windows and Mac with a network-blocking fixture proving no test touches the network.
 
-**Plans**: 4/4 plans planned
+**Plans**: 2/4 plans executed planned
 Plans:
 **Wave 1**
 
@@ -157,7 +157,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 05-02-PLAN.md — PRUNE_CAP 500→20 (D-33) + api/log_housekeep.py rotation primitives (D-34) + main() M-A boot dance (D-32)
+- [x] 05-02-PLAN.md — PRUNE_CAP 500→20 (D-33) + api/log_housekeep.py rotation primitives (D-34) + main() M-A boot dance (D-32)
 
 **Wave 3** *(blocked on Wave 2 completion — 05-03 documents 05-02's as-built rotation/cap facts from its SUMMARY)*
 
@@ -180,4 +180,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Read-Only State Endpoints + Defensive Read Layer | 1/1 | Complete    | 2026-09-03 |
 | 3. Trigger Runner, Job Registry & Locks + Auth Enforcement | 4/4 | Complete    | 2026-09-04 |
 | 4. Exposure Hardening + Data Classification | 7/7 | Complete    | 2026-09-04 |
-| 5. Recovery, Observability & Ops Polish | 0/4 | Not started | - |
+| 5. Recovery, Observability & Ops Polish | 2/4 | In Progress|  |
