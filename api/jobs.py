@@ -23,7 +23,7 @@ import uuid
 
 from scripts.daily.config import DATA_DIR, LOG_DIR, PROJECT_ROOT  # 仅在函数内引用
 
-PRUNE_CAP = 500  # registry 上限: 只保留最新 500 个终态 job (json+log 对)
+PRUNE_CAP = 20  # registry 上限 (D-33, 05-02): 只保留最新 20 个终态 job (json+log 对)
 TERMINAL = ("succeeded", "failed", "interrupted")
 
 _claims = {}  # kind -> job dict; 派生缓存, 永不权威 (文件才是真相)
