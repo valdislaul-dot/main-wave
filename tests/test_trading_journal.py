@@ -146,3 +146,93 @@ def test_failure_path_residue_pinned_target_holds_old(ledger_files, monkeypatch)
     assert tmp_path.exists()
     assert _normalize(tmp_path.read_bytes()) == _serialize(new_pf)
     assert pf_path.read_bytes() == _serialize(good)
+
+
+# ---------- WR-02 (04 修复): record_sell 匹配语义 —— code 身份优先, name/code 错配拒绝 ----------
+
+def _two_position_pf():
+    """两只不同持仓 (positions 列表 + 兼容字段), record_sell 写路径字段齐备。"""
+    return {
+        'cash': 10000.0,
+        'total_trades': 0,
+        'winning_trades': 0,
+        'total_pnl': 0.0,
+        'position': {'name': '楚天龙', 'code': '003040', 'buy_date': '2026-09-01',
+                     'buy_price': 15.0, 'shares': 100},
+        'positions': [
+            {'name': '楚天龙', 'code': '003040', 'buy_date': '2026-09-01',
+             'buy_price': 15.0, 'shares': 100},
+            {'name': '华天酒店', 'code': '000428', 'buy_date': '2026-09-02',
+             'buy_price': 4.5, 'shares': 100},
+        ],
+    }
+
+
+def test_record_sell_mismatch_name_code_refused_no_double_sell(ledger_files, capsys):
+    """WR-02: A 的名字 + B 的代码 (手滑) -> 拒绝卖出; 两只持仓原样, 日志零 SELL。
+
+    原 name-OR-code 并集在此输入下把 A/B 一并移除并记双卖 (WR-02 缺陷)。
+    """
+    pf = _two_position_pf()
+    tj.save_portfolio(pf)
+    tj.save_journal([])
+
+    tj.record_sell('楚天龙', '000428', 5.0)  # 楚天龙名 + 华天酒店码
+
+    assert 'WARNING' in capsys.readouterr().out
+    assert tj.load_portfolio() == pf  # 拒绝 = 零改动 (文件内容不变)
+    assert tj.load_journal() == []
+
+
+def test_record_sell_correct_pair_sells_only_that_stock(ledger_files):
+    """WR-02: 名码一致 -> 只卖该股; 他股保留, cash 只加该笔 proceeds。"""
+    pf = _two_position_pf()
+    tj.save_portfolio(pf)
+    tj.save_journal([])
+
+    tj.record_sell('华天酒店', '000428', 5.0)
+
+    rest = tj.load_portfolio()
+    assert [p['code'] for p in rest['positions']] == ['003040']  # 楚天龙保留
+    assert rest['cash'] == 10000.0 + 5.0 * 100
+    sells = [e for e in tj.load_journal() if e['action'] == 'SELL']
+    assert len(sells) == 1
+    assert sells[0]['code'] == '000428' and sells[0]['shares'] == 100
+
+
+def test_record_sell_same_code_merges_all_lots_keeps_other_stock(ledger_files):
+    """WR-02 (2026-09-03 语义保持): 同码多批整仓卖合并全部批次, 他股不动。"""
+    pf = _two_position_pf()
+    pf['positions'] = [
+        {'name': '楚天龙', 'code': '003040', 'buy_date': '2026-08-25',
+         'buy_price': 14.0, 'shares': 100},
+        {'name': '楚天龙', 'code': '003040', 'buy_date': '2026-08-26',
+         'buy_price': 16.0, 'shares': 200},
+        {'name': '华天酒店', 'code': '000428', 'buy_date': '2026-09-02',
+         'buy_price': 4.5, 'shares': 100},
+    ]
+    pf['position'] = pf['positions'][0]
+    tj.save_portfolio(pf)
+    tj.save_journal([])
+
+    tj.record_sell('楚天龙', '003040', 18.0)
+
+    rest = tj.load_portfolio()
+    assert [p['code'] for p in rest['positions']] == ['000428']
+    sells = [e for e in tj.load_journal() if e['action'] == 'SELL']
+    assert len(sells) == 1
+    assert sells[0]['shares'] == 300  # 两批合并单笔
+    assert sells[0]['buy_date'] == '2026-08-25'  # 最早批日期
+
+
+def test_record_sell_typo_code_falls_back_to_unambiguous_name(ledger_files):
+    """WR-02: code 无命中 (手滑码) -> 退回 name 全等匹配; 名字唯一 -> 正常卖。"""
+    pf = _two_position_pf()
+    tj.save_portfolio(pf)
+    tj.save_journal([])
+
+    tj.record_sell('华天酒店', '00042', 5.0)  # 码缺位 -> 无 code 命中
+
+    rest = tj.load_portfolio()
+    assert [p['code'] for p in rest['positions']] == ['003040']
+    assert tj.load_journal()[0]['code'] == '000428'

@@ -109,13 +109,27 @@ def record_buy(name, code, price, shares, cost, note=''):
 
 def record_sell(name, code, price, note=''):
     """Record a sell trade (2026-09-03修复: 同码多笔加仓整仓卖时合并全部批次,
-    原只删第一笔致残仓滞留+现金少记)"""
+    原只删第一笔致残仓滞留+现金少记; 2026-09-04 WR-02修复: code 优先精确匹配,
+    name/code 错配拒绝, 原 name-OR-code 并集会把两只持仓一并卖出记双卖)"""
     pf = load_portfolio()
     journal = load_journal()
 
     positions = pf.get('positions')
     if positions:
-        matched = [p for p in positions if p['name'] == name or p['code'] == code]
+        # WR-02 (04 修复): code 是身份键, name 是展示名 —— 原 name-OR-code 并集在
+        # name/code 错配时 (手滑码/过期名) 会把两只不同持仓一并卖出、账本记双卖。
+        # 语义: 任一持仓带该 code -> 只按 code 匹配 (2026-09-03 同码多批整仓卖保持,
+        # 同码改名历史批也并卖); 无 code 命中 -> 退回 name 全等单匹配。name/code
+        # 双给且 name 不属于该 code 任何批的名字 -> fail-loud 拒绝, 绝不猜。
+        by_code = [p for p in positions if p['code'] == code]
+        if by_code:
+            if name and name != code and name not in {p['name'] for p in by_code}:
+                print(f'[Journal] WARNING: {name}/{code} 错配: code 属于 '
+                      f'{[p["name"] for p in by_code]}, 拒绝卖出(防错配双卖)')
+                return pf
+            matched = by_code
+        else:
+            matched = [p for p in positions if p['name'] == name]
         if not matched:
             print(f'[Journal] WARNING: No position in {name}')
             return pf
@@ -144,10 +158,17 @@ def record_sell(name, code, price, note=''):
         pf['winning_trades'] += 1
     pf['total_pnl'] += pnl_amt
 
+    # WR-02 (04 修复): SELL 身份写实际被卖持仓 —— name 回退匹配时 argv code 可能
+    # 是手滑值, 照记会把不存在的代码写进账本 (账本现经 /v1/private/* 对外服务)。
+    # name 给了且确属被卖批次真名时保留 argv 形态 (同码更名批整仓卖不记旧名)。
+    sell_code = matched[0]['code']
+    sell_name = (name if (name and name != code
+                          and name in {p['name'] for p in matched})
+                 else matched[0]['name'])
     entry = {
         'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'action': 'SELL',
-        'name': name, 'code': code,
+        'name': sell_name, 'code': sell_code,
         'price': price, 'shares': total_sh,
         'proceeds': proceeds, 'pnl_pct': round(pnl, 2),
         'pnl_amt': round(pnl_amt, 2),
