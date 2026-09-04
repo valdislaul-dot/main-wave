@@ -308,11 +308,17 @@ def test_reload_sweep_tolerates_corrupt_and_dotfiles(tmp_path):
     assert (base / ".DS_Store").exists()  # 点文件 -> 跳过
 
 
-def test_reload_sweep_prune_cap_keeps_500_newest_terminal(tmp_path):
+def test_reload_sweep_prune_cap_keeps_20_newest_terminal(tmp_path):
+    """D-33 边界 (05-02): 25 终态 + 3 inflight -> sweep 收编后 prune 到恰好 20。
+
+    PRUNE_CAP == 20 是唯一常量 (单源); 本测试在旧常量 500 上必红
+    (28 <= 500, prune 无事可做) —— cap 收紧是唯一转绿路径。
+    """
+    assert api.jobs.PRUNE_CAP == 20  # 常量钉: 旧值 500 时此断言先红
     base = tmp_path / "jobs"
     base.mkdir()
     terminal_ids = []
-    for i in range(505):
+    for i in range(25):
         jid = f"{i:032x}"
         _seed_job_file(base, jid, "succeeded", mtime=1_700_000_000 + i)
         terminal_ids.append(jid)
@@ -323,16 +329,78 @@ def test_reload_sweep_prune_cap_keeps_500_newest_terminal(tmp_path):
     api.jobs.reload_registry(str(base))
 
     remaining = [p.name[: -len(".json")] for p in base.glob("*.json")]
-    assert len(remaining) == 500  # 505 终态 - 8 最旧 + 3 刚收编 = 500
+    assert len(remaining) == 20  # 25 终态 - 8 最旧 + 3 刚收编 = 20 (jobs.py L27 语义)
     for jid in inflight:
-        assert jid in remaining  # 非终态文件在 sweep 后存活 (interrupted, 未删)
+        assert jid in remaining  # 刚收编的 interrupted 计入上限且存活
         assert api.jobs.read_job(jid, str(base))["status"] == "interrupted"
     for i in range(8):
         assert f"{i:032x}" not in remaining  # 最旧 8 对 (json+log) 被删
-    for i in range(8, 505):
-        assert f"{i:032x}" in remaining  # 最新 497 对存活
+    for i in range(8, 25):
+        assert f"{i:032x}" in remaining  # 最新 17 个终态对存活
     assert not (base / f"{0:032x}.log").exists()  # log 与 json 成对删除
     assert not (base / f"{0:032x}.json").exists()
+
+    # 幂等钉: 第二次 reload 无事可做 (20 <= cap, sweep 无 inflight)
+    api.jobs.reload_registry(str(base))
+    after_second = sorted(p.name[: -len(".json")] for p in base.glob("*.json"))
+    assert len(after_second) == 20
+    assert after_second == sorted(remaining)
+
+
+def test_run_job_finally_prune_trims_to_cap_20(tmp_path, monkeypatch):
+    """run_job finally-prune (03-01 承诺, jobs.py:170) 按 PRUNE_CAP=20 修剪超限 registry。"""
+    base = tmp_path / "jobs"
+    base.mkdir()
+    for i in range(25):
+        jid = f"{i:032x}"
+        _seed_job_file(base, jid, "succeeded", mtime=1_700_000_000 + i)
+    fake = fake_script(tmp_path, rc=0, sleep=0.1)
+    monkeypatch.setenv("FAKE_OUT", str(tmp_path / "out.json"))
+    lock_fd = job_lock.acquire("pipeline", api.jobs.locks_dir())
+    assert lock_fd is not None
+    job = api.jobs.start_job("pipeline", [sys.executable, fake], lock_fd, base)
+    term = wait_terminal(job["job_id"], base)
+    assert term["status"] == "succeeded"
+    # prune 在 finally 的最后一步: 终态可见后仍需等修剪落地 (轮询到 20)
+
+    def _pruned():
+        return len(list(base.glob("*.json"))) == 20
+
+    _wait_for(_pruned, f"finally-prune 把 registry 修到 20 (job {job['job_id']})")
+    remaining = sorted(p.name[: -len(".json")] for p in base.glob("*.json"))
+    assert len(remaining) == 20  # 25 种子终态 + 新终态 1 - 最旧 6 = 20
+    for i in range(6):
+        assert f"{i:032x}" not in remaining  # 最旧 6 对 (json+log) 被删
+        assert not (base / f"{i:032x}.json").exists()
+        assert not (base / f"{i:032x}.log").exists()
+    for i in range(6, 25):
+        assert f"{i:032x}" in remaining  # 最新 19 个种子终态存活
+    assert job["job_id"] in remaining  # 刚完成的 job 是最新终态, 存活
+
+
+def test_prune_skips_corrupt_json_still_trims_others(tmp_path):
+    """逐文件容错不变: 最旧区一个损坏 .json 被跳过, 其余超限对照常修剪 (05-02 行为 3)。"""
+    base = tmp_path / "jobs"
+    base.mkdir()
+    for i in range(23):  # 22 个有效终态 + 1 个损坏 (i=2, 最旧区)
+        jid = f"{i:032x}"
+        _seed_job_file(base, jid, "succeeded", mtime=1_700_000_000 + i)
+    corrupt = base / f"{2:032x}.json"
+    corrupt.write_text("{not json", encoding="utf-8")
+
+    api.jobs.prune(str(base))
+
+    # 损坏文件未被计数也未被动过 (含其 .log 陪衬 —— 不成对被删)
+    assert corrupt.read_text(encoding="utf-8") == "{not json"
+    assert (base / f"{2:032x}.log").exists()
+    remaining = sorted(p.name[: -len(".json")] for p in base.glob("*.json"))
+    assert len(remaining) == 21  # 22 个有效终态 - 最旧 2 个有效对 + 损坏 1 个留存 = 21
+    for i in (0, 1):
+        assert f"{i:032x}" not in remaining  # 最旧 2 个有效对 (json+log) 被删
+        assert not (base / f"{i:032x}.json").exists()
+        assert not (base / f"{i:032x}.log").exists()
+    for i in range(3, 23):
+        assert f"{i:032x}" in remaining  # 其余 20 个有效对 + 损坏 json 存活
 
 
 def test_reload_sweep_missing_dir_creates_and_returns(tmp_path):
