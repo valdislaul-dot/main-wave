@@ -28,11 +28,12 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 - ✓ 持仓/账本/候选读取（GET /v1/private/*，token-gated，raw 透传 + X-Data-* 新鲜度头，candidates 可选 date 白名单）— Phase 4
 - ✓ 数据分级鉴权（公开级/机密级两档分级表定稿，PROJECT.md Constraints/Security 常驻参考）— Phase 4
 - ✓ 错误信封（机器可读 `{"detail","code"}` + 404 文案归一 + openapi）与暴露面硬化（WR-01 env 强制 token、date 白名单、SC5 扫描）— Phase 4
+- ✓ 日志轮转（console.log 5MB launcher 侧轮转 + job registry 20 对封顶）+ 鉴权版 GET /health/details（versions/uptime/last_check）— Phase 5
+- ✓ 双机测试套件 Win 侧全绿（193 passed + 1 env-conditional skip，网络封锁 fixture）— Phase 5；Mac 侧待用户 rollout 回填（D-35 清单已交付）
 
 ### Active
 
-- [ ] 日志轮转 + 鉴权版 /health/details（OPS-03）— Phase 5
-- [ ] 双机测试套件全绿（Win/Mac 网络封锁证明）— Phase 5
+- [ ] Mac 侧测试套件实跑 + 结果回填（D-35 清单已交付，跨机 rollout 步骤，用户执行）
 
 ### Out of Scope
 
@@ -94,6 +95,10 @@ gogo 主升浪交易系统的 HTTP API 服务层（FastAPI）。为负载均衡�
 | WR-01 修复：非回环绑定 env 强制 token（文件 token 不再满足）+ 控制台警告 | 自动生成 token 文件与误配无法区分；fail-closed boot check 有测试覆盖（SC2） | ✓ Good (Phase 4) |
 | date 白名单（YYYY-MM-DD/YYYYMMDD）+ fail-loud session-date 门 | 用户 2026-09-04 签字：非当日合法日期脚本拒绝 exit 2，API 参数对非当日刻意失效 | ✓ Good (Phase 4) |
 | 分级表定稿（公开级/机密级两档） | 2026-09-02 用户确认 + Phase 4 定稿 2026-09-04；端点字符串逐字节核对 | ✓ Good (Phase 4) |
+| /health/details 机密级 + D-29 三字段契约 | OPS-03 SC1；router 级 require_api_key 同一依赖对象；null 腿 200 不 5xx | ✓ Good (Phase 5) |
+| 日志有界：M-B launcher 侧轮转（5MB→console.log.1 一代）+ PRUNE_CAP 20 | M-A 进程内舞步 live 实测被 cmd >> deny-share 句柄推翻；SC2 实况证明 | ✓ Good (Phase 5) |
+| uptime 单叶锚点模块 api/uptime.py | live 实测 lazy import 双身份重置锚点；单锚点 11==11 验证 | ✓ Good (Phase 5) |
+| 15:30 定时任务确认不在册（D-36 闭环） | 2026-09-05 枚举空 + 控制枚举健康；无需停用命令 | ✓ Good (Phase 5) |
 
 ## Evolution
 
@@ -113,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-04 after Phase 4*
+*Last updated: 2026-09-05 after Phase 5*
