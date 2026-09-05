@@ -10,6 +10,14 @@ tmp_path, 真实 logs/api/jobs 零触碰 (否则套件会改写真实 in-flight 
 并用 cap-20 prune 删真实终态对)。补丁只加在真正跑完 reload_registry 的 4 个测试上
 (case 5/8 在 SEC-03 门提前 SystemExit, 到不了 registry)。
 
+WR-04 隔离 pin (2026-09-05): 这 4 个全 boot 测试进程内跑完 housekeeping 块 —— 真
+repoint_std_streams 会把 pytest 运行器自身的 fd 1/2 dup2 到 tmp_path 的
+console.log, `-s` 调试模式下 11 dot 之后的进度/失败 traceback/汇总全部落进随测
+删除的 tmp 文件 (静默失败窗, 只剩退出码)。故 4 个测试都在 main() 前把 repoint 置
+no-op —— main() 调用时解析 log_housekeep.repoint_std_streams, 模块 attr 补丁即
+生效; 真机 dup2 语义由 test_log_housekeep 的 subprocess 探针钉住, 零覆盖损失;
+本模块无断言依赖 repoint 副作用 (boot 打印全在 housekeeping 之前)。
+
 补丁机制说明: api/main.py 在 main() 内惰性 import uvicorn (函数局部名, 模块上无
 uvicorn 属性), 因此用伪模块预置 sys.modules["uvicorn"] 使 main() 的 import 拿到
 no-op run —— 断言内容与计划一致, 仅补丁方式按 main.py 实际导入形状调整。
@@ -21,6 +29,7 @@ import pytest
 
 import api.boot
 import api.jobs  # WR-02: 全 boot 测试 pin registry 缝 (jobs.LOG_DIR/DATA_DIR)
+import api.log_housekeep  # WR-04: no-op repoint 的补丁缝 (main() 调用时解析模块 attr)
 import api.main
 from api.boot import ensure_token, has_token, is_loopback, read_token
 
@@ -31,6 +40,18 @@ def _patch_uvicorn_run(monkeypatch):
     fake = types.ModuleType("uvicorn")
     fake.run = lambda app=None, **kw: None  # uvicorn.run(app, host=..., ...) 首参位置传 app
     monkeypatch.setitem(sys.modules, "uvicorn", fake)
+
+
+# ---------- 工具: WR-04 —— 全 boot 测试 no-op 掉 fd 重指向原语 ----------
+
+def _noop_repoint(monkeypatch):
+    # 进程内跑真 repoint 会把 pytest 自身的 fd 1/2 dup2 到 tmp console.log
+    # (`-s` 模式静默失败窗)。main() 调用时解析 log_housekeep.repoint_std_streams
+    # (模块 attr), 故 monkeypatch 即生效; 真机 dup2 语义由 test_log_housekeep 的
+    # subprocess 探针钉住 (零覆盖损失)。
+    monkeypatch.setattr(
+        api.log_housekeep, "repoint_std_streams", lambda path=None: None
+    )
 
 
 # ---------- case 1: is_loopback ----------
@@ -129,6 +150,7 @@ def test_loopback_boot_prints_only_notice_and_creates_token(monkeypatch, tmp_pat
     monkeypatch.setattr(api.jobs, "LOG_DIR", str(tmp_path))  # WR-02: reload_registry 的 jobs_dir 缝
     monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path))  # WR-02: 锁缝同 tmp (test_jobs 惯例)
     _patch_uvicorn_run(monkeypatch)
+    _noop_repoint(monkeypatch)  # WR-04: 不把 pytest 的 fd 1/2 dup2 到 tmp console.log
     api.main.main()  # 不得抛 SystemExit
     assert (tmp_path / "api_token.txt").exists()
     captured = capsys.readouterr()
@@ -164,6 +186,7 @@ def test_loopback_boot_generates_token_and_exits_normally(monkeypatch, tmp_path,
     monkeypatch.setattr(api.jobs, "LOG_DIR", str(tmp_path))  # WR-02: reload_registry 的 jobs_dir 缝
     monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path))  # WR-02: 锁缝同 tmp (test_jobs 惯例)
     _patch_uvicorn_run(monkeypatch)
+    _noop_repoint(monkeypatch)  # WR-04: 不把 pytest 的 fd 1/2 dup2 到 tmp console.log
     api.main.main()  # 默认 host=127.0.0.1 -> 回环分支, 不得 SystemExit
     assert (tmp_path / "api_token.txt").exists()  # D-03 在回环分支生成
     captured = capsys.readouterr()
@@ -183,6 +206,7 @@ def test_env_token_satisfies_non_loopback_check(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(api.jobs, "LOG_DIR", str(tmp_path))  # WR-02: reload_registry 的 jobs_dir 缝
     monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path))  # WR-02: 锁缝同 tmp (test_jobs 惯例)
     _patch_uvicorn_run(monkeypatch)
+    _noop_repoint(monkeypatch)  # WR-04: 不把 pytest 的 fd 1/2 dup2 到 tmp console.log
     api.main.main()  # env token 满足检查 -> 不得 SystemExit
     assert not (tmp_path / "api_token.txt").exists()  # 已有 token, 不生成文件
     captured = capsys.readouterr()
@@ -229,6 +253,7 @@ def test_env_token_non_loopback_proceeds_with_ascii_warning_no_token_echo(monkey
     monkeypatch.setattr(api.jobs, "LOG_DIR", str(tmp_path))  # WR-02: reload_registry 的 jobs_dir 缝
     monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path))  # WR-02: 锁缝同 tmp (test_jobs 惯例)
     _patch_uvicorn_run(monkeypatch)
+    _noop_repoint(monkeypatch)  # WR-04: 不把 pytest 的 fd 1/2 dup2 到 tmp console.log
     api.main.main()  # env token 满足 -> 不得 SystemExit, 正常走到 uvicorn.run
     assert not (tmp_path / "api_token.txt").exists()  # 非回环分支绝不生成文件
     captured = capsys.readouterr()
