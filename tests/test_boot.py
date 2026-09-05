@@ -4,6 +4,12 @@
 case 5 是 Pitfall-2 回归测试(承重): 非回环 + 无 token 的拒绝分支绝不能被自动生成掩盖。
 case 8 是 WR-01 回归测试(承重): 文件 token 存在也绝不能满足非回环检查 (D-12 env 强制)。
 
+WR-02 隔离 pin: main() 走到 jobs.reload_registry() 时 registry 目录经 api.jobs.LOG_DIR
+调用时解析 (jobs_dir), 与 api.main.LOG_DIR 是两个缝 —— 全 boot 测试两个缝都 pin 到
+tmp_path, 真实 logs/api/jobs 零触碰 (否则套件会改写真实 in-flight job 为 interrupted
+并用 cap-20 prune 删真实终态对)。补丁只加在真正跑完 reload_registry 的 4 个测试上
+(case 5/8 在 SEC-03 门提前 SystemExit, 到不了 registry)。
+
 补丁机制说明: api/main.py 在 main() 内惰性 import uvicorn (函数局部名, 模块上无
 uvicorn 属性), 因此用伪模块预置 sys.modules["uvicorn"] 使 main() 的 import 拿到
 no-op run —— 断言内容与计划一致, 仅补丁方式按 main.py 实际导入形状调整。
@@ -14,6 +20,7 @@ import types
 import pytest
 
 import api.boot
+import api.jobs  # WR-02: 全 boot 测试 pin registry 缝 (jobs.LOG_DIR/DATA_DIR)
 import api.main
 from api.boot import ensure_token, has_token, is_loopback, read_token
 
@@ -119,6 +126,8 @@ def test_loopback_boot_prints_only_notice_and_creates_token(monkeypatch, tmp_pat
     monkeypatch.delenv("GOGO_API_TOKEN", raising=False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
     monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
+    monkeypatch.setattr(api.jobs, "LOG_DIR", str(tmp_path))  # WR-02: reload_registry 的 jobs_dir 缝
+    monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path))  # WR-02: 锁缝同 tmp (test_jobs 惯例)
     _patch_uvicorn_run(monkeypatch)
     api.main.main()  # 不得抛 SystemExit
     assert (tmp_path / "api_token.txt").exists()
@@ -152,6 +161,8 @@ def test_loopback_boot_generates_token_and_exits_normally(monkeypatch, tmp_path,
     monkeypatch.delenv("GOGO_API_TOKEN", raising=False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
     monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
+    monkeypatch.setattr(api.jobs, "LOG_DIR", str(tmp_path))  # WR-02: reload_registry 的 jobs_dir 缝
+    monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path))  # WR-02: 锁缝同 tmp (test_jobs 惯例)
     _patch_uvicorn_run(monkeypatch)
     api.main.main()  # 默认 host=127.0.0.1 -> 回环分支, 不得 SystemExit
     assert (tmp_path / "api_token.txt").exists()  # D-03 在回环分支生成
@@ -169,6 +180,8 @@ def test_env_token_satisfies_non_loopback_check(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(api.main, "is_loopback", lambda host: False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
     monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
+    monkeypatch.setattr(api.jobs, "LOG_DIR", str(tmp_path))  # WR-02: reload_registry 的 jobs_dir 缝
+    monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path))  # WR-02: 锁缝同 tmp (test_jobs 惯例)
     _patch_uvicorn_run(monkeypatch)
     api.main.main()  # env token 满足检查 -> 不得 SystemExit
     assert not (tmp_path / "api_token.txt").exists()  # 已有 token, 不生成文件
@@ -213,6 +226,8 @@ def test_env_token_non_loopback_proceeds_with_ascii_warning_no_token_echo(monkey
     monkeypatch.setattr(api.main, "is_loopback", lambda host: False)
     monkeypatch.setattr(api.main, "DATA_DIR", str(tmp_path))
     monkeypatch.setattr(api.main, "LOG_DIR", str(tmp_path))  # 05-02: housekeeping 只碰 tmp 树
+    monkeypatch.setattr(api.jobs, "LOG_DIR", str(tmp_path))  # WR-02: reload_registry 的 jobs_dir 缝
+    monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path))  # WR-02: 锁缝同 tmp (test_jobs 惯例)
     _patch_uvicorn_run(monkeypatch)
     api.main.main()  # env token 满足 -> 不得 SystemExit, 正常走到 uvicorn.run
     assert not (tmp_path / "api_token.txt").exists()  # 非回环分支绝不生成文件
