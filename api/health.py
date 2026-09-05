@@ -14,7 +14,8 @@ require_api_key 门 (与 private/actions/jobs 同一依赖对象身份, SC2 审�
 - last_check.health_job: logs/api/jobs registry 中 kind == "health-check" 且
   status == "succeeded" 的最新 finished_at 的 ISO-8601 UTC; 无匹配 -> null。
   registry 经 api.jobs.jobs_dir()/read_job 只读 (单一事实源); 扫描镜像
-  jobs.prune 的 OSError/ValueError 容错 —— 缺失/损坏文件绝不 5xx (T-05-03)。
+  jobs.prune 的 OSError/ValueError 容错 + dict 形状守卫 —— 缺失/损坏/
+  可解析非对象 JSON 文件绝不 5xx (T-05-03)。
 - last_check.market_state_mtime: data/market_state.json 的 os.stat mtime ISO;
   缺失/不可 stat -> null (与 health_job 对称 —— 详情探针诚实回答数据缺席,
   绝不把缺失状态打成 5xx 掩盖自身要报告的条件)。
@@ -67,7 +68,8 @@ def _latest_succeeded_health_check():
 
     容错镜像 jobs.prune (jobs.py:227-245): listdir OSError -> None (null, 绝不 5xx);
     逐文件 (OSError, ValueError) -> 跳过 (read_job 对损坏 JSON 上抛 ValueError);
-    finished_at 非 int (畸形文件) -> 跳过 —— 扫描永不被外来字节打成 5xx (T-05-03)。
+    非 dict (可解析的非对象 JSON) -> 跳过; finished_at 非 int (畸形文件) -> 跳过
+    —— 扫描永不被外来字节打成 5xx (T-05-03)。
     """
     base = jobs.jobs_dir()
     try:
@@ -84,8 +86,8 @@ def _latest_succeeded_health_check():
             job = jobs.read_job(stem, base)
         except (OSError, ValueError):
             continue  # 撕裂/损坏 -> 跳过 (prune 同形)
-        if job is None:
-            continue
+        if not isinstance(job, dict):
+            continue  # 非对象 JSON (list/str/int/bool/null) -> 跳过, 绝不 5xx (T-05-03)
         if job.get("kind") != "health-check" or job.get("status") != "succeeded":
             continue
         finished = job.get("finished_at")

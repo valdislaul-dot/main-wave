@@ -308,6 +308,28 @@ def test_reload_sweep_tolerates_corrupt_and_dotfiles(tmp_path):
     assert (base / ".DS_Store").exists()  # 点文件 -> 跳过
 
 
+def test_reload_sweep_tolerates_non_object_json(tmp_path):
+    """WR-03 形状守卫 (reload): 可解析但非对象 JSON (list/str/int/bool/null)
+    不中断扫描 —— 否则 main() boot 序列在 prune 前崩, API 起不来。"""
+    base = tmp_path / "jobs"
+    base.mkdir()
+    _seed_job_file(base, "a" * 32, "running")
+    for stem, payload in (
+        ("list_job", "[1, 2]"),
+        ("num_job", "42"),
+        ("str_job", '"hello"'),
+        ("bool_job", "true"),
+        ("null_job", "null"),
+    ):
+        (base / f"{stem}.json").write_text(payload, encoding="utf-8")
+
+    api.jobs.reload_registry(str(base))  # 绝不 raise (boot 尾部 prune 未包 try)
+
+    assert api.jobs.read_job("a" * 32, str(base))["status"] == "interrupted"  # 扫描照常
+    for stem in ("list_job", "num_job", "str_job", "bool_job", "null_job"):
+        assert (base / f"{stem}.json").exists()  # 非对象 -> 跳过, 不删不动
+
+
 def test_reload_sweep_prune_cap_keeps_20_newest_terminal(tmp_path):
     """D-33 边界 (05-02): 25 终态 + 3 inflight -> sweep 收编后 prune 到恰好 20。
 
@@ -401,6 +423,30 @@ def test_prune_skips_corrupt_json_still_trims_others(tmp_path):
         assert not (base / f"{i:032x}.log").exists()
     for i in range(3, 23):
         assert f"{i:032x}" in remaining  # 其余 20 个有效对 + 损坏 json 存活
+
+
+def test_prune_skips_non_object_json_still_trims_others(tmp_path):
+    """WR-03 形状守卫 (prune): 非对象 JSON 不计为终态、不参与修剪 (成对被删规则), 其余照常。"""
+    base = tmp_path / "jobs"
+    base.mkdir()
+    for i in range(23):
+        jid = f"{i:032x}"
+        _seed_job_file(base, jid, "succeeded", mtime=1_700_000_000 + i)
+    non_object = base / f"{2:032x}.json"
+    non_object.write_text("true", encoding="utf-8")  # 最旧区: 有效终态覆盖成可解析非对象 JSON
+
+    api.jobs.prune(str(base))
+
+    assert non_object.read_text(encoding="utf-8") == "true"  # 不计数也未被删
+    assert (base / f"{2:032x}.log").exists()  # 陪衬 .log 不成对被删 (跳过语义同损坏 json)
+    remaining = sorted(p.name[: -len(".json")] for p in base.glob("*.json"))
+    assert len(remaining) == 21  # 22 个有效终态 - 最旧 2 个有效对 + 非对象 1 个留存 = 21
+    for i in (0, 1):
+        assert f"{i:032x}" not in remaining  # 最旧 2 个有效对 (json+log) 被删
+        assert not (base / f"{i:032x}.json").exists()
+        assert not (base / f"{i:032x}.log").exists()
+    for i in range(3, 23):
+        assert f"{i:032x}" in remaining  # 其余 20 个有效对 + 非对象 json 存活
 
 
 def test_reload_sweep_missing_dir_creates_and_returns(tmp_path):

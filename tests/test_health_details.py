@@ -253,6 +253,36 @@ def test_health_job_null_dotfile_only_registry(tmp_path):
     assert r.json()["last_check"]["health_job"] is None  # 点文件 -> 扫描跳过
 
 
+def test_health_job_null_non_object_json_skipped(tmp_path):
+    """WR-03 形状守卫: 可解析但非对象 JSON (list/str/int/bool/null) 全跳过, 绝不 5xx。"""
+    base = Path(tmp_path) / "logs" / "api" / "jobs"
+    base.mkdir(parents=True, exist_ok=True)
+    for stem, payload in (
+        ("list_job", "[1, 2]"),
+        ("num_job", "42"),
+        ("str_job", '"hello"'),
+        ("bool_job", "true"),
+        ("null_job", "null"),
+    ):
+        (base / f"{stem}.json").write_text(payload, encoding="utf-8")
+    r = client.get("/health/details", headers=_headers())
+    assert r.status_code == 200  # 外来字节绝不打成 5xx (T-05-03)
+    assert r.json()["last_check"]["health_job"] is None  # 非对象 -> 跳过
+
+
+def test_health_job_non_object_files_do_not_shadow_valid_succeeded(tmp_path):
+    """WR-03 混合矩阵: 非对象 JSON 与合法 succeeded health-check 并存 -> 扫描继续取后者。"""
+    _seed_registry_job(tmp_path, "a" * 32, "health-check", "succeeded",
+                       finished_at=_FINISHED_AT)
+    base = Path(tmp_path) / "logs" / "api" / "jobs"
+    (base / "list_job.json").write_text("[1, 2]", encoding="utf-8")
+    (base / "bool_job.json").write_text("true", encoding="utf-8")
+    r = client.get("/health/details", headers=_headers())
+    assert r.status_code == 200
+    expected_iso = datetime.fromtimestamp(_FINISHED_AT, timezone.utc).isoformat()
+    assert r.json()["last_check"]["health_job"] == expected_iso  # 守卫不误伤合法 job
+
+
 # ---------- 矩阵: market_state_mtime null 腿 (缺失/不可 stat -> null) ----------
 
 def test_market_state_mtime_null_when_file_missing(tmp_path):

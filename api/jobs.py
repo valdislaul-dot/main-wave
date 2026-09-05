@@ -193,9 +193,9 @@ def reload_registry(base=None, cap=PRUNE_CAP):
 
     deterministic-interrupted 是"API 在 job 飞行中死亡"的诚实终态 —— failed 意味着
     脚本真的跑过并出错; 无 PID 探针 (孤儿收养归 ACT-05 v2)。逐文件原子重写,
-    不可解析文件与点文件跳过 (绝不中断扫描); 结尾 prune(base, cap) —— 刚收编的
-    interrupted 与任何终态一样计入上限。纯函数, 由 03-02 在 main() 启动序列调用,
-    绝不在 import 时执行。
+    不可解析/非对象 JSON 文件与点文件跳过 (绝不中断扫描); 结尾 prune(base, cap)
+    —— 刚收编的 interrupted 与任何终态一样计入上限。纯函数, 由 03-02 在 main()
+    启动序列调用, 绝不在 import 时执行。
     """
     base = base or jobs_dir()
     os.makedirs(base, exist_ok=True)
@@ -211,8 +211,8 @@ def reload_registry(base=None, cap=PRUNE_CAP):
             job = read_job(stem, base)
         except (OSError, ValueError):
             continue  # 撕裂/损坏 -> 跳过, 不删不动
-        if job is None or job.get("status") not in ("pending", "running"):
-            continue
+        if not isinstance(job, dict) or job.get("status") not in ("pending", "running"):
+            continue  # 非对象 JSON (list/str/int/bool/null) -> 跳过, 绝不崩 boot
         job["status"] = "interrupted"
         job["finished_at"] = int(time.time())
         write_job(job, base)  # 原地原子重写 (Pattern 2)
@@ -238,8 +238,8 @@ def prune(base=None, cap=PRUNE_CAP):
         json_path = os.path.join(base, name)
         try:
             job = read_job(stem, base)
-            if job is None or job.get("status") not in TERMINAL:
-                continue
+            if not isinstance(job, dict) or job.get("status") not in TERMINAL:
+                continue  # 非对象 JSON -> 跳过 (形状守卫同 reload_registry)
             terminal.append((os.path.getmtime(json_path), json_path, stem))
         except (OSError, ValueError):
             continue  # 撕裂/缺失/竞态删除 -> 跳过, 绝不致命
