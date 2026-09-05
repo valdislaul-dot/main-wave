@@ -1,7 +1,8 @@
 ---
 phase: 05-recovery-observability-ops-polish
-reviewed: 2026-09-05T01:08:02Z
+reviewed: 2026-09-05T02:05:00Z
 depth: standard
+iteration: 2
 files_reviewed: 11
 files_reviewed_list:
   - api/health.py
@@ -17,114 +18,77 @@ files_reviewed_list:
   - tests/test_log_housekeep.py
 findings:
   critical: 0
-  warning: 3
-  info: 4
-  total: 7
+  warning: 1
+  info: 3
+  total: 4
 status: issues_found
 ---
 
-# Phase 5: Code Review Report
+# Phase 5: Code Review Report (iteration 2 — fix verification)
 
-**Reviewed:** 2026-09-05T01:08:02Z
+**Reviewed:** 2026-09-05T02:05:00Z
 **Depth:** standard
 **Files Reviewed:** 11
 **Status:** issues_found
 
 ## Summary
 
-Reviewed the Phase 5 delta: auth-gated `GET /health/details` (api/health.py + api/uptime.py single-leaf anchor), log-rotation primitives (api/log_housekeep.py, run_api.bat M-B launcher rotation, api/main.py boot block), PRUNE_CAP 500→20 (api/jobs.py), and their contract suites. Cross-checked against api/auth.py, api/boot.py, api/actions.py, api/errors.py, api/state.py, scripts/daily/config.py, scripts/daily/job_lock.py, tests/conftest.py, and the live state under logs/api/jobs (5 terminal pairs; logs/ gitignored).
+Re-review of the Phase 5 tree after the iteration-1 fixer applied 3 fixes (commits d4ad4ae, a07279b, 11645c4). Verified each fix against the current source, the fix diffs, the new test matrix rows, and by running the full suite in the main checkout. All three applied fixes are correct and regression-free for the Windows deployment; one warning remains — the second half of WR-02 (in-process fd dup2 during full-boot tests) that the fixer did not address.
 
-The Windows cmd `>>` launch path is well analyzed and the live-verified constraints (deny-share handle, M-B window, CRLF/ASCII batch hygiene, dual-identity uptime anchor) are correctly reflected in code. The 401/403/200 matrix, D-29 shape, null legs, and cap-20 prune semantics are suite-pinned and consistent with the implementation. Three Warnings remain — one platform-conditional logic gap in the in-process boot branch, one test-isolation gap that touches the real registry with now-destructive pruning, and one shape-validation gap in the shared registry-scan tolerance contract.
+**Fix verification results:**
+
+- **WR-03 (dict-shape guards) — verified fixed.** `isinstance(job, dict)` guards now sit at all three scan sites with correct short-circuit ordering (`api/jobs.py:214` reload_registry, `api/jobs.py:241` prune, `api/health.py:89` scan; `None` from a listdir/read race is also covered by the guard). The 4 new matrix rows (`test_health_job_null_non_object_json_skipped`, `test_health_job_non_object_files_do_not_shadow_valid_succeeded`, `test_reload_sweep_tolerates_non_object_json`, `test_prune_skips_non_object_json_still_trims_others`) are all mutation-meaningful — each 500s/crashes on the pre-fix code. Trim arithmetic in `test_prune_skips_non_object_json_still_trims_others` checks out (22 valid − 2 oldest + 1 non-object = 21). `api/actions.py:129-145` (GET /v1/jobs/{id}) is a single-file direct read, not a scan — its documented 503/404 classification contract is intact and it never calls `.get()`, so no fourth site exists.
+- **WR-01 (True-branch repoint) — verified correct by analysis; POSIX branch remains needs-human-verification (as fixer marked).** `api/main.py:124-131` consumes `_rotated` exactly per the prescribed fix: `_rotated` → repoint with its own WARNING; `elif rotate_err` → rotation-skipped warning; no-op → silence. Windows cmd `>>` production path is byte-identical to iteration 1 (deny-share handle makes `_rotated=True` structurally unreachable — the new code is inert there). Flush ordering is safe: `repoint_std_streams` flushes stdout/stderr before dup2 (log_housekeep.py:65-66), so the tail of buffered output lands in the renamed `.1` inode via the still-open fds — no lost or misdirected bytes. Only reachable on POSIX/share-delete launchers (D-35 Mac rollout) — cannot be exercised on this machine; keep the human-verification flag.
+- **WR-02 (registry isolation) — registry-escape vector closed and empirically confirmed.** All 4 full-boot tests pin both seams (`api.jobs.LOG_DIR` + `api.jobs.DATA_DIR`, test_boot.py:129-130/164-165/183-184/229-230); the SEC-03-gate tests (case 5/8) need no pin because `SystemExit` fires at main.py:89 before `reload_registry()` at main.py:106 (verified in main() ordering). Grep confirms test_boot is the only module invoking `main()`/`reload_registry`. Independent reproduction in the main checkout: full suite **193 passed, 1 skipped in 16.59s** (matches the fixer's claim; +4 = exactly the WR-03 rows over the 189 baseline); real `logs/api/jobs` sha256 `637e2c7c…` byte-identical before/after; `git status --porcelain -- data/ logs/` empty.
+- **Scope hygiene:** fix commits touch only api/jobs.py, api/health.py, api/main.py, tests/test_health_details.py, tests/test_jobs.py, tests/test_boot.py — no 定稿机制 modules (V4 scoring/temperature/sell-engine), run_api.bat untouched. run_api.bat verified still CRLF-only (14 CRLF, 0 bare LF) and ASCII-only (0 non-ASCII bytes).
+
+One warning remains open (WR-04 below) — it is the "Additionally" paragraph of iteration-1 WR-02 that the fixer's fix did not cover, and it is now empirically demonstrated to degrade test reliability in a standard pytest mode. The three iteration-1 Info items (IN-01/03/04) carry over unchanged; IN-02 is resolved by the WR-01 fix (True branch now consumes `_rotated`; the remaining unused False-branch binding at main.py:133 is an underscore-discard convention, not a defect).
 
 ## Warnings
 
-### WR-01: True-branch rotate success strands fd 1/2 on the renamed console.log.1 (no repoint)
+### WR-04: Full-boot tests dup2 the pytest runner's fd 1/2 onto a tmp console.log — verified output/failure-report loss under `pytest -s`
 
-**File:** `api/main.py:123-126`
-**Issue:** When `std_streams_on(console_log)` is True, the boot block attempts `rotate_console_log` and only prints a warning on error. If the rotation *succeeds* (file > 5MB and rename permitted), fd 1/2 still point at the renamed inode — now `console.log.1` — and nothing repoints them to a fresh `console.log`. Consequences of a successful True-branch rotate:
-1. The current session's entire output (uvicorn banner onward) lands in `console.log.1`, the file named "one generation old"; the `console.log` path is left absent until the next launch creates it.
-2. At the following boot, a `> 5MB` `console.log` is renamed over the existing `.1` (`os.replace`, log_housekeep.py:44), discarding the previous generation — including that session's live tail.
+**File:** `tests/test_boot.py:125, 160, 177, 222` (via `api/main.py:133-134` → `api/log_housekeep.py:50-76`)
+**Issue:** The WR-02 fix pinned the registry seams, but the four full-boot tests still run the boot housekeeping block for real inside the pytest process. When fd 1/2 do not point at console.log (any test/manual launch — the False branch), `main()` calls the real `repoint_std_streams(console_log)`, which dup2s the **test runner's own fd 1/2** onto the tmp_path console.log (log_housekeep.py:67-73). Iteration-1 review noted this as "currently tolerated by pytest capture"; it is only tolerated because default fd-capture makes pytest independent of OS fd 1/2. Empirically confirmed on this machine:
 
-On the Windows cmd `>>` path this cannot occur (the inherited handle denies FILE_SHARE_DELETE, so rename fails and the warning fires — the designed degraded mode). But on POSIX (Mac rollout per D-35 runs the suite; shell `>>` redirect launches allow rename with open fds) and on any launcher that grants share-delete on the redirected handle, rotation succeeds and the session log is silently misplaced. The False branch performs the correct rotate → repoint dance; the True branch omits the repoint half. Note the code already captures the success signal in `_rotated` (line 124) but never uses it.
-
-**Fix:** Repoint when rotation actually succeeded:
-```python
-if log_housekeep.std_streams_on(console_log):
-    _rotated, rotate_err = log_housekeep.rotate_console_log(console_log)
-    if _rotated:  # rename succeeded -> heal fd split (POSIX / share-delete launchers)
-        repoint_err = log_housekeep.repoint_std_streams(console_log)
-        if repoint_err:
-            print(f"WARNING: log repoint failed - {repoint_err} - continuing boot", file=sys.stderr)
-    elif rotate_err:
-        print(f"WARNING: console.log rotation skipped - {rotate_err} - continuing boot", file=sys.stderr)
 ```
-On Windows cmd `>>` this stays a no-op (rotate cannot succeed), preserving the live-verified M-B behavior.
-
-### WR-02: test_boot full-boot tests escape the isolation pin and run reload_registry against the real logs/api/jobs
-
-**File:** `tests/test_boot.py:118-129, 151-162, 166-177, 209-225` (with `api/main.py:106`, `api/jobs.py:191-219`)
-**Issue:** Four tests call `api.main.main()` to completion but patch only `api.main.DATA_DIR`/`api.main.LOG_DIR`. `main()` invokes `jobs.reload_registry()` with the default base, which resolves `api.jobs.LOG_DIR` — unpatched, pointing at the real `logs/api/jobs`. The suite's own isolation pin ("real data/ and logs/ zero touch", CRITICAL 数据隔离 in the other test modules) is therefore violated:
-1. If the suite runs while the real scheduled service has a pending/running job, the real job file is rewritten to `interrupted` with a fresh `finished_at` (jobs.py:216-218) — live registry corruption from a test run.
-2. The tail `prune(base, cap)` (jobs.py:219, 222-254) now applies the Phase 5 cap of **20** (was 500). During the transition window — a real registry still holding >20 terminal pairs accumulated under the old cap — each of the four full-boot tests silently deletes the oldest terminal json+log pairs from the real registry.
-3. The gate's hygiene claim (`git status --porcelain -- data/ logs/` empty, 05-04-SUMMARY C3) cannot detect any of this: `logs/` is gitignored (`logs/*`, `logs/*.log`), so writes to the real registry are invisible to git. The "no suite test touches the real registry" prohibition was verified with a blind check.
-
-Additionally, each of these four tests executes `repoint_std_streams` for real inside the pytest process (main.py:129), dup2-ing the test runner's own fd 1/2 onto the tmp console.log — currently tolerated by pytest capture, but it is the in-process boot path running with real side effects rather than a patched one.
-
-**Fix:** Patch the jobs seams in the four full-boot tests, mirroring test_jobs' fixture:
-```python
-monkeypatch.setattr(api.jobs, "LOG_DIR", str(tmp_path))
-monkeypatch.setattr(api.jobs, "DATA_DIR", str(tmp_path))
+$ python -m pytest tests/test_boot.py -s -q
+...........            <- stops at 11 dots
 ```
-(or add an autouse fixture to test_boot doing this for every test), and strengthen the hygiene check to assert the real registry is byte-identical before/after the suite rather than relying on git status of untracked files.
 
-### WR-03: Registry scans assume dict JSON — valid non-object JSON raises AttributeError (500 on /health/details, boot crash)
+The first full-boot test (test #12, test_loopback_boot_prints_only_notice_and_creates_token) hijacks fd 1/2; the remaining 6 progress dots and the entire `17 passed` summary are written into `tmp_path/api/console.log`, which pytest deletes at teardown. Under `-s` (the standard debugging mode for exactly these boot tests), any failure in the 6 tests after the hijack point — or in later test files in a full-suite `-s` run — produces **no visible traceback or summary**: silent-failure window with only the exit code as signal. Default-capture runs (CI, this suite's own runs) are unaffected, which is why 193-passed runs look healthy.
 
-**File:** `api/health.py:89` (also `api/jobs.py:214`, `api/jobs.py:241`)
-**Issue:** All three registry scans guard `read_job` against `OSError`/`ValueError` (missing file, torn file, corrupt JSON) but not against *well-formed JSON of the wrong shape*. `read_job` (jobs.py:88-99) returns whatever `json.load` produces. A registry file containing `[1, 2]`, `"hello"`, `42`, or `true` parses cleanly and then:
-- `api/health.py:89` — `job.get("kind")` raises AttributeError → unhandled → **500** on `GET /health/details`. This directly violates the module's documented contract "扫描永不被外来字节打成 5xx (T-05-03)" and its test matrix (test_health_details covers corrupt JSON `{not json` at line 238-244 but not parseable non-object JSON).
-- `api/jobs.py:214` (reload_registry) and `api/jobs.py:241` (prune) — same AttributeError. In reload_registry the trailing `prune(base, cap)` (line 219) is unwrapped, so the exception propagates out of `main()`'s boot sequence (main.py:106) after token handling — the API **fails to start** until the offending file is removed by hand.
-
-Write paths always produce dicts (write_job), so a realistic trigger requires an external writer or operator hand-edit — but the tolerance contract explicitly promises immunity to "外来字节", and this is exactly the class of file the scans claim to survive.
-
-**Fix:** Type-guard after every read in the three scan sites:
+**Fix:** No-op the fd-touching primitive in the four full-boot tests before calling `main()` (main() resolves `log_housekeep.repoint_std_streams` at call time, so the patch takes effect; real repoint behavior stays pinned by test_log_housekeep's subprocess probes, so no coverage is lost; no assertion in these tests depends on repoint's side effects — the boot prints occur before housekeeping and the WARNING paths require errors the no-op avoids):
 ```python
-job = jobs.read_job(stem, base)
-if not isinstance(job, dict):
-    continue  # 非对象 JSON (list/str/int/bool/null) -> 跳过, 绝不 5xx / 绝不崩 boot
+monkeypatch.setattr(
+    api.log_housekeep, "repoint_std_streams", lambda path=None: None
+)
 ```
-(`job is None` checks become redundant but harmless.) Add a test seeding a parseable non-object file (e.g., `[1,2]`) asserting 200-with-null on /health/details and no-raise through reload_registry/prune.
+(A module-level autouse fixture in test_boot applying this for every `main()`-invoking test is equivalent.) With that, the four full-boot tests keep testing everything they assert — token generation, SEC-03/D-12 refusal ordering, print pins — while no longer mutating the runner's process-wide fd state.
 
 ## Info
 
 ### IN-01: Rotation threshold duplicated across launcher and module
 
 **File:** `run_api.bat:12` (with `api/log_housekeep.py:23`)
-**Issue:** `MAX_CONSOLE_LOG_BYTES = 5 * 1024 * 1024` (python) and the literal `5242880` (bat) are the same constant in two languages, kept in sync only by cross-referencing comments. A future threshold change in one place silently diverges the M-B window from the in-process check. Both comments acknowledge the coupling; a drift guard is cheap.
+**Issue:** `MAX_CONSOLE_LOG_BYTES = 5 * 1024 * 1024` (python) and the literal `5242880` (bat) are the same constant in two languages, kept in sync only by cross-referencing comments. Unchanged from iteration 1; currently in sync (5242880 == 5 MB).
 **Fix:** Pin the coupling in a test (e.g., assert the bat contains the literal `str(api.log_housekeep.MAX_CONSOLE_LOG_BYTES)`), so any one-sided change fails the suite.
-
-### IN-02: `_rotated` is assigned in both branches and never read
-
-**File:** `api/main.py:124, 128`
-**Issue:** Both branch assignments bind `_rotated` but nothing consumes it — the rotation-success signal is computed and discarded. Beyond being dead, it is the very signal needed for the WR-01 fix.
-**Fix:** Fold into WR-01's fix (consume `_rotated` in the True branch).
 
 ### IN-03: Rotation is boot-bound only; in-session console.log growth is unbounded
 
-**File:** `run_api.bat:12`, `api/main.py:117-133`
-**Issue:** Rotation fires only at process start (launcher M-B / boot block). During a continuous session that exceeds 5MB, console.log grows without bound until the next restart. This is structurally forced by the cmd `>>` deny-share handle (in-process rotation impossible — live-proven) and is the operator-accepted D-32 boot-check design, but it does not literally meet SC2's "disk footprint stays bounded through weeks of continuous running **with no manual cleanup**" unless the machine/session restarts within the growth budget. Live evidence shows the footprint is tiny in practice (405 bytes after two days, access_log off), so this is a recorded-limitation note, not a defect.
+**File:** `run_api.bat:12`, `api/main.py:117-137`
+**Issue:** Rotation fires only at process start. Structurally forced by the cmd `>>` deny-share handle (in-process rotation impossible — live-proven) and operator-accepted; live footprint tiny (405 bytes after two days). Recorded-limitation note, not a defect.
 **Fix:** None required for the Windows deployment; record in README known-limits that a long-lived un-restarted session grows console.log past the threshold by design.
 
 ### IN-04: run_api.bat does not check the move errorlevel
 
 **File:** `run_api.bat:12`
-**Issue:** If `move /y` fails (the documented orphan state — Stop-ScheduledTask leaves the old python holding console.log deny-share, per 05-04-SUMMARY), the bat proceeds, the subsequent `>>` open fails, and the task exits 1 with no distinguishing diagnostic — the same LastTaskResult 1 signature as the recorded port-occupancy failure. Recovery (taskkill the orphan) is documented, so this is a diagnosability gap only.
-**Fix:** Optional one-liner for a distinct signature:
-```bat
-if exist "logs\api\console.log" for %%A in ("logs\api\console.log") do if %%~zA GTR 5242880 move /y "logs\api\console.log" "logs\api\console.log.1" >nul 2>&1 || echo ROTATION-FAILED > "logs\api\rotate_error.flag"
-```
+**Issue:** If `move /y` fails (documented orphan state — old python still holding console.log deny-share), the bat proceeds, the `>>` open fails, and the task exits 1 with no distinguishing diagnostic. Diagnosability gap only.
+**Fix:** Optional one-liner for a distinct signature (e.g., `move /y ... >nul 2>&1 || echo ROTATION-FAILED > "logs\api\rotate_error.flag"`), keeping CRLF + ASCII-only.
 
 ---
 
-_Reviewed: 2026-09-05T01:08:02Z_
+_Reviewed: 2026-09-05T02:05:00Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
+_Iteration: 2_
