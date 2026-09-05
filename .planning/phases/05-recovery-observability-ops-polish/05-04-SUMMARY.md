@@ -163,33 +163,33 @@ Operator: mark each row ACCEPT or DELTA (one-line local change suffices to flip 
 ### 05-01 flagged rows (built as assumed, 05-01 marked all ACCEPT)
 | # | Flagged row | Executor note | Verdict |
 |---|---|---|---|
-| 1 | market_state.json missing/unreadable -> market_state_mtime null (200-with-null, never 5xx) | ACCEPT — suite-pinned; live last_check carried real parseable mtime | [ ] ACCEPT / [ ] DELTA |
+| 1 | market_state.json missing/unreadable -> market_state_mtime null (200-with-null, never 5xx) | ACCEPT — suite-pinned; live last_check carried real parseable mtime | [x] ACCEPT / [ ] DELTA |
 | 2 | uptime wiring = public uptime_seconds() + handler-level lazy import | **Live-DISPROVEN and adapted** — lazy import re-executes main.py under `python -m` (dual identity), forking the anchor; now api/uptime.py single leaf anchor (commit 3e0898b, live-verified equal) | [ ] ACCEPT (adaptation) / [ ] DELTA |
-| 3 | newest succeeded health-check = max finished_at among kind health-check + status succeeded | ACCEPT — live health_job = 2026-09-03T18:17:59+00:00 from registry | [ ] ACCEPT / [ ] DELTA |
-| 4 | ISO output = datetime.fromtimestamp(value, timezone.utc).isoformat() | ACCEPT — live values parse with that exact form | [ ] ACCEPT / [ ] DELTA |
+| 3 | newest succeeded health-check = max finished_at among kind health-check + status succeeded | ACCEPT — live health_job = 2026-09-03T18:17:59+00:00 from registry | [x] ACCEPT / [ ] DELTA |
+| 4 | ISO output = datetime.fromtimestamp(value, timezone.utc).isoformat() | ACCEPT — live values parse with that exact form | [x] ACCEPT / [ ] DELTA |
 
 ### 05-02 flagged rows
 | # | Flagged row | Executor note | Verdict |
 |---|---|---|---|
 | 5 | Two-repoint ordering (repoint -> rotate -> repoint) is the only working order | **Live-DISPROVEN and superseded** — no in-process order works while cmd's own handle copy lives; M-B launcher rotation + std_streams_on branch replaces the dance (commit 413bf90) | [ ] ACCEPT (adaptation) / [ ] DELTA |
-| 6 | Uniform dance (both repoints) even when console.log <= 5MB | **Superseded** — the boot block now branches on std_streams_on; under cmd >> it does zero fd ops regardless of size | [ ] ACCEPT / [ ] DELTA |
-| 7 | Rewritten cap test seed (25 terminal + 3 inflight) provably fails on the old cap 500 | ACCEPT — suite green; cap semantics unchanged (20) | [ ] ACCEPT / [ ] DELTA |
-| 8 | prune_job_logs() belt-and-suspenders over reload_registry's tail-prune | ACCEPT — idempotent, suite-pinned | [ ] ACCEPT / [ ] DELTA |
+| 6 | Uniform dance (both repoints) even when console.log <= 5MB | **Superseded** — the boot block now branches on std_streams_on; under cmd >> it does zero fd ops regardless of size | [x] ACCEPT / [ ] DELTA |
+| 7 | Rewritten cap test seed (25 terminal + 3 inflight) provably fails on the old cap 500 | ACCEPT — suite green; cap semantics unchanged (20) | [x] ACCEPT / [ ] DELTA |
+| 8 | prune_job_logs() belt-and-suspenders over reload_registry's tail-prune | ACCEPT — idempotent, suite-pinned | [x] ACCEPT / [ ] DELTA |
 
 ### 05-03 flagged rows
 | # | Flagged row | Executor note | Verdict |
 |---|---|---|---|
-| 9 | 15:30 scheduled task remains absent | ACCEPT — D-36 audit CONFIRMED ABSENT (2026-09-05), see cross-ref below | [ ] ACCEPT / [ ] DELTA |
-| 10 | README.md exists with the Phase 4 known-limits segment | ACCEPT — local README extended in 05-03, stays local-only (gitignored, upload-scope rule) | [ ] ACCEPT / [ ] DELTA |
-| 11 | "157+ passed, 1 env-conditional skip" wording describes phase-end Windows result | ACCEPT — exact Win count now recorded: **189 passed, 1 skipped** (floor exceeded) | [ ] ACCEPT / [ ] DELTA |
+| 9 | 15:30 scheduled task remains absent | ACCEPT — D-36 audit CONFIRMED ABSENT (2026-09-05), see cross-ref below | [x] ACCEPT / [ ] DELTA |
+| 10 | README.md exists with the Phase 4 known-limits segment | ACCEPT — local README extended in 05-03, stays local-only (gitignored, upload-scope rule) | [x] ACCEPT / [ ] DELTA |
+| 11 | "157+ passed, 1 env-conditional skip" wording describes phase-end Windows result | ACCEPT — exact Win count now recorded: **189 passed, 1 skipped** (floor exceeded) | [x] ACCEPT / [ ] DELTA |
 
 ### 05-04 flagged rows (this plan)
 | # | Flagged row | Executor note | Verdict |
 |---|---|---|---|
-| 12 | Service currently running under gogo-api task; registry only terminal pairs | Partial found-state: service was STOPPED (Ready, LastTaskResult 1) — precondition scan handled it; registry held exactly 5 terminal pairs as assumed | [ ] ACCEPT / [ ] DELTA |
+| 12 | Service currently running under gogo-api task; registry only terminal pairs | Partial found-state: service was STOPPED (Ready, LastTaskResult 1) — precondition scan handled it; registry held exactly 5 terminal pairs as assumed | [x] ACCEPT / [ ] DELTA |
 | 13 | Real cmd >> handle semantics match the machine-verified model | **DISPROVEN** — handled by adapt-and-record (commit 413bf90), delta recorded above; re-proven live | [ ] ACCEPT (adaptation) / [ ] DELTA |
-| 14 | Final suite lands at 157+ / 1 skip | ACCEPT — 189 passed / 1 skipped (recorded, not assumed) | [ ] ACCEPT / [ ] DELTA |
-| 15 | Outside the 9:15–9:35 auction window | ACCEPT — Saturday 01:05–01:31, non-trading day | [ ] ACCEPT / [ ] DELTA |
+| 14 | Final suite lands at 157+ / 1 skip | ACCEPT — 189 passed / 1 skipped (recorded, not assumed) | [x] ACCEPT / [ ] DELTA |
+| 15 | Outside the 9:15–9:35 auction window | ACCEPT — Saturday 01:05–01:31, non-trading day | [x] ACCEPT / [ ] DELTA |
 
 ### Prohibition rows (all status unverified -> verified at this gate)
 | Prohibition | Gate evidence |
@@ -213,3 +213,13 @@ None — no placeholder values, no unwired components introduced; the live servi
 - Files exist: api/uptime.py (git ls-files + working tree), 05-04-SUMMARY.md (this file).
 - Commits exist: 413bf90 (git log), 3e0898b (git log); docs commit follows this file.
 - Live state re-verified at write time: task Running (267009), pid 32532, /health 200 uptime 215, console.log 403 bytes, no .1, registry 5 terminal / 0 non-terminal, hygiene clean.
+
+## Operator Verdict (2026-09-05)
+
+**Verdict: ACCEPT** — all 15 flagged rows accepted, all 5 prohibition rows verified at the gate.
+
+**Adaptation sign-off:** both live-disproven assumptions' fixes endorsed by the operator:
+- uptime single-leaf anchor (`api/uptime.py`, commit 3e0898b) — live-verified equal anchors (11==11, 13==13)
+- launcher-side M-B rotation (`run_api.bat` pre-rotation + std_streams_on() branch, commit 413bf90) — live-proven at 01:23:31 (console.log.1 static 6.3MB, fresh 201-byte console.log with only the uvicorn banner)
+
+**Mac checklist:** per D-35, the Mac-side run is a cross-machine rollout step the operator executes later; Win exact counts recorded here: 189 passed, 1 env-conditional skip.
