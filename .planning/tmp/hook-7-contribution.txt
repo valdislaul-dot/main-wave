@@ -1,0 +1,3 @@
+=== capId: security kind: contribution into: planner ===
+CONFIGVALUES: {"security_asvs_level":1,"security_block_on":"high"}
+Each PLAN.md must include a <threat_model> block when security enforcement is active. Use the configured ASVS level and blocking threshold from workflow.security_asvs_level and workflow.security_block_on.
