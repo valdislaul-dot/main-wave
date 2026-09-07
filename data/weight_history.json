@@ -52,5 +52,32 @@
       "win_rate": 54.5,
       "trades": 55
     }
+  },
+  {
+    "date": "2026-09-08",
+    "prev_obj": 1231.3,
+    "obj": 1368.1,
+    "weights": {
+      "vr": 11.9,
+      "gap": 2.5,
+      "board_type": 9.5,
+      "cons": 1.6,
+      "seal": 1.6,
+      "zhaban": 5.4,
+      "sector": 40.9,
+      "divergence": 0.0,
+      "dt_risk": 21.2,
+      "turnover": 5.4
+    },
+    "strong": {
+      "ret": 4334.4,
+      "win_rate": 75.9,
+      "trades": 54
+    },
+    "weak": {
+      "ret": 138.4,
+      "win_rate": 55.2,
+      "trades": 58
+    }
   }
 ]
