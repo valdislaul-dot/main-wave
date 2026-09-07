@@ -1,55 +1,76 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 44,
+  "total_sessions": 46,
   "current": {
-    "date": "2026-09-04",
-    "captured": "2026-09-04 09:26:29",
-    "total": 42,
-    "buyable": 5,
-    "avg_gap": 1.87,
+    "date": "2026-09-07",
+    "captured": "2026-09-07 09:46:48",
+    "total": 72,
+    "buyable": 8,
+    "avg_gap": 1.85,
     "gap_distribution": {
-      "-3-0%": 10,
-      "5-9%": 6,
-      "0-2%": 12,
-      "2-5%": 6,
-      "9%+": 4,
-      "<-3%": 4
+      "2-5%": 16,
+      "5-9%": 8,
+      "-3-0%": 18,
+      "9%+": 6,
+      "<-3%": 7,
+      "0-2%": 17
     },
     "buyable_stocks": [
       {
-        "code": "002980",
-        "name": "华盛昌",
-        "gap_pct": 7.38,
-        "score": 65.0,
-        "limit_days": 1
+        "code": "605580",
+        "name": "恒盛能源",
+        "gap_pct": 5.12,
+        "score": 51.5,
+        "limit_days": 2
       },
       {
-        "code": "600185",
-        "name": "珠免集团",
-        "gap_pct": 5.3,
-        "score": 53.7,
-        "limit_days": 1
+        "code": "605577",
+        "name": "龙版传媒",
+        "gap_pct": 6.5,
+        "score": 45.7,
+        "limit_days": 5
       },
       {
-        "code": "001299",
-        "name": "美能能源",
-        "gap_pct": 7.57,
-        "score": 53.4,
-        "limit_days": 1
-      },
-      {
-        "code": "600234",
-        "name": "科新发展",
-        "gap_pct": 5.21,
-        "score": 47.5,
-        "limit_days": 1
-      },
-      {
-        "code": "605088",
-        "name": "冠盛股份",
-        "gap_pct": 5.36,
+        "code": "002124",
+        "name": "天邦食品",
+        "gap_pct": 7.44,
         "score": 0,
         "limit_days": 1
+      },
+      {
+        "code": "603151",
+        "name": "邦基科技",
+        "gap_pct": 7.28,
+        "score": 0,
+        "limit_days": 1
+      },
+      {
+        "code": "603696",
+        "name": "安记食品",
+        "gap_pct": 6.68,
+        "score": 0,
+        "limit_days": 1
+      },
+      {
+        "code": "000798",
+        "name": "中水渔业",
+        "gap_pct": 5.33,
+        "score": 0,
+        "limit_days": 1
+      },
+      {
+        "code": "601949",
+        "name": "中国出版",
+        "gap_pct": 4.8,
+        "score": 0,
+        "limit_days": 1
+      },
+      {
+        "code": "600354",
+        "name": "敦煌种业",
+        "gap_pct": 4.27,
+        "score": 0,
+        "limit_days": 3
       }
     ]
   },
@@ -620,7 +641,33 @@
         "9%+": 4,
         "<-3%": 4
       }
+    },
+    {
+      "date": "2026-09-07",
+      "total": 42,
+      "buyable": 2,
+      "gap_distribution": {
+        "-3-0%": 14,
+        "<-3%": 5,
+        "0-2%": 12,
+        "9%+": 3,
+        "2-5%": 6,
+        "5-9%": 2
+      }
+    },
+    {
+      "date": "2026-09-07",
+      "total": 72,
+      "buyable": 8,
+      "gap_distribution": {
+        "2-5%": 16,
+        "5-9%": 8,
+        "-3-0%": 18,
+        "9%+": 6,
+        "<-3%": 7,
+        "0-2%": 17
+      }
     }
   ],
-  "last_update": "2026-09-04"
+  "last_update": "2026-09-07"
 }
