@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from backtest_common import parse_window, has_window_args, temp_position
+from backtest_common import parse_window, has_window_args, FIXED_POS
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
@@ -21,7 +21,7 @@ THS_DIR = os.path.join(BASE, 'data', 'zt_pool_history_ths')
 INIT = 200000
 COST = 0.00125   # 滑点+佣金
 FACTORS = ['vr', 'gap', 'board_type', 'cons', 'seal', 'zhaban', 'sector', 'divergence', 'dt_risk', 'turnover']
-CUSTOM_WIN = has_window_args()  # 用户给窗口 → 单窗+温度四档仓位; 缺省=强弱双窗交叉
+CUSTOM_WIN = has_window_args()  # 用户给窗口 → 单窗+A式恒定55%仓位; 缺省=强弱双窗交叉
 
 
 def load_config_v4():
@@ -72,14 +72,14 @@ def main():
     print(f'K线: {len(ktbl)}只')
 
     ths_files = sorted(fn for fn in os.listdir(THS_DIR) if fn.endswith('.json'))
-    # 窗口 (2026-09-04参数化: 用户给--months/--start/--end → 单窗+温度四档仓位)
+    # 窗口 (2026-09-04参数化: 用户给--months/--start/--end → 单窗+A式恒定55%仓位)
     if CUSTOM_WIN:
         WS, WE = parse_window('2025-10-09', '2026-07-24')
         strong_dates = []
         weak_dates = [fn.replace('.json', '') for fn in ths_files
                       if WS.replace('-', '') <= fn.replace('.json', '') <= WE.replace('-', '')]
         all_dates = sorted(weak_dates)
-        print(f'回测日: 自定义窗{WS}~{WE} {len(all_dates)}天 (温度四档仓位)')
+        print(f'回测日: 自定义窗{WS}~{WE} {len(all_dates)}天 (A式恒定55%仓位)')
     else:
         strong_dates = []
         weak_dates = []
@@ -93,7 +93,7 @@ def main():
         print(f'回测日: 强市窗{len(strong_dates)}天 + 弱市窗{len(weak_dates)}天')
 
     # 每日池 + 因子
-    temp_of = {}   # 温度(当日涨停数) — CUSTOM_WIN时用于温度四档仓位
+    temp_of = {}   # 温度(当日涨停数) — A式后仅记录, 不用于仓位(2026-09-07)
     for ymd in all_dates:
         date_fmt = f'{ymd[:4]}-{ymd[4:6]}-{ymd[6:]}'
         with open(os.path.join(THS_DIR, f'{ymd}.json'), encoding='utf-8') as f:
@@ -251,7 +251,7 @@ def main():
                     if not (4.0 <= gap <= 8.0):
                         continue
                     price = kls[idx0]['open'] * (1 + COST)
-                    # pos_pct: 标量(双窗)或 dict{date:仓位}(自定义窗温度四档)
+                    # pos_pct: 标量(双窗)或 dict{date:仓位}(自定义窗A式恒定55%)
                     pct = pos_pct.get(d, 0.5) if isinstance(pos_pct, dict) else pos_pct
                     budget = cash * pct
                     shares = int(min(cash, budget) / price / 100) * 100
@@ -268,10 +268,10 @@ def main():
         return final, trades
 
     def objective(weights):
-        """缺省两窗交叉(强市全仓+弱市半仓) | CUSTOM_WIN=单窗+温度四档仓位; 目标=收益60%+胜率40%"""
+        """缺省两窗交叉(强市全仓+弱市半仓) | CUSTOM_WIN=单窗+A式恒定55%仓位(2026-09-07); 目标=收益60%+胜率40%"""
         if CUSTOM_WIN:
             d_fmt = [f'{y[:4]}-{y[4:6]}-{y[6:]}' for y in all_dates]
-            pos_by_day = {d: temp_position(temp_of.get(d, 0)) for d in d_fmt}
+            pos_by_day = {d: FIXED_POS for d in d_fmt}  # 2026-09-07 A式: 温度不控仓
             final, trades = simulate(weights, d_fmt, pos_by_day)
             ret = (final / INIT - 1) * 100
             wr = sum(1 for t in trades if t['pnl'] > 0) / len(trades) * 100 if trades else 0
@@ -374,14 +374,14 @@ def main():
     out = []
     out.append('=' * 78)
     out.append('V4权重搜索结果 (目标=收益60%+胜率40%'
-               + (f', 自定义窗{WS}~{WE}温度四档仓位)' if CUSTOM_WIN else ', 强市窗+弱市窗交叉)'))
+               + (f', 自定义窗{WS}~{WE}A式恒定55%仓位)' if CUSTOM_WIN else ', 强市窗+弱市窗交叉)'))
     out.append(f'生成: {datetime.now().strftime("%Y-%m-%d %H:%M")}')
     out.append('=' * 78)
     out.append(f'最优目标分: {obj:+.1f}')
     out.append(f'最优权重: ' + ' '.join(f'{k}={w[k]}' for k in FACTORS))
     if CUSTOM_WIN:
         r = results[0]
-        out.append(f'  单窗(温度四档仓位): 收益{r[0]:+.1f}% | 胜率{r[1]:.0f}% | {r[2]}笔 | 期末{r[3]:,.0f}')
+        out.append(f'  单窗(A式恒定55%仓位): 收益{r[0]:+.1f}% | 胜率{r[1]:.0f}% | {r[2]}笔 | 期末{r[3]:,.0f}')
     else:
         for label, r in (('强市窗(全仓)', results[0]), ('弱市窗(半仓)', results[1])):
             out.append(f'  {label}: 收益{r[0]:+.1f}% | 胜率{r[1]:.0f}% | {r[2]}笔 | 期末{r[3]:,.0f}')

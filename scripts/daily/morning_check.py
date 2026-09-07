@@ -145,9 +145,9 @@ def compute_position_decision(pos):
 
 def compute_environment(pf):
     """静默计算市场环境评级+买入开关 (2026-08-20: 供决策摘要先行打印)
-    分档(2026-09-04用户拍板): 极弱<40或最高≤2板=空仓(升温例外半仓) |
-    每10只一档仓位从40%起步(40-49=40%...90-99=90%) | 涨停≥100=全仓
-    降档(任一条触发沿阶梯降一档, 只降一次): 骤降防线 | 竞价二次确认 | 赚钱效应转负
+    A式(2026-09-07用户拍板): 仓位恒定55%, 温度只展示不控仓; 风控交个股层
+    评级: 极弱(<40或最高≤2) / 弱市(40-99) / 强势(≥100)
+    警示(仅展示): 骤降防线 | 竞价二次确认 | 赚钱效应转负
     返回 {env, switch, pos_pct, warming, collapse, zt_n, max_cons, zt_prev, max_cons_prev,
           avg_gap, money_effect, downgraded, downgrade_reason}"""
     r = {'env': None, 'switch': None, 'pos_pct': 0, 'warming': False, 'collapse': False,
@@ -723,13 +723,13 @@ def main():
     if env_info.get('env'):
         print(f'\n  {env_info["env"]}: 昨日涨停{env_info["zt_n"]}只, 最高{env_info["max_cons"]}板'
               + (f', 较前日{env_info["zt_prev"]}只{"回升" if env_info["warming"] else "回落"}' if env_info["zt_prev"] is not None else ''))
-        print(f'  {env_info["switch"]} (仓位由个人交易情况决定, 仅温度建议)')
-        # 三条降档规则状态 (2026-09-03)
+        print(f'  {env_info["switch"]} (2026-09-07 A式: 温度仅展示, 不控仓)')
+        # 三条警示状态 (2026-09-03原降档规则, 2026-09-07 A式起仅展示)
         _dr = env_info.get('downgrade_reason')
         if env_info.get('zt_prev'):
             _dpct = round((env_info['zt_prev'] - env_info['zt_n']) / env_info['zt_prev'] * 100)
             if env_info.get('collapse'):
-                _col_txt = '已降档' if _dr and _dr.startswith('骤降防线') else '触发(开关已关闭)'
+                _col_txt = '⚠警示(仅展示)' if _dr and _dr.startswith('骤降防线') else '触发警示(仅展示)'
                 print(f'  ⚠ 骤降防线: 昨日{env_info["zt_n"]}只 较前日{env_info["zt_prev"]}只 ({-_dpct:+d}%) → {_col_txt}')
             else:
                 print(f'  ✓ 骤降防线: 昨日{env_info["zt_n"]}只 较前日{env_info["zt_prev"]}只 ({-_dpct:+d}%), 未触发')
@@ -738,22 +738,22 @@ def main():
         elif env_info.get('avg_gap') is not None:
             if env_info['avg_gap'] <= -0.5:
                 if _dr and _dr.startswith('竞价二次确认'):
-                    print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5% → 环境降档'
+                    print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5% → ⚠警示(仅展示)'
                           f' (3年724日: 该档当日-2.87%/上涨31%)')
                 else:
                     print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5%'
-                          f' → 触发(开关已关闭或他规则已降档, 不叠加)')
+                          f' → ⚠警示(仅展示, 不降仓)')
             else:
                 print(f'  ✓ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% > -0.5%, 维持评级')
         if env_info.get('me_stale'):
-            print(f'  ⚠ 盘后赚钱效应: 数据日期滞后(未跑盘后流水线), 已跳过转负降档')
+            print(f'  ⚠ 盘后赚钱效应: 数据日期滞后(未跑盘后流水线), 已跳过转负警示')
         elif env_info.get('money_effect') is not None:
             _me = env_info['money_effect']
             if _me < 0 and _dr and _dr.startswith('赚钱效应转负'):
-                print(f'  ⚠ 盘后赚钱效应: 昨日{_me:+.1f}% 转负 → 已降档')
+                print(f'  ⚠ 盘后赚钱效应: 昨日{_me:+.1f}% 转负 → ⚠警示(仅展示, 不降仓)')
             else:
                 _me_mark = '⚠' if _me < 0 else '✓'
-                print(f'  {_me_mark} 盘后赚钱效应: 昨日{_me:+.1f}% (关联最强指标, 转负降档)')
+                print(f'  {_me_mark} 盘后赚钱效应: 昨日{_me:+.1f}% (关联最强指标, 转负警示)')
 
     # ── 📊 表1: 当日可买前三 ──
     top3 = buyable[:3]
@@ -784,10 +784,10 @@ def main():
     elif not top3 and not quick:
         print(f'  (无可买标的)')
 
-    # quick模式: 一行式可买前三 (2026-08-31用户定死: 持仓建议与可买标的必出, 开关关闭也列并标注仅参考)
+    # quick模式: 一行式可买前三 (2026-08-31用户定死: 持仓建议与可买标的必出)
+    # A式(2026-09-07): 仓位恒定55%开关恒开, "仅参考"标注逻辑随之移除
     if quick:
-        _note = '' if env_info.get('pos_pct', 0) > 0 else ' ⚠买入开关关闭, 以下仅参考'
-        print(f'\n  ⚡ 可买前三(quick, gap平滑窗 按综合分排序){_note}:')
+        print(f'\n  ⚡ 可买前三(quick, gap平滑窗 按综合分排序):')
         for i, b in enumerate(top3, 1):
             print(f'    #{i} {b["name"]}({b["code"]}) {b["score"]:.0f}分 '
                   f'gap{b["gap"]:+.1f}% {int(b.get("limit_days") or 1)}板 板块{b["sector"]}只')
