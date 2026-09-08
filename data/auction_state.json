@@ -1,76 +1,89 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 46,
+  "total_sessions": 47,
   "current": {
-    "date": "2026-09-07",
-    "captured": "2026-09-07 09:46:48",
-    "total": 72,
-    "buyable": 8,
-    "avg_gap": 1.85,
+    "date": "2026-09-08",
+    "captured": "2026-09-08 09:25:54",
+    "total": 86,
+    "buyable": 12,
+    "avg_gap": 3.42,
     "gap_distribution": {
-      "2-5%": 16,
-      "5-9%": 8,
-      "-3-0%": 18,
-      "9%+": 6,
-      "<-3%": 7,
-      "0-2%": 17
+      "-3-0%": 8,
+      "9%+": 10,
+      "5-9%": 12,
+      "2-5%": 28,
+      "0-2%": 28
     },
     "buyable_stocks": [
       {
-        "code": "605580",
-        "name": "恒盛能源",
-        "gap_pct": 5.12,
-        "score": 51.5,
-        "limit_days": 2
-      },
-      {
-        "code": "605577",
-        "name": "龙版传媒",
-        "gap_pct": 6.5,
-        "score": 45.7,
-        "limit_days": 5
-      },
-      {
-        "code": "002124",
-        "name": "天邦食品",
-        "gap_pct": 7.44,
-        "score": 0,
-        "limit_days": 1
-      },
-      {
-        "code": "603151",
-        "name": "邦基科技",
-        "gap_pct": 7.28,
-        "score": 0,
-        "limit_days": 1
-      },
-      {
-        "code": "603696",
-        "name": "安记食品",
-        "gap_pct": 6.68,
-        "score": 0,
+        "code": "603118",
+        "name": "共进股份",
+        "gap_pct": 4.02,
+        "score": 67.9,
         "limit_days": 1
       },
       {
         "code": "000798",
         "name": "中水渔业",
-        "gap_pct": 5.33,
-        "score": 0,
+        "gap_pct": 7.26,
+        "score": 67.3,
+        "limit_days": 2
+      },
+      {
+        "code": "002436",
+        "name": "兴森科技",
+        "gap_pct": 6.12,
+        "score": 65.1,
+        "limit_days": 1
+      },
+      {
+        "code": "002980",
+        "name": "华盛昌",
+        "gap_pct": 5.74,
+        "score": 64.8,
+        "limit_days": 1
+      },
+      {
+        "code": "603626",
+        "name": "科森科技",
+        "gap_pct": 5.58,
+        "score": 63.0,
+        "limit_days": 1
+      },
+      {
+        "code": "603696",
+        "name": "安记食品",
+        "gap_pct": 4.15,
+        "score": 58.7,
+        "limit_days": 2
+      },
+      {
+        "code": "600400",
+        "name": "红豆股份",
+        "gap_pct": 6.35,
+        "score": 55.1,
+        "limit_days": 1
+      },
+      {
+        "code": "605577",
+        "name": "龙版传媒",
+        "gap_pct": 6.25,
+        "score": 54.4,
+        "limit_days": 6
+      },
+      {
+        "code": "002815",
+        "name": "崇达技术",
+        "gap_pct": 6.87,
+        "score": 51.7,
         "limit_days": 1
       },
       {
         "code": "601949",
         "name": "中国出版",
-        "gap_pct": 4.8,
-        "score": 0,
-        "limit_days": 1
-      },
-      {
-        "code": "600354",
-        "name": "敦煌种业",
-        "gap_pct": 4.27,
-        "score": 0,
-        "limit_days": 3
+        "gap_pct": 6.08,
+        "score": 50.9,
+        "limit_days": 2
       }
     ]
   },
@@ -667,7 +680,19 @@
         "<-3%": 7,
         "0-2%": 17
       }
+    },
+    {
+      "date": "2026-09-08",
+      "total": 86,
+      "buyable": 12,
+      "gap_distribution": {
+        "-3-0%": 8,
+        "9%+": 10,
+        "5-9%": 12,
+        "2-5%": 28,
+        "0-2%": 28
+      }
     }
   ],
-  "last_update": "2026-09-07"
+  "last_update": "2026-09-08"
 }
