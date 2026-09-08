@@ -1,13 +1,11 @@
 {
- "date": "2026-09-07",
- "ours_n": 86,
- "official_n": 86,
+ "date": "2026-09-08",
+ "ours_n": 70,
+ "official_n": 70,
  "only_ours": [],
  "only_off": [],
- "ld_diff_count": 3,
+ "ld_diff_count": 1,
  "ld_diff_list": [
-  "002708",
-  "002909",
-  "600540"
+  "000560"
  ]
 }

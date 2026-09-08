@@ -307,6 +307,59 @@ def find_divergence_candidates():
 _prev_pool_cache = None
 
 
+def ice_repair_stocks(env_info):
+    """🧊冰点修复信号 (2026-09-08晚用户拍板A+B, 数据裁决: 全样本3220笔分歧信号温度分层)
+    条件: 昨日温度<40(极弱冰点) → 昨池1板分歧票(涨停+大振幅>=10% 且 vr20>=2)为修复候选
+    依据: 极弱分歧段均笔+3.88%/51%胜 (全样本均值+1.37%); 国芳案例=分歧日38只→买入日85只回暖
+    返回 {code: {'vr': float, 'amp': float}} — 仅池内涨停分歧型(龙版型); 断板型(国芳)竞价快照
+    不覆盖, 属已知局限"""
+    if not env_info or env_info.get('zt_n', 100) >= 40:
+        return {}
+    pp = _load_prev_pool()
+    if not pp:
+        return {}
+    stocks, _ = pp
+    # 昨日池文件日期 → 校验K线末bar为同日(防错日评分)
+    from zt_pool import get_prev_pool_file
+    prev_fn = get_prev_pool_file()
+    if not prev_fn:
+        return {}
+    prev_date_fmt = f'{prev_fn[:4]}-{prev_fn[4:6]}-{prev_fn[6:8]}'
+    out = {}
+    for s in stocks:
+        code = str(s.get('code', '')).replace('sh', '').replace('sz', '')
+        if not code or code.startswith(('300', '301', '688', '8', '9')):
+            continue
+        if int(s.get('limit_days', 1) or 1) != 1:
+            continue
+        kp = os.path.join(BASE, 'data', 'kline_data', f'{code}.json')
+        if not os.path.exists(kp):
+            continue
+        try:
+            with open(kp, encoding='utf-8') as f:
+                raw = json.load(f)
+        except UnicodeDecodeError:
+            with open(kp, encoding='gbk') as f:
+                raw = json.load(f)
+        kl = raw.get('data', raw) if isinstance(raw, dict) else raw
+        idx = len(kl) - 1
+        if idx < 21 or str(kl[idx].get('date')) != prev_date_fmt:
+            continue
+        k = kl[idx]
+        pk = kl[idx - 1]
+        if pk['close'] <= 0 or (k['close'] - pk['close']) / pk['close'] < 0.098:
+            continue
+        amp = (k['high'] - k['low']) / pk['close'] * 100
+        if amp < 10:
+            continue
+        vols = [x['volume'] for x in kl[max(0, idx - 20):idx] if x.get('volume', 0) > 0]
+        vr = k['volume'] / (sum(vols) / len(vols)) if vols else 1.0
+        if vr < 2.0:
+            continue
+        out[code] = {'vr': round(vr, 1), 'amp': round(amp, 1)}
+    return out
+
+
 def _load_prev_pool():
     """上一交易日涨停池文件 → (stocks, sector_cnt), 带缓存"""
     global _prev_pool_cache
@@ -508,6 +561,8 @@ def main():
         pos_list = []
     pos_results = [(pos, compute_position_decision(pos)) for pos in pos_list]
     env_info = compute_environment(pf)
+    # ── 🧊 冰点修复信号 (2026-09-08晚用户拍板A+B) ──
+    ice_repair = ice_repair_stocks(env_info)
 
     # ── 持仓V4评分 (2026-08-28, 用户要求: 持仓与其他股票同台比较) ──
     pos_scores = []
@@ -545,6 +600,8 @@ def main():
         print(f'  ║  空仓')
     if env_info.get('env'):
         print(f'  ║  {env_info["switch"]}')
+    if ice_repair:
+        print(f'  ║  🧊 冰点修复: 昨温度{env_info["zt_n"]}只<40, {len(ice_repair)}只1板分歧票综合分×1.2上浮')
     print(f'  ╚══════════════════════════════════════════════╝')
 
     # ── 盘后体检警告 (解释层, 2026-08-19 体检→候选联动) ──
@@ -704,10 +761,13 @@ def main():
             # 现场评分优先(与表2细则同源), 失败则退回快照分/候选分
             final_score = meta['score'] if meta['score'] is not None else \
                 (auction_score if auction_score > 0 else cand_score)
+            _ice = code in ice_repair
             buyable.append({
                 'code': code, 'name': s.get('name', ''),
                 'gap': gap, 'score': final_score,
-                'weighted': final_score * _gw, 'gap_w': _gw,
+                # 冰点修复票综合分×1.2上浮 (2026-09-08拍板: 极弱分歧段均笔+3.88% vs 全样本+1.37%)
+                'weighted': final_score * _gw * (1.2 if _ice else 1.0), 'gap_w': _gw,
+                'ice': _ice,
                 'limit_days': meta['cons'] if meta['cons'] != '?' else s.get('limit_days', cand.get('cons', 1)),
                 'industry': meta['industry'] or cand.get('industry', ''),
                 'sector': meta['sector'],
@@ -757,6 +817,16 @@ def main():
 
     # ── 📊 表1: 当日可买前三 ──
     top3 = buyable[:3]
+    # 🧊 冰点修复信号明细 (2026-09-08拍板: 只提示, 加权见排序)
+    if ice_repair and not quick:
+        print(f'\n  🧊 冰点修复信号 (昨温度<40, 依据: 极弱分歧段均笔+3.88% vs 全样本+1.37%, 2026-09-08数据裁决)')
+        for _ic, _iv in ice_repair.items():
+            _nm = next((st.get('name', '?') for st in auction_stocks if st.get('code') == _ic), '?')
+            _gap_v = next((st.get('gap_pct') for st in auction_stocks if st.get('code') == _ic), None)
+            _in_top = any(b['code'] == _ic for b in top3)
+            _gap_s = f'{_gap_v:+.1f}%' if _gap_v is not None else '?'
+            print(f'     {_nm}({_ic}) vr{_iv["vr"]} 振幅{_iv["amp"]}% 竞价gap{_gap_s}'
+                  + ('  ✓进可买Top3(已×1.2加权)' if _in_top else '  (未进Top3, 仅提示)'))
     if not quick:
         print(f'\n{"=" * 65}')
         print(f'  📊 表1: 当日可买前三 (gap平滑窗4-8%±1%边缘带, 按综合分=评分×gap权重排序, 已过滤一字/4板+一字/300·688)')
@@ -779,7 +849,8 @@ def main():
                 _dt_p, _dt_risk = 10.7, -0.42
             _dt_mark = '🔴' if _dt_p >= 20 else ('🟡' if _dt_p >= 10 else '⚪')
             _dt_str = f'{_dt_mark}{_dt_p:.0f}%({_dt_risk:+.2f})'
-            print(f'  {i:<3}{b["name"]}({b["code"]}){b["score"]:>8.0f}{b["gap"]:>+7.1f}%'
+            _ice_tag = '🧊' if b.get('ice') else ''
+            print(f'  {i:<3}{_ice_tag}{b["name"]}({b["code"]}){b["score"]:>8.0f}{b["gap"]:>+7.1f}%'
                   f'{str(_cons) + "板":>6}{str(b["sector"]) + "只":>6}{_dt_str:>14}')
     elif not top3 and not quick:
         print(f'  (无可买标的)')
@@ -789,7 +860,8 @@ def main():
     if quick:
         print(f'\n  ⚡ 可买前三(quick, gap平滑窗 按综合分排序):')
         for i, b in enumerate(top3, 1):
-            print(f'    #{i} {b["name"]}({b["code"]}) {b["score"]:.0f}分 '
+            _ice_tag = '🧊' if b.get('ice') else ''
+            print(f'    #{i} {_ice_tag}{b["name"]}({b["code"]}) {b["score"]:.0f}分 '
                   f'gap{b["gap"]:+.1f}% {int(b.get("limit_days") or 1)}板 板块{b["sector"]}只')
         if not top3:
             print('    (无可买标的)')
