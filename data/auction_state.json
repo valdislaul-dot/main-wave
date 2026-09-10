@@ -1,76 +1,90 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 48,
+  "total_sessions": 49,
   "current": {
-    "date": "2026-09-09",
-    "captured": "2026-09-09 09:25:36",
-    "total": 70,
-    "buyable": 8,
-    "avg_gap": 2.33,
+    "date": "2026-09-10",
+    "captured": "2026-09-10 09:25:39",
+    "total": 48,
+    "buyable": 10,
+    "avg_gap": 2.82,
     "gap_distribution": {
-      "-3-0%": 15,
-      "2-5%": 17,
-      "0-2%": 19,
+      "-3-0%": 11,
       "9%+": 7,
-      "<-3%": 6,
-      "5-9%": 6
+      "5-9%": 8,
+      "<-3%": 4,
+      "2-5%": 8,
+      "0-2%": 10
     },
     "buyable_stocks": [
       {
-        "code": "600880",
-        "name": "博瑞传播",
-        "gap_pct": 4.37,
-        "score": 76.2,
+        "code": "603162",
+        "name": "海通发展",
+        "gap_pct": 5.83,
+        "score": 53.9,
+        "limit_days": 3
+      },
+      {
+        "code": "605198",
+        "name": "安德利",
+        "gap_pct": 4.64,
+        "score": 46.3,
         "limit_days": 1
       },
       {
-        "code": "603938",
-        "name": "三孚股份",
-        "gap_pct": 5.49,
-        "score": 72.4,
+        "code": "000972",
+        "name": "中基健康",
+        "gap_pct": 7.78,
+        "score": 43.1,
         "limit_days": 1
       },
       {
-        "code": "000020",
-        "name": "深华发A",
-        "gap_pct": 4.89,
-        "score": 47.4,
+        "code": "600192",
+        "name": "长城电工",
+        "gap_pct": 4.82,
+        "score": 42.4,
+        "limit_days": 1
+      },
+      {
+        "code": "600403",
+        "name": "大有能源",
+        "gap_pct": 5.88,
+        "score": 41.5,
+        "limit_days": 1
+      },
+      {
+        "code": "603900",
+        "name": "莱绅通灵",
+        "gap_pct": 4.97,
+        "score": 41.1,
         "limit_days": 1
       },
       {
         "code": "000980",
         "name": "众泰汽车",
-        "gap_pct": 5.43,
-        "score": 44.1,
-        "limit_days": 1
+        "gap_pct": 6.93,
+        "score": 39.0,
+        "limit_days": 2
       },
       {
-        "code": "002068",
-        "name": "黑猫股份",
-        "gap_pct": 6.04,
-        "score": 42.8,
-        "limit_days": 1
+        "code": "000759",
+        "name": "中百集团",
+        "gap_pct": 5.67,
+        "score": 33.8,
+        "limit_days": 3
       },
       {
-        "code": "600691",
-        "name": "潞化科技",
-        "gap_pct": 4.17,
-        "score": 42.6,
-        "limit_days": 1
-      },
-      {
-        "code": "002349",
-        "name": "精华制药",
-        "gap_pct": 4.63,
-        "score": 42.4,
-        "limit_days": 1
+        "code": "000930",
+        "name": "中粮科技",
+        "gap_pct": 6.71,
+        "score": 0,
+        "limit_days": 2
       },
       {
         "code": "605077",
         "name": "华康股份",
-        "gap_pct": 4.55,
+        "gap_pct": 4.5,
         "score": 0,
-        "limit_days": 1
+        "limit_days": 2
       }
     ]
   },
@@ -692,7 +706,20 @@
         "<-3%": 6,
         "5-9%": 6
       }
+    },
+    {
+      "date": "2026-09-10",
+      "total": 48,
+      "buyable": 10,
+      "gap_distribution": {
+        "-3-0%": 11,
+        "9%+": 7,
+        "5-9%": 8,
+        "<-3%": 4,
+        "2-5%": 8,
+        "0-2%": 10
+      }
     }
   ],
-  "last_update": "2026-09-09"
+  "last_update": "2026-09-10"
 }
