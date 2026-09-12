@@ -1,90 +1,41 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 49,
+  "total_sessions": 50,
   "current": {
-    "date": "2026-09-10",
-    "captured": "2026-09-10 09:25:39",
-    "total": 48,
-    "buyable": 10,
-    "avg_gap": 2.82,
+    "date": "2026-09-11",
+    "captured": "2026-09-11 09:25:33",
+    "total": 34,
+    "buyable": 3,
+    "avg_gap": 1.24,
     "gap_distribution": {
-      "-3-0%": 11,
-      "9%+": 7,
-      "5-9%": 8,
-      "<-3%": 4,
-      "2-5%": 8,
-      "0-2%": 10
+      "-3-0%": 12,
+      "<-3%": 6,
+      "0-2%": 2,
+      "2-5%": 6,
+      "9%+": 5,
+      "5-9%": 3
     },
     "buyable_stocks": [
       {
-        "code": "603162",
-        "name": "海通发展",
-        "gap_pct": 5.83,
-        "score": 53.9,
-        "limit_days": 3
-      },
-      {
-        "code": "605198",
-        "name": "安德利",
-        "gap_pct": 4.64,
-        "score": 46.3,
-        "limit_days": 1
-      },
-      {
-        "code": "000972",
-        "name": "中基健康",
-        "gap_pct": 7.78,
-        "score": 43.1,
-        "limit_days": 1
-      },
-      {
-        "code": "600192",
-        "name": "长城电工",
-        "gap_pct": 4.82,
-        "score": 42.4,
-        "limit_days": 1
-      },
-      {
-        "code": "600403",
-        "name": "大有能源",
-        "gap_pct": 5.88,
-        "score": 41.5,
-        "limit_days": 1
-      },
-      {
-        "code": "603900",
-        "name": "莱绅通灵",
-        "gap_pct": 4.97,
-        "score": 41.1,
-        "limit_days": 1
-      },
-      {
-        "code": "000980",
-        "name": "众泰汽车",
-        "gap_pct": 6.93,
-        "score": 39.0,
+        "code": "600359",
+        "name": "新农开发",
+        "gap_pct": 7.68,
+        "score": 45.3,
         "limit_days": 2
       },
       {
-        "code": "000759",
-        "name": "中百集团",
-        "gap_pct": 5.67,
-        "score": 33.8,
-        "limit_days": 3
+        "code": "603318",
+        "name": "水发燃气",
+        "gap_pct": 6.28,
+        "score": 43.5,
+        "limit_days": 1
       },
       {
-        "code": "000930",
-        "name": "中粮科技",
-        "gap_pct": 6.71,
-        "score": 0,
-        "limit_days": 2
-      },
-      {
-        "code": "605077",
-        "name": "华康股份",
-        "gap_pct": 4.5,
-        "score": 0,
-        "limit_days": 2
+        "code": "600876",
+        "name": "凯盛新能",
+        "gap_pct": 7.08,
+        "score": 42.9,
+        "limit_days": 1
       }
     ]
   },
@@ -719,7 +670,20 @@
         "2-5%": 8,
         "0-2%": 10
       }
+    },
+    {
+      "date": "2026-09-11",
+      "total": 34,
+      "buyable": 3,
+      "gap_distribution": {
+        "-3-0%": 12,
+        "<-3%": 6,
+        "0-2%": 2,
+        "2-5%": 6,
+        "9%+": 5,
+        "5-9%": 3
+      }
     }
   ],
-  "last_update": "2026-09-10"
+  "last_update": "2026-09-11"
 }
