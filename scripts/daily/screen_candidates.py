@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scoring import (
-    score_v4, load_config as load_scoring_config,
+    score_active, load_config as load_scoring_config,
     get_buy_window,
     load_config, sector_resonance_count,
 )
@@ -170,7 +170,7 @@ def main():
             'sector_bucket': _sector_bucket_map.get(s['industry'], '<3'),
         }
 
-        score, details = score_v4(code, klines, details_raw)
+        score, details = score_active(code, klines, details_raw)
         if score is None:
             score_fail += 1
             kl = klines.get('data', klines) if isinstance(klines, dict) else klines

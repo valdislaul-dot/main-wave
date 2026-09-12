@@ -485,8 +485,8 @@ def stock_scoring_meta(code):
         except Exception:
             pass
         if meta['klines']:
-            from scoring import score_v4
-            sc, _ = score_v4(code, meta['klines'], meta['detail'] or {})
+            from scoring import score_active
+            sc, _ = score_active(code, meta['klines'], meta['detail'] or {})
             if sc is None:
                 # 末日非涨停(断板持仓) → 截取至最近一次涨停日打分(与池内口径一致)
                 _kl = meta['klines']
@@ -499,12 +499,54 @@ def stock_scoring_meta(code):
                         _idx = i
                         break
                 if _idx is not None and _idx >= 25:
-                    sc, _ = score_v4(code, _kl[:_idx + 1], meta['detail'] or {})
+                    sc, _ = score_active(code, _kl[:_idx + 1], meta['detail'] or {})
             meta['score'] = sc
     except Exception:
         pass
     _meta_cache[code] = meta
     return meta
+
+
+def today_top1_code():
+    """当日可买第1名代码 (与表1同源: 竞价池 + gap平滑窗 + 现场V3评分 + 冰点上浮)
+
+    用途(2026-09-12 用户拍板): 若当日Top1仍是已持仓的票 → 不触发卖出, 继续持有
+    (例: 09-07买龙版传媒, 09-08 Top1仍是它 → 不卖不买, 持仓延续)
+    """
+    try:
+        from scoring import gap_weight as _gw
+        _f = os.path.join(BASE, 'data', 'auction',
+                          datetime.now().strftime('%Y-%m-%d') + '.json')
+        if not os.path.exists(_f):
+            return None
+        auc = json.load(open(_f, encoding='utf-8')).get('stocks', [])
+    except Exception:
+        return None
+    try:
+        _ice = set((ice_repair_stocks(compute_environment(None)) or {}).keys())
+    except Exception:
+        _ice = set()
+    best, best_w = None, -1e9
+    for s in auc:
+        code = str(s.get('code', '')).zfill(6)
+        gap = s.get('gap_pct', 0)
+        if not code or code.startswith(('300', '301', '688', '8', '9')):
+            continue
+        if s.get('one_line') or s.get('high_risk'):
+            continue
+        w = _gw(gap)
+        if w <= 0:
+            continue
+        try:
+            meta = stock_scoring_meta(code)
+        except Exception:
+            continue
+        if not meta or meta.get('score') is None:
+            continue
+        sc = meta['score'] * w * (1.2 if code in _ice else 1.0)
+        if sc > best_w:
+            best_w, best = sc, code
+    return best
 
 
 def main():
@@ -560,6 +602,22 @@ def main():
     else:
         pos_list = []
     pos_results = [(pos, compute_position_decision(pos)) for pos in pos_list]
+
+    # ── 规则: 当日Top1仍是已持仓的票 → 不触发卖出, 继续持有 (2026-09-12用户拍板) ──
+    # 例: 09-07买龙版传媒, 09-08 Top1仍是它 → 不卖也不重复买, 持仓延续
+    _t1 = today_top1_code()
+    if _t1:
+        _new = []
+        for _pos, _r in pos_results:
+            if (_r and _r.get('signal')
+                    and str(_pos.get('code', '')).zfill(6) == _t1
+                    and _r['signal'].get('action') in ('sell', 'sell_half')):
+                _r['signal'] = {'action': 'hold', 'urgency': 'normal',
+                                'reason': f'当日V3 Top1仍是它({_pos.get("name","")}) → 继续持有',
+                                'reference_price': _r['signal'].get('reference_price', 0),
+                                'detail': '2026-09-12拍板: 模型连续选中同一标的时不触发卖出'}
+            _new.append((_pos, _r))
+        pos_results = _new
     env_info = compute_environment(pf)
     # ── 🧊 冰点修复信号 (2026-09-08晚用户拍板A+B) ──
     ice_repair = ice_repair_stocks(env_info)
@@ -876,14 +934,15 @@ def main():
         for b in top3:
             meta = stock_scoring_meta(b['code'])
             if meta['klines'] and meta['detail']:
-                from scoring import score_v4
-                _sc4, _det4 = score_v4(b['code'], meta['klines'], meta['detail'])
+                from scoring import score_active
+                _sc4, _det4 = score_active(b['code'], meta['klines'], meta['detail'])
                 if _det4:
                     print(f'  {b["name"]}({b["code"]})  {_sc4:.0f}分')
-                    _f = _det4['factor_scores']
-                    _w = _cfg2['v4']['weights']
-                    print(f'    ' + '  '.join(
-                        f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
+                    _f = _det4.get('factor_scores') or {}
+                    _w = (_cfg2.get('v4') or {}).get('weights', {})
+                    if _f and _w:
+                        print(f'    ' + '  '.join(
+                            f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
 
     # ── 📊 表4: 持仓评分对比 (2026-08-28, 持仓与可买池同台比较) ──
     if pos_scores:

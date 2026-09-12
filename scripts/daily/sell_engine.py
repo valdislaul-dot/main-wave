@@ -308,6 +308,27 @@ def sell_signal(position, today_auction, config=None):
                     f'硬止损: 浮亏{loss_pct:+.1f}% ≤ {hard_stop:+.0f}% — 无条件卖出',
                     current_price)
 
+    # ══════════════════════════════════════════════════════════════
+    # A式出场 (2026-09-12 用户拍板: "出场用你的那个")
+    # 规则: 买入后次日起 —— 挂涨停价限价卖; 封板则成交在涨停价(当日最高),
+    #       未封板则盘中择机卖(70%(H+O)/2+30%收), 14:45 市价兜底。
+    # 硬止损 -10% 已在上方优先处理, 此处不重复。
+    # 依据: 同模拟器 V3选股+A式出场 22笔 均+1.05%/胜率59%;
+    #       换"轮换日开盘价卖"同批票仅 -1.20%/45% —— 出场价差 2.25pt/笔。
+    # 回滚: 把 scoring_config.json 的 sell_a_style.enabled 改 false 即回到决策树。
+    # ══════════════════════════════════════════════════════════════
+    if bool((config or {}).get('sell_a_style', {}).get('enabled', False)):
+        _lim = round(prev_close * 1.1, 2) if prev_close else None
+        if _lim and auction_price and auction_price >= _lim - 0.005:
+            return _signal('sell', 'urgent',
+                f'A式: 开盘即涨停({auction_price}) → 挂涨停价成交',
+                auction_price, 'A式出场(2026-09-12定稿)')
+        return _signal('sell', 'normal',
+            f'A式: 不在竞价卖 → 盘中挂涨停价限价卖(涨停价{_lim})',
+            auction_price,
+            '封板则成交在涨停价(当日最高); 未封则盘中择机卖[70%(H+O)/2+30%收]; 14:45市价兜底',
+        )
+
     # 前日量能 (T-2)
     prev_day_idx = yesterday_idx - 1
     prev_vol = klines[prev_day_idx].get('volume', 0) if prev_day_idx >= 0 else 0

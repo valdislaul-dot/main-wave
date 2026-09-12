@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import morning_check as mc
 import job_lock
-from scoring import load_config, compute_score, score_v4, gap_weight
+from scoring import load_config, compute_score, score_active, gap_weight
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
@@ -235,7 +235,7 @@ if zt_stocks:
         }
         try:
             # V4评分(2026-08-26起GUI切换到v4, v3配置已移除)
-            score, det = score_v4(code, kls, details)
+            score, det = score_active(code, kls, details)
         except Exception:
             continue
         if score is None or det is None:

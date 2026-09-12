@@ -489,6 +489,13 @@ def score_v4(code, klines, details_raw=None, config=None):
     pdb, today_dt = result
     t1 = pdb[today_dt]
 
+    # V5 (2026-09-12): 近5日涨幅因子 (从K线自算, 无需调用方传参)
+    _ds = sorted(pdb.keys())
+    _i = _ds.index(today_dt) if today_dt in _ds else -1
+    ret5 = None
+    if _i >= 5 and pdb[_ds[_i - 5]].get('close'):
+        ret5 = (t1['close'] / pdb[_ds[_i - 5]]['close'] - 1) * 100
+
     # 活跃度过滤(与v3一致)
     from datetime import timedelta
     cutoff = (datetime.strptime(today_dt, '%Y-%m-%d') - timedelta(days=365)).strftime('%Y-%m-%d')
@@ -522,6 +529,16 @@ def score_v4(code, klines, details_raw=None, config=None):
     # 2026-09-03修复: 题材数据缺失不得默认最高档(85分虚高14.7), 诚实低档
     sec_b = str(details_raw.get('sector_bucket', '<3'))
     div_b = '分歧' if (zh >= 1 and vr >= 1.5) else '非分歧'
+    # V5 新增: 流通市值(亿) / 近5日涨幅
+    try:
+        _fc = float(details_raw.get('float_cap', 0) or 0)
+    except Exception:
+        _fc = 0
+    _mc = _fc / 1e8 if _fc > 1e6 else _fc          # 兼容"元"与"亿"两种传入
+    mc_b = '缺失' if _mc <= 0 else ('<30亿' if _mc < 30 else '30-60亿' if _mc < 60
+                                   else '60-150亿' if _mc < 150 else '>=150亿')
+    r5_b = '缺失' if ret5 is None else ('<5%' if ret5 < 5 else '5-15%' if ret5 < 15
+                                        else '15-30%' if ret5 < 30 else '>=30%')
     if cons >= 3:
         dt_p = 30.5
     elif cons == 2:
@@ -549,12 +566,46 @@ def score_v4(code, klines, details_raw=None, config=None):
         'divergence': norm['divergence'].get(div_b, 55),
         'dt_risk': max(10, min(100, 100 - (dt_p - 5) * 3)),
         'turnover': norm.get('turnover', {}).get(to_b, 50),
+        'mktcap': norm.get('mktcap', {}).get(mc_b, 50),
+        'ret5': norm.get('ret5', {}).get(r5_b, 50),
     }
     score = sum(weights[k] * f[k] for k in weights if k in f) / 100.0
     det = {'score': round(score, 1), 'factor_scores': f, 'cons': cons,
            'vr': round(vr, 2), 'gap': round(gap, 2), 'board_type': board_type,
            'dt_p': dt_p}
     return round(score, 1), det
+
+
+def score_active(code, klines, details_raw=None, config=None):
+    """按 config['active'] 分派评分 (2026-09-12 恢复V3为生产评分)
+
+    V3 恢复依据(同模拟器/同买入窗/同出场, 2026-08-26~09-11 共13个交易日):
+      V3: 封板率30.8% 均收益+1.59% 胜率70% 累计+15.92%
+      V4: 封板率23.1% 均收益-0.08% 胜率36% 累计 -0.92%
+      实际推荐(对照): 封板率18.2% 均收益-3.71%
+    另有独立证据(2026-07-24~09-11 同日对照): 老版本时段 全池基率20.6%/模型选中53.3%,
+    V4时段 全池基率22.9%/模型选中18.2% —— 池子质量相当, 是选股逻辑差异。
+
+    返回 (score, details); details 已归一化, 保证 board_type/cons/vr/gap/factor_scores/dt_p 齐备。
+    """
+    if config is None:
+        config = load_config()
+    ver = str(config.get('active', 'v4')).lower()
+    if ver == 'v3':
+        sc, det = compute_score(code, klines, details_raw, 'v3', config)
+        if sc is None:
+            return None, None
+        det = dict(det or {})
+        _ol = bool(det.get('one_line'))
+        _t1 = bool(det.get('true_one_line'))
+        det['board_type'] = '一字' if _t1 else ('T字' if _ol else '换手')
+        det['vr'] = det.get('vr20', det.get('vr', 1))
+        det.setdefault('cons', 1)
+        det.setdefault('gap', 0)
+        det.setdefault('factor_scores', {})
+        det.setdefault('dt_p', 0)
+        return sc, det
+    return score_v4(code, klines, details_raw, config)
 
 
 def score_to_prob(score, config=None):

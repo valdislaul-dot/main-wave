@@ -409,36 +409,12 @@ def main():
     if CUSTOM_WIN:
         print('\n(自定义窗口模式: 不写回 scoring_config / weight_history)')
         return
-    cfg_path = os.path.join(BASE, 'data', 'scoring_config.json')
-    with open(cfg_path, encoding='utf-8') as f:
-        cfg = json.load(f)
-    prev_obj = cfg.get('v4', {}).get('searched_obj')
-    cfg['v4']['weights'] = w
-    cfg['v4']['searched_obj'] = round(obj, 1)
-    with open(cfg_path, 'w', encoding='utf-8') as f:
-        json.dump(cfg, f, ensure_ascii=False, indent=2)
-    print('\n最优权重已写回 scoring_config.json v4.weights')
-
-    # 2026-09-01起: 每次月度重搜后记录到权重历史 (data/weight_history.json, 供查找对比)
-    hist_path = os.path.join(BASE, 'data', 'weight_history.json')
-    hist = []
-    if os.path.exists(hist_path):
-        try:
-            with open(hist_path, encoding='utf-8') as f:
-                hist = json.load(f)
-        except Exception:
-            hist = []
-    hist.append({
-        'date': datetime.now().strftime('%Y-%m-%d'),
-        'prev_obj': prev_obj,
-        'obj': round(obj, 1),
-        'weights': dict(w),
-        'strong': {'ret': round(results[0][0], 1), 'win_rate': round(results[0][1], 1), 'trades': results[0][2]},
-        'weak': {'ret': round(results[1][0], 1), 'win_rate': round(results[1][1], 1), 'trades': results[1][2]},
-    })
-    with open(hist_path, 'w', encoding='utf-8') as f:
-        json.dump(hist, f, ensure_ascii=False, indent=2)
-    print(f'权重历史已记录: data/weight_history.json ({len(hist)}次)')
+    # 2026-09-12 用户拍板「后续选股只用老版本(V3)」→ 本脚本不再写回定稿配置与权重历史。
+    # 原逻辑(已删): 把重搜出的权重写进 scoring_config.json 的 v4.weights + 追加 weight_history.json。
+    # 保留本脚本作为纯研究工具: 照常跑搜索、照常打印结果、照常写 logs/backtest_v4_weights.txt。
+    print('\n[已停用] 权重写回 scoring_config.json / weight_history.json —— '
+          '2026-09-12 起选股只用 V3(active=v3), V4权重重搜不再作为定稿依据。')
+    print('           结果仅打印并存入 logs/backtest_v4_weights.txt (研究参考)。')
 
 
 def show_history():
