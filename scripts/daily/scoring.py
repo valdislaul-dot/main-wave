@@ -322,6 +322,7 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         return None, None  # 近1年涨停<2次, 不纳入候选
 
     score = 0.0
+    bd = {}  # 分项明细(2026-09-13: 供竞价面板表2还原V3累加制得分; 只记录不参与计算)
     tables = config['tables'][version]
 
     # -------- 量比 --------
@@ -332,48 +333,54 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         vr = t1['vol_ratio20']
 
     if tables.get('vr_mode') == 'linear':
-        score += piecewise_linear(vr, tables['vr_anchors'])
+        bd['vr'] = piecewise_linear(vr, tables['vr_anchors'])
     else:
-        score += step_score_asc(vr, tables['vr_tiers'])
+        bd['vr'] = step_score_asc(vr, tables['vr_tiers'])
+    score += bd['vr']
 
     # -------- Gap --------
     g = t1['gap_open_pct']
     if tables.get('gap_mode') == 'linear':
-        score += piecewise_linear(g, tables['gap_anchors'])
+        bd['gap'] = piecewise_linear(g, tables['gap_anchors'])
     else:
-        score += step_score_desc(g, tables['gap_tiers'])
+        bd['gap'] = step_score_desc(g, tables['gap_tiers'])
+    score += bd['gap']
 
     # -------- 一字板 --------
     if t1.get('is_one_line', False):
         if abs(t1['high'] - t1['low']) < 0.001:
-            score += config['one_line_score']['true_one']
+            bd['one_line'] = config['one_line_score']['true_one']
         else:
-            score += config['one_line_score']['t_board']
+            bd['one_line'] = config['one_line_score']['t_board']
+        score += bd['one_line']
 
     # -------- 连板 --------
     # 按具体连板数给分
     if cons == 0:
-        score += config['cons_score']['first']
+        bd['cons'] = config['cons_score']['first']
     elif cons == 1:
-        score += config['cons_score']['2']
+        bd['cons'] = config['cons_score']['2']
     elif cons == 2:
-        score += config['cons_score']['3']
+        bd['cons'] = config['cons_score']['3']
     elif cons == 3:
-        score += config['cons_score']['4']
+        bd['cons'] = config['cons_score']['4']
     elif cons == 4:
-        score += config['cons_score']['5']
+        bd['cons'] = config['cons_score']['5']
     else:
-        score += config['cons_score']['6plus']
+        bd['cons'] = config['cons_score']['6plus']
+    score += bd['cons']
 
     # -------- 周几 --------
     tomorrow = datetime.strptime(today_dt, '%Y-%m-%d') + timedelta(days=1)
     while tomorrow.weekday() >= 5:
         tomorrow = tomorrow + timedelta(days=1)
     dow = tomorrow.weekday()
+    bd['dow'] = 0
     if dow == 0:
-        score += config['dow_score']['monday']
+        bd['dow'] = config['dow_score']['monday']
     elif dow == 4:
-        score += config['dow_score']['friday']
+        bd['dow'] = config['dow_score']['friday']
+    score += bd['dow']
 
     # -------- 封板时间 --------
     if details_raw is None:
@@ -386,36 +393,41 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
             hh = int(st_clean[:2])
             mm = int(st_clean[2:4])
             mins = max(0, (hh - 9) * 60 + mm - 30)  # 距9:30分钟数
-            score += step_score_asc(mins, config['seal_time_tiers'])
+            bd['seal_time'] = step_score_asc(mins, config['seal_time_tiers'])
+            score += bd['seal_time']
         except:
             pass
 
     # -------- 炸板 --------
     zhaban = details_raw.get('zhaban', 0)
     final_seal = details_raw.get('final_seal_time', seal_time)
+    _zb = 0.0
     if zhaban > 0:
         try:
             fst = int(final_seal.replace(':', '')[:4]) if final_seal and final_seal != '?' else 1500
             vr20_val = t1.get('vol_ratio20', 2)
             zb_cfg = config['zhaban']
             if fst <= zb_cfg['early_reseal'][0]:
-                score -= zhaban * zb_cfg['early_reseal'][1]
+                _zb = zhaban * zb_cfg['early_reseal'][1]
             elif fst <= zb_cfg['mid_reseal'][0]:
-                score -= zhaban * zb_cfg['mid_reseal'][1]
+                _zb = zhaban * zb_cfg['mid_reseal'][1]
             else:
                 if vr20_val < zb_cfg['late_vol_low'][0]:
-                    score -= zhaban * zb_cfg['late_vol_low'][1]
+                    _zb = zhaban * zb_cfg['late_vol_low'][1]
                 elif vr20_val < zb_cfg['late_vol_mid'][0]:
-                    score -= zhaban * zb_cfg['late_vol_mid'][1]
+                    _zb = zhaban * zb_cfg['late_vol_mid'][1]
                 else:
-                    score -= zhaban * zb_cfg['late_vol_high'][1]
+                    _zb = zhaban * zb_cfg['late_vol_high'][1]
         except:
-            score -= zhaban * config['zhaban']['fallback']
+            _zb = zhaban * config['zhaban']['fallback']
+        bd['zhaban'] = -_zb
+        score += bd['zhaban']
 
     # -------- 板块共振 --------
     sector_count = details_raw.get('sector_count', 1)
     for thresh, val in config['sector_tiers']:
         if sector_count >= thresh:
+            bd['sector'] = val
             score += val
             break
 
@@ -438,6 +450,7 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         if seal_weak and t1.get('vol_class') == 'heavy' and prev_vol_ratio >= div_cfg.get('prev_day_vol_min', 1.5):
             # 板块效应=必要条件: 有板块给满额, 无板块只给象征分
             div_bonus = div_cfg.get('bonus', 15) if sector_count >= 2 else div_cfg.get('no_sector_bonus', 4)
+            bd['divergence'] = div_bonus
             score += div_bonus
 
     score = round(score, 2)
@@ -453,7 +466,8 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         't2_lu': False,
         'tomorrow_dow': dow,
         'divergence': div_bonus,
-        'vol_class': t1.get('vol_class', 'normal')
+        'vol_class': t1.get('vol_class', 'normal'),
+        'v3_breakdown': bd,
     }
 
     return score, details

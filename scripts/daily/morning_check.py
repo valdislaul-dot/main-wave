@@ -792,9 +792,15 @@ def main():
             candidate_scores[c['code']] = c
 
     # ── 今日竞价池买入候选（现场打分, 解决流水线评分盲区） ──
-    from scoring import gap_weight as _gw_fn
+    from scoring import gap_weight as _gw_fn, load_config as _lc_ver
     buyable = []
     _stale_cnt = 0
+    # 评分量纲守卫(2026-09-13): 快照/候选分由盘后流水线按当时active写入,
+    # 与现行active版本不符时(如候选是V4分而现行是V3)禁止兜底, 防旧量纲分污染排序
+    _active_ver = str((_lc_ver() or {}).get('active', 'v4')).lower()
+    _cand_ver = str((data or {}).get('version', '')).lower()
+    _ver_ok = bool(_cand_ver) and _cand_ver == _active_ver
+    _unit_cnt = 0
     for s in auction_stocks:
         code = s.get('code', '')
         gap = s.get('gap_pct', 0)
@@ -807,7 +813,7 @@ def main():
         # 4板+一字/T字高危过滤 (2026-09-03修复: 定稿2026-08-24裁决, T字次日开盘买入-1.17%)
         if int(cand.get('cons', 0) or 0) >= 4 and cand.get('one_line', False):
             continue
-        # gap平滑窗口 (2026-09-04拍板: 3-4%/8-9%边缘带衰减, 4-8%核心, 带外=0)
+        # gap窗口 (2026-09-13改硬边界4-8%: 对齐v3_sim_hold.py模拟口径; V3负分域乘法会反转)
         _gw = _gw_fn(gap)
         if _gw > 0:
             meta = stock_scoring_meta(code)
@@ -816,9 +822,15 @@ def main():
                 continue
             auction_score = s.get('score', 0)
             cand_score = cand.get('score', 0)
-            # 现场评分优先(与表2细则同源), 失败则退回快照分/候选分
-            final_score = meta['score'] if meta['score'] is not None else \
-                (auction_score if auction_score > 0 else cand_score)
+            # 现场评分优先(与表2细则同源)
+            if meta['score'] is not None:
+                final_score = meta['score']
+            elif _ver_ok:
+                # 兜底仅同量纲时启用(见循环前守卫说明)
+                final_score = auction_score if auction_score > 0 else cand_score
+            else:
+                _unit_cnt += 1
+                continue
             _ice = code in ice_repair
             buyable.append({
                 'code': code, 'name': s.get('name', ''),
@@ -835,6 +847,9 @@ def main():
 
     if _stale_cnt:
         print(f'  ⚠ K线滞后跳过 {_stale_cnt} 只候选(未覆盖T-1涨停bar, 防错日评分)')
+    if _unit_cnt:
+        _cv = _cand_ver or '?'
+        print(f'  ⚠ 量纲不符跳过 {_unit_cnt} 只(快照分版本"{_cv}"≠现行"{_active_ver}", 防旧分污染排序)')
     buyable.sort(key=lambda x: x['weighted'], reverse=True)
 
     # ── 🌡️ 市场环境评级详情 (结论已在摘要, 此处解释) ──
@@ -887,7 +902,7 @@ def main():
                   + ('  ✓进可买Top3(已×1.2加权)' if _in_top else '  (未进Top3, 仅提示)'))
     if not quick:
         print(f'\n{"=" * 65}')
-        print(f'  📊 表1: 当日可买前三 (gap平滑窗4-8%±1%边缘带, 按综合分=评分×gap权重排序, 已过滤一字/4板+一字/300·688)')
+        print(f'  📊 表1: 当日可买前三 (gap硬边界4-8%, 按{"V3" if _active_ver == "v3" else "V4"}评分排序, 已过滤一字/4板+一字/300·688)')
         print(f'{"=" * 65}')
     if top3 and not quick:
         print(f'  {"#":<3}{"标的":<14}{"评分":>6}{"竞价gap":>8}{"连板":>5}{"板块":>9}{"⚠跌停风险":>10}')
@@ -916,7 +931,7 @@ def main():
     # quick模式: 一行式可买前三 (2026-08-31用户定死: 持仓建议与可买标的必出)
     # A式(2026-09-07): 仓位恒定55%开关恒开, "仅参考"标注逻辑随之移除
     if quick:
-        print(f'\n  ⚡ 可买前三(quick, gap平滑窗 按综合分排序):')
+        print(f'\n  ⚡ 可买前三(quick, gap硬边界4-8%, 按{"V3" if _active_ver == "v3" else "V4"}评分排序):')
         for i, b in enumerate(top3, 1):
             _ice_tag = '🧊' if b.get('ice') else ''
             print(f'    #{i} {_ice_tag}{b["name"]}({b["code"]}) {b["score"]:.0f}分 '
@@ -926,28 +941,37 @@ def main():
 
     # ── 📊 表2: 前三名得分细则 ──
     if top3 and not quick:
+        _v3_mode = _active_ver == 'v3'
         print(f'\n{"=" * 65}')
-        print(f'  📊 表2: 前三名得分细则 (V4百分制加权)')
+        print(f'  📊 表2: 前三名得分细则 ({"V3累加制" if _v3_mode else "V4百分制加权"})')
         print(f'{"=" * 65}')
-        from scoring import load_config as _lc2
+        from scoring import load_config as _lc2, score_active
         _cfg2 = _lc2()
+        _V3_NAMES = {'vr': '量比', 'gap': 'Gap', 'one_line': '一字板', 'cons': '连板',
+                     'dow': '周几', 'seal_time': '封板', 'zhaban': '炸板',
+                     'sector': '板块', 'divergence': '分歧'}
         for b in top3:
             meta = stock_scoring_meta(b['code'])
             if meta['klines'] and meta['detail']:
-                from scoring import score_active
                 _sc4, _det4 = score_active(b['code'], meta['klines'], meta['detail'])
                 if _det4:
                     print(f'  {b["name"]}({b["code"]})  {_sc4:.0f}分')
-                    _f = _det4.get('factor_scores') or {}
-                    _w = (_cfg2.get('v4') or {}).get('weights', {})
-                    if _f and _w:
-                        print(f'    ' + '  '.join(
-                            f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
+                    if _v3_mode:
+                        # V3累加制分项(2026-09-13): 由 scoring.compute_score 的 v3_breakdown 还原
+                        _bd = _det4.get('v3_breakdown') or {}
+                        _items = [f'{_V3_NAMES.get(k, k)}{v:+.0f}' for k, v in _bd.items() if v]
+                        print('    ' + ('  '.join(_items) if _items else '(无分项)'))
+                    else:
+                        _f = _det4.get('factor_scores') or {}
+                        _w = (_cfg2.get('v4') or {}).get('weights', {})
+                        if _f and _w:
+                            print(f'    ' + '  '.join(
+                                f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
 
     # ── 📊 表4: 持仓评分对比 (2026-08-28, 持仓与可买池同台比较) ──
     if pos_scores:
         print(f'\n{"=" * 65}')
-        print(f'  📊 表4: 持仓评分对比 (V4同口径)')
+        print(f'  📊 表4: 持仓评分对比 ({"V3" if _active_ver == "v3" else "V4"}同口径)')
         print(f'{"=" * 65}')
         for p in pos_scores:
             print(f'  持仓 {p["name"]}({p["code"]})  {p["score"]:.0f}分  {p["cons"]}板  {p["industry"][:10]}')
