@@ -1,40 +1,82 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 50,
+  "total_sessions": 51,
   "current": {
-    "date": "2026-09-11",
-    "captured": "2026-09-11 09:25:33",
-    "total": 34,
-    "buyable": 3,
-    "avg_gap": 1.24,
+    "date": "2026-09-14",
+    "captured": "2026-09-14 09:25:35",
+    "total": 39,
+    "buyable": 9,
+    "avg_gap": 2.34,
     "gap_distribution": {
-      "-3-0%": 12,
-      "<-3%": 6,
-      "0-2%": 2,
-      "2-5%": 6,
-      "9%+": 5,
-      "5-9%": 3
+      "0-2%": 8,
+      "2-5%": 8,
+      "5-9%": 6,
+      "<-3%": 2,
+      "-3-0%": 11,
+      "9%+": 4
     },
     "buyable_stocks": [
       {
-        "code": "600359",
-        "name": "新农开发",
-        "gap_pct": 7.68,
-        "score": 45.3,
-        "limit_days": 2
+        "code": "002161",
+        "name": "远望谷",
+        "gap_pct": 5.35,
+        "score": 58.8,
+        "limit_days": 1
       },
       {
-        "code": "603318",
-        "name": "水发燃气",
-        "gap_pct": 6.28,
-        "score": 43.5,
+        "code": "001232",
+        "name": "嘉立创",
+        "gap_pct": 6.34,
+        "score": 51.4,
         "limit_days": 1
       },
       {
         "code": "600876",
         "name": "凯盛新能",
-        "gap_pct": 7.08,
-        "score": 42.9,
+        "gap_pct": 6.21,
+        "score": 48.8,
+        "limit_days": 2
+      },
+      {
+        "code": "600088",
+        "name": "中视传媒",
+        "gap_pct": 7.99,
+        "score": 42.6,
+        "limit_days": 1
+      },
+      {
+        "code": "002585",
+        "name": "双星新材",
+        "gap_pct": 7.63,
+        "score": 42.5,
+        "limit_days": 1
+      },
+      {
+        "code": "000980",
+        "name": "众泰汽车",
+        "gap_pct": 4.25,
+        "score": 42.4,
+        "limit_days": 3
+      },
+      {
+        "code": "603439",
+        "name": "三力制药",
+        "gap_pct": 5.02,
+        "score": 41.1,
+        "limit_days": 1
+      },
+      {
+        "code": "000993",
+        "name": "闽东电力",
+        "gap_pct": 4.54,
+        "score": 37.6,
+        "limit_days": 3
+      },
+      {
+        "code": "605011",
+        "name": "杭州热电",
+        "gap_pct": 4.05,
+        "score": 0,
         "limit_days": 1
       }
     ]
@@ -683,7 +725,20 @@
         "9%+": 5,
         "5-9%": 3
       }
+    },
+    {
+      "date": "2026-09-14",
+      "total": 39,
+      "buyable": 9,
+      "gap_distribution": {
+        "0-2%": 8,
+        "2-5%": 8,
+        "5-9%": 6,
+        "<-3%": 2,
+        "-3-0%": 11,
+        "9%+": 4
+      }
     }
   ],
-  "last_update": "2026-09-11"
+  "last_update": "2026-09-14"
 }
