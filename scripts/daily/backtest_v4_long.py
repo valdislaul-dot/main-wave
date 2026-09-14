@@ -9,9 +9,12 @@ import json, os, sys
 from datetime import datetime, timedelta
 from collections import defaultdict
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from backtest_common import KLINE_DIR, parse_window
+
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
-START, END = '2023-08-19', '2026-08-19'
+# 窗口: 缺省3年, 可用 --months N / --start/--end 覆盖 (2026-09-04用户定稿)
+START, END = parse_window('2023-08-19', '2026-08-19')
 INIT = 200000
 COST = 0.00125
 SUB_FACTORS = ['vr', 'gap', 'board_type', 'cons', 'dt_risk']
@@ -156,8 +159,6 @@ def main():
                     cands.append((score, c))
                 cands.sort(key=lambda x: -x[0])
                 for score, c in cands:
-                    if score < 50:
-                        break
                     r = factor_of(c, d)
                     if not r:
                         continue

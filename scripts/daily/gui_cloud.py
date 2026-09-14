@@ -58,7 +58,15 @@ if ms:
     m[1].metric("最高板", f"{ms.get('max_cons', '?')}板")
     m[2].metric("赚钱效应", f"{ms.get('money_effect', 0):+.1f}%")
     tier = ms.get('zt_n', 0)
-    tier_txt = '强市(≥110)' if tier >= 110 else ('弱市(40-109)' if tier >= 40 else '极弱(<40)')
+    # 四档(2026-09-03拍板, 与temperature.py一致)
+    if tier < 40 or ms.get('max_cons', 0) <= 2:
+        tier_txt = '极弱(<40或≤2板)'
+    elif tier >= 110:
+        tier_txt = '强市(≥110)'
+    elif tier < 65:
+        tier_txt = '弱市下沿(40-64)'
+    else:
+        tier_txt = '弱市(65-109)'
     m[3].metric("温度档", tier_txt)
     hist = ms.get('history', [])
     if hist:

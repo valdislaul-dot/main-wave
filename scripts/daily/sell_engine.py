@@ -280,6 +280,8 @@ def sell_signal(position, today_auction, config=None):
     yest_lu = was_limit_up(klines, yesterday_idx)
     board_num = get_board_count(klines, yesterday_idx)
     yest_vol = yesterday.get('volume', 0)
+    # 昨收浮盈(利润垫判断, A体系: 加速上板后浮盈>10%则无固定卖点)
+    float_pnl = (yesterday['close'] - buy_price) / buy_price * 100 if buy_price > 0 else 0
 
     # ── 硬止损 (2026-08-20调整: 炸板缓冲, 按当日收盘跌幅分级) ──
     # 数据(3年, 炸板股T日收盘分档×次日):
@@ -305,6 +307,27 @@ def sell_signal(position, today_auction, config=None):
                 return _signal('sell', 'urgent',
                     f'硬止损: 浮亏{loss_pct:+.1f}% ≤ {hard_stop:+.0f}% — 无条件卖出',
                     current_price)
+
+    # ══════════════════════════════════════════════════════════════
+    # A式出场 (2026-09-12 用户拍板: "出场用你的那个")
+    # 规则: 买入后次日起 —— 挂涨停价限价卖; 封板则成交在涨停价(当日最高),
+    #       未封板则盘中择机卖(70%(H+O)/2+30%收), 14:45 市价兜底。
+    # 硬止损 -10% 已在上方优先处理, 此处不重复。
+    # 依据: 同模拟器 V3选股+A式出场 22笔 均+1.05%/胜率59%;
+    #       换"轮换日开盘价卖"同批票仅 -1.20%/45% —— 出场价差 2.25pt/笔。
+    # 回滚: 把 scoring_config.json 的 sell_a_style.enabled 改 false 即回到决策树。
+    # ══════════════════════════════════════════════════════════════
+    if bool((config or {}).get('sell_a_style', {}).get('enabled', False)):
+        _lim = round(prev_close * 1.1, 2) if prev_close else None
+        if _lim and auction_price and auction_price >= _lim - 0.005:
+            return _signal('sell', 'urgent',
+                f'A式: 开盘即涨停({auction_price}) → 挂涨停价成交',
+                auction_price, 'A式出场(2026-09-12定稿)')
+        return _signal('sell', 'normal',
+            f'A式: 不在竞价卖 → 盘中挂涨停价限价卖(涨停价{_lim})',
+            auction_price,
+            '封板则成交在涨停价(当日最高); 未封则盘中择机卖[70%(H+O)/2+30%收]; 14:45市价兜底',
+        )
 
     # 前日量能 (T-2)
     prev_day_idx = yesterday_idx - 1
@@ -345,12 +368,14 @@ def sell_signal(position, today_auction, config=None):
                     return _signal('sell_half', 'urgent',
                         f'前日爆量+昨缩量加速, 竞价{gap:+.1f}%未达5%强高开预期 → 半仓减',
                         auction_price,
-                        '剩余: 拉升量能<爆量日→格局; 量能放大逼近爆量或破5%→清')
+                        '剩余: 拉升量能<爆量日→格局; 量能放大逼近爆量或破5%→清; '
+                        '14:45前未确认弱转强→市价兜底(A执行纪律)')
                 else:
                     return _signal('hold', 'normal',
                         f'前日爆量+昨缩量加速, 竞价{gap:+.1f}%达标 → 开盘关注量能',
                         yesterday['close'] * 1.10,
-                        '量能<爆量日→格局; 量能放大逼近爆量→减仓')
+                        '量能<爆量日→格局; 量能放大逼近爆量→减仓; '
+                        f'今日若封板加速且浮盈已垫厚(现{float_pnl:+.0f}%)→A体系: 利润垫>10%后无固定卖点, 格局看量能, 破VWAP黄线才走')
 
             # ② 连续正常量 → 分歧日预期 (A独有)
             elif prev_vol_class == 'normal' and yest_vol_class == 'normal':
@@ -369,7 +394,8 @@ def sell_signal(position, today_auction, config=None):
                 return _signal('watch', 'normal',
                     f'昨爆量分歧日(第{board_num}板), 今高开{gap:+.1f}% → 弱转强待确认',
                     auction_price,
-                    '开盘拉升>7%→真弱转强格局; 下杀破0%→走')
+                    '开盘拉升>7%→真弱转强格局; 下杀破0%→走; '
+                    '今日若封板: 量能<昨爆量日→加速板, 格局; 量能≥昨爆量日→连续两日爆量→板砸(挂涨停价)')
 
             # ④ 正常持有
             else:
@@ -385,12 +411,15 @@ def sell_signal(position, today_auction, config=None):
                     f'今强高开{gap:+.1f}% → 弱转强信号',
                     auction_price,
                     f'开盘拉升>7%=弱转强→格局; '
-                    f'量超烂板日→板砸; 下杀破0%或破今日VWAP→走')
+                    f'今日若封板: 量能<昨烂板爆量日→加速板, 格局(浮盈{float_pnl:+.0f}%, '
+                    f'垫厚>10%后无固定卖点); 量能≥昨爆量日→连续两日爆量→板砸(挂涨停价); '
+                    f'下杀破0%或破今日VWAP→走')
             elif gap > 0:
                 return _signal('watch', 'normal',
                     f'昨烂板+小高开{gap:+.1f}% → 弱转强待确认',
                     auction_price,
-                    '开盘拉升>7%→格局; 下杀→0%底线走')
+                    '开盘拉升>7%→格局; 下杀→0%底线走; '
+                    '今日若封板: 量能<昨爆量日→加速格局; 量能≥昨爆量日→连续爆量→板砸(挂涨停价)')
             else:
                 return _signal('sell', 'urgent',
                     f'昨烂板+低开{gap:+.1f}% → 竞价走',
@@ -404,24 +433,16 @@ def sell_signal(position, today_auction, config=None):
         if buy_date and buy_date == buy_dt:
             loss_pct = (yesterday['close'] - buy_price) / buy_price * 100
         else:
-            # 前日收盘作为参考
+            # 前日收盘作为参考 (2026-09-03修复: 原用prev_k['open']与注释/定稿矛盾,
+            # T-2高开涨停日会把大亏算成小亏 → 该"等冲高减亏"的被"竞价走")
             prev_k = klines[yesterday_idx - 1] if yesterday_idx > 0 else yesterday
-            loss_pct = (yesterday['close'] - prev_k['open']) / prev_k['open'] * 100 if prev_k['open'] > 0 else 0
+            loss_pct = (yesterday['close'] - prev_k['close']) / prev_k['close'] * 100 if prev_k['close'] > 0 else 0
 
         is_minor_loss = loss_pct > soft_stop  # 浮亏在软止损范围内=小亏
 
-        # ── 大亏+平开/高开 → 等修复冲高 (2026-08-20新增, 仅温和炸板适用) ──
-        # 数据: 炸板股T日收盘分档×次日 — 温和档(-3%内)次日-1.5%, 收红档+2.8%;
-        #       深炸档(≤-7%)次日-8.8%~-15%, 正收益0%, 不适用缓冲(硬止损已在前面拦截)
-        hard_stop = config['loss_feedback']['hard_stop_pct']
-        if loss_pct <= hard_stop and gap > cfg_gap['deep_low_open'] + 1:
-            return _signal('watch', 'urgent',
-                f'昨浮亏{loss_pct:+.1f}%超硬止损+今{gap:+.1f}%平开/高开 → 等修复冲高减亏',
-                yesterday.get('high', auction_price),
-                '3年数据: 温和炸板次日平开76%上涨+2.18%, 比开盘止损平均少亏约1.6%; '
-                '盘中破-4%或冲高乏力→走')
-
         # ── 弱转强高开 (gap≥5%) — A体系 ──
+        # (2026-09-04定稿: 大高开优先于大亏等修复, 与CLAUDE.md树序一致;
+        #  深炸+大高开属极端形态, 反包确认+VWAP纪律比平开验证的等修复更适用)
         if gap >= cfg_gap['strong_high_open']:
             vwap_info = check_vwap_breach(yesterday)
             vwap_note = f'昨VWAP={vwap_info["vwap"]:.2f}, 昨低={vwap_info["low"]:.2f}'
@@ -439,6 +460,17 @@ def sell_signal(position, today_auction, config=None):
                 f'昨断板+gap{gap:+.1f}%≥4% → 持有观察 (V3.2规则)',
                 yesterday.get('high', auction_price),
                 'V3.2回测验证: 断板日gap≥4%持有收益为正')
+
+        # ── 大亏+平开/小高开 → 等修复冲高 (2026-08-20新增, 仅温和炸板适用) ──
+        # 数据: 炸板股T日收盘分档×次日 — 温和档(-3%内)次日-1.5%, 收红档+2.8%;
+        #       深炸档(≤-7%)次日-8.8%~-15%, 正收益0%, 不适用缓冲(硬止损已在前面拦截)
+        hard_stop = config['loss_feedback']['hard_stop_pct']
+        if loss_pct <= hard_stop and gap > cfg_gap['deep_low_open'] + 1:
+            return _signal('watch', 'urgent',
+                f'昨浮亏{loss_pct:+.1f}%超硬止损+今{gap:+.1f}%平开/小高开 → 等修复冲高减亏',
+                yesterday.get('high', auction_price),
+                '3年数据: 温和炸板次日平开76%上涨+2.18%, 比开盘止损平均少亏约1.6%; '
+                '盘中破-4%或冲高乏力→走')
 
         # ── 低开分支 — A体系 (2026-08-24修正: 跌停开按3年数据拆分) ──
         # 数据(v3跌停分析): 跌停开盘开板率仅30.1%(69.9%封死), 封死次日-2.1%~-5.75%;

@@ -11,8 +11,8 @@ from datetime import datetime, timedelta
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scoring import (
-    score_v4, load_config as load_scoring_config,
-    get_buy_window, get_score_min,
+    score_active, load_config as load_scoring_config,
+    get_buy_window,
     load_config, sector_resonance_count,
 )
 LOG_DIR = os.path.join(BASE, 'logs')
@@ -123,7 +123,8 @@ def main():
     # Save snapshot
     snap_dir = os.path.join(BASE, 'data', 'zt_pool')
     os.makedirs(snap_dir, exist_ok=True)
-    with open(os.path.join(snap_dir, f'{today_yyyymmdd}.json'), 'w') as fh:
+    # 2026-09-03修复: 显式utf-8, 原Windows默认cp936致池文件GBK与全项目其他JSON不一致
+    with open(os.path.join(snap_dir, f'{today_yyyymmdd}.json'), 'w', encoding='utf-8') as fh:
         json.dump(pool, fh, ensure_ascii=False, indent=1)
 
     print(f'[Screen] Today LU stocks (eligible): {len(pool)}')
@@ -166,10 +167,10 @@ def main():
             'zhaban': s['break_times'],
             'sector_count': sector_counts.get(s['industry'], 1),
             'industry': s['industry'], 'turnover': s['turnover'],
-            'sector_bucket': _sector_bucket_map.get(s['industry'], '>=10'),
+            'sector_bucket': _sector_bucket_map.get(s['industry'], '<3'),
         }
 
-        score, details = score_v4(code, klines, details_raw)
+        score, details = score_active(code, klines, details_raw)
         if score is None:
             score_fail += 1
             kl = klines.get('data', klines) if isinstance(klines, dict) else klines
@@ -198,7 +199,8 @@ def main():
             'code': code, 'name': name,
             'score': score, 'vr20': details.get('vr', 0),
             'gap': details.get('gap', 0), 'cons': details.get('cons', 1),
-            'one_line': details.get('board_type') == '一字',
+            # 2026-09-03修复: 4板+一字/T字过滤定稿(2026-08-24)含T字, 原只写真一字致T字漏网
+            'one_line': details.get('board_type') in ('一字', 'T字'),
             'true_one_line': details.get('board_type') == '一字',
             'open': k['open'], 'close': k['close'],
             'seal_time': s['first_seal'], 'seal_dur': seal_duration,
@@ -293,9 +295,7 @@ def main():
             print(f'{r["code"]:<8} {r["name"]:<8} {cons:>3}板 {r["turnover"]:>5.1f}% {r["industry"]:<10} {warn} 区间{lo}-{hi}')
         print(f'{"="*85}')
 
-    min_score = get_score_min()
-    filtered_count = sum(1 for r in results if r['score'] >= min_score)
-    print(f'\n[Screen] 评分≥{min_score}: {filtered_count}/{len(results)}只 | 缺K线/评分失败: {score_fail}只')
+    print(f'\n[Screen] 评分完成: {len(results)}只 | 缺K线/评分失败: {score_fail}只')
     if fail_reasons:
         print(f'[Screen] 评分失败原因: {fail_reasons}')
 

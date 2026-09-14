@@ -25,5 +25,59 @@
       "win_rate": 51,
       "trades": 57
     }
+  },
+  {
+    "date": "2026-09-04",
+    "prev_obj": 1214.0,
+    "obj": 1231.3,
+    "weights": {
+      "vr": 9.5,
+      "gap": 12.0,
+      "board_type": 7.6,
+      "cons": 6.3,
+      "seal": 6.3,
+      "zhaban": 4.3,
+      "sector": 32.7,
+      "divergence": 0.0,
+      "dt_risk": 17.0,
+      "turnover": 4.3
+    },
+    "strong": {
+      "ret": 3834.3,
+      "win_rate": 74.1,
+      "trades": 54
+    },
+    "weak": {
+      "ret": 184.3,
+      "win_rate": 54.5,
+      "trades": 55
+    }
+  },
+  {
+    "date": "2026-09-08",
+    "prev_obj": 1231.3,
+    "obj": 1368.1,
+    "weights": {
+      "vr": 11.9,
+      "gap": 2.5,
+      "board_type": 9.5,
+      "cons": 1.6,
+      "seal": 1.6,
+      "zhaban": 5.4,
+      "sector": 40.9,
+      "divergence": 0.0,
+      "dt_risk": 21.2,
+      "turnover": 5.4
+    },
+    "strong": {
+      "ret": 4334.4,
+      "win_rate": 75.9,
+      "trades": 54
+    },
+    "weak": {
+      "ret": 138.4,
+      "win_rate": 55.2,
+      "trades": 58
+    }
   }
 ]

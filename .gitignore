@@ -9,6 +9,8 @@ data/raw/
 data/trading_calendar.json
 data/tushare_token.txt
 data/hithink_token.txt
+data/api_token.txt
+data/locks/
 logs/*
 results/
 data/daily_close/
@@ -34,3 +36,6 @@ setup/
 多端部署.md
 回测对比条件.txt
 backup/CLAUDE_v3机制全量_20260826.md
+
+# 2026-09-04: 资金流历史留档(2562只×500天, 因子已弃用但保留重验数据, 不上传)
+data/money_flow_history/

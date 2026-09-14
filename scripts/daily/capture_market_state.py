@@ -22,6 +22,12 @@ def is_limit_up_row(k, pk):
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
     today = datetime.now().strftime('%Y-%m-%d')
+    # 2026-09-03修复: 非交易日运行(周末/节假日)时K线无今日bar → 全部走腾讯兜底,
+    # 赚钱效应被写成≈+9.9%假值并覆盖真实记录(恒0守卫只拦0不拦+10) → 直接跳过
+    from trading_calendar import is_trading_day
+    if not is_trading_day(datetime.now().date()):
+        print(f'[MarketState] 今日({today})非交易日, 跳过采集(防+10%假值覆盖)')
+        return
     # 昨日涨停池快照 (2026-09-01统一走get_prev_pool_file共享函数, 防日期过滤复制出错)
     from zt_pool import get_prev_pool_file
     fn = get_prev_pool_file(today)

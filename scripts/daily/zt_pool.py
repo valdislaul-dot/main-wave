@@ -164,10 +164,9 @@ def prune_stale(state, days=10):
 # ============================================================
 
 def _load_klines(code, name=None):
-    """加载K线: 兼容新旧两种格式"""
+    """加载K线: 兼容新旧两种格式 (2026-09-04写死: 只读 data/kline_data, backtest_kline已删除)"""
     search_dirs = [
         os.path.join(BASE, 'data', 'kline_data'),
-        os.path.join(BASE, 'data', 'backtest_kline'),
     ]
 
     for sdir in search_dirs:
@@ -343,7 +342,11 @@ def update_zt_pool(date_str=None, verbose=True):
     5. 不涨停 → 移出池子
     """
     if date_str is None:
-        date_str = datetime.now().strftime('%Y-%m-%d')
+        # 2026-09-03修复: 与update_data/screen_candidates口径对齐, 15:00前盘中运行回退昨日,
+        # 否则state(当日盘中池, 午后涨停缺失/炸板未剔)与K线/候选(昨日)日期错位
+        _now = datetime.now()
+        date_str = (_now - timedelta(days=1)).strftime('%Y-%m-%d') if _now.hour < 15 \
+            else _now.strftime('%Y-%m-%d')
 
     if verbose:
         print(f'\n[ZT Pool] 更新涨停池 → {date_str}')

@@ -1,0 +1,38 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": null,
+  "phases": [
+    {
+      "number": "1",
+      "name": "Service Skeleton + /health Liveness",
+      "status": "complete"
+    },
+    {
+      "number": "2",
+      "name": "Read-Only State Endpoints + Defensive Read Layer",
+      "status": "complete"
+    },
+    {
+      "number": "3",
+      "name": "Trigger Runner, Job Registry & Locks + Auth Enforcement",
+      "status": "complete"
+    },
+    {
+      "number": "4",
+      "name": "Exposure Hardening + Data Classification",
+      "status": "complete"
+    },
+    {
+      "number": "5",
+      "name": "Recovery, Observability & Ops Polish",
+      "status": "complete"
+    }
+  ],
+  "next": {
+    "command": "/gsd:progress",
+    "label": "Show progress",
+    "reason": "Unsure of state — showing progress"
+  },
+  "updated_at": "2026-09-05T01:54:56.522Z"
+}

@@ -3,7 +3,6 @@
 被 run_pipeline.py 盘后自动调用
 """
 import json, os
-import os
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime, timedelta
 
@@ -21,11 +20,24 @@ def load_portfolio():
 
 
 def load_latest_candidates():
-    files = sorted([f for f in os.listdir(LOG_DIR) if f.startswith('candidates_')])
-    if not files:
-        return None
-    with open(os.path.join(LOG_DIR, files[-1]), 'r', encoding='utf-8') as f:
-        return json.load(f)
+    """按文件名日期取最新候选存档。禁止 sorted() 字典序: 'candidates_2026-08-07' 会排在
+    'candidates_2026-09-08' 后面(files[-1]取到旧月文件); 且 candidates_v3_* 旧版必须排除。"""
+    import re
+    best, best_date = None, ''
+    for f in os.listdir(LOG_DIR):
+        m = re.match(r'candidates_(\d{4}-\d{2}-\d{2})\.json$', f)
+        if not m:
+            continue
+        d = m.group(1)
+        if d > best_date:
+            try:
+                with open(os.path.join(LOG_DIR, f), 'r', encoding='utf-8') as fh:
+                    data = json.load(fh)
+                if data.get('date', d) == d:  # 文件名与内部date一致才认
+                    best, best_date = data, d
+            except Exception:
+                continue
+    return best
 
 
 def load_journal():
@@ -54,33 +66,44 @@ def generate():
     today = datetime.now()
     next_day = get_next_trading_day()
 
-    # Portfolio
-    pos = pf['position'] if pf else None
+    # Portfolio (多持仓: positions列表优先, 旧单持仓position字段兜底)
     cash = pf['cash'] if pf else 0
-    pos_value = 0
-    pos_info = {'name': '-', 'code': '-', 'buy_price': 0, 'shares': 0, 'buy_date': '-'}
-    unrealized = 0
+    positions = []
+    if pf:
+        ps = pf.get('positions') or ([pf['position']] if pf.get('position') else [])
+        positions = [p for p in ps if p]
 
-    if pos:
-        # Try to get yesterday's close from daily data
-        yesterday = today - timedelta(days=1)
-        while yesterday.weekday() >= 5:
-            yesterday = yesterday - timedelta(days=1)
-        ystr = yesterday.strftime('%Y-%m-%d')
+    # 现价: 今日daily_close(池内股) → K线最后bar(池外持仓股) → 成本价兜底
+    # (禁止用昨日收盘算浮盈: 买入日=今日的持仓会算出方向相反的假浮亏)
+    today_str = today.strftime('%Y-%m-%d')
+    daily_file = os.path.join(BASE, 'data', 'daily_close', today_str, 'daily_data.json')
+    dd = {}
+    if os.path.exists(daily_file):
+        with open(daily_file, 'r', encoding='utf-8') as f:
+            dd = json.load(f)
 
-        close_price = None
-        daily_file = os.path.join(BASE, 'data', 'daily_close', ystr, 'daily_data.json')
-        if os.path.exists(daily_file):
-            with open(daily_file, 'r', encoding='utf-8') as f:
-                dd = json.load(f)
-            if pos['code'] in dd:
-                close_price = dd[pos['code']]['close']
+    def get_close(code):
+        if code in dd:
+            return dd[code]['close']
+        kf = os.path.join(BASE, 'data', 'kline_data', f'{code}.json')
+        if os.path.exists(kf):
+            try:
+                with open(kf, 'r', encoding='utf-8') as f:
+                    k = json.load(f)
+                bars = k if isinstance(k, list) else (k.get('data') or k.get('klines') or [])
+                if bars and isinstance(bars[-1], dict) and 'close' in bars[-1]:
+                    return bars[-1]['close']
+            except Exception:
+                pass
+        return None
 
-        if close_price:
-            pos_value = pos['shares'] * close_price
-            unrealized = (close_price - pos['buy_price']) / pos['buy_price'] * 100
-        else:
-            pos_value = pos['shares'] * pos['buy_price']  # fallback
+    pos_rows, pos_value = [], 0
+    for p in positions:
+        close_price = get_close(p['code'])
+        if close_price is None:
+            close_price = p['buy_price']
+        pos_rows.append({**p, 'close': close_price, 'value': p['shares'] * close_price})
+        pos_value += pos_rows[-1]['value']
 
     total = cash + pos_value
 
@@ -95,33 +118,34 @@ def generate():
     r.append("")
     r.append("## 当前持仓")
     r.append("")
-    r.append("| 项目 | 详情 |")
-    r.append("|------|------|")
-    r.append(f"| 标的 | {pos['name']} ({pos['code']}) |" if pos else "| 标的 | 空仓 |")
-    r.append(f"| 成本 | {pos['buy_price']:.3f} |" if pos else "| 成本 | - |")
-    r.append(f"| 股数 | {pos['shares']} |" if pos else "| 股数 | - |")
-    r.append(f"| 买入日 | {pos['buy_date']} |" if pos else "| 买入日 | - |")
-    r.append(f"| 市值 | {pos_value:,.0f} |")
-    r.append(f"| 浮盈 | {unrealized:+.1f}% |" if pos else "| 浮盈 | - |")
-    r.append(f"| 现金 | {cash:,.0f} |")
-    r.append(f"| **总资产** | **{total:,.0f}** |")
+    r.append("| 标的 | 成本 | 股数 | 买入日 | 现价 | 市值 | 浮盈 |")
+    r.append("|------|------|------|--------|------|------|------|")
+    if pos_rows:
+        for p in pos_rows:
+            up = (p['close'] - p['buy_price']) / p['buy_price'] * 100
+            r.append(f"| {p['name']} ({p['code']}) | {p['buy_price']:.3f} | {p['shares']} | {p['buy_date']} | {p['close']:.2f} | {p['value']:,.0f} | {up:+.1f}% |")
+    else:
+        r.append("| 空仓 | — | — | — | — | — | — |")
+    r.append(f"| 现金 | — | — | — | — | {cash:,.0f} | — |")
+    r.append(f"| **总资产** | — | — | — | — | **{total:,.0f}** | — |")
     r.append("")
     r.append("---")
     r.append("")
 
     # Candidates
-    r.append(f"## 明日候选 (T-1={cand_data['date']}涨停 → {next_day.strftime('%m/%d')}{dow_cn(next_day)})")
+    cand_date = cand_data['date'] if cand_data else '?'
+    r.append(f"## 明日候选 (T-1={cand_date}涨停 → {next_day.strftime('%m/%d')}{dow_cn(next_day)})")
     r.append("")
 
     if cand_data and cand_data['candidates']:
+        cands = sorted(cand_data['candidates'], key=lambda c: -(c.get('score') or 0))[:5]
         r.append("| # | 代码 | 名称 | 评分 | 量比 | 连板 | 封板 | 仓位 | 竞价观察(4-8%) |")
         r.append("|---|------|------|------|------|------|------|------|----------------|")
-        for i, c in enumerate(cand_data['candidates'][:5]):
+        for i, c in enumerate(cands):
             ref_close = c['close']
             lo = ref_close * 1.04; hi = ref_close * 1.08
             seal = c.get('seal_time', '?')
-            pos_type = '全仓' if c['score'] >= 30 else '半仓'
-            r.append(f"| {i+1} | {c['code']} | {c['name']} | {c['score']:.0f} | {c['vr20']:.1f}x | {c['cons']}板 | {seal} | {pos_type} | {lo:.2f}-{hi:.2f} |")
+            r.append(f"| {i+1} | {c['code']} | {c['name']} | {c['score']:.0f} | {c['vr20']:.1f}x | {c['cons']}板 | {seal} | 55% | {lo:.2f}-{hi:.2f} |")
 
         top = cand_data['top_pick']
         r.append("")
@@ -135,10 +159,10 @@ def generate():
     # Tomorrow's action
     r.append("## 明日操作")
     r.append("")
-    if pos:
-        r.append(f"**卖出判断**: 昨涨停+今不低开(开≥昨收)→持有 | 昨涨停+今低开→卖出 | 昨断板+今gap<4%→卖出 | 昨断板+今gap≥4%→持有")
+    if pos_rows:
+        r.append("**卖出判断**(V4.1引擎): 昨涨停低开→竞价卖 | 烂板高开→弱转强观察 | 昨断板gap<4%→开盘价卖 | gap≥4%→持有 | 硬止损-10%兜底")
         r.append("")
-    r.append("**买入**: 首选候选竞价≥6%且不低开 → 55%仓位买入；一字板封死 → 备选")
+    r.append("**买入**(A式): 开关恒开, 竞价面板Top1(综合分=评分×gap权重) gap4-8%平滑窗(边缘3-4/8-9衰减) → 恒定55%仓位；一字板封死 → 顺延备选")
     r.append("")
     r.append("---")
     r.append("")

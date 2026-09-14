@@ -12,12 +12,16 @@ import json, os, sys, random
 from datetime import datetime, timedelta
 from collections import defaultdict
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from backtest_common import parse_window, has_window_args, FIXED_POS
+
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
 THS_DIR = os.path.join(BASE, 'data', 'zt_pool_history_ths')
 INIT = 200000
 COST = 0.00125   # 滑点+佣金
 FACTORS = ['vr', 'gap', 'board_type', 'cons', 'seal', 'zhaban', 'sector', 'divergence', 'dt_risk', 'turnover']
+CUSTOM_WIN = has_window_args()  # 用户给窗口 → 单窗+A式恒定55%仓位; 缺省=强弱双窗交叉
 
 
 def load_config_v4():
@@ -68,23 +72,33 @@ def main():
     print(f'K线: {len(ktbl)}只')
 
     ths_files = sorted(fn for fn in os.listdir(THS_DIR) if fn.endswith('.json'))
-    # 两窗日期
-    strong_dates = []
-    weak_dates = []
-    for fn in ths_files:
-        ymd = fn.replace('.json', '')
-        if '20260304' <= ymd <= '20260724':
-            strong_dates.append(ymd)
-        elif '20251009' <= ymd <= '20260303':
-            weak_dates.append(ymd)
-    all_dates = sorted(set(strong_dates + weak_dates))
-    print(f'回测日: 强市窗{len(strong_dates)}天 + 弱市窗{len(weak_dates)}天')
+    # 窗口 (2026-09-04参数化: 用户给--months/--start/--end → 单窗+A式恒定55%仓位)
+    if CUSTOM_WIN:
+        WS, WE = parse_window('2025-10-09', '2026-07-24')
+        strong_dates = []
+        weak_dates = [fn.replace('.json', '') for fn in ths_files
+                      if WS.replace('-', '') <= fn.replace('.json', '') <= WE.replace('-', '')]
+        all_dates = sorted(weak_dates)
+        print(f'回测日: 自定义窗{WS}~{WE} {len(all_dates)}天 (A式恒定55%仓位)')
+    else:
+        strong_dates = []
+        weak_dates = []
+        for fn in ths_files:
+            ymd = fn.replace('.json', '')
+            if '20260304' <= ymd <= '20260724':
+                strong_dates.append(ymd)
+            elif '20251009' <= ymd <= '20260303':
+                weak_dates.append(ymd)
+        all_dates = sorted(set(strong_dates + weak_dates))
+        print(f'回测日: 强市窗{len(strong_dates)}天 + 弱市窗{len(weak_dates)}天')
 
     # 每日池 + 因子
+    temp_of = {}   # 温度(当日涨停数) — A式后仅记录, 不用于仓位(2026-09-07)
     for ymd in all_dates:
         date_fmt = f'{ymd[:4]}-{ymd[4:6]}-{ymd[6:]}'
         with open(os.path.join(THS_DIR, f'{ymd}.json'), encoding='utf-8') as f:
             info = json.load(f)
+        temp_of[date_fmt] = len(info)
         day_map = {}
         # 题材热度(当日)
         from collections import Counter
@@ -226,8 +240,6 @@ def main():
                     cands.append((score, code))
                 cands.sort(key=lambda x: -x[0])
                 for score, code in cands:
-                    if score < 50:
-                        break
                     kls = ktbl.get(code)
                     if not kls:
                         continue
@@ -239,7 +251,9 @@ def main():
                     if not (4.0 <= gap <= 8.0):
                         continue
                     price = kls[idx0]['open'] * (1 + COST)
-                    budget = cash * pos_pct
+                    # pos_pct: 标量(双窗)或 dict{date:仓位}(自定义窗A式恒定55%)
+                    pct = pos_pct.get(d, 0.5) if isinstance(pos_pct, dict) else pos_pct
+                    budget = cash * pct
                     shares = int(min(cash, budget) / price / 100) * 100
                     if shares <= 0:
                         continue
@@ -254,7 +268,15 @@ def main():
         return final, trades
 
     def objective(weights):
-        """两窗交叉: 强市窗全仓 + 弱市窗半仓, 目标=收益60%+胜率40%"""
+        """缺省两窗交叉(强市全仓+弱市半仓) | CUSTOM_WIN=单窗+A式恒定55%仓位(2026-09-07); 目标=收益60%+胜率40%"""
+        if CUSTOM_WIN:
+            d_fmt = [f'{y[:4]}-{y[4:6]}-{y[6:]}' for y in all_dates]
+            pos_by_day = {d: FIXED_POS for d in d_fmt}  # 2026-09-07 A式: 温度不控仓
+            final, trades = simulate(weights, d_fmt, pos_by_day)
+            ret = (final / INIT - 1) * 100
+            wr = sum(1 for t in trades if t['pnl'] > 0) / len(trades) * 100 if trades else 0
+            r = (ret, wr, len(trades), final)
+            return ret * 0.6 + wr * 0.4, [r, r]
         results = []
         s_fmt = [f'{y[:4]}-{y[4:6]}-{y[6:]}' for y in strong_dates]
         w_fmt = [f'{y[:4]}-{y[4:6]}-{y[6:]}' for y in weak_dates]
@@ -351,60 +373,48 @@ def main():
     obj, w, results = best
     out = []
     out.append('=' * 78)
-    out.append('V4权重搜索结果 (目标=收益60%+胜率40%, 强市窗+弱市窗交叉)')
+    out.append('V4权重搜索结果 (目标=收益60%+胜率40%'
+               + (f', 自定义窗{WS}~{WE}A式恒定55%仓位)' if CUSTOM_WIN else ', 强市窗+弱市窗交叉)'))
     out.append(f'生成: {datetime.now().strftime("%Y-%m-%d %H:%M")}')
     out.append('=' * 78)
     out.append(f'最优目标分: {obj:+.1f}')
     out.append(f'最优权重: ' + ' '.join(f'{k}={w[k]}' for k in FACTORS))
-    for label, r in (('强市窗(全仓)', results[0]), ('弱市窗(半仓)', results[1])):
-        out.append(f'  {label}: 收益{r[0]:+.1f}% | 胜率{r[1]:.0f}% | {r[2]}笔 | 期末{r[3]:,.0f}')
+    if CUSTOM_WIN:
+        r = results[0]
+        out.append(f'  单窗(A式恒定55%仓位): 收益{r[0]:+.1f}% | 胜率{r[1]:.0f}% | {r[2]}笔 | 期末{r[3]:,.0f}')
+    else:
+        for label, r in (('强市窗(全仓)', results[0]), ('弱市窗(半仓)', results[1])):
+            out.append(f'  {label}: 收益{r[0]:+.1f}% | 胜率{r[1]:.0f}% | {r[2]}笔 | 期末{r[3]:,.0f}')
     out.append(f'基线权重目标分(初始配置):')
     obj0, res0 = objective(dict(base_w))
-    out.append(f'  初始权重: obj={obj0:+.1f} | 强市{res0[0][0]:+.1f}%/{res0[0][1]:.0f}%胜 | 弱市{res0[1][0]:+.1f}%/{res0[1][1]:.0f}%胜')
-    # 对照: 弱市窗空仓(温度开关口径)下的最优权重表现
-    out.append('')
-    out.append('对照 — 弱市窗空仓(温度开关口径, 弱市不参与):')
-    s_fmt = [f'{y[:4]}-{y[4:6]}-{y[6:]}' for y in strong_dates]
-    f_s, tr_s = simulate(w, s_fmt, 1.0)
-    ret_s = (f_s / INIT - 1) * 100
-    wr_s = sum(1 for t in tr_s if t['pnl'] > 0) / len(tr_s) * 100 if tr_s else 0
-    out.append(f'  强市窗全仓: 收益{ret_s:+.1f}% | 胜率{wr_s:.0f}% | {len(tr_s)}笔')
-    out.append(f'  弱市窗空仓: 收益0.0% | 0笔 (不参与)')
-    out.append(f'  合计(仅强市窗): 收益{ret_s:+.1f}% — 对比用户口径(强弱都做)整体{(results[0][0]+results[1][0])/2:+.1f}%')
+    if CUSTOM_WIN:
+        out.append(f'  初始权重: obj={obj0:+.1f} | 单窗{res0[0][0]:+.1f}%/{res0[0][1]:.0f}%胜')
+    else:
+        out.append(f'  初始权重: obj={obj0:+.1f} | 强市{res0[0][0]:+.1f}%/{res0[0][1]:.0f}%胜 | 弱市{res0[1][0]:+.1f}%/{res0[1][1]:.0f}%胜')
+    # 对照: 弱市窗空仓(温度开关口径)下的最优权重表现 (仅缺省双窗模式)
+    if not CUSTOM_WIN:
+        out.append('')
+        out.append('对照 — 弱市窗空仓(温度开关口径, 弱市不参与):')
+        s_fmt = [f'{y[:4]}-{y[4:6]}-{y[6:]}' for y in strong_dates]
+        f_s, tr_s = simulate(w, s_fmt, 1.0)
+        ret_s = (f_s / INIT - 1) * 100
+        wr_s = sum(1 for t in tr_s if t['pnl'] > 0) / len(tr_s) * 100 if tr_s else 0
+        out.append(f'  强市窗全仓: 收益{ret_s:+.1f}% | 胜率{wr_s:.0f}% | {len(tr_s)}笔')
+        out.append(f'  弱市窗空仓: 收益0.0% | 0笔 (不参与)')
+        out.append(f'  合计(仅强市窗): 收益{ret_s:+.1f}% — 对比用户口径(强弱都做)整体{(results[0][0]+results[1][0])/2:+.1f}%')
     with open(os.path.join(BASE, 'logs', 'backtest_v4_weights.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(out))
     print('\n'.join(out))
-    # 保存最优权重
-    cfg_path = os.path.join(BASE, 'data', 'scoring_config.json')
-    with open(cfg_path, encoding='utf-8') as f:
-        cfg = json.load(f)
-    prev_obj = cfg.get('v4', {}).get('searched_obj')
-    cfg['v4']['weights'] = w
-    cfg['v4']['searched_obj'] = round(obj, 1)
-    with open(cfg_path, 'w', encoding='utf-8') as f:
-        json.dump(cfg, f, ensure_ascii=False, indent=2)
-    print('\n最优权重已写回 scoring_config.json v4.weights')
-
-    # 2026-09-01起: 每次月度重搜后记录到权重历史 (data/weight_history.json, 供查找对比)
-    hist_path = os.path.join(BASE, 'data', 'weight_history.json')
-    hist = []
-    if os.path.exists(hist_path):
-        try:
-            with open(hist_path, encoding='utf-8') as f:
-                hist = json.load(f)
-        except Exception:
-            hist = []
-    hist.append({
-        'date': datetime.now().strftime('%Y-%m-%d'),
-        'prev_obj': prev_obj,
-        'obj': round(obj, 1),
-        'weights': dict(w),
-        'strong': {'ret': round(results[0][0], 1), 'win_rate': round(results[0][1], 1), 'trades': results[0][2]},
-        'weak': {'ret': round(results[1][0], 1), 'win_rate': round(results[1][1], 1), 'trades': results[1][2]},
-    })
-    with open(hist_path, 'w', encoding='utf-8') as f:
-        json.dump(hist, f, ensure_ascii=False, indent=2)
-    print(f'权重历史已记录: data/weight_history.json ({len(hist)}次)')
+    # 保存最优权重 (自定义窗口的回测只读数据, 不写回定稿配置)
+    if CUSTOM_WIN:
+        print('\n(自定义窗口模式: 不写回 scoring_config / weight_history)')
+        return
+    # 2026-09-12 用户拍板「后续选股只用老版本(V3)」→ 本脚本不再写回定稿配置与权重历史。
+    # 原逻辑(已删): 把重搜出的权重写进 scoring_config.json 的 v4.weights + 追加 weight_history.json。
+    # 保留本脚本作为纯研究工具: 照常跑搜索、照常打印结果、照常写 logs/backtest_v4_weights.txt。
+    print('\n[已停用] 权重写回 scoring_config.json / weight_history.json —— '
+          '2026-09-12 起选股只用 V3(active=v3), V4权重重搜不再作为定稿依据。')
+    print('           结果仅打印并存入 logs/backtest_v4_weights.txt (研究参考)。')
 
 
 def show_history():

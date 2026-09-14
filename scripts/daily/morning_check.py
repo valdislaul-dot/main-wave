@@ -2,7 +2,7 @@
 集成A的卖点引擎: 量能三态 + 封板质量 + 弱转强
 """
 import json, os, sys, time
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LOG_DIR = os.path.join(BASE, 'logs')
@@ -36,7 +36,7 @@ def fetch_live_quote(code):
         resp = urllib.request.urlopen(req, timeout=10)
         data = resp.read().decode('gbk')
         fields = data.split('~')
-        return {
+        quote = {
             'name': fields[1],
             'open': float(fields[5]),
             'prev_close': float(fields[4]),
@@ -46,6 +46,12 @@ def fetch_live_quote(code):
             'change_pct': float(fields[32]),
             'limit_up': float(fields[47]) if len(fields) > 47 else 0,
         }
+        # 2026-09-03修复: open/prev_close=0(竞价未撮合/停牌)视为行情未就绪,
+        # 否则gap=-100%会触发"跌停排队卖"类假结论
+        if quote['open'] <= 0 or quote['prev_close'] <= 0:
+            print(f'  [WARN] {code} 行情未就绪(open={quote["open"]}), 需9:25后重跑')
+            return None
+        return quote
     except Exception as e:
         print(f'  [WARN] 无法获取{code}实时行情: {e}')
         return None
@@ -139,10 +145,15 @@ def compute_position_decision(pos):
 
 def compute_environment(pf):
     """静默计算市场环境评级+买入开关 (2026-08-20: 供决策摘要先行打印)
-    分档: <60或最高≤2板=弱市(空仓,升温例外1/3) | 60-109=正常(半仓) | ≥110=强势(全仓)
-    返回 {env, switch, pos_pct, warming, zt_n, max_cons, zt_prev, avg_gap, downgraded}"""
-    r = {'env': None, 'switch': None, 'pos_pct': 0, 'warming': False,
-         'zt_n': 0, 'max_cons': 1, 'zt_prev': None, 'avg_gap': None, 'downgraded': False}
+    A式(2026-09-07用户拍板): 仓位恒定55%, 温度只展示不控仓; 风控交个股层
+    评级: 极弱(<40或最高≤2) / 弱市(40-99) / 强势(≥100)
+    警示(仅展示): 骤降防线 | 竞价二次确认 | 赚钱效应转负
+    返回 {env, switch, pos_pct, warming, collapse, zt_n, max_cons, zt_prev, max_cons_prev,
+          avg_gap, money_effect, downgraded, downgrade_reason}"""
+    r = {'env': None, 'switch': None, 'pos_pct': 0, 'warming': False, 'collapse': False,
+         'zt_n': 0, 'max_cons': 1, 'zt_prev': None, 'max_cons_prev': None,
+         'avg_gap': None, 'money_effect': None, 'downgraded': False, 'downgrade_reason': None,
+         'gap_stale': False, 'me_stale': False}
     try:
         _pp = _load_prev_pool()
         if not _pp:
@@ -150,7 +161,7 @@ def compute_environment(pf):
         _stocks, _ = _pp
         r['zt_n'] = len(_stocks)
         r['max_cons'] = max((int(x.get('limit_days', 1) or 1) for x in _stocks), default=1)
-        # 前日涨停数(升温判断)
+        # 前日涨停数+最高板 (升温/骤降判断)
         try:
             _zt_dir = os.path.join(BASE, 'data', 'zt_pool')
             _pool_files = sorted(f for f in os.listdir(_zt_dir) if f.endswith('.json'))
@@ -164,54 +175,45 @@ def compute_environment(pf):
                         _pp2 = json.load(_f)
                 _p2stocks = _pp2 if isinstance(_pp2, list) else _pp2.get('stocks', _pp2.get('data', []))
                 r['zt_prev'] = len(_p2stocks)
+                r['max_cons_prev'] = max((int(x.get('limit_days', 1) or 1) for x in _p2stocks), default=None)
+                r['_p2_date'] = _pool_files[-2][:8]  # T-2池文件日期(YYYYMMDD, 供赚效陈旧校验)
         except Exception:
             pass
-        r['warming'] = r['zt_prev'] is not None and r['zt_n'] > r['zt_prev']
-
-        # 温度分档(2026-08-25用户定稿): 极弱<40空仓(升温例外半仓) | 弱市40-109半仓 | 强市≥110全仓
-        if r['zt_n'] < 40 or r['max_cons'] <= 2:
-            r['env'] = '🌡️ 极弱'
-            if r['warming']:
-                r['switch'], r['pos_pct'] = '🟡 买入开关: 半仓(升温日例外)', 0.5
-            else:
-                r['switch'], r['pos_pct'] = '🛑 买入开关: 关闭(空仓)', 0.0
-        elif r['zt_n'] >= 110:
-            r['env'], r['switch'], r['pos_pct'] = '🌡️ 强势', '🟢 买入开关: 全仓', 1.0
-        else:
-            r['env'], r['switch'], r['pos_pct'] = '🌡️ 弱市', '🟢 买入开关: 半仓', 0.5
-
         # 竞价二次确认: 池均gap ≤ -0.5% → 降一档 (3年724日校准)
+        # 2026-09-03修复: current必须为今日采集, 否则昨日gap冒充今日参与降档
         try:
             _astate_path = os.path.join(BASE, 'data', 'auction_state.json')
             if os.path.exists(_astate_path):
                 with open(_astate_path, encoding='utf-8') as _f:
                     _astate = json.load(_f)
-                r['avg_gap'] = (_astate.get('current') or {}).get('avg_gap')
-                if r['avg_gap'] is not None and r['avg_gap'] <= -0.5:
-                    _downgrade = {'🌡️ 极弱': ('🌡️ 极弱', '🛑 买入开关: 关闭(空仓)', 0.0),
-                                  '🌡️ 弱市': ('🌡️ 极弱↓', '🛑 买入开关: 关闭(空仓, 竞价二次确认降档)', 0.0),
-                                  '🌡️ 强势': ('🌡️ 弱市↓', '🟢 买入开关: 半仓(竞价二次确认降档)', 0.5)}
-                    if r['env'] in _downgrade:
-                        r['env'], r['switch'], r['pos_pct'] = _downgrade[r['env']]
-                        r['downgraded'] = True
+                _cur = _astate.get('current') or {}
+                _today = datetime.now().strftime('%Y-%m-%d')
+                if _cur.get('date') == _today:
+                    r['avg_gap'] = _cur.get('avg_gap')
+                else:
+                    r['gap_stale'] = True
         except Exception:
             pass
-        # 盘后赚钱效应校准 (2026-08-25, 斯皮尔曼+0.403最强指标): 昨日<-2% → 降一档
+        # 盘后赚钱效应 (斯皮尔曼+0.403最强指标, capture_market_state盘后写入)
+        # 2026-09-03修复: 记录日期必须=T-2池日期, 滞后(未跑盘后流水线)则跳过转负降档
         try:
             _ms_path = os.path.join(BASE, 'data', 'market_state.json')
             if os.path.exists(_ms_path):
                 with open(_ms_path, encoding='utf-8') as _f:
                     _ms = json.load(_f)
-                r['money_effect'] = _ms.get('money_effect')
-                if r['money_effect'] is not None and r['money_effect'] < -2.0 and not r['downgraded']:
-                    _downgrade_me = {'🌡️ 极弱': ('🌡️ 极弱', '🛑 买入开关: 关闭(空仓)', 0.0),
-                                     '🌡️ 弱市': ('🌡️ 极弱↓', '🛑 买入开关: 关闭(空仓, 赚钱效应-2%校准)', 0.0),
-                                     '🌡️ 强势': ('🌡️ 弱市↓', '🟢 买入开关: 半仓(赚钱效应-2%校准)', 0.5)}
-                    if r['env'] in _downgrade_me:
-                        r['env'], r['switch'], r['pos_pct'] = _downgrade_me[r['env']]
-                        r['downgraded'] = True
+                _ms_date = _ms.get('date')
+                _p2d = r.get('_p2_date')
+                _exp = f'{_p2d[:4]}-{_p2d[4:6]}-{_p2d[6:]}' if _p2d else None
+                if _ms_date and _exp and _ms_date != _exp:
+                    r['me_stale'] = True
+                else:
+                    r['money_effect'] = _ms.get('money_effect')
         except Exception:
             pass
+        # 档位决策走纯函数 (2026-09-03, 可离线单测/历史回放)
+        from temperature import decide_temp_switch
+        r.update(decide_temp_switch(r['zt_n'], r['max_cons'], r['zt_prev'], r['max_cons_prev'],
+                                    r['avg_gap'], r['money_effect']))
     except Exception:
         pass
     return r
@@ -305,6 +307,59 @@ def find_divergence_candidates():
 _prev_pool_cache = None
 
 
+def ice_repair_stocks(env_info):
+    """🧊冰点修复信号 (2026-09-08晚用户拍板A+B, 数据裁决: 全样本3220笔分歧信号温度分层)
+    条件: 昨日温度<40(极弱冰点) → 昨池1板分歧票(涨停+大振幅>=10% 且 vr20>=2)为修复候选
+    依据: 极弱分歧段均笔+3.88%/51%胜 (全样本均值+1.37%); 国芳案例=分歧日38只→买入日85只回暖
+    返回 {code: {'vr': float, 'amp': float}} — 仅池内涨停分歧型(龙版型); 断板型(国芳)竞价快照
+    不覆盖, 属已知局限"""
+    if not env_info or env_info.get('zt_n', 100) >= 40:
+        return {}
+    pp = _load_prev_pool()
+    if not pp:
+        return {}
+    stocks, _ = pp
+    # 昨日池文件日期 → 校验K线末bar为同日(防错日评分)
+    from zt_pool import get_prev_pool_file
+    prev_fn = get_prev_pool_file()
+    if not prev_fn:
+        return {}
+    prev_date_fmt = f'{prev_fn[:4]}-{prev_fn[4:6]}-{prev_fn[6:8]}'
+    out = {}
+    for s in stocks:
+        code = str(s.get('code', '')).replace('sh', '').replace('sz', '')
+        if not code or code.startswith(('300', '301', '688', '8', '9')):
+            continue
+        if int(s.get('limit_days', 1) or 1) != 1:
+            continue
+        kp = os.path.join(BASE, 'data', 'kline_data', f'{code}.json')
+        if not os.path.exists(kp):
+            continue
+        try:
+            with open(kp, encoding='utf-8') as f:
+                raw = json.load(f)
+        except UnicodeDecodeError:
+            with open(kp, encoding='gbk') as f:
+                raw = json.load(f)
+        kl = raw.get('data', raw) if isinstance(raw, dict) else raw
+        idx = len(kl) - 1
+        if idx < 21 or str(kl[idx].get('date')) != prev_date_fmt:
+            continue
+        k = kl[idx]
+        pk = kl[idx - 1]
+        if pk['close'] <= 0 or (k['close'] - pk['close']) / pk['close'] < 0.098:
+            continue
+        amp = (k['high'] - k['low']) / pk['close'] * 100
+        if amp < 10:
+            continue
+        vols = [x['volume'] for x in kl[max(0, idx - 20):idx] if x.get('volume', 0) > 0]
+        vr = k['volume'] / (sum(vols) / len(vols)) if vols else 1.0
+        if vr < 2.0:
+            continue
+        out[code] = {'vr': round(vr, 1), 'amp': round(amp, 1)}
+    return out
+
+
 def _load_prev_pool():
     """上一交易日涨停池文件 → (stocks, sector_cnt), 带缓存"""
     global _prev_pool_cache
@@ -371,6 +426,8 @@ def stock_scoring_meta(code):
                     'final_seal_time': str(p.get('last_seal', '')).replace(':', ''),
                     'zhaban': int(p.get('break_times', 0) or 0),
                     'sector_count': meta['sector'],
+                    # 2026-09-03修复: 主分支漏传turnover, 缺失默认57分虚高
+                    'turnover': p.get('turnover', 0),
                     # V4题材热度分档(池级词频)
                     'sector_bucket': _sector_bucket_of(p.get('industry', ''), stocks),
                 }
@@ -417,9 +474,19 @@ def stock_scoring_meta(code):
                     meta['detail'] = {'sector_bucket': '<3'}
             except Exception:
                 pass
+        # K线新鲜度守卫 (2026-09-03修复): 末bar须覆盖T-1池日期, 否则错日bar×错日明细混评
+        meta['kline_fresh'] = True
+        try:
+            from zt_pool import get_prev_pool_file
+            _pfn = get_prev_pool_file()
+            if _pfn and meta['klines']:
+                _pdate = f'{_pfn[:4]}-{_pfn[4:6]}-{_pfn[6:8]}'
+                meta['kline_fresh'] = meta['klines'][-1]['date'] >= _pdate
+        except Exception:
+            pass
         if meta['klines']:
-            from scoring import score_v4
-            sc, _ = score_v4(code, meta['klines'], meta['detail'] or {})
+            from scoring import score_active
+            sc, _ = score_active(code, meta['klines'], meta['detail'] or {})
             if sc is None:
                 # 末日非涨停(断板持仓) → 截取至最近一次涨停日打分(与池内口径一致)
                 _kl = meta['klines']
@@ -432,7 +499,7 @@ def stock_scoring_meta(code):
                         _idx = i
                         break
                 if _idx is not None and _idx >= 25:
-                    sc, _ = score_v4(code, _kl[:_idx + 1], meta['detail'] or {})
+                    sc, _ = score_active(code, _kl[:_idx + 1], meta['detail'] or {})
             meta['score'] = sc
     except Exception:
         pass
@@ -440,8 +507,66 @@ def stock_scoring_meta(code):
     return meta
 
 
+def today_top1_code():
+    """当日可买第1名代码 (与表1同源: 竞价池 + gap平滑窗 + 现场V3评分 + 冰点上浮)
+
+    用途(2026-09-12 用户拍板): 若当日Top1仍是已持仓的票 → 不触发卖出, 继续持有
+    (例: 09-07买龙版传媒, 09-08 Top1仍是它 → 不卖不买, 持仓延续)
+    """
+    try:
+        from scoring import gap_weight as _gw
+        _f = os.path.join(BASE, 'data', 'auction',
+                          datetime.now().strftime('%Y-%m-%d') + '.json')
+        if not os.path.exists(_f):
+            return None
+        auc = json.load(open(_f, encoding='utf-8')).get('stocks', [])
+    except Exception:
+        return None
+    try:
+        _ice = set((ice_repair_stocks(compute_environment(None)) or {}).keys())
+    except Exception:
+        _ice = set()
+    best, best_w = None, -1e9
+    for s in auc:
+        code = str(s.get('code', '')).zfill(6)
+        gap = s.get('gap_pct', 0)
+        if not code or code.startswith(('300', '301', '688', '8', '9')):
+            continue
+        if s.get('one_line') or s.get('high_risk'):
+            continue
+        w = _gw(gap)
+        if w <= 0:
+            continue
+        try:
+            meta = stock_scoring_meta(code)
+        except Exception:
+            continue
+        if not meta or meta.get('score') is None:
+            continue
+        sc = meta['score'] * w * (1.2 if code in _ice else 1.0)
+        if sc > best_w:
+            best_w, best = sc, code
+    return best
+
+
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
+    # SC4 会话日期门 (04-04, T-04-14): 先于候选加载/快照采集/网络 —— --date
+    # 存在且 != 本地会话日期 -> ASCII 拒绝 + exit 2 (fail-loud, PATTERNS)。
+    # 解析单源 date_args (T-04-15); 无 token = 今日运行, 与 Phase 3 行为相同。
+    try:
+        from date_args import resolve_date_arg
+        _session = resolve_date_arg(sys.argv)
+    except ValueError:
+        print('ERROR: invalid --date value: expected YYYY-MM-DD or YYYYMMDD '
+              '(a real calendar date) as the session date', file=sys.stderr)
+        sys.exit(2)
+    if _session is not None and _session != date.today():
+        print(f'ERROR: --date={_session:%Y-%m-%d} is not the current session '
+              f'date; refusing to label a live run under another date',
+              file=sys.stderr)
+        sys.exit(2)
+
     quick = '--quick' in sys.argv
     data = load_latest_candidates()
     pf = load_portfolio()
@@ -477,7 +602,25 @@ def main():
     else:
         pos_list = []
     pos_results = [(pos, compute_position_decision(pos)) for pos in pos_list]
+
+    # ── 规则: 当日Top1仍是已持仓的票 → 不触发卖出, 继续持有 (2026-09-12用户拍板) ──
+    # 例: 09-07买龙版传媒, 09-08 Top1仍是它 → 不卖也不重复买, 持仓延续
+    _t1 = today_top1_code()
+    if _t1:
+        _new = []
+        for _pos, _r in pos_results:
+            if (_r and _r.get('signal')
+                    and str(_pos.get('code', '')).zfill(6) == _t1
+                    and _r['signal'].get('action') in ('sell', 'sell_half')):
+                _r['signal'] = {'action': 'hold', 'urgency': 'normal',
+                                'reason': f'当日V3 Top1仍是它({_pos.get("name","")}) → 继续持有',
+                                'reference_price': _r['signal'].get('reference_price', 0),
+                                'detail': '2026-09-12拍板: 模型连续选中同一标的时不触发卖出'}
+            _new.append((_pos, _r))
+        pos_results = _new
     env_info = compute_environment(pf)
+    # ── 🧊 冰点修复信号 (2026-09-08晚用户拍板A+B) ──
+    ice_repair = ice_repair_stocks(env_info)
 
     # ── 持仓V4评分 (2026-08-28, 用户要求: 持仓与其他股票同台比较) ──
     pos_scores = []
@@ -507,11 +650,16 @@ def main():
             elif act == 'watch':
                 print(f'  ║  🟡 观察 {pos["name"]}({pos["code"]}) — {sig["reason"]}')
             else:
-                print(f'  ║  ⚪ 持有 {pos["name"]}({pos["code"]}) — {sig["reason"]}')
+                # 2026-09-03修复: 无K线/数据不足是引擎失败态, 不能呈现为"持有"
+                _fail = sig['reason'] in ('无K线数据', 'K线数据不足')
+                _mark, _act = ('⚠', '需手动判断') if _fail else ('⚪', '持有')
+                print(f'  ║  {_mark} {_act} {pos["name"]}({pos["code"]}) — {sig["reason"]}')
     else:
         print(f'  ║  空仓')
     if env_info.get('env'):
         print(f'  ║  {env_info["switch"]}')
+    if ice_repair:
+        print(f'  ║  🧊 冰点修复: 昨温度{env_info["zt_n"]}只<40, {len(ice_repair)}只1板分歧票综合分×1.2上浮')
     print(f'  ╚══════════════════════════════════════════════╝')
 
     # ── 盘后体检警告 (解释层, 2026-08-19 体检→候选联动) ──
@@ -644,26 +792,52 @@ def main():
             candidate_scores[c['code']] = c
 
     # ── 今日竞价池买入候选（现场打分, 解决流水线评分盲区） ──
+    from scoring import gap_weight as _gw_fn, load_config as _lc_ver
     buyable = []
+    _stale_cnt = 0
+    # 评分量纲守卫(2026-09-13): 快照/候选分由盘后流水线按当时active写入,
+    # 与现行active版本不符时(如候选是V4分而现行是V3)禁止兜底, 防旧量纲分污染排序
+    _active_ver = str((_lc_ver() or {}).get('active', 'v4')).lower()
+    _cand_ver = str((data or {}).get('version', '')).lower()
+    _ver_ok = bool(_cand_ver) and _cand_ver == _active_ver
+    _unit_cnt = 0
     for s in auction_stocks:
         code = s.get('code', '')
         gap = s.get('gap_pct', 0)
         is_one_line = s.get('one_line', False)
         is_300 = code.startswith(('300', '301', '688', '8', '9'))
+        cand = candidate_scores.get(code, {})
 
         if is_300 or is_one_line or s.get('high_risk', False):
             continue
-        if 4.0 <= gap <= 8.0:
-            cand = candidate_scores.get(code, {})
+        # 4板+一字/T字高危过滤 (2026-09-03修复: 定稿2026-08-24裁决, T字次日开盘买入-1.17%)
+        if int(cand.get('cons', 0) or 0) >= 4 and cand.get('one_line', False):
+            continue
+        # gap窗口 (2026-09-13改硬边界4-8%: 对齐v3_sim_hold.py模拟口径; V3负分域乘法会反转)
+        _gw = _gw_fn(gap)
+        if _gw > 0:
             meta = stock_scoring_meta(code)
+            if not meta.get('kline_fresh', True):
+                _stale_cnt += 1
+                continue
             auction_score = s.get('score', 0)
             cand_score = cand.get('score', 0)
-            # 现场评分优先(与表2细则同源), 失败则退回快照分/候选分
-            final_score = meta['score'] if meta['score'] is not None else \
-                (auction_score if auction_score > 0 else cand_score)
+            # 现场评分优先(与表2细则同源)
+            if meta['score'] is not None:
+                final_score = meta['score']
+            elif _ver_ok:
+                # 兜底仅同量纲时启用(见循环前守卫说明)
+                final_score = auction_score if auction_score > 0 else cand_score
+            else:
+                _unit_cnt += 1
+                continue
+            _ice = code in ice_repair
             buyable.append({
                 'code': code, 'name': s.get('name', ''),
                 'gap': gap, 'score': final_score,
+                # 冰点修复票综合分×1.2上浮 (2026-09-08拍板: 极弱分歧段均笔+3.88% vs 全样本+1.37%)
+                'weighted': final_score * _gw * (1.2 if _ice else 1.0), 'gap_w': _gw,
+                'ice': _ice,
                 'limit_days': meta['cons'] if meta['cons'] != '?' else s.get('limit_days', cand.get('cons', 1)),
                 'industry': meta['industry'] or cand.get('industry', ''),
                 'sector': meta['sector'],
@@ -671,32 +845,64 @@ def main():
                 'in_candidates': code in candidate_scores
             })
 
-    buyable.sort(key=lambda x: x['score'], reverse=True)
+    if _stale_cnt:
+        print(f'  ⚠ K线滞后跳过 {_stale_cnt} 只候选(未覆盖T-1涨停bar, 防错日评分)')
+    if _unit_cnt:
+        _cv = _cand_ver or '?'
+        print(f'  ⚠ 量纲不符跳过 {_unit_cnt} 只(快照分版本"{_cv}"≠现行"{_active_ver}", 防旧分污染排序)')
+    buyable.sort(key=lambda x: x['weighted'], reverse=True)
 
     # ── 🌡️ 市场环境评级详情 (结论已在摘要, 此处解释) ──
     if env_info.get('env'):
         print(f'\n  {env_info["env"]}: 昨日涨停{env_info["zt_n"]}只, 最高{env_info["max_cons"]}板'
               + (f', 较前日{env_info["zt_prev"]}只{"回升" if env_info["warming"] else "回落"}' if env_info["zt_prev"] is not None else ''))
-        print(f'  {env_info["switch"]} (仓位由个人交易情况决定, 仅温度建议)')
-        if env_info.get('downgraded'):
-            print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5% → 环境降档'
-                  f' (3年724日: 该档当日-2.87%/上涨31%)')
+        print(f'  {env_info["switch"]} (2026-09-07 A式: 温度仅展示, 不控仓)')
+        # 三条警示状态 (2026-09-03原降档规则, 2026-09-07 A式起仅展示)
+        _dr = env_info.get('downgrade_reason')
+        if env_info.get('zt_prev'):
+            _dpct = round((env_info['zt_prev'] - env_info['zt_n']) / env_info['zt_prev'] * 100)
+            if env_info.get('collapse'):
+                _col_txt = '⚠警示(仅展示)' if _dr and _dr.startswith('骤降防线') else '触发警示(仅展示)'
+                print(f'  ⚠ 骤降防线: 昨日{env_info["zt_n"]}只 较前日{env_info["zt_prev"]}只 ({-_dpct:+d}%) → {_col_txt}')
+            else:
+                print(f'  ✓ 骤降防线: 昨日{env_info["zt_n"]}只 较前日{env_info["zt_prev"]}只 ({-_dpct:+d}%), 未触发')
+        if env_info.get('gap_stale'):
+            print(f'  ⚠ 竞价二次确认: 竞价快照非今日采集, 已跳过 (需9:25-9:30重跑采集)')
         elif env_info.get('avg_gap') is not None:
-            print(f'  ✓ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% > -0.5%, 维持评级')
-        if env_info.get('money_effect') is not None:
+            if env_info['avg_gap'] <= -0.5:
+                if _dr and _dr.startswith('竞价二次确认'):
+                    print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5% → ⚠警示(仅展示)'
+                          f' (3年724日: 该档当日-2.87%/上涨31%)')
+                else:
+                    print(f'  ⚠ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% ≤ -0.5%'
+                          f' → ⚠警示(仅展示, 不降仓)')
+            else:
+                print(f'  ✓ 竞价二次确认: 池均gap {env_info["avg_gap"]:+.1f}% > -0.5%, 维持评级')
+        if env_info.get('me_stale'):
+            print(f'  ⚠ 盘后赚钱效应: 数据日期滞后(未跑盘后流水线), 已跳过转负警示')
+        elif env_info.get('money_effect') is not None:
             _me = env_info['money_effect']
-            if _me < -2.0 and env_info.get('downgraded'):
-                print(f'  ⚠ 盘后赚钱效应: 昨日{_me:+.1f}% < -2% → 已降档')
+            if _me < 0 and _dr and _dr.startswith('赚钱效应转负'):
+                print(f'  ⚠ 盘后赚钱效应: 昨日{_me:+.1f}% 转负 → ⚠警示(仅展示, 不降仓)')
             else:
                 _me_mark = '⚠' if _me < 0 else '✓'
-                print(f'  {_me_mark} 盘后赚钱效应: 昨日{_me:+.1f}% (关联最强指标, <-2%降档)')
+                print(f'  {_me_mark} 盘后赚钱效应: 昨日{_me:+.1f}% (关联最强指标, 转负警示)')
 
     # ── 📊 表1: 当日可买前三 ──
-    from scoring import get_score_min as _gsm
-    top3 = [b for b in buyable if b['score'] >= _gsm()][:3]
+    top3 = buyable[:3]
+    # 🧊 冰点修复信号明细 (2026-09-08拍板: 只提示, 加权见排序)
+    if ice_repair and not quick:
+        print(f'\n  🧊 冰点修复信号 (昨温度<40, 依据: 极弱分歧段均笔+3.88% vs 全样本+1.37%, 2026-09-08数据裁决)')
+        for _ic, _iv in ice_repair.items():
+            _nm = next((st.get('name', '?') for st in auction_stocks if st.get('code') == _ic), '?')
+            _gap_v = next((st.get('gap_pct') for st in auction_stocks if st.get('code') == _ic), None)
+            _in_top = any(b['code'] == _ic for b in top3)
+            _gap_s = f'{_gap_v:+.1f}%' if _gap_v is not None else '?'
+            print(f'     {_nm}({_ic}) vr{_iv["vr"]} 振幅{_iv["amp"]}% 竞价gap{_gap_s}'
+                  + ('  ✓进可买Top3(已×1.2加权)' if _in_top else '  (未进Top3, 仅提示)'))
     if not quick:
         print(f'\n{"=" * 65}')
-        print(f'  📊 表1: 当日可买前三 (评分≥50, 竞价4-8%, 已过滤一字/4板+一字/300·688)')
+        print(f'  📊 表1: 当日可买前三 (gap硬边界4-8%, 按{"V3" if _active_ver == "v3" else "V4"}评分排序, 已过滤一字/4板+一字/300·688)')
         print(f'{"=" * 65}')
     if top3 and not quick:
         print(f'  {"#":<3}{"标的":<14}{"评分":>6}{"竞价gap":>8}{"连板":>5}{"板块":>9}{"⚠跌停风险":>10}')
@@ -716,44 +922,56 @@ def main():
                 _dt_p, _dt_risk = 10.7, -0.42
             _dt_mark = '🔴' if _dt_p >= 20 else ('🟡' if _dt_p >= 10 else '⚪')
             _dt_str = f'{_dt_mark}{_dt_p:.0f}%({_dt_risk:+.2f})'
-            print(f'  {i:<3}{b["name"]}({b["code"]}){b["score"]:>8.0f}{b["gap"]:>+7.1f}%'
+            _ice_tag = '🧊' if b.get('ice') else ''
+            print(f'  {i:<3}{_ice_tag}{b["name"]}({b["code"]}){b["score"]:>8.0f}{b["gap"]:>+7.1f}%'
                   f'{str(_cons) + "板":>6}{str(b["sector"]) + "只":>6}{_dt_str:>14}')
     elif not top3 and not quick:
-        print(f'  (无评分≥50的可买标的)')
+        print(f'  (无可买标的)')
 
-    # quick模式: 一行式可买前三 (2026-08-31用户定死: 持仓建议与可买标的必出, 开关关闭也列并标注仅参考)
+    # quick模式: 一行式可买前三 (2026-08-31用户定死: 持仓建议与可买标的必出)
+    # A式(2026-09-07): 仓位恒定55%开关恒开, "仅参考"标注逻辑随之移除
     if quick:
-        _note = '' if env_info.get('pos_pct', 0) > 0 else ' ⚠买入开关关闭, 以下仅参考'
-        print(f'\n  ⚡ 可买前三(quick, 评分≥50 竞价4-8%){_note}:')
+        print(f'\n  ⚡ 可买前三(quick, gap硬边界4-8%, 按{"V3" if _active_ver == "v3" else "V4"}评分排序):')
         for i, b in enumerate(top3, 1):
-            print(f'    #{i} {b["name"]}({b["code"]}) {b["score"]:.0f}分 '
+            _ice_tag = '🧊' if b.get('ice') else ''
+            print(f'    #{i} {_ice_tag}{b["name"]}({b["code"]}) {b["score"]:.0f}分 '
                   f'gap{b["gap"]:+.1f}% {int(b.get("limit_days") or 1)}板 板块{b["sector"]}只')
         if not top3:
-            print('    (无评分≥50的可买标的)')
+            print('    (无可买标的)')
 
     # ── 📊 表2: 前三名得分细则 ──
     if top3 and not quick:
+        _v3_mode = _active_ver == 'v3'
         print(f'\n{"=" * 65}')
-        print(f'  📊 表2: 前三名得分细则 (V4百分制加权)')
+        print(f'  📊 表2: 前三名得分细则 ({"V3累加制" if _v3_mode else "V4百分制加权"})')
         print(f'{"=" * 65}')
-        from scoring import load_config as _lc2
+        from scoring import load_config as _lc2, score_active
         _cfg2 = _lc2()
+        _V3_NAMES = {'vr': '量比', 'gap': 'Gap', 'one_line': '一字板', 'cons': '连板',
+                     'dow': '周几', 'seal_time': '封板', 'zhaban': '炸板',
+                     'sector': '板块', 'divergence': '分歧'}
         for b in top3:
             meta = stock_scoring_meta(b['code'])
             if meta['klines'] and meta['detail']:
-                from scoring import score_v4
-                _sc4, _det4 = score_v4(b['code'], meta['klines'], meta['detail'])
+                _sc4, _det4 = score_active(b['code'], meta['klines'], meta['detail'])
                 if _det4:
                     print(f'  {b["name"]}({b["code"]})  {_sc4:.0f}分')
-                    _f = _det4['factor_scores']
-                    _w = _cfg2['v4']['weights']
-                    print(f'    ' + '  '.join(
-                        f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
+                    if _v3_mode:
+                        # V3累加制分项(2026-09-13): 由 scoring.compute_score 的 v3_breakdown 还原
+                        _bd = _det4.get('v3_breakdown') or {}
+                        _items = [f'{_V3_NAMES.get(k, k)}{v:+.0f}' for k, v in _bd.items() if v]
+                        print('    ' + ('  '.join(_items) if _items else '(无分项)'))
+                    else:
+                        _f = _det4.get('factor_scores') or {}
+                        _w = (_cfg2.get('v4') or {}).get('weights', {})
+                        if _f and _w:
+                            print(f'    ' + '  '.join(
+                                f'{k}({_f.get(k, 0):.0f}分×{_w.get(k, 0):.0f}%)' for k in _w if _w[k] > 0))
 
     # ── 📊 表4: 持仓评分对比 (2026-08-28, 持仓与可买池同台比较) ──
     if pos_scores:
         print(f'\n{"=" * 65}')
-        print(f'  📊 表4: 持仓评分对比 (V4同口径)')
+        print(f'  📊 表4: 持仓评分对比 ({"V3" if _active_ver == "v3" else "V4"}同口径)')
         print(f'{"=" * 65}')
         for p in pos_scores:
             print(f'  持仓 {p["name"]}({p["code"]})  {p["score"]:.0f}分  {p["cons"]}板  {p["industry"][:10]}')

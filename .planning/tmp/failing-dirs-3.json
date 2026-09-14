@@ -1,0 +1,115 @@
+{
+  "status": "ok",
+  "commands": [
+    {
+      "command": "for i in $(seq 1 30); do python -c \"import urllib.request,json; r=urllib.request.urlopen('http://127.0.0.1:8018/v1/state/market_state', timeout=2); body=r.read(); h=dict(r.headers); assert r.status==200 and json.loads(body) and h.get('content-type')=='application/json' and int(h['x-data-mtime'])>=0 and int(h['x-data-age-s'])>=0 and 'x-data-stale' not in h\" && { echo \"state service up on 8018\"; exit 0; }; sleep 1; done; echo \"never came up: the assertion never passed within 30 s\" >&2; exit 1",
+      "statement": "the command exits 1 because the 30 s poll loop ended without the assertion passing (service never came up on 8018, non-200, non-JSON body, wrong content-type, missing/non-integer freshness headers, or an x-data-stale header on a fresh read — check the temp log for a boot error first)",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "api/state.py: defensive read layer + /v1/state/{name} + /health/ready, registered in api/main.py, live-probed end-to-end"
+    },
+    {
+      "command": "python -c \"import urllib.request,pathlib; got=urllib.request.urlopen('http://127.0.0.1:8018/v1/state/market_state').read(); want=pathlib.Path('data/market_state.json').read_bytes(); assert got==want and b'\\r\\n' in got, (len(got), len(want))\"",
+      "statement": "the served bytes differ from the file bytes or contain no CRLF (verbatim contract broken — check for a text-mode read or re-serialization in read_state_file); if the pipeline rewrote the file mid-check, re-run the command once before treating it as a real failure",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "api/state.py: defensive read layer + /v1/state/{name} + /health/ready, registered in api/main.py, live-probed end-to-end"
+    },
+    {
+      "command": "python -c \"import urllib.request,json; import urllib.error; import json as j; from urllib.error import HTTPError; import urllib.request as u; \ntry:\n    u.urlopen('http://127.0.0.1:8018/v1/state/portfolio', timeout=2); raise SystemExit('expected 404')\nexcept HTTPError as e:\n    assert e.code==404 and j.loads(e.read())['detail']=='unknown state name'\nb=j.loads(u.urlopen('http://127.0.0.1:8018/health/ready', timeout=2).read()); assert b=={'status':'ready'}\nb=j.loads(u.urlopen('http://127.0.0.1:8018/health', timeout=2).read()); assert b['status']=='ok'\"",
+      "statement": "a traversal/unknown name returns anything but 404 with the exact detail, or /health/ready is not 200 {\"status\": \"ready\"}, or /health regressed (Phase 1 purity broken by the registration)",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "api/state.py: defensive read layer + /v1/state/{name} + /health/ready, registered in api/main.py, live-probed end-to-end"
+    },
+    {
+      "command": "out=$(netstat -ano | grep \":8018\" | grep LISTENING); if [ -n \"$out\" ]; then echo \"port 8018 still occupied after taskkill:\"; echo \"$out\"; exit 1; fi; echo \"cleanup check passed: no LISTENING entry on 8018\"",
+      "statement": "the command exits 1 because netstat still shows a process LISTENING on 8018 after the taskkill (a stray process would not break Task 3, but an orphaned python would violate the repo's single-resident-process discipline — do not proceed until the port is free)",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "api/state.py: defensive read layer + /v1/state/{name} + /health/ready, registered in api/main.py, live-probed end-to-end"
+    },
+    {
+      "command": "python -m pytest tests/test_state.py -q",
+      "statement": "non-zero exit, or the summary line shows any failed/error count above 0, or 0 tests collected",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "tests/test_state.py: STA-01 verbatim/header/whitelist + STA-03 retry/cache/stale + HLT-02 ready + SC4 source-scan suite"
+    },
+    {
+      "command": "git status --porcelain -- data/",
+      "statement": "non-empty output (a test touched or dirtied real data/ files — the data-isolation pin failed; every fixture write must stay under tmp_path)",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "tests/test_state.py: STA-01 verbatim/header/whitelist + STA-03 retry/cache/stale + HLT-02 ready + SC4 source-scan suite"
+    },
+    {
+      "command": "python -m pytest tests/test_state.py -q",
+      "statement": "non-zero exit, or any failed/error count above 0, or 0 tests collected (the hammer must pass with every response 200 and every stale body equal to the last-known-good bytes)",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "0x5xx hammer test + full-suite gate + SC4 grep audit + resident-service restart onto the new code"
+    },
+    {
+      "command": "python -m pytest -q",
+      "statement": "non-zero exit, or any failed/error above 0, or \"no tests ran\" (Phase 1 regressions would appear here — /health, boot, token tests must all stay green)",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "0x5xx hammer test + full-suite gate + SC4 grep audit + resident-service restart onto the new code"
+    },
+    {
+      "command": "out=$(grep -nE \"(requests|urllib|httpx|aiohttp|socket)(\\.|[[:space:]]*import|import)\" api/*.py); test -z \"$out\" && echo \"SC4 audit clean\"",
+      "statement": "the captured output is non-empty (a network-capable import or call exists in api/*.py — ROADMAP SC4 violated; find and remove it before proceeding)",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "0x5xx hammer test + full-suite gate + SC4 grep audit + resident-service restart onto the new code"
+    },
+    {
+      "command": "powershell -NoProfile -Command \"Start-ScheduledTask -TaskName 'gogo-api' -ErrorAction Stop\" || { echo \"Start-ScheduledTask gogo-api failed\" >&2; exit 1; }; for i in $(seq 1 12); do python -c \"import urllib.request,json; b=json.load(urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)); assert b['status']=='ok'\" && { echo \"gogo-api service up on 8000\"; exit 0; }; sleep 5; done; echo \"never came up: /health not 200 ok within 60 s\" >&2; exit 1",
+      "statement": "the command exits 1 on either path: Start-ScheduledTask failed immediately (the task was not started — verify the 'gogo-api' task registration per the Phase 1 playbook), or the 60 s poll loop ended without /health 200 ok (the restarted task did not bring the service up — tail logs/api/console.log and diagnose before proceeding)",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "0x5xx hammer test + full-suite gate + SC4 grep audit + resident-service restart onto the new code"
+    },
+    {
+      "command": "python -c \"import urllib.request,pathlib,json; got=urllib.request.urlopen('http://127.0.0.1:8000/v1/state/market_state').read(); want=pathlib.Path('data/market_state.json').read_bytes(); assert got==want, (len(got), len(want)); h=dict(urllib.request.urlopen('http://127.0.0.1:8000/v1/state/market_state').headers); assert int(h['x-data-mtime'])>=0 and int(h['x-data-age-s'])>=0 and 'x-data-stale' not in h; b=json.load(urllib.request.urlopen('http://127.0.0.1:8000/health/ready')); assert b=={'status':'ready'}\"",
+      "statement": "the resident service's /v1/state/market_state body is not byte-identical to the file (verbatim contract broken on the live service), the freshness headers are missing/non-integer, a stale header appears on a fresh read, or /health/ready is not 200 ready — if the file was mid-rewrite, re-run once before treating as real",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "0x5xx hammer test + full-suite gate + SC4 grep audit + resident-service restart onto the new code"
+    },
+    {
+      "command": "python -c \"import urllib.request; import urllib.error; from urllib.error import HTTPError; import json as j\ntry:\n    urllib.request.urlopen('http://127.0.0.1:8000/v1/state/portfolio', timeout=2); raise SystemExit('expected 404')\nexcept HTTPError as e:\n    assert e.code==404 and j.loads(e.read())['detail']=='unknown state name'\"",
+      "statement": "an unknown name on the live service returns anything but 404 with the pinned detail (whitelist broken in the running code)",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "0x5xx hammer test + full-suite gate + SC4 grep audit + resident-service restart onto the new code"
+    },
+    {
+      "command": "powershell -NoProfile -Command \"(Get-ScheduledTask -TaskName 'gogo-api').State; (Get-ScheduledTaskInfo -TaskName 'gogo-api').LastTaskResult; (Get-Content logs/api/console.log | Measure-Object -Line).Lines\"",
+      "statement": "State is not Running, or LastTaskResult is a failure code (1 = SEC-03 refusal, 0xC000013A/0x2 = command not found), or the console.log line count did not grow past the pre-restart baseline",
+      "status": "ok",
+      "severity": "none",
+      "plan": "02-01-PLAN.md",
+      "task": "0x5xx hammer test + full-suite gate + SC4 grep audit + resident-service restart onto the new code"
+    }
+  ],
+  "counts": {
+    "blocker": 0,
+    "warning": 0,
+    "total": 13
+  },
+  "readError": null
+}

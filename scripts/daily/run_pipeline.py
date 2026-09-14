@@ -4,8 +4,8 @@
   python run_pipeline.py              # 盘后运行
   python run_pipeline.py --fast       # 轻量模式(仅涨停池+评分)
   python run_pipeline.py --status     # 查看持仓
-  python run_pipeline.py --buy CODE PRICE SHARES
-  python run_pipeline.py --sell CODE PRICE
+  python run_pipeline.py --buy NAME CODE PRICE [SHARES]   # 2026-09-03: 修正文档(实现按此序解析)
+  python run_pipeline.py --sell NAME CODE PRICE   # 2026-09-04 WR-06: 修正文档(实现按此序解析; 原2参形从未可用)
 """
 import sys, os, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -14,6 +14,8 @@ BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 from update_data import main as update_data
 from screen_candidates import main as screen_candidates
 from trading_journal import print_status, record_buy, record_sell, record_hold_valuation
+from date_args import resolve_date_arg  # SC4 会话日期门单源解析 (04-04, 零副作用)
+from datetime import date
 
 
 def main():
@@ -28,27 +30,42 @@ def main():
             from trading_journal import load_portfolio
             pf = load_portfolio()
             if shares == 0:
-                import json
-                candidates_file = None
-                for f in sorted(os.listdir(os.path.join(BASE,'logs'))):
-                    if f.startswith('candidates_'): candidates_file = os.path.join(BASE,'logs',f)
+                # 2026-09-03修复: 原候选查找循环pos_pct恒0.5属死代码;
+                # 仓位由温度开关(temperature.py)管, 此处保持半仓近似仅用于自动股数
                 pos_pct = 0.5
-                if candidates_file:
-                    with open(candidates_file, 'r', encoding='utf-8') as cf:
-                        data = json.load(cf)
-                        for c in data.get('candidates',[]):
-                            if c['code'] == code: pos_pct = 0.5; break
                 deploy = pf['cash'] * pos_pct
                 shares = int(deploy / price / 100) * 100
             cost = shares * price
             record_buy(name, code, price, shares, cost)
-        elif cmd == '--sell' and len(sys.argv) >= 4:
-            record_sell(sys.argv[2], sys.argv[3], float(sys.argv[4]))
+        elif cmd == '--sell' and len(sys.argv) >= 5:
+            # WR-06 (04 修复): 文档 2 参形 (--sell CODE PRICE) 从未可用 —— 原 len>=4
+            # 守卫下 2 参 argv 长度恰为 4, argv[4] 越界崩溃 (按文档敲即 traceback)。
+            # 实际形态与 --buy 及 record_trader.py --sell 同形: NAME CODE PRICE
+            # (2026-09-03 buy 文档已按同口径修正); 收紧守卫至 >= 5, 缺参落 Usage。
+            # WR-07 (04 修复): record_sell 拒绝 (错配/空仓) 返回 None —— 原返回 pf
+            # 且本行忽略返回值, 脚本/包装方把"被拒"当"已卖" (进程退出码 0)。
+            if record_sell(sys.argv[2], sys.argv[3], float(sys.argv[4])) is None:
+                sys.exit(1)  # 卖出被拒: 名码错配/空仓, 非零退出防静默漏卖
         elif cmd == '--value' and len(sys.argv) >= 3:
             record_hold_valuation(float(sys.argv[2]))
         else:
             print('Usage: python run_pipeline.py [--status|--buy|--sell|--value]')
     else:
+        # SC4 会话日期门 (04-04, T-04-14): --date 存在且 != 本地会话日期 ->
+        # ASCII 拒绝 + exit 2, 先于任何采集/写文件/网络 (fail-loud, PATTERNS)。
+        # 解析单源 date_args (T-04-15); 无 token = 今日运行, 与 Phase 3 行为相同。
+        try:
+            _session = resolve_date_arg(sys.argv)
+        except ValueError:
+            print('ERROR: invalid --date value: expected YYYY-MM-DD or YYYYMMDD '
+                  '(a real calendar date) as the session date', file=sys.stderr)
+            sys.exit(2)
+        if _session is not None and _session != date.today():
+            print(f'ERROR: --date={_session:%Y-%m-%d} is not the current session '
+                  f'date; refusing to label a live run under another date',
+                  file=sys.stderr)
+            sys.exit(2)
+
         print('=' * 60)
         print('  每日选股流水线')
         print('=' * 60)
@@ -57,9 +74,15 @@ def main():
         print('\n[Step 1/7] 更新当日涨停池...')
         try:
             from zt_pool import update_zt_pool
-            update_zt_pool()
+            _res = update_zt_pool()
+            # 2026-09-03修复: 双源失败(返回None)时中止流水线, 原继续跑会用旧state
+            # 覆写当日候选, 次日早晨面板基于滞后一日的池且无任何告警
+            if _res is None:
+                print('⚠⚠ 涨停池更新失败(双源均无数据), 中止流水线 — 检查网络后重跑')
+                sys.exit(1)
         except Exception as e:
-            print(f'[Warning] ZT pool update failed: {e}')
+            print(f'⚠⚠ ZT pool update failed: {e}, 中止流水线')
+            sys.exit(1)
 
         # Step 1.1: 官方API双源校验 (2026-08-31, 仅警告不改数据)
         try:
@@ -100,13 +123,8 @@ def main():
         except Exception as e:
             print(f'[Warning] 封板重算失败: {e}')
 
-        # Step 1.6: 资金流采集 (新浪日频, 观察数据不进评分, 待N≥50回看检验)
-        print('\n[Step 1.6] 采集涨停池资金流...')
-        try:
-            from capture_money_flow import main as capture_money_flow
-            capture_money_flow()
-        except Exception as e:
-            print(f'[Warning] 资金流采集失败: {e}')
+        # Step 1.6 已弃用(2026-09-04): 资金流采集移除 — N≥50检验+大样本四象限裁决: 无预测力
+        # (历史: 新浪日频观察数据, 待N≥50回看检验独立预测力再解冻, 2026-09-04大样本否决)
 
         # Step 2: Update K-line (only ZT pool stocks, Tencent fqkline + Sina fallback)
         print('\n[Step 2/7] 更新K线数据(涨停池标的)...')
@@ -152,7 +170,10 @@ def main():
             try:
                 from generate_report import generate
                 generate()
-            except: pass
+            except Exception as e:
+                # WR-04 (04 修复): 原 bare except: pass 把报告失败静默吞掉 —
+                # 流水线报成功且零诊断; bare except 还吞 KeyboardInterrupt (Ctrl-C 失效)
+                print(f'[Warning] 报告生成失败: {e}')
 
             # Step 6: Review yesterday's top-3 recommendations
             print('\n[Step 6/7] 回看昨日推荐前三...')
@@ -167,7 +188,9 @@ def main():
             try:
                 from capture_tboard_minute import main as capture_tboard
                 capture_tboard()
-            except: pass
+            except Exception as e:
+                # WR-04 (04 修复): 同 Step 5 —— 原 bare except: pass 静默吞失败
+                print(f'[Warning] T字板分钟捕获失败: {e}')
 
             # Step 8: Data health check
             print('\n[Step 8/8] 数据体检...')
@@ -183,6 +206,13 @@ def main():
                 capture_market_state()
             except Exception as e:
                 print(f'[Warning] 市场状态采集失败: {e}')
+
+            # Step 8.6: 卖点规则月度跟踪 (2026-09-02, 断板低开持有vs卖, 盘后运行不影响竞价)
+            try:
+                from backtest_sell_exit import watch_summary
+                watch_summary()
+            except Exception as e:
+                print(f'[Warning] 卖点规则跟踪失败: {e}')
 
             # Step 9: 数据上云同步 (2026-08-16新增, 自动push关键快照到GitHub)
             print('\n[Step 9] 数据上云同步...')

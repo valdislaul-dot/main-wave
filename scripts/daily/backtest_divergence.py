@@ -1,11 +1,11 @@
 """
 分歧弱转强模式回测 (2026-08-13)
 来源: 干货_怎么选.doc — T日爆量+烂板涨停(大分歧日) → T+1高开弱转强 → 缩量加速
-样本: data/zt_pool/ 日快照(含炸板/封板时间), K线用腾讯qfq日线(完整历史)
+样本: data/zt_pool/ 日快照(含炸板/封板时间), K线只读 data/kline_data (2026-09-04写死, 禁止网络抓取)
 模拟: T+1开盘买入(按高开分档) → 记录T+1收盘、T+2收盘收益
 分组: 低开(不进) | 小高开0-4% | 高开4-6% | 大高开>=6% × 缩量/放量
 """
-import json, os, sys, urllib.request
+import json, os, sys
 from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -23,17 +23,28 @@ def load_pool(p):
 
 
 def fetch_bars(code, days=90):
-    """腾讯qfq日线 → 按日期索引的bar列表"""
+    """本地K线 (2026-09-04写死: 只读 data/kline_data, 禁止网络抓取) → 按日期索引的bar列表"""
     if code in _kline_cache:
         return _kline_cache[code]
-    mkt = 'sz' if code.startswith(('0', '3', '1')) else 'sh'
-    url = f'http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={mkt}{code},day,,,{days},qfq'
+    fpath = os.path.join(BASE, 'data', 'kline_data', f'{code}.json')
     try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        d = json.loads(urllib.request.urlopen(req, timeout=10).read().decode('utf-8'))
-        rows = (d.get('data', {}).get(f'{mkt}{code}', {}) or {}).get('qfqday') or []
-        bars = [{'date': r[0], 'open': float(r[1]), 'close': float(r[2]),
-                 'high': float(r[3]), 'low': float(r[4]), 'volume': float(r[5]) * 100} for r in rows]
+        for enc in ('utf-8', 'gbk'):
+            try:
+                with open(fpath, encoding=enc) as f:
+                    j = json.load(f)
+                break
+            except UnicodeDecodeError:
+                continue
+        else:
+            _kline_cache[code] = []
+            return []
+        rows = j.get('data', j) if isinstance(j, dict) else j
+        bars = [{'date': r.get('date'), 'open': float(r.get('open', 0) or 0),
+                 'close': float(r.get('close', 0) or 0), 'high': float(r.get('high', 0) or 0),
+                 'low': float(r.get('low', 0) or 0), 'volume': float(r.get('volume_lots', 0) or 0) * 100}
+                for r in rows if isinstance(r, dict)]
+        if days:
+            bars = bars[-days:]
         _kline_cache[code] = bars
         return bars
     except Exception:

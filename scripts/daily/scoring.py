@@ -129,7 +129,6 @@ def default_scoring_config():
             "position": [[40, 100], [20, 50], [-99, 33]]
         },
         "buy_window": [4.0, 8.0],
-        "score_min":  10,
         "filters": {
             "true_one_line_skip":  True,
             "board4_one_line_skip": True
@@ -323,6 +322,7 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         return None, None  # 近1年涨停<2次, 不纳入候选
 
     score = 0.0
+    bd = {}  # 分项明细(2026-09-13: 供竞价面板表2还原V3累加制得分; 只记录不参与计算)
     tables = config['tables'][version]
 
     # -------- 量比 --------
@@ -333,48 +333,54 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         vr = t1['vol_ratio20']
 
     if tables.get('vr_mode') == 'linear':
-        score += piecewise_linear(vr, tables['vr_anchors'])
+        bd['vr'] = piecewise_linear(vr, tables['vr_anchors'])
     else:
-        score += step_score_asc(vr, tables['vr_tiers'])
+        bd['vr'] = step_score_asc(vr, tables['vr_tiers'])
+    score += bd['vr']
 
     # -------- Gap --------
     g = t1['gap_open_pct']
     if tables.get('gap_mode') == 'linear':
-        score += piecewise_linear(g, tables['gap_anchors'])
+        bd['gap'] = piecewise_linear(g, tables['gap_anchors'])
     else:
-        score += step_score_desc(g, tables['gap_tiers'])
+        bd['gap'] = step_score_desc(g, tables['gap_tiers'])
+    score += bd['gap']
 
     # -------- 一字板 --------
     if t1.get('is_one_line', False):
         if abs(t1['high'] - t1['low']) < 0.001:
-            score += config['one_line_score']['true_one']
+            bd['one_line'] = config['one_line_score']['true_one']
         else:
-            score += config['one_line_score']['t_board']
+            bd['one_line'] = config['one_line_score']['t_board']
+        score += bd['one_line']
 
     # -------- 连板 --------
     # 按具体连板数给分
     if cons == 0:
-        score += config['cons_score']['first']
+        bd['cons'] = config['cons_score']['first']
     elif cons == 1:
-        score += config['cons_score']['2']
+        bd['cons'] = config['cons_score']['2']
     elif cons == 2:
-        score += config['cons_score']['3']
+        bd['cons'] = config['cons_score']['3']
     elif cons == 3:
-        score += config['cons_score']['4']
+        bd['cons'] = config['cons_score']['4']
     elif cons == 4:
-        score += config['cons_score']['5']
+        bd['cons'] = config['cons_score']['5']
     else:
-        score += config['cons_score']['6plus']
+        bd['cons'] = config['cons_score']['6plus']
+    score += bd['cons']
 
     # -------- 周几 --------
     tomorrow = datetime.strptime(today_dt, '%Y-%m-%d') + timedelta(days=1)
     while tomorrow.weekday() >= 5:
         tomorrow = tomorrow + timedelta(days=1)
     dow = tomorrow.weekday()
+    bd['dow'] = 0
     if dow == 0:
-        score += config['dow_score']['monday']
+        bd['dow'] = config['dow_score']['monday']
     elif dow == 4:
-        score += config['dow_score']['friday']
+        bd['dow'] = config['dow_score']['friday']
+    score += bd['dow']
 
     # -------- 封板时间 --------
     if details_raw is None:
@@ -387,36 +393,41 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
             hh = int(st_clean[:2])
             mm = int(st_clean[2:4])
             mins = max(0, (hh - 9) * 60 + mm - 30)  # 距9:30分钟数
-            score += step_score_asc(mins, config['seal_time_tiers'])
+            bd['seal_time'] = step_score_asc(mins, config['seal_time_tiers'])
+            score += bd['seal_time']
         except:
             pass
 
     # -------- 炸板 --------
     zhaban = details_raw.get('zhaban', 0)
     final_seal = details_raw.get('final_seal_time', seal_time)
+    _zb = 0.0
     if zhaban > 0:
         try:
             fst = int(final_seal.replace(':', '')[:4]) if final_seal and final_seal != '?' else 1500
             vr20_val = t1.get('vol_ratio20', 2)
             zb_cfg = config['zhaban']
             if fst <= zb_cfg['early_reseal'][0]:
-                score -= zhaban * zb_cfg['early_reseal'][1]
+                _zb = zhaban * zb_cfg['early_reseal'][1]
             elif fst <= zb_cfg['mid_reseal'][0]:
-                score -= zhaban * zb_cfg['mid_reseal'][1]
+                _zb = zhaban * zb_cfg['mid_reseal'][1]
             else:
                 if vr20_val < zb_cfg['late_vol_low'][0]:
-                    score -= zhaban * zb_cfg['late_vol_low'][1]
+                    _zb = zhaban * zb_cfg['late_vol_low'][1]
                 elif vr20_val < zb_cfg['late_vol_mid'][0]:
-                    score -= zhaban * zb_cfg['late_vol_mid'][1]
+                    _zb = zhaban * zb_cfg['late_vol_mid'][1]
                 else:
-                    score -= zhaban * zb_cfg['late_vol_high'][1]
+                    _zb = zhaban * zb_cfg['late_vol_high'][1]
         except:
-            score -= zhaban * config['zhaban']['fallback']
+            _zb = zhaban * config['zhaban']['fallback']
+        bd['zhaban'] = -_zb
+        score += bd['zhaban']
 
     # -------- 板块共振 --------
     sector_count = details_raw.get('sector_count', 1)
     for thresh, val in config['sector_tiers']:
         if sector_count >= thresh:
+            bd['sector'] = val
             score += val
             break
 
@@ -439,6 +450,7 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         if seal_weak and t1.get('vol_class') == 'heavy' and prev_vol_ratio >= div_cfg.get('prev_day_vol_min', 1.5):
             # 板块效应=必要条件: 有板块给满额, 无板块只给象征分
             div_bonus = div_cfg.get('bonus', 15) if sector_count >= 2 else div_cfg.get('no_sector_bonus', 4)
+            bd['divergence'] = div_bonus
             score += div_bonus
 
     score = round(score, 2)
@@ -454,7 +466,8 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         't2_lu': False,
         'tomorrow_dow': dow,
         'divergence': div_bonus,
-        'vol_class': t1.get('vol_class', 'normal')
+        'vol_class': t1.get('vol_class', 'normal'),
+        'v3_breakdown': bd,
     }
 
     return score, details
@@ -490,6 +503,13 @@ def score_v4(code, klines, details_raw=None, config=None):
     pdb, today_dt = result
     t1 = pdb[today_dt]
 
+    # V5 (2026-09-12): 近5日涨幅因子 (从K线自算, 无需调用方传参)
+    _ds = sorted(pdb.keys())
+    _i = _ds.index(today_dt) if today_dt in _ds else -1
+    ret5 = None
+    if _i >= 5 and pdb[_ds[_i - 5]].get('close'):
+        ret5 = (t1['close'] / pdb[_ds[_i - 5]]['close'] - 1) * 100
+
     # 活跃度过滤(与v3一致)
     from datetime import timedelta
     cutoff = (datetime.strptime(today_dt, '%Y-%m-%d') - timedelta(days=365)).strftime('%Y-%m-%d')
@@ -520,8 +540,19 @@ def score_v4(code, klines, details_raw=None, config=None):
         '10-30min' if seal <= '1000' else ('30-60min' if seal <= '1030' else '>60min')))
     zh = int(details_raw.get('zhaban', 0) or 0)
     zh_b = '0' if zh == 0 else ('1' if zh == 1 else ('2' if zh == 2 else '3+'))
-    sec_b = str(details_raw.get('sector_bucket', '>=10'))
+    # 2026-09-03修复: 题材数据缺失不得默认最高档(85分虚高14.7), 诚实低档
+    sec_b = str(details_raw.get('sector_bucket', '<3'))
     div_b = '分歧' if (zh >= 1 and vr >= 1.5) else '非分歧'
+    # V5 新增: 流通市值(亿) / 近5日涨幅
+    try:
+        _fc = float(details_raw.get('float_cap', 0) or 0)
+    except Exception:
+        _fc = 0
+    _mc = _fc / 1e8 if _fc > 1e6 else _fc          # 兼容"元"与"亿"两种传入
+    mc_b = '缺失' if _mc <= 0 else ('<30亿' if _mc < 30 else '30-60亿' if _mc < 60
+                                   else '60-150亿' if _mc < 150 else '>=150亿')
+    r5_b = '缺失' if ret5 is None else ('<5%' if ret5 < 5 else '5-15%' if ret5 < 15
+                                        else '15-30%' if ret5 < 30 else '>=30%')
     if cons >= 3:
         dt_p = 30.5
     elif cons == 2:
@@ -549,12 +580,46 @@ def score_v4(code, klines, details_raw=None, config=None):
         'divergence': norm['divergence'].get(div_b, 55),
         'dt_risk': max(10, min(100, 100 - (dt_p - 5) * 3)),
         'turnover': norm.get('turnover', {}).get(to_b, 50),
+        'mktcap': norm.get('mktcap', {}).get(mc_b, 50),
+        'ret5': norm.get('ret5', {}).get(r5_b, 50),
     }
     score = sum(weights[k] * f[k] for k in weights if k in f) / 100.0
     det = {'score': round(score, 1), 'factor_scores': f, 'cons': cons,
            'vr': round(vr, 2), 'gap': round(gap, 2), 'board_type': board_type,
            'dt_p': dt_p}
     return round(score, 1), det
+
+
+def score_active(code, klines, details_raw=None, config=None):
+    """按 config['active'] 分派评分 (2026-09-12 恢复V3为生产评分)
+
+    V3 恢复依据(同模拟器/同买入窗/同出场, 2026-08-26~09-11 共13个交易日):
+      V3: 封板率30.8% 均收益+1.59% 胜率70% 累计+15.92%
+      V4: 封板率23.1% 均收益-0.08% 胜率36% 累计 -0.92%
+      实际推荐(对照): 封板率18.2% 均收益-3.71%
+    另有独立证据(2026-07-24~09-11 同日对照): 老版本时段 全池基率20.6%/模型选中53.3%,
+    V4时段 全池基率22.9%/模型选中18.2% —— 池子质量相当, 是选股逻辑差异。
+
+    返回 (score, details); details 已归一化, 保证 board_type/cons/vr/gap/factor_scores/dt_p 齐备。
+    """
+    if config is None:
+        config = load_config()
+    ver = str(config.get('active', 'v4')).lower()
+    if ver == 'v3':
+        sc, det = compute_score(code, klines, details_raw, 'v3', config)
+        if sc is None:
+            return None, None
+        det = dict(det or {})
+        _ol = bool(det.get('one_line'))
+        _t1 = bool(det.get('true_one_line'))
+        det['board_type'] = '一字' if _t1 else ('T字' if _ol else '换手')
+        det['vr'] = det.get('vr20', det.get('vr', 1))
+        det.setdefault('cons', 1)
+        det.setdefault('gap', 0)
+        det.setdefault('factor_scores', {})
+        det.setdefault('dt_p', 0)
+        return sc, det
+    return score_v4(code, klines, details_raw, config)
 
 
 def score_to_prob(score, config=None):
@@ -575,10 +640,24 @@ def get_buy_window(config=None):
     return config['buy_window']
 
 
-def get_score_min(config=None):
+def gap_weight(gap, config=None):
+    """竞价gap平滑窗口权重 (2026-09-04用户拍板: 硬边界改平滑)
+    梯形: [lo,hi]核心=1, 边缘带[lo-band,lo)/(hi,hi+band]线性衰减, 带外=0
+    配置: buy_window=[lo,hi], gap_band=band (band<=0时退化为硬边界)
+    回测依据: 一年234交易日, smooth±1.0% 均笔+5.76% vs 硬边界+5.44%, 边缘带8笔+3.33%"""
     if config is None:
         config = load_config()
-    return config['score_min']
+    lo, hi = config['buy_window']
+    band = config.get('gap_band', 1.0)
+    if band <= 0:
+        return 1.0 if lo <= gap <= hi else 0.0
+    if gap < lo - band or gap > hi + band:
+        return 0.0
+    if gap < lo:
+        return (gap - (lo - band)) / band
+    if gap > hi:
+        return (hi + band - gap) / band
+    return 1.0
 
 
 def should_filter(one_line, true_one_line, cons, config=None):
@@ -743,7 +822,7 @@ if __name__ == '__main__':
     print(f"V2 VR tiers:  {cfg['tables']['v2']['vr_tiers']}")
     print(f"V3 VR anchors: {cfg['tables']['v3']['vr_anchors'][:5]}...")
     print(f"V3 Gap anchors: {cfg['tables']['v3']['gap_anchors'][:5]}...")
-    print(f"Buy window: {cfg['buy_window']}, Score min: {cfg['score_min']}")
+    print(f"Buy window: {cfg['buy_window']}")
 
     # Test interpolation
     for x in [0.2, 0.4, 0.6, 1.0, 2.0, 5.0]:

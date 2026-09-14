@@ -213,10 +213,28 @@ def capture_auction(force=False):
 
     print(f'[Auction Pool] 目标标的: {len(target_codes)}只 (涨停池{len(zt_state.get("stocks",[]))} + 候选额外{len(target_codes)-len(zt_state.get("stocks",[]))})')
 
+    # 2026-09-03修复: state与池文件日期一致性校验(前晚流水线未跑 → 竞价宇宙滞后, 提前告警)
+    try:
+        from zt_pool import get_prev_pool_file as _gppf
+        _pp_fn = _gppf()
+        _asof = str(zt_state.get('as_of_date', ''))[:10]
+        if _pp_fn and _asof and _pp_fn[:8] != _asof.replace('-', ''):
+            print(f'[Auction Pool] ⚠⚠ 池状态日期({_asof})与最新池文件({_pp_fn})不一致, '
+                  f'竞价宇宙可能滞后(前晚流水线未跑?), 温度/评分口径错位')
+    except Exception:
+        pass
+
     # 2. 批量获取竞价行情
     all_codes = sorted(target_codes)
     quotes = fetch_quotes(all_codes)
     print(f'[Auction Pool] 获取行情: {len(quotes)}只')
+    # 2026-09-03修复: 全失败拒绝写快照(防全gap=0垃圾快照); 单只缺失剔除+告警
+    if not quotes:
+        print('[Auction Pool] ⚠⚠ 行情获取全失败, 拒绝写入快照')
+        return None
+    _miss_codes = [c for c in all_codes if c not in quotes]
+    if _miss_codes:
+        print(f'[Auction Pool] ⚠ 单只行情缺失({len(_miss_codes)}只), 已从快照剔除: {", ".join(_miss_codes[:10])}')
 
     # 2.4 双源交叉: 新浪 vs 腾讯 (gap 偏差>0.3% 或 昨收不一致=疑似除权 → 告警)
     sina_quotes = fetch_sina_quotes(all_codes)
@@ -273,6 +291,9 @@ def capture_auction(force=False):
 
     for code in sorted(target_codes):
         info = target_info.get(code, {})
+        if code not in quotes:
+            # 2026-09-03修复: 行情缺失不入快照(原gap=0静默混入, 拉低可买池且无告警)
+            continue
         q = quotes.get(code, {})
 
         gap = q.get('gap_pct', 0)
@@ -321,26 +342,28 @@ def capture_auction(force=False):
     # 4. 保存快照 (原子写入: 先tmp再rename; 已有快照且非force不覆盖)
     fpath = os.path.join(AUCTION_DIR, f'{today}.json')
     if os.path.exists(fpath) and not force:
-        print(f'[Auction Pool] 快照已存在({fpath}), 跳过覆盖 (--force可覆盖)')
-    else:
-        # 平均gap (2026-08-20新增: 当日情绪二次确认信号, 3年数据: 均gap<0次日接力差)
-        _gaps = [s.get('gap_pct', 0) or 0 for s in snapshot if (s.get('gap_pct') or 0) != 0]
-        avg_gap = round(sum(_gaps) / len(_gaps), 2) if _gaps else 0.0
-        payload = {
-            'date': today,
-            'captured': ts,
-            'total_stocks': len(snapshot),
-            'quoted': len(quotes),
-            'buyable_count': buyable_count,
-            'avg_gap': avg_gap,
-            'gap_distribution': dict(gap_dist),
-            'stocks': snapshot,
-        }
-        tmp_path = fpath + '.tmp'
-        with open(tmp_path, 'w', encoding='utf-8') as f:
-            json.dump(payload, f, ensure_ascii=False, indent=2)
-        os.replace(tmp_path, fpath)
-        print(f'[Auction Pool] 快照保存: {fpath} ({len(snapshot)}只)')
+        # 2026-09-03修复: 快照已存在时state/history也不更新,
+        # 防同日重复条目与残数据(重跑行情不全)覆盖current
+        print(f'[Auction Pool] 快照已存在({fpath}), 跳过覆盖与状态更新 (--force可覆盖)')
+        return None
+    # 平均gap (2026-08-20新增: 当日情绪二次确认信号, 3年数据: 均gap<0次日接力差)
+    _gaps = [s.get('gap_pct', 0) or 0 for s in snapshot if (s.get('gap_pct') or 0) != 0]
+    avg_gap = round(sum(_gaps) / len(_gaps), 2) if _gaps else 0.0
+    payload = {
+        'date': today,
+        'captured': ts,
+        'total_stocks': len(snapshot),
+        'quoted': len(quotes),
+        'buyable_count': buyable_count,
+        'avg_gap': avg_gap,
+        'gap_distribution': dict(gap_dist),
+        'stocks': snapshot,
+    }
+    tmp_path = fpath + '.tmp'
+    with open(tmp_path, 'w', encoding='utf-8') as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    os.replace(tmp_path, fpath)
+    print(f'[Auction Pool] 快照保存: {fpath} ({len(snapshot)}只)')
 
     # 5. 更新状态文件
     state = load_auction_state()
