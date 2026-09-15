@@ -1,10 +1,10 @@
 import json, openpyxl
 from datetime import datetime, timedelta
 
-with open(r'C:\Users\Davis\Desktop\主升浪\data\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\data\stock_data.json','r',encoding='utf-8') as f:
     stock_data=json.load(f)
 def ed(s): return datetime(1899,12,30)+timedelta(days=int(s))
-wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\data\副本主升浪.xlsx')
+wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\data\副本主升浪.xlsx')
 ws=wb['Sheet1']
 records=[]
 for row in ws.iter_rows(min_row=2,values_only=True):
@@ -66,7 +66,7 @@ for didx,date in enumerate(ad):
             bp_=pdb[bn][date]['open']; deploy=cash*0.55; sh=int(deploy/bp_/100)*100
             if sh>0: cash-=sh*bp_; pos_list.append({'n':bn,'b':date,'bp':bp_,'s':sh})
 
-out_path=r'C:\Users\Davis\Desktop\主升浪\logs\gap_analysis_v2.txt'
+out_path=r'C:\Users\Davis\Desktop\项目\gogo\logs\gap_analysis_v2.txt'
 with open(out_path,'w',encoding='utf-8') as f:
     f.write("="*100+"\n")
     f.write("卖出执行差距分析: HIGH vs (H+O)/2 vs CLOSE\n")

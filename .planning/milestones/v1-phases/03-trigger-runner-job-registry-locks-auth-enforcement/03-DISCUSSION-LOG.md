@@ -29,7 +29,7 @@
 
 **User's choice:** 停用任务(推荐项)。
 
-**Notes:** 核实依据:auto_start.bat `set BASE=C:\Users\Davis\Desktop\主升浪`(仓库已迁 gogo)、install_scheduled_task.ps1:8 ScriptPath 同旧路径、双触发(开机+15:30)。任务自仓库更名后每天 15:30 静默失败无人发现。
+**Notes:** 核实依据:auto_start.bat `set BASE=C:\Users\Davis\Desktop\项目\gogo`(仓库已迁 gogo)、install_scheduled_task.ps1:8 ScriptPath 同旧路径、双触发(开机+15:30)。任务自仓库更名后每天 15:30 静默失败无人发现。
 
 | Option | Description | Selected |
 |--------|-------------|----------|

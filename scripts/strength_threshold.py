@@ -1,10 +1,10 @@
 import json, openpyxl
 from datetime import datetime, timedelta
 
-with open(r'C:\Users\Davis\Desktop\主升浪\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\stock_data.json','r',encoding='utf-8') as f:
     stock_data=json.load(f)
 def ed(s): return datetime(1899,12,30)+timedelta(days=int(s))
-wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws=wb['Sheet1']
 records=[]
 for row in ws.iter_rows(min_row=2,values_only=True):
@@ -40,7 +40,7 @@ for s,st in records: d=ed(s); tl.append((d.strftime('%Y-%m-%d'),st))
 ad=sorted(set(d for d,_ in tl))
 INIT=300000; TARGET=1000000
 
-out_path=r'C:\Users\Davis\Desktop\主升浪\strength_results.txt'
+out_path=r'C:\Users\Davis\Desktop\项目\gogo\strength_results.txt'
 with open(out_path,'w',encoding='utf-8') as f:
     f.write("="*80+"\n")
     f.write("「不涨停」= 竞价开盘涨幅不够强 (阈值搜索)\n")

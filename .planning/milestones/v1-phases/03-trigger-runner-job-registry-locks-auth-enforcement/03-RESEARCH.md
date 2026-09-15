@@ -1,6 +1,6 @@
 # Phase 3: Trigger Runner, Job Registry & Locks + Auth Enforcement - Research
 
-**Researched:** 2026-09-03 (real-machine probes on this Windows 11 box, repo `C:\Users\Davis\Desktop\gogo`)
+**Researched:** 2026-09-03 (real-machine probes on this Windows 11 box, repo `C:\Users\Davis\Desktop\项目\gogo`)
 **Domain:** Windows subprocess governance / background job orchestration / single-flight locking / request auth (FastAPI)
 **Confidence:** HIGH — every load-bearing claim below was probed on the real machine this session (Python 3.13.1, NTFS C:, cp936 locale, GBK console), not taken from training memory
 
@@ -29,7 +29,7 @@ All four 定稿机制 sign-off gates listed in the ROADMAP research directive ar
 
 #### 单飞锁边界与并发者 (ACT-03)
 - **D-01:** GUI 一键刷新加入同一把锁文件。刷新按钮启动前先取锁,锁被占(API job 运行中)时禁用刷新并提示运行中,不抢跑。改 `scripts/daily/gui_dashboard.py:88` 的 subprocess 前置逻辑,保持"直接 subprocess 跑 run_pipeline --fast"的既有形态,只加锁检查。—— 最小改动达成 SC2 "any other entry point" 意图。
-- **D-02:** 停用「主升浪每日选股流水线」计划任务。`scripts/daily/auto_start.bat` 硬编码 `BASE=C:\Users\Davis\Desktop\主升浪`(仓库已迁 `gogo`),任务每天 15:30 cd 失败静默退出;仓库更名以来无人发现,证明用户不依赖它。停用需一条提权命令(Phase 1 已验证 Unregister-ScheduledTask 需提权),盘后靠手动面板/管线 + API 触发。—— **Reversibility:** reversible — 重新注册即可恢复,但按 Phase 1 D-07 惯例重装时勿复制 stale 路径。
+- **D-02:** 停用「主升浪每日选股流水线」计划任务。`scripts/daily/auto_start.bat` 硬编码 `BASE=C:\Users\Davis\Desktop\项目\gogo`(仓库已迁 `gogo`),任务每天 15:30 cd 失败静默退出;仓库更名以来无人发现,证明用户不依赖它。停用需一条提权命令(Phase 1 已验证 Unregister-ScheduledTask 需提权),盘后靠手动面板/管线 + API 触发。—— **Reversibility:** reversible — 重新注册即可恢复,但按 Phase 1 D-07 惯例重装时勿复制 stale 路径。
 - **D-03:** 锁作用域 = Win 本机锁。锁文件放 Win 本机 data/ 下(gitignore),防本机 API/GUI/计划任务并发。Mac 端 crontab(15:00 盘后 / 9:26 竞价)不加锁,保持两机串行约定——跨机锁经 git 同步存在天然竞态(两机可同时 pull 到无锁状态再抢锁),不可靠。锁实现细节(portalocker/msvcrt/lockfile 选型、stale 锁处理)留给 research 在真机验证。
 
 #### 写侧原子化 (ROADMAP 签字门)
@@ -79,7 +79,7 @@ ROADMAP Phase 3 Research note lists four user sign-off gates. All four are resol
 |------|----------|--------|
 | Writer-side atomicization (touches pipeline modules) | D-04..D-06: defer to Phase 4, bound as STA-02 precondition | Locked (no Phase 3 action; read-side defense from Phase 2 already covers the 3 whitelist files) |
 | GUI one-key refresh joins the same lock | D-01: gui_dashboard.py:88 area adds lock check only, keeps direct subprocess | Locked (Win/Mac GUI share source; helper must be cross-platform — see job_lock.py below) |
-| Liveness of the 15:30 scheduled task | D-02 assumed task exists and needs an elevated unregister | **Machine finding (this research): the task is ABSENT on this machine** — full task query by name (主升浪/选股/流水线/pipeline) and by action path (auto_start.bat / 主升浪 / Desktop gogo) over all 201 tasks returns only `gogo-api`. D-02's elevated command reduces to a verify-only check; `auto_start.bat` (stale `BASE=C:\Users\Davis\Desktop\主升浪` [VERIFIED: scripts/daily/auto_start.bat:7]) and `install_scheduled_task.ps1` remain as dead files in the repo — do NOT register them at reinstall |
+| Liveness of the 15:30 scheduled task | D-02 assumed task exists and needs an elevated unregister | **Machine finding (this research): the task is ABSENT on this machine** — full task query by name (主升浪/选股/流水线/pipeline) and by action path (auto_start.bat / 主升浪 / Desktop gogo) over all 201 tasks returns only `gogo-api`. D-02's elevated command reduces to a verify-only check; `auto_start.bat` (stale `BASE=C:\Users\Davis\Desktop\项目\gogo` [VERIFIED: scripts/daily/auto_start.bat:7]) and `install_scheduled_task.ps1` remain as dead files in the repo — do NOT register them at reinstall |
 | Trigger default --fast | D-07 (pipeline `--fast`), D-08 (morning-check `--quick`), D-09 (zero params) | Locked |
 
 ## Architectural Responsibility Map
@@ -514,7 +514,7 @@ FAKE = "import json,sys,time;json.dump(sys.argv[1:],open(sys.argv[1],'w'));time.
 | GUI/timeout leaves orphan children | finally-release lock + warning (D-01 scope); taskkill tree-kill when v2 ACT-04 lands | this phase / v2 | Single-flight holds across GUI path; orphan reaping is backlog |
 
 **Deprecated/outdated:**
-- `auto_start.bat` + `install_scheduled_task.ps1` (stale `C:\Users\Davis\Desktop\主升浪` BASE): the task they installed is machine-verified absent; the files are dead repo artifacts — leave untouched this phase (part of the 116-file boundary), do not re-register.
+- `auto_start.bat` + `install_scheduled_task.ps1` (stale `C:\Users\Davis\Desktop\项目\gogo` BASE): the task they installed is machine-verified absent; the files are dead repo artifacts — leave untouched this phase (part of the 116-file boundary), do not re-register.
 - GUI's `capture_output=True, text=True` refresh: silently degrades to "部分失败" on emoji prints (probe V1 pipe variant); not fixed this phase (D-01 lock-only scope) but flagged for Phase 4/5 hardening consideration.
 
 ## Assumptions Log

@@ -1,7 +1,7 @@
 import json, os
 from collections import defaultdict
 
-with open(r'C:\Users\Davis\Desktop\主升浪\data\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\data\stock_data.json','r',encoding='utf-8') as f:
     stock_data=json.load(f)
 
 # Count LU streaks: for each stock, find consecutive LU sequences
@@ -34,7 +34,7 @@ for name, klines in stock_data.items():
 
         prev_close = c
 
-out_path = r'C:\Users\Davis\Desktop\主升浪\logs\lianban_prob.txt'
+out_path = r'C:\Users\Davis\Desktop\项目\gogo\logs\lianban_prob.txt'
 with open(out_path,'w',encoding='utf-8') as f:
     f.write("="*65+"\n")
     f.write("连板延续概率分析 (72只标的, 2025-09至2026-07)\n")
@@ -56,7 +56,7 @@ with open(out_path,'w',encoding='utf-8') as f:
 
     # Part 2: Trader A's actual performance by board count
     import openpyxl
-    wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\data\副本主升浪.xlsx')
+    wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\data\副本主升浪.xlsx')
     ws=wb['Sheet1']
     records=[]
     for row in ws.iter_rows(min_row=2,values_only=True):

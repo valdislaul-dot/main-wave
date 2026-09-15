@@ -32,7 +32,7 @@ The gogo API service exists as a resident FastAPI process on the Windows machine
 ### Windows Autostart
 - **D-07:** Task Scheduler registration copies the existing convention from `scripts/daily/install_scheduled_task.ps1`: `AtStartup` trigger + 5-min random delay, principal = current user (Interactive, RunLevel Limited), `StartWhenAvailable`, `RestartCount 3` / 10-min interval, `MultipleInstances IgnoreNew`. Distinct task name (not "主升浪每日选股流水线"). Behavior: runs ~5 min after boot when the user is logged in; otherwise waits for logon — accepted tradeoff for a user-attended trading machine (SYSTEM boot task rejected: no user env, expanded privilege surface).
 - **D-08:** Default port **8000**, overridable via `GOGO_API_PORT`. The load-balancer probe contract points at `127.0.0.1:8000/health`. — **Reversibility:** one-way — the LB's probe URL is configured against this default; changing it later changes what external consumers configure.
-- **D-09:** `run_api.bat` (repo root, OPS-01) locates the repo via `%~dp0` relative path — do NOT copy the hardcoded stale `BASE=C:\Users\Davis\Desktop\主升浪` bug in `scripts/daily/auto_start.bat`.
+- **D-09:** `run_api.bat` (repo root, OPS-01) locates the repo via `%~dp0` relative path — do NOT copy the hardcoded stale `BASE=C:\Users\Davis\Desktop\项目\gogo` bug in `scripts/daily/auto_start.bat`.
 
 ### Mac Scope
 - **D-10:** Phase 1 delivers Windows autostart only. The service code itself must run on Mac (config.py auto-detects PROJECT_ROOT on both ends), but the launchd plist is deferred to Phase 5 (Win/Mac parity).

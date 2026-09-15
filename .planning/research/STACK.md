@@ -120,7 +120,7 @@ No venv required — the machine's shared interpreter already carries the compat
 - WebSearch 2026-09-02: health-endpoint conventions (liveness vs readiness split, 200/503 semantics, `{"status","uptime"}` body shape, probe intervals 5-10 s) — MEDIUM (multiple independent sources: 137foundry, ASOasis, Plane docs, dev.to)
 - WebSearch 2026-09-02: NSSM vs Windows Task Scheduler for uvicorn services — MEDIUM (multiple community guides, consistent)
 - Local empirical verification on 2026-09-02: pip list (fastapi 0.115.14, starlette 0.46.2, pydantic 2.13.4, uvicorn 0.51.0, httpx 0.25.2, watchfiles 1.2.0), Python 3.13.1, functional smoke test — HIGH
-- Project grounding: `Desktop/gogo/.planning/PROJECT.md`, `.planning/codebase/CONCERNS.md`, `scripts/daily/config.py`, `install_scheduled_task.ps1`, `requirements.txt` — HIGH (local audit)
+- Project grounding: `Desktop/项目/gogo/.planning/PROJECT.md`, `.planning/codebase/CONCERNS.md`, `scripts/daily/config.py`, `install_scheduled_task.ps1`, `requirements.txt` — HIGH (local audit)
 
 ---
 *Stack research for: gogo FastAPI HTTP API service layer (health + state + subprocess-triggered ops)*

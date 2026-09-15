@@ -4,14 +4,14 @@ from datetime import datetime, timedelta
 from collections import defaultdict, Counter
 
 # Load stock data
-with open(r'C:\Users\Davis\Desktop\主升浪\stock_data.json', 'r', encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\stock_data.json', 'r', encoding='utf-8') as f:
     stock_data = json.load(f)
 
 def excel_to_date(serial):
     return datetime(1899, 12, 30) + timedelta(days=int(serial))
 
 # Load trading records
-wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws = wb['Sheet1']
 records = []
 for row in ws.iter_rows(min_row=2, values_only=True):
@@ -126,7 +126,7 @@ for serial, stock in records:
     timeline.append((d.strftime('%Y-%m-%d'), stock))
 
 # For each trade, look back N days
-out_path = r'C:\Users\Davis\Desktop\主升浪\strategy_findings.txt'
+out_path = r'C:\Users\Davis\Desktop\项目\gogo\strategy_findings.txt'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write("="*120 + "\n")
     f.write("选股策略深度分析报告\n")

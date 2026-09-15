@@ -145,7 +145,7 @@ Register-ScheduledTask -TaskName $TaskName `
     -Description "每日盘后自动下载K线数据并筛选明日涨停候选标的" `
     -Force
 ```
-Phase 1 adaptations (D-07/D-09): `$Trigger1` only (drop `$Trigger2`); action points at `<repo>\run_api.bat`; `$ScriptPath`/`$WorkingDir` derived from `$PSScriptRoot` (ps1 lives in `scripts/daily/` → `$RepoRoot = Split-Path -Parent $PSScriptRoot`) — NEVER the literal `C:\Users\Davis\Desktop\主升浪` (stale-path bug class, D-09; anti-example at lines 7-9 above, `auto_start.bat:7`).
+Phase 1 adaptations (D-07/D-09): `$Trigger1` only (drop `$Trigger2`); action points at `<repo>\run_api.bat`; `$ScriptPath`/`$WorkingDir` derived from `$PSScriptRoot` (ps1 lives in `scripts/daily/` → `$RepoRoot = Split-Path -Parent $PSScriptRoot`) — NEVER the literal `C:\Users\Davis\Desktop\项目\gogo` (stale-path bug class, D-09; anti-example at lines 7-9 above, `auto_start.bat:7`).
 
 ---
 
@@ -155,7 +155,7 @@ Phase 1 adaptations (D-07/D-09): `$Trigger1` only (drop `$Trigger2`); action poi
 
 **Anti-pattern NOT to copy — `scripts/daily/auto_start.bat:7-13` (tracked, quoted verbatim):**
 ```bat
-set BASE=C:\Users\Davis\Desktop\主升浪
+set BASE=C:\Users\Davis\Desktop\项目\gogo
 set LOG=%BASE%\logs\pipeline.log
 
 echo [%date% %time%] Pipeline starting... >> "%LOG%"
@@ -187,7 +187,7 @@ Phase 1 addition (RESEARCH.md Pattern 3 / Pitfall 3): a second autouse fixture d
 
 ### `tests/test_health.py` (test, request-response via TestClient)
 
-**In-repo analog: none** (`scripts/test_executable.py` is a legacy backtest one-off with hardcoded `C:\Users\Davis\Desktop\主升浪` paths — not pytest, not a model; do not cite it). Use RESEARCH.md Code Example 2 (lines 373-392):
+**In-repo analog: none** (`scripts/test_executable.py` is a legacy backtest one-off with hardcoded `C:\Users\Davis\Desktop\项目\gogo` paths — not pytest, not a model; do not cite it). Use RESEARCH.md Code Example 2 (lines 373-392):
 ```python
 # RESEARCH.md Code Example 2 — shape only (official FastAPI testing pattern)
 # tests/test_health.py

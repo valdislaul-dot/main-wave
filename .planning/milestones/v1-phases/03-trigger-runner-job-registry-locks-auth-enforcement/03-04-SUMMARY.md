@@ -143,7 +143,7 @@ PASS | wrong-key POST -> 403 invalid API key | status=403 detail='invalid API ke
 PASS | registry stillness after 401/403 (no spawn) | counts 1->1
 PASS | valid-key POST -> 202 pending + job_id | status=202 body={"job_id":"4629b0230a6344d3a8660ae597ceb825","kind":"health-check","status":"pending"}
 PASS | second POST while live -> 409 + running_job_id | status=409 body={"detail":{"message":"health-check already running","running_job_id":"4629b0230a6344d3a8660ae597ceb825"}}
-PASS | poll to terminal succeeded + exit_code 0 + log exists | status=succeeded exit_code=0 log='C:\Users\Davis\Desktop\gogo\logs\api\jobs\4629b0230a6344d3a8660ae597ceb825.log' wall=1.0s
+PASS | poll to terminal succeeded + exit_code 0 + log exists | status=succeeded exit_code=0 log='C:\Users\Davis\Desktop\项目\gogo\logs\api\jobs\4629b0230a6344d3a8660ae597ceb825.log' wall=1.0s
 PASS | job log bytes decode as UTF-8
 PASS | token bytes absent from job log | loglen=540
 PASS | token bytes absent from console.log tail (256 KB) | taillen=1424

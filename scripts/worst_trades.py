@@ -1,10 +1,10 @@
 import json, openpyxl
 from datetime import datetime, timedelta
 
-with open(r'C:\Users\Davis\Desktop\主升浪\data\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\data\stock_data.json','r',encoding='utf-8') as f:
     stock_data=json.load(f)
 def ed(s): return datetime(1899,12,30)+timedelta(days=int(s))
-wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\data\副本主升浪.xlsx')
+wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\data\副本主升浪.xlsx')
 ws=wb['Sheet1']
 records=[]
 for row in ws.iter_rows(min_row=2,values_only=True):
@@ -77,7 +77,7 @@ for didx,date in enumerate(ad):
 
 trades.sort(key=lambda x:x['pnl'])
 
-out_path=r'C:\Users\Davis\Desktop\主升浪\logs\worst_trades.txt'
+out_path=r'C:\Users\Davis\Desktop\项目\gogo\logs\worst_trades.txt'
 with open(out_path,'w',encoding='utf-8') as f:
     f.write("="*100+"\n")
     f.write("交易员A 亏损交易分析\n")

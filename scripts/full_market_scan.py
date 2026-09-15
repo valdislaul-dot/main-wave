@@ -150,7 +150,7 @@ for code in codes:
 # Sort and display
 results.sort(key=lambda x: x['score'], reverse=True)
 
-out_path = r'C:\Users\Davis\Desktop\主升浪\market_scan_results.txt'
+out_path = r'C:\Users\Davis\Desktop\项目\gogo\market_scan_results.txt'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write("=" * 85 + "\n")
     f.write("全市场涨停股筛选 (2026-07-24 周五 -> 周一07/27候选)\n")

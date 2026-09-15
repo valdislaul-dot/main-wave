@@ -8,7 +8,7 @@
 
 | # | Project | Root | Nature | Authored locally? |
 |---|---------|------|--------|-------------------|
-| 1 | 主升浪 "gogo" (main-wave) | `Desktop/gogo` | Live-traded A-share limit-up decision system, Python, 27.5k LOC across 116 `.py` files, 181 commits | Yes — primary |
+| 1 | 主升浪 "gogo" (main-wave) | `Desktop/项目/gogo` | Live-traded A-share limit-up decision system, Python, 27.5k LOC across 116 `.py` files, 181 commits | Yes — primary |
 | 2 | vibe-astock | `vibe-astock` | A-share short-term review dashboard (LangGraph + FastAPI + React, duanxian/), 46 `.py` files | No — shallow clone (1 commit, author PaulX1029, remote `simonlin1212/vibe-astock`), clean tree |
 | 3 | HiThink-Financial-API | `HiThink-Financial-API` | Official 同花顺 data service (Python SDK + Node CLI) | No — clean checkout, 0 divergence from `origin/main` |
 | 4 | UZI-Skill | `UZI-Skill` | Stock deep-analysis agent skill plugin | No — clean checkout, 0 divergence from `origin/main` |
@@ -32,7 +32,7 @@ Both gogo and vibe-astock checkouts are **shallow clones** (`.git/shallow` prese
 ## Tech Debt
 
 ### gogo: experiment-script sprawl (no cleanup discipline)
-- Issue: 70 one-off Python scripts kept at `Desktop/gogo/scripts/` root alongside the 40-file production pipeline in `scripts/daily/` — research leftovers like `scripts/final_strategy_analysis.py`, `scripts/deep_strategy_analysis.py`, `scripts/strategy_analysis.py`, `scripts/final_grid_search.py`, `scripts/exhaustive_search.py`, `scripts/calibrate_v2.py`, `scripts/calibrate_v3.py`, `scripts/calibrate_execution.py`, `scripts/optimized_model.py`, `scripts/filter_optimization.py` (each 400–560 lines) plus `scripts/backup/legacy_scripts/` (6 more) and `backup/auction_backup_20260827.zip`.
+- Issue: 70 one-off Python scripts kept at `Desktop/项目/gogo/scripts/` root alongside the 40-file production pipeline in `scripts/daily/` — research leftovers like `scripts/final_strategy_analysis.py`, `scripts/deep_strategy_analysis.py`, `scripts/strategy_analysis.py`, `scripts/final_grid_search.py`, `scripts/exhaustive_search.py`, `scripts/calibrate_v2.py`, `scripts/calibrate_v3.py`, `scripts/calibrate_execution.py`, `scripts/optimized_model.py`, `scripts/filter_optimization.py` (each 400–560 lines) plus `scripts/backup/legacy_scripts/` (6 more) and `backup/auction_backup_20260827.zip`.
 - Impact: readers/agents cannot tell production from archaeology; naming collisions across generations (`backtest_v2.py` at root vs `backtest_v4.py` + `backtest_v4_long.py` in daily); stale calibrate scripts imply config drift risk vs `data/scoring_config.json`.
 - Fix approach: move non-production scripts to `backup/research/<date>/`, keep `scripts/daily/` as the only executable path, add a README index.
 
@@ -78,7 +78,7 @@ Both gogo and vibe-astock checkouts are **shallow clones** (`.git/shallow` prese
 
 ### Plaintext API tokens at rest
 - Risk: `data/tushare_token.txt` and `data/hithink_token.txt` hold API keys in plaintext on disk (gogo). Never tracked in git (verified: absent from `git ls-files` and history) — exposure only via local compromise/backup, or a future `git add .`.
-- Mitigation: `.gitignore` entries exist (`Desktop/gogo/.gitignore`); `scripts/daily/kline_source.py:26` reads token from env var first, file second.
+- Mitigation: `.gitignore` entries exist (`Desktop/项目/gogo/.gitignore`); `scripts/daily/kline_source.py:26` reads token from env var first, file second.
 - Recommendation: prefer env vars; at minimum keep the gitignore lines and never whitelist them in `sync_cloud.py`.
 
 ### Cleartext HTTP to market-data endpoints
@@ -93,7 +93,7 @@ Both gogo and vibe-astock checkouts are **shallow clones** (`.git/shallow` prese
 ## Performance Bottlenecks
 
 ### gogo git operations (repo bloat)
-- Problem: 603 MB pack, 2.0 GB working tree (`Desktop/gogo/`), dominated by tracked JSON history; largest tracked files are `data/backtest_kline/*.json` (~410 KB each, 70 files) and `data/stock_data.json` (2.4 MB).
+- Problem: 603 MB pack, 2.0 GB working tree (`Desktop/项目/gogo/`), dominated by tracked JSON history; largest tracked files are `data/backtest_kline/*.json` (~410 KB each, 70 files) and `data/stock_data.json` (2.4 MB).
 - Cause: daily `[auto] 数据快照同步` commits of whitelisted state files since 2026-08-16; earlier bulk commits of kline JSONs.
 - Impact: GitHub soft-limits warn past 1 GB; every pipeline Step-9 push grows; the Mac↔Win sync (both ends run pipelines against the same origin) gets slower and more conflict-prone; shallow-clone boundary on both machines hides part of the cost but not the push side.
 - Improvement path: untrack `data/backtest_kline/` (regenerate from `data/kline_data/`), stop committing dated pool dumps, then run `git gc`/`filter-repo` only if history shrink is needed (see Security — a scrub may be warranted anyway).
@@ -106,13 +106,13 @@ Both gogo and vibe-astock checkouts are **shallow clones** (`.git/shallow` prese
 ## Fragile Areas
 
 ### gogo `scripts/daily/morning_check.py` (852-line auction-panel monolith)
-- Files: `Desktop/gogo/scripts/daily/morning_check.py`
+- Files: `Desktop/项目/gogo/scripts/daily/morning_check.py`
 - Why fragile: single file owns candidate loading (`load_latest_candidates` sorts by filename date string — breaks if filename format changes), portfolio load, live-quote dual-source fetch, decision display and the 60-second SLA; fetch failures degrade to `None` and callers must remember to handle it; the global rule "买入开关关闭时也列可买前三并标注仅参考" and quick-mode logic live here and in `run_pipeline.py` interplay.
 - Safe modification: add pure helpers + unit tests first (see Test Coverage Gaps); keep display logic out of fetch logic.
 - Test coverage: none.
 
 ### gogo uncommitted in-flight change (cross-machine hazard)
-- Files: `Desktop/gogo/scripts/daily/run_pipeline.py` (modified, uncommitted — adds Step 8.6 importing `backtest_sell_exit.watch_summary`), `Desktop/gogo/scripts/daily/backtest_sell_exit.py` (untracked), `data/historical_zt_pool.json` (modified, uncommitted — not in `sync_cloud.py` whitelist so auto-commit never picks it up), `data/zt_pool/20260902.json` (untracked).
+- Files: `Desktop/项目/gogo/scripts/daily/run_pipeline.py` (modified, uncommitted — adds Step 8.6 importing `backtest_sell_exit.watch_summary`), `Desktop/项目/gogo/scripts/daily/backtest_sell_exit.py` (untracked), `data/historical_zt_pool.json` (modified, uncommitted — not in `sync_cloud.py` whitelist so auto-commit never picks it up), `data/zt_pool/20260902.json` (untracked).
 - Why fragile: gogo is a two-machine system (Mac + Win share one origin; user rule = review Mac fixes before applying). If the Win side pulls/rebases or the Mac auto-pushes before these files are committed, Step 8.6's import fails at runtime or the module silently diverges between machines. The dirty `historical_zt_pool.json` also means the "git" tree never reflects truth.
 - Safe modification: commit the code change + new module together (single logical change), decide whether pool dumps belong in git at all, and keep `sync_cloud.py` whitelist explicit.
 
@@ -131,13 +131,13 @@ Both gogo and vibe-astock checkouts are **shallow clones** (`.git/shallow` prese
 
 ## Scaling Limits
 
-- **gogo disk growth**: `data/kline_data/` already 1.3 GB (gitignored — OK) and `Desktop/gogo/` totals 2.0 GB; `data/daily_close/` snapshots accumulate daily. Watch for disk exhaustion on the Win box; `data/zt_pool_history/` (2.6 MB, gitignored) fine.
+- **gogo disk growth**: `data/kline_data/` already 1.3 GB (gitignored — OK) and `Desktop/项目/gogo/` totals 2.0 GB; `data/daily_close/` snapshots accumulate daily. Watch for disk exhaustion on the Win box; `data/zt_pool_history/` (2.6 MB, gitignored) fine.
 - **Tracked JSON churn**: `data/historical_zt_pool.json` alone churns ~500 lines/sync in the pack; 181-commit history at 603 MB → ~3.3 MB/commit average. Crossing GitHub's 1 GB soft limit slows pushes for both machines.
 - **GitHub repo visibility/size interaction**: if made private, size limits still apply (5 GB hard block) — the 603 MB pack is sustainable, but at current growth rates (~few MB/day snapshots) it will not stay that way indefinitely.
 
 ## Dependencies at Risk
 
-- **Unpinned requirements** (`Desktop/gogo/requirements.txt`): `akshare>=1.10.0`, `requests>=2.28.0`, `streamlit>=1.28.0`, `tushare>=1.2.0` — no lockfile. Two machines (Mac/Win) installing at different dates can silently run different scraping/API behavior; akshare especially churns against source sites.
+- **Unpinned requirements** (`Desktop/项目/gogo/requirements.txt`): `akshare>=1.10.0`, `requests>=2.28.0`, `streamlit>=1.28.0`, `tushare>=1.2.0` — no lockfile. Two machines (Mac/Win) installing at different dates can silently run different scraping/API behavior; akshare especially churns against source sites.
 - **Tencent/Sina unofficial endpoints**: no contract; recurring schema bugs (see Known Bugs) and rate blocks. Primary kline + live-quote dependency for the entire pipeline.
 - **Tushare**: token-gated official API used for kline fallback (`scripts/daily/kline_source.py`); service/credit changes affect backfill quality.
 - **HiThink hosted API** (`fuyao.aicubes.cn`, via `scripts/daily/hithink_api.py`): new (2026-08-31), used as zt-pool fallback + dual-source validator; availability/rate limits unknown long-term; the local `HiThink-Financial-API` checkout is the official mirror for contract reference.
@@ -154,7 +154,7 @@ Both gogo and vibe-astock checkouts are **shallow clones** (`.git/shallow` prese
 
 ### gogo — CRITICAL: zero tests for live-traded logic
 - What's not tested: everything — scoring (`scripts/daily/scoring.py:296 compute_score`, `classify_volume`, `seal_quality`), sell engine (`scripts/daily/sell_engine.py:245 sell_signal`, `:503 sell_execution_price`, `:572 check_vwap_breach`), zt-pool state machine (`scripts/daily/zt_pool.py`), auction decision, portfolio/exit log mechanics. No `test_*.py` file exists in the repo (verified).
-- Files: `Desktop/gogo/scripts/` (27.5k LOC).
+- Files: `Desktop/项目/gogo/scripts/` (27.5k LOC).
 - Risk: every recalibration ("9月权重重搜", V4 rules), sell-engine tweak, or parser fix ships without regression safety; the 181-commit history is full of "fix/三连修/双修" commits — each fixing something a test would have caught (e.g. 赚钱效应恒0三连修 `d1a8f7b`/`f45b236`).
 - Priority: High. Suggested first targets: `sell_engine.sell_signal`/`check_vwap_breach` (pure functions over kline arrays — trivially unit-testable with fixtures from `data/backtest_kline/`), then `scoring.compute_score`, mirroring the disciplined pattern already proven in `vibe-astock/tests/` (network-blocking autouse fixture, pure-logic-only policy).
 
@@ -171,7 +171,7 @@ Both gogo and vibe-astock checkouts are **shallow clones** (`.git/shallow` prese
 ## Appendix: Evidence Notes
 
 - Repo visibility test: `curl -o /dev/null -w "%{http_code}" https://github.com/valdislaul-dot/main-wave` → 200 on 2026-09-02 (control repo returned 200; private repos return 404). GitHub API was rate-limited, so confirm via `gh repo view`.
-- Git pack size: `git count-objects -vH` in `Desktop/gogo` → size-pack 603.44 MiB, 552 objects.
+- Git pack size: `git count-objects -vH` in `Desktop/项目/gogo` → size-pack 603.44 MiB, 552 objects.
 - Broad-except count: `grep -c "except Exception\|except:" scripts/daily/*.py` → 119.
 - Sensitive-history commits: `d11d116` (logs/portfolio.json, logs/trading_journal.json, logs/daily_reports/2026-08-31.md), `0bad0b3` (CLAUDE.md, .gitignore, daily report), removal `f65c5bf`.
 - Untracked/dirty at audit time (2026-09-02): `scripts/daily/run_pipeline.py`, `scripts/daily/backtest_sell_exit.py`, `data/historical_zt_pool.json`, `data/zt_pool/20260902.json`.

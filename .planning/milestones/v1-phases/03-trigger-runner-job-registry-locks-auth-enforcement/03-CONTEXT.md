@@ -22,7 +22,7 @@
 
 ### 单飞锁边界与并发者 (ACT-03)
 - **D-01:** GUI 一键刷新加入同一把锁文件。刷新按钮启动前先取锁,锁被占(API job 运行中)时禁用刷新并提示运行中,不抢跑。改 `scripts/daily/gui_dashboard.py:88` 的 subprocess 前置逻辑,保持"直接 subprocess 跑 run_pipeline --fast"的既有形态,只加锁检查。—— 最小改动达成 SC2 "any other entry point" 意图。
-- **D-02:** 停用「主升浪每日选股流水线」计划任务。`scripts/daily/auto_start.bat` 硬编码 `BASE=C:\Users\Davis\Desktop\主升浪`(仓库已迁 `gogo`),任务每天 15:30 cd 失败静默退出;仓库更名以来无人发现,证明用户不依赖它。停用需一条提权命令(Phase 1 已验证 Unregister-ScheduledTask 需提权),盘后靠手动面板/管线 + API 触发。—— **Reversibility:** reversible — 重新注册即可恢复,但按 Phase 1 D-07 惯例重装时勿复制 stale 路径。
+- **D-02:** 停用「主升浪每日选股流水线」计划任务。`scripts/daily/auto_start.bat` 硬编码 `BASE=C:\Users\Davis\Desktop\项目\gogo`(仓库已迁 `gogo`),任务每天 15:30 cd 失败静默退出;仓库更名以来无人发现,证明用户不依赖它。停用需一条提权命令(Phase 1 已验证 Unregister-ScheduledTask 需提权),盘后靠手动面板/管线 + API 触发。—— **Reversibility:** reversible — 重新注册即可恢复,但按 Phase 1 D-07 惯例重装时勿复制 stale 路径。
 - **D-03:** 锁作用域 = Win 本机锁。锁文件放 Win 本机 data/ 下(gitignore),防本机 API/GUI/计划任务并发。Mac 端 crontab(15:00 盘后 / 9:26 竞价)不加锁,保持两机串行约定——跨机锁经 git 同步存在天然竞态(两机可同时 pull 到无锁状态再抢锁),不可靠。锁实现细节(portalocker/msvcrt/lockfile 选型、stale 锁处理)留给 research 在真机验证。
 
 ### 写侧原子化 (ROADMAP 签字门)

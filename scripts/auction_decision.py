@@ -1,11 +1,11 @@
 import json, openpyxl
 from datetime import datetime, timedelta
 
-with open(r'C:\Users\Davis\Desktop\主升浪\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\stock_data.json','r',encoding='utf-8') as f:
     stock_data = json.load(f)
 
 def ed(s): return datetime(1899,12,30) + timedelta(days=int(s))
-wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws = wb['Sheet1']
 records = []
 for row in ws.iter_rows(min_row=2, values_only=True):
@@ -76,7 +76,7 @@ all_dates = sorted(set(d for d, _ in timeline))
 INIT = 300000
 TARGET = 1000000
 
-out_path = r'C:\Users\Davis\Desktop\主升浪\auction_decision_results.txt'
+out_path = r'C:\Users\Davis\Desktop\项目\gogo\auction_decision_results.txt'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write("=" * 80 + "\n")
     f.write("竞价决策模型: 卖出决定在竞价阶段(9:15-9:25)做出\n")

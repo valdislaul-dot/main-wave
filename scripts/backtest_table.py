@@ -1,10 +1,10 @@
 import json, openpyxl
 from datetime import datetime, timedelta
 
-with open(r'C:\Users\Davis\Desktop\主升浪\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\stock_data.json','r',encoding='utf-8') as f:
     stock_data=json.load(f)
 def ed(s): return datetime(1899,12,30)+timedelta(days=int(s))
-wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws=wb['Sheet1']
 records=[]
 for row in ws.iter_rows(min_row=2,values_only=True):
@@ -102,7 +102,7 @@ def get_mp(date):
     return top3[0]['name']
 
 # ============ RUN BACKTEST ============
-out_path=r'C:\Users\Davis\Desktop\主升浪\backtest_table.txt'
+out_path=r'C:\Users\Davis\Desktop\项目\gogo\backtest_table.txt'
 with open(out_path,'w',encoding='utf-8') as f:
     f.write("="*110+"\n")
     f.write("完整回测表格 | 初始资金:200,000 | 模型选股(评分>=30) | 55%仓位 | 高价卖出\n")
@@ -175,7 +175,7 @@ with open(out_path,'w',encoding='utf-8') as f:
     f.write(f"\n最终资产: {final:,.0f} | 总收益: {final-INIT:+,.0f} | 总收益率: {(final-INIT)/INIT*100:+.1f}%\n")
 
     # Also write CSV for easy import
-    csv_path=r'C:\Users\Davis\Desktop\主升浪\backtest_table.csv'
+    csv_path=r'C:\Users\Davis\Desktop\项目\gogo\backtest_table.csv'
     with open(csv_path,'w',encoding='utf-8-sig') as fc:
         fc.write("日期,操作,标的,价格,股数,金额,持仓市值,现金,总资产,日收益,累计收益率\n")
         for log in daily_log:

@@ -63,7 +63,7 @@ for i, dt in enumerate(dates):
         if code in next_set:
             transitions[cons]['next_lu'] += 1
 
-out_path = r'C:\Users\Davis\Desktop\主升浪\logs\full_market_lianban.txt'
+out_path = r'C:\Users\Davis\Desktop\项目\gogo\logs\full_market_lianban.txt'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write("="*65+"\n")
     f.write("全市场连板延续概率 (2026-03至2026-07, 剔除300/301/688)\n")

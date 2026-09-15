@@ -10,7 +10,7 @@
 
 **Secondary:**
 - Bash — `scripts/daily/morning_run.sh`（Mac 竞价定时）、根目录 `setup_mac.sh`、`merge_kline.sh`
-- Batch — `scripts/daily/auto_start.bat`（Windows 定时流水线入口，注意：其中 BASE 路径硬编码为旧路径 `C:\Users\Davis\Desktop\主升浪`）
+- Batch — `scripts/daily/auto_start.bat`（Windows 定时流水线入口，注意：其中 BASE 路径硬编码为旧路径 `C:\Users\Davis\Desktop\项目\gogo`）
 - PowerShell — `scripts/daily/install_scheduled_task.ps1`（注册 Windows 计划任务）
 
 ## Runtime

@@ -137,7 +137,7 @@ GET  /v1/jobs/3f2a… → {"job_id":…,"status":"done","exit_code":0,"started_a
 ### Pattern 3: 单飞锁 + 每 kind 隔离（Single-Flight per Script Kind）
 
 **What:** 同一种脚本同时只允许一个实例：进程内 `threading.Lock`/dict 登记 + 跨进程 advisory 文件锁（portalocker `PidFileLock`/msvcrt 语义，进程死 OS 自动释放 → 无陈旧锁困扰；portalocker 4.2.0+ 修过 LK_LOCK fallback 旧 bug，用新版）。不同 kind（pipeline vs morning-check vs backtest）互不阻塞。
-**When to use:** 仓库今天"无跨进程锁、并发双跑会竞争写同一 state JSON"（codebase ARCHITECTURE 明示）。API 至少要保证自己这侧不双跑；15:30 Windows 计划任务（注意：auto_start.bat 的 BASE 还硬编码旧路径 `C:\Users\Davis\Desktop\主升浪`，该任务大概率已失效）这类外部触发无法强制，作为已知限制写进 README。
+**When to use:** 仓库今天"无跨进程锁、并发双跑会竞争写同一 state JSON"（codebase ARCHITECTURE 明示）。API 至少要保证自己这侧不双跑；15:30 Windows 计划任务（注意：auto_start.bat 的 BASE 还硬编码旧路径 `C:\Users\Davis\Desktop\项目\gogo`，该任务大概率已失效）这类外部触发无法强制，作为已知限制写进 README。
 **Trade-offs:** advisory 锁只在所有参与者都遵守时才完备——只能约束 API 自身触发的请求；换来的是零侵入（不改 daily 代码）。
 
 ### Pattern 4: Freshness-Proxying Read（新鲜度透传只读）

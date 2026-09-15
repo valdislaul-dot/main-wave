@@ -1,10 +1,10 @@
 import json, openpyxl
 from datetime import datetime, timedelta
 
-with open(r'C:\Users\Davis\Desktop\主升浪\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\stock_data.json','r',encoding='utf-8') as f:
     stock_data=json.load(f)
 def ed(s): return datetime(1899,12,30)+timedelta(days=int(s))
-wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws=wb['Sheet1']
 records=[]
 for row in ws.iter_rows(min_row=2,values_only=True):

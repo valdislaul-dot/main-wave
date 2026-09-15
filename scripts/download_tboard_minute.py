@@ -8,7 +8,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-BASE = r'C:\Users\Davis\Desktop\gogo'
+BASE = r'C:\Users\Davis\Desktop\项目\gogo'
 KLINE_DIR = Path(BASE) / 'data' / 'kline_data'
 OUT_DIR = Path(BASE) / 'data' / 'minute_kline'
 OUT_DIR.mkdir(parents=True, exist_ok=True)

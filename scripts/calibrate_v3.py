@@ -2,13 +2,13 @@ import json
 import openpyxl
 from datetime import datetime, timedelta
 
-with open(r'C:\Users\Davis\Desktop\主升浪\stock_data.json', 'r', encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\stock_data.json', 'r', encoding='utf-8') as f:
     stock_data = json.load(f)
 
 def excel_to_date(serial):
     return datetime(1899, 12, 30) + timedelta(days=int(serial))
 
-wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws = wb['Sheet1']
 records = []
 for row in ws.iter_rows(min_row=2, values_only=True):
@@ -88,7 +88,7 @@ all_trade_dates = sorted(set(d for d, _ in timeline))
 INITIAL = 300000
 TARGET = 1000000
 
-out_path = r'C:\Users\Davis\Desktop\主升浪\calibrate_v3_results.txt'
+out_path = r'C:\Users\Davis\Desktop\项目\gogo\calibrate_v3_results.txt'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write("="*100 + "\n")
     f.write("买卖规则校准 V3 — 扩展搜索\n")

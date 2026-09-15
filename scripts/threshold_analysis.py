@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'daily'))
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-BASE = r'C:\Users\Davis\Desktop\主升浪'
+BASE = r'C:\Users\Davis\Desktop\项目\gogo'
 
 # Load data
 with open(os.path.join(BASE, 'data', 'stock_data.json'), 'r', encoding='utf-8') as f:

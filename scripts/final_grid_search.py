@@ -2,12 +2,12 @@ import json, openpyxl
 from datetime import datetime, timedelta
 from itertools import product
 
-with open(r'C:\Users\Davis\Desktop\主升浪\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\stock_data.json','r',encoding='utf-8') as f:
     stock_data=json.load(f)
 
 def ed(s): return datetime(1899,12,30)+timedelta(days=int(s))
 
-wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws=wb['Sheet1']
 records=[]
 for row in ws.iter_rows(min_row=2,values_only=True):
@@ -70,7 +70,7 @@ def sp_v(d,n):
     return None
 def sp_h(d,n): return pdb[n][d]['high'] if n in pdb and d in pdb[n] else None
 
-out_path=r'C:\Users\Davis\Desktop\主升浪\final_grid_results.txt'
+out_path=r'C:\Users\Davis\Desktop\项目\gogo\final_grid_results.txt'
 with open(out_path,'w',encoding='utf-8') as f:
     f.write("最终网格搜索: 找到使交易员选股达到~1M的精确执行参数\n")
     f.write("="*80+"\n\n")

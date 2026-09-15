@@ -10,7 +10,7 @@ def excel_to_date(serial):
     return datetime(1899, 12, 30) + timedelta(days=int(serial))
 
 # Load trading record
-wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws = wb['Sheet1']
 records = []
 for row in ws.iter_rows(min_row=2, values_only=True):

@@ -1,10 +1,10 @@
 import json, openpyxl
 from datetime import datetime, timedelta
 
-with open(r'C:\Users\Davis\Desktop\主升浪\data\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\data\stock_data.json','r',encoding='utf-8') as f:
     stock_data=json.load(f)
 def ed(s): return datetime(1899,12,30)+timedelta(days=int(s))
-wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\data\副本主升浪.xlsx')
+wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\data\副本主升浪.xlsx')
 ws=wb['Sheet1']
 records=[]
 for row in ws.iter_rows(min_row=2,values_only=True):
@@ -34,7 +34,7 @@ for s,st in records: d=ed(s); tl.append((d.strftime('%Y-%m-%d'),st))
 ad=sorted(set(d for d,_ in tl))
 INIT=200000; TARGET=1022000
 
-out_path = r'C:\Users\Davis\Desktop\主升浪\logs\executable_test.txt'
+out_path = r'C:\Users\Davis\Desktop\项目\gogo\logs\executable_test.txt'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write("交易员A选股 + 55%仓位 + 阈值6% (修正后)\n")
     f.write("="*60+"\n\n")

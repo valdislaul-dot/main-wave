@@ -4,9 +4,12 @@
 #  以管理员身份运行此脚本
 # ============================================
 
+# 路径一律由 $PSScriptRoot 推导（本文件在 scripts/daily/），不硬编码 —— 见 D-09 约定。
+# 硬编码路径已因仓库搬家失效两次（主升浪→gogo→项目\gogo）。
+$WorkingDir = $PSScriptRoot
+$ScriptPath = Join-Path $WorkingDir "auto_start.bat"
+
 $TaskName = "主升浪每日选股流水线"
-$ScriptPath = "C:\Users\Davis\Desktop\主升浪\scripts\daily\auto_start.bat"
-$WorkingDir = "C:\Users\Davis\Desktop\主升浪\scripts\daily"
 
 # Remove existing task if any
 try { Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue } catch {}
@@ -47,10 +50,10 @@ Write-Host ""
 Write-Host "  任务名称: $TaskName"
 Write-Host "  运行时间: 开机后5分钟 + 每日15:30"
 Write-Host "  脚本路径: $ScriptPath"
-Write-Host "  日志位置: C:\Users\Davis\Desktop\主升浪\logs\pipeline.log"
+Write-Host "  日志位置: C:\Users\Davis\Desktop\项目\gogo\logs\pipeline.log"
 Write-Host ""
 Write-Host "  手动运行测试:"
-Write-Host "    cd C:\Users\Davis\Desktop\主升浪\scripts\daily"
+Write-Host "    cd C:\Users\Davis\Desktop\项目\gogo\scripts\daily"
 Write-Host "    python run_pipeline.py"
 Write-Host ""
 Write-Host "  查看任务: taskschd.msc"

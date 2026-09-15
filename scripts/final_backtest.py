@@ -1,12 +1,12 @@
 import json, openpyxl
 from datetime import datetime, timedelta
 
-with open(r'C:\Users\Davis\Desktop\主升浪\data\stock_data.json','r',encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\data\stock_data.json','r',encoding='utf-8') as f:
     stock_data=json.load(f)
 def ed(s): return datetime(1899,12,30)+timedelta(days=int(s))
 
 # Load new xlsx with buy/sell columns
-wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪.xlsx')
+wb=openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo.xlsx')
 ws=wb['Sheet1']
 records=[]
 for row in ws.iter_rows(min_row=2,values_only=True):
@@ -42,7 +42,7 @@ for name,code in sm.items():
         if pc and pc>0: e['is_limit_up']=lu(c,pc,lpt); e['gap_open_pct']=(o-pc)/pc*100
         pdb[name][dt]=e; pc=c
 
-out_path=r'C:\Users\Davis\Desktop\主升浪\logs\final_backtest.txt'
+out_path=r'C:\Users\Davis\Desktop\项目\gogo\logs\final_backtest.txt'
 with open(out_path,'w',encoding='utf-8') as f:
     f.write("="*70+"\n")
     f.write("A最终回测: 次日必卖, 全仓, 全量买入\n")

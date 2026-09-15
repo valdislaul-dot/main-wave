@@ -117,7 +117,7 @@
 
 ## 历史/研究脚本注意
 
-- `scripts/` 根目录大量 `*_v2.py`/`*_v3.py`/`final_*.py`/`worst_trades*.py` 等一次性研究脚本: 命名带版本后缀递增、硬编码日期窗口与数据路径(如 `scripts/verify_review.py` 引用 `C:\Users\Davis\Desktop\主升浪\...` 旧路径), 不属生产代码, 勿以其风格为准
+- `scripts/` 根目录大量 `*_v2.py`/`*_v3.py`/`final_*.py`/`worst_trades*.py` 等一次性研究脚本: 命名带版本后缀递增、硬编码日期窗口与数据路径(如 `scripts/verify_review.py` 引用 `C:\Users\Davis\Desktop\项目\gogo\...` 旧路径), 不属生产代码, 勿以其风格为准
 - 生产风格判断依据: 位于 `scripts/daily/` 且被 `run_pipeline.py`/`morning_check.py`/`gui_dashboard.py` 引用, 或与它们共享 `BASE` 推导模式与 `[模块名]` 前缀 print
 
 ---

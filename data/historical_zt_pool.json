@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-08",
-  "total_stocks": 976,
+  "updated": "2026-09-15",
+  "total_stocks": 1034,
   "stocks": {
     "000006": {
       "name": "深振业Ａ",
@@ -20,9 +20,9 @@
     },
     "000011": {
       "name": "深物业A",
-      "count": 3,
+      "count": 4,
       "first_date": "20260724",
-      "last_date": "20260831",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "房地产开"
     },
@@ -36,17 +36,17 @@
     },
     "000019": {
       "name": "深粮控股",
-      "count": 2,
+      "count": 3,
       "first_date": "20260818",
-      "last_date": "20260901",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "农产品加"
     },
     "000020": {
       "name": "深华发Ａ",
-      "count": 2,
+      "count": 3,
       "first_date": "20260818",
-      "last_date": "20260819",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "光学光电"
     },
@@ -76,17 +76,17 @@
     },
     "000048": {
       "name": "京基智农",
-      "count": 2,
+      "count": 3,
       "first_date": "20260804",
-      "last_date": "20260812",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "养殖业"
     },
     "000059": {
       "name": "华锦股份",
-      "count": 2,
+      "count": 3,
       "first_date": "20260819",
-      "last_date": "20260828",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "炼化及贸"
     },
@@ -188,10 +188,10 @@
     },
     "000523": {
       "name": "红棉股份",
-      "count": 1,
+      "count": 3,
       "first_date": "20260820",
-      "last_date": "20260820",
-      "max_cons": 1,
+      "last_date": "20260909",
+      "max_cons": 2,
       "industry": "代糖+饮料+半年报预增+广州国资"
     },
     "000526": {
@@ -201,6 +201,14 @@
       "last_date": "20260819",
       "max_cons": 2,
       "industry": "教育"
+    },
+    "000532": {
+      "name": "华金资本",
+      "count": 1,
+      "first_date": "20260910",
+      "last_date": "20260910",
+      "max_cons": 1,
+      "industry": "创投+人工智能+铝电解电容器"
     },
     "000533": {
       "name": "顺钠股份",
@@ -236,10 +244,10 @@
     },
     "000560": {
       "name": "我爱我家",
-      "count": 5,
+      "count": 6,
       "first_date": "20260819",
-      "last_date": "20260901",
-      "max_cons": 3,
+      "last_date": "20260908",
+      "max_cons": 6,
       "industry": "房地产服"
     },
     "000564": {
@@ -252,10 +260,10 @@
     },
     "000565": {
       "name": "渝三峡A",
-      "count": 1,
+      "count": 3,
       "first_date": "20260828",
-      "last_date": "20260828",
-      "max_cons": 1,
+      "last_date": "20260910",
+      "max_cons": 2,
       "industry": "重防腐涂料+辐射制冷+半年报增长+国资控股"
     },
     "000566": {
@@ -281,6 +289,14 @@
       "last_date": "20260803",
       "max_cons": 1,
       "industry": "煤炭开采"
+    },
+    "000572": {
+      "name": "海马汽车",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "氢能汽车+海南自贸港+出口"
     },
     "000576": {
       "name": "甘化科工",
@@ -364,9 +380,9 @@
     },
     "000620": {
       "name": "盈新发展",
-      "count": 3,
+      "count": 4,
       "first_date": "20260814",
-      "last_date": "20260824",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "房地产开"
     },
@@ -396,9 +412,9 @@
     },
     "000636": {
       "name": "风华高科",
-      "count": 1,
+      "count": 2,
       "first_date": "20260727",
-      "last_date": "20260727",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "元件"
     },
@@ -469,8 +485,8 @@
     "000679": {
       "name": "大连友谊",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "新零售+大连零售+拟国资入主"
     },
@@ -562,6 +578,14 @@
       "max_cons": 1,
       "industry": "旅游餐饮+中华老字号+降本增效"
     },
+    "000722": {
+      "name": "湖南发展",
+      "count": 1,
+      "first_date": "20260910",
+      "last_date": "20260910",
+      "max_cons": 1,
+      "industry": "水力发电+光伏发电+业绩增长+资产重组"
+    },
     "000723": {
       "name": "美锦能源",
       "count": 2,
@@ -612,10 +636,10 @@
     },
     "000759": {
       "name": "中百集团",
-      "count": 1,
+      "count": 3,
       "first_date": "20260907",
-      "last_date": "20260907",
-      "max_cons": 1,
+      "last_date": "20260909",
+      "max_cons": 3,
       "industry": "商业零售+硬折扣+本地生活"
     },
     "000779": {
@@ -636,9 +660,9 @@
     },
     "000798": {
       "name": "中水渔业",
-      "count": 3,
+      "count": 4,
       "first_date": "20260828",
-      "last_date": "20260907",
+      "last_date": "20260909",
       "max_cons": 2,
       "industry": "远洋渔业+AI渔业+半年报增长"
     },
@@ -657,6 +681,14 @@
       "last_date": "20260817",
       "max_cons": 2,
       "industry": "通用设备"
+    },
+    "000812": {
+      "name": "陕西金叶",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "烟草配套+教育事业+股权转让"
     },
     "000813": {
       "name": "德展健康",
@@ -692,10 +724,10 @@
     },
     "000823": {
       "name": "超声电子",
-      "count": 1,
+      "count": 4,
       "first_date": "20260907",
-      "last_date": "20260907",
-      "max_cons": 1,
+      "last_date": "20260914",
+      "max_cons": 3,
       "industry": "算力PCB+存储PCB+高端HDI"
     },
     "000831": {
@@ -709,16 +741,16 @@
     "000833": {
       "name": "粤桂股份",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "硫铁矿+精制磷酸+光伏银粉+业绩增长"
     },
     "000839": {
       "name": "国安股份",
-      "count": 1,
+      "count": 2,
       "first_date": "20260806",
-      "last_date": "20260806",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "通信服务"
     },
@@ -746,6 +778,14 @@
       "max_cons": 1,
       "industry": "电力"
     },
+    "000868": {
+      "name": "安凯客车",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "新能源客车+销量增长+自主研发"
+    },
     "000876": {
       "name": "新希望",
       "count": 1,
@@ -764,9 +804,9 @@
     },
     "000890": {
       "name": "法尔胜",
-      "count": 2,
+      "count": 3,
       "first_date": "20260826",
-      "last_date": "20260827",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "光纤参股+环保业务+金属制品"
     },
@@ -788,10 +828,10 @@
     },
     "000912": {
       "name": "泸天化",
-      "count": 1,
+      "count": 3,
       "first_date": "20260828",
-      "last_date": "20260828",
-      "max_cons": 1,
+      "last_date": "20260909",
+      "max_cons": 2,
       "industry": "化肥+尿素+煤化工+新材料"
     },
     "000925": {
@@ -805,17 +845,17 @@
     "000928": {
       "name": "中钢国际",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "海外EPC+低碳冶金+订单增长"
     },
     "000930": {
       "name": "中粮科技",
-      "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
-      "max_cons": 1,
+      "count": 2,
+      "first_date": "20260908",
+      "last_date": "20260909",
+      "max_cons": 2,
       "industry": "功能糖+淀粉糖+燃料乙醇"
     },
     "000931": {
@@ -852,9 +892,9 @@
     },
     "000962": {
       "name": "东方钽业",
-      "count": 3,
+      "count": 4,
       "first_date": "20260804",
-      "last_date": "20260827",
+      "last_date": "20260914",
       "max_cons": 2,
       "industry": "小金属"
     },
@@ -876,9 +916,9 @@
     },
     "000972": {
       "name": "中基健康",
-      "count": 1,
+      "count": 2,
       "first_date": "20260813",
-      "last_date": "20260813",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "农产品加"
     },
@@ -900,27 +940,35 @@
     },
     "000978": {
       "name": "桂林旅游",
-      "count": 1,
+      "count": 5,
       "first_date": "20260907",
-      "last_date": "20260907",
-      "max_cons": 1,
+      "last_date": "20260914",
+      "max_cons": 4,
       "industry": "AI文旅+低空经济+景区旅游"
     },
     "000980": {
       "name": "众泰汽车",
-      "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
-      "max_cons": 1,
+      "count": 4,
+      "first_date": "20260908",
+      "last_date": "20260914",
+      "max_cons": 3,
       "industry": "自研车型+新能源整车+海外布局"
     },
     "000981": {
       "name": "山子高科",
-      "count": 1,
+      "count": 2,
       "first_date": "20260805",
-      "last_date": "20260805",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "汽车零部"
+    },
+    "000993": {
+      "name": "闽东电力",
+      "count": 4,
+      "first_date": "20260909",
+      "last_date": "20260914",
+      "max_cons": 4,
+      "industry": "清洁能源+海上风电+福建国资"
     },
     "000997": {
       "name": "新大陆",
@@ -961,6 +1009,22 @@
       "last_date": "20260820",
       "max_cons": 1,
       "industry": "电力"
+    },
+    "001212": {
+      "name": "中旗新材",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "高纯石英砂+TFT石英粉+人造石英石"
+    },
+    "001216": {
+      "name": "华瓷股份",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "氧化锆+MLCC+日用陶瓷出口"
     },
     "001221": {
       "name": "悍高集团",
@@ -1004,9 +1068,9 @@
     },
     "001232": {
       "name": "嘉立创",
-      "count": 1,
+      "count": 2,
       "first_date": "20260827",
-      "last_date": "20260827",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "半年报增长+PCB制造+EDA软件+次新股"
     },
@@ -1092,9 +1156,9 @@
     },
     "001299": {
       "name": "美能能源",
-      "count": 1,
+      "count": 2,
       "first_date": "20260903",
-      "last_date": "20260903",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "城镇燃气运营+储能布局"
     },
@@ -1306,6 +1370,14 @@
       "max_cons": 1,
       "industry": "通用设备"
     },
+    "001896": {
+      "name": "豫能控股",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "电力+算力+抽水蓄能"
+    },
     "002005": {
       "name": "德豪润达",
       "count": 1,
@@ -1420,9 +1492,9 @@
     },
     "002040": {
       "name": "南 京 港",
-      "count": 1,
+      "count": 2,
       "first_date": "20260819",
-      "last_date": "20260819",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "航运港口"
     },
@@ -1449,6 +1521,14 @@
       "last_date": "20260821",
       "max_cons": 1,
       "industry": "AI眼镜+智能音箱+PCB概念+锂电池"
+    },
+    "002046": {
+      "name": "国机精工",
+      "count": 1,
+      "first_date": "20260909",
+      "last_date": "20260909",
+      "max_cons": 1,
+      "industry": "金刚石散热+半导体耗材+商业航天"
     },
     "002047": {
       "name": "宝鹰股份",
@@ -1500,10 +1580,10 @@
     },
     "002068": {
       "name": "黑猫股份",
-      "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
-      "max_cons": 1,
+      "count": 2,
+      "first_date": "20260908",
+      "last_date": "20260909",
+      "max_cons": 2,
       "industry": "超级电容+导电炭黑+炭黑龙头"
     },
     "002072": {
@@ -1521,6 +1601,14 @@
       "last_date": "20260803",
       "max_cons": 1,
       "industry": "特钢Ⅱ"
+    },
+    "002077": {
+      "name": "大港股份",
+      "count": 1,
+      "first_date": "20260909",
+      "last_date": "20260909",
+      "max_cons": 1,
+      "industry": "集成电路测试+产能满产+镇江国资"
     },
     "002080": {
       "name": "中材科技",
@@ -1557,8 +1645,8 @@
     "002093": {
       "name": "国脉科技",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "通信服务+养老AI+身联网+AI应用"
     },
@@ -1573,8 +1661,8 @@
     "002095": {
       "name": "生意宝",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "大宗电商+AI应用+业绩扭亏"
     },
@@ -1660,9 +1748,9 @@
     },
     "002141": {
       "name": "贤丰控股",
-      "count": 3,
+      "count": 4,
       "first_date": "20260727",
-      "last_date": "20260831",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "元件"
     },
@@ -1684,9 +1772,9 @@
     },
     "002155": {
       "name": "湖南黄金",
-      "count": 1,
+      "count": 2,
       "first_date": "20260827",
-      "last_date": "20260827",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "重大重组+复牌+黄金产业链+业绩增长"
     },
@@ -1705,6 +1793,22 @@
       "last_date": "20260727",
       "max_cons": 1,
       "industry": "通用设备"
+    },
+    "002161": {
+      "name": "远望谷",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "拟收购光泰通信+光通信+AI赋能+RFID物联网"
+    },
+    "002162": {
+      "name": "悦心健康",
+      "count": 1,
+      "first_date": "20260909",
+      "last_date": "20260909",
+      "max_cons": 1,
+      "industry": "康养机器人+养老服务+中报增长"
     },
     "002164": {
       "name": "宁波东力",
@@ -1732,9 +1836,9 @@
     },
     "002172": {
       "name": "澳洋健康",
-      "count": 8,
+      "count": 10,
       "first_date": "20260812",
-      "last_date": "20260907",
+      "last_date": "20260914",
       "max_cons": 6,
       "industry": "医疗服务"
     },
@@ -1748,9 +1852,9 @@
     },
     "002174": {
       "name": "游族网络",
-      "count": 2,
+      "count": 3,
       "first_date": "20260727",
-      "last_date": "20260813",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "游戏Ⅱ"
     },
@@ -1820,9 +1924,9 @@
     },
     "002194": {
       "name": "武汉凡谷",
-      "count": 3,
+      "count": 4,
       "first_date": "20260806",
-      "last_date": "20260811",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "通信设备"
     },
@@ -1836,11 +1940,19 @@
     },
     "002201": {
       "name": "九鼎新材",
-      "count": 1,
+      "count": 3,
       "first_date": "20260902",
-      "last_date": "20260902",
-      "max_cons": 1,
+      "last_date": "20260911",
+      "max_cons": 2,
       "industry": "特种玻纤+航空航天+复合材料"
+    },
+    "002204": {
+      "name": "大连重工",
+      "count": 1,
+      "first_date": "20260910",
+      "last_date": "20260910",
+      "max_cons": 1,
+      "industry": "港口机械+重型装备+商业航天+机器人"
     },
     "002208": {
       "name": "合肥城建",
@@ -1860,9 +1972,9 @@
     },
     "002212": {
       "name": "天融信",
-      "count": 3,
+      "count": 4,
       "first_date": "20260806",
-      "last_date": "20260828",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "软件开发"
     },
@@ -1881,6 +1993,14 @@
       "last_date": "20260806",
       "max_cons": 2,
       "industry": "军工电子"
+    },
+    "002218": {
+      "name": "拓日新能",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "光伏玻璃+光储一体化+光伏电站+储能"
     },
     "002219": {
       "name": "新里程",
@@ -1906,6 +2026,14 @@
       "max_cons": 2,
       "industry": "IT服务Ⅱ"
     },
+    "002232": {
+      "name": "启明信息",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "车联网+车路云+一汽配套"
+    },
     "002235": {
       "name": "安妮股份",
       "count": 2,
@@ -1916,9 +2044,9 @@
     },
     "002242": {
       "name": "九阳股份",
-      "count": 1,
+      "count": 2,
       "first_date": "20260727",
-      "last_date": "20260727",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "小家电"
     },
@@ -1973,8 +2101,8 @@
     "002264": {
       "name": "新华都",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "AI营销+电商白酒+减持未实施"
     },
@@ -1996,9 +2124,9 @@
     },
     "002274": {
       "name": "华昌化工",
-      "count": 1,
+      "count": 2,
       "first_date": "20260902",
-      "last_date": "20260902",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "控制权变更+多元醇+业绩增长"
     },
@@ -2037,16 +2165,16 @@
     "002285": {
       "name": "世联行",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "房地产服务+大资管+珠海国资"
     },
     "002286": {
       "name": "保龄宝",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "功能糖+减糖甜味剂+玉米加工"
     },
@@ -2084,10 +2212,10 @@
     },
     "002295": {
       "name": "精艺股份",
-      "count": 2,
+      "count": 4,
       "first_date": "20260826",
-      "last_date": "20260901",
-      "max_cons": 1,
+      "last_date": "20260909",
+      "max_cons": 2,
       "industry": "铜加工+头部客户+国资背景"
     },
     "002297": {
@@ -2149,8 +2277,8 @@
     "002312": {
       "name": "川发龙蟒",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "磷化工+磷矿资源+新能源材料"
     },
@@ -2197,8 +2325,8 @@
     "002343": {
       "name": "慈文传媒",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "影视IP+短剧+江西国资"
     },
@@ -2212,9 +2340,9 @@
     },
     "002346": {
       "name": "柘中股份",
-      "count": 1,
+      "count": 2,
       "first_date": "20260805",
-      "last_date": "20260805",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "电网设备"
     },
@@ -2228,9 +2356,9 @@
     },
     "002349": {
       "name": "精华制药",
-      "count": 2,
+      "count": 4,
       "first_date": "20260828",
-      "last_date": "20260901",
+      "last_date": "20260909",
       "max_cons": 2,
       "industry": "中药+创新药+原料药"
     },
@@ -2260,9 +2388,9 @@
     },
     "002357": {
       "name": "富临运业",
-      "count": 1,
+      "count": 2,
       "first_date": "20260812",
-      "last_date": "20260812",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "铁路公路"
     },
@@ -2274,6 +2402,14 @@
       "max_cons": 2,
       "industry": "塑料"
     },
+    "002362": {
+      "name": "汉王科技",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "AI应用+具身智能+AI终端"
+    },
     "002364": {
       "name": "中恒电气",
       "count": 2,
@@ -2284,9 +2420,9 @@
     },
     "002365": {
       "name": "永安药业",
-      "count": 3,
+      "count": 4,
       "first_date": "20260727",
-      "last_date": "20260820",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "化学制药"
     },
@@ -2338,6 +2474,14 @@
       "max_cons": 1,
       "industry": "计算机设"
     },
+    "002377": {
+      "name": "国创高新",
+      "count": 2,
+      "first_date": "20260909",
+      "last_date": "20260910",
+      "max_cons": 2,
+      "industry": "业绩增长+改性沥青+控股股东增持"
+    },
     "002379": {
       "name": "宏桥控股",
       "count": 1,
@@ -2349,8 +2493,8 @@
     "002383": {
       "name": "合众思壮",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "农机+北斗导航+商业航天"
     },
@@ -2404,10 +2548,10 @@
     },
     "002403": {
       "name": "爱仕达",
-      "count": 3,
+      "count": 4,
       "first_date": "20260903",
-      "last_date": "20260907",
-      "max_cons": 3,
+      "last_date": "20260908",
+      "max_cons": 4,
       "industry": "人形机器人+工业机器人+炊具小家电"
     },
     "002407": {
@@ -2564,10 +2708,10 @@
     },
     "002470": {
       "name": "金正大",
-      "count": 2,
+      "count": 4,
       "first_date": "20260901",
-      "last_date": "20260907",
-      "max_cons": 1,
+      "last_date": "20260909",
+      "max_cons": 3,
       "industry": "复合肥+磷化工+缓控释肥"
     },
     "002474": {
@@ -2618,6 +2762,14 @@
       "max_cons": 1,
       "industry": "户外面料+运动功能面料+绿色面料"
     },
+    "002487": {
+      "name": "大金重工",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "海上风电+海外拓展+特种运输"
+    },
     "002491": {
       "name": "通鼎互联",
       "count": 4,
@@ -2628,9 +2780,9 @@
     },
     "002498": {
       "name": "汉缆股份",
-      "count": 1,
+      "count": 2,
       "first_date": "20260724",
-      "last_date": "20260724",
+      "last_date": "20260909",
       "max_cons": 2,
       "industry": "电网设备"
     },
@@ -2641,6 +2793,14 @@
       "last_date": "20260907",
       "max_cons": 1,
       "industry": "食品加工"
+    },
+    "002519": {
+      "name": "银河电子",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "军工装备+新能源结构件+商业航天+业绩扭亏"
     },
     "002520": {
       "name": "日发精机",
@@ -2657,6 +2817,14 @@
       "last_date": "20260727",
       "max_cons": 1,
       "industry": "塑料"
+    },
+    "002531": {
+      "name": "天顺风能",
+      "count": 1,
+      "first_date": "20260910",
+      "last_date": "20260910",
+      "max_cons": 1,
+      "industry": "风电+海工装备+油气船舶+定增扩产"
     },
     "002534": {
       "name": "西子洁能",
@@ -2684,9 +2852,9 @@
     },
     "002543": {
       "name": "万和电气",
-      "count": 2,
+      "count": 3,
       "first_date": "20260813",
-      "last_date": "20260819",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "厨卫电器"
     },
@@ -2705,6 +2873,14 @@
       "last_date": "20260818",
       "max_cons": 1,
       "industry": "汽车零部"
+    },
+    "002560": {
+      "name": "通达股份",
+      "count": 2,
+      "first_date": "20260911",
+      "last_date": "20260914",
+      "max_cons": 2,
+      "industry": "特高压+航空零部件+机器人线束"
     },
     "002562": {
       "name": "兄弟科技",
@@ -2756,9 +2932,9 @@
     },
     "002579": {
       "name": "中京电子",
-      "count": 4,
+      "count": 6,
       "first_date": "20260804",
-      "last_date": "20260907",
+      "last_date": "20260914",
       "max_cons": 2,
       "industry": "元件"
     },
@@ -2778,12 +2954,20 @@
       "max_cons": 1,
       "industry": "休闲食品"
     },
+    "002584": {
+      "name": "西陇科学",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "PCB用化学试剂+氢氟酸+磷化工"
+    },
     "002585": {
       "name": "双星新材",
-      "count": 1,
+      "count": 3,
       "first_date": "20260811",
-      "last_date": "20260811",
-      "max_cons": 1,
+      "last_date": "20260914",
+      "max_cons": 2,
       "industry": "塑料"
     },
     "002589": {
@@ -2852,9 +3036,9 @@
     },
     "002636": {
       "name": "金安国纪",
-      "count": 3,
+      "count": 4,
       "first_date": "20260727",
-      "last_date": "20260827",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "元件"
     },
@@ -2954,6 +3138,14 @@
       "max_cons": 1,
       "industry": "机器人电源+LED电源+济南国资"
     },
+    "002661": {
+      "name": "克明食品",
+      "count": 1,
+      "first_date": "20260910",
+      "last_date": "20260910",
+      "max_cons": 1,
+      "industry": "挂面主业+冷冻面+生猪产能"
+    },
     "002668": {
       "name": "TCL智家",
       "count": 1,
@@ -2961,6 +3153,14 @@
       "last_date": "20260817",
       "max_cons": 1,
       "industry": "白色家电"
+    },
+    "002669": {
+      "name": "康达新材",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "PCB概念+电子级环氧树脂+风电胶粘剂龙头+唐山国资"
     },
     "002674": {
       "name": "兴业科技",
@@ -3044,10 +3244,10 @@
     },
     "002702": {
       "name": "海欣食品",
-      "count": 2,
+      "count": 3,
       "first_date": "20260904",
-      "last_date": "20260907",
-      "max_cons": 2,
+      "last_date": "20260908",
+      "max_cons": 3,
       "industry": "速冻食品+山姆渠道+营收增长+海峡两岸"
     },
     "002703": {
@@ -3236,10 +3436,10 @@
     },
     "002790": {
       "name": "瑞尔特",
-      "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
-      "max_cons": 1,
+      "count": 4,
+      "first_date": "20260908",
+      "last_date": "20260911",
+      "max_cons": 4,
       "industry": "智能卫浴+适老卫浴+冲水组件+海峡两岸"
     },
     "002792": {
@@ -3284,9 +3484,9 @@
     },
     "002815": {
       "name": "崇达技术",
-      "count": 1,
+      "count": 2,
       "first_date": "20260907",
-      "last_date": "20260907",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "高端PCB+AI服务器+股份回购"
     },
@@ -3377,6 +3577,22 @@
       "last_date": "20260810",
       "max_cons": 1,
       "industry": "小金属"
+    },
+    "002846": {
+      "name": "英联股份",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "固态电池+复合集流体+易开盖"
+    },
+    "002848": {
+      "name": "高斯贝尔",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "高频高速覆铜板+AI材料+定增推进"
     },
     "002852": {
       "name": "道道全",
@@ -3506,6 +3722,14 @@
       "max_cons": 2,
       "industry": "通用设备"
     },
+    "002897": {
+      "name": "意华股份",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "高速连接器+送样推进+液冷产品"
+    },
     "002900": {
       "name": "哈三联",
       "count": 5,
@@ -3516,9 +3740,9 @@
     },
     "002902": {
       "name": "铭普光磁",
-      "count": 2,
+      "count": 3,
       "first_date": "20260803",
-      "last_date": "20260907",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "通信设备"
     },
@@ -3556,18 +3780,18 @@
     },
     "002909": {
       "name": "集泰股份",
-      "count": 5,
+      "count": 6,
       "first_date": "20260831",
-      "last_date": "20260907",
+      "last_date": "20260908",
       "max_cons": 5,
       "industry": "液冷硅油+新能源胶+密封胶"
     },
     "002912": {
       "name": "中新赛克",
-      "count": 1,
+      "count": 4,
       "first_date": "20260804",
-      "last_date": "20260804",
-      "max_cons": 1,
+      "last_date": "20260914",
+      "max_cons": 3,
       "industry": "计算机设"
     },
     "002913": {
@@ -3596,9 +3820,9 @@
     },
     "002918": {
       "name": "蒙娜丽莎",
-      "count": 2,
+      "count": 3,
       "first_date": "20260727",
-      "last_date": "20260828",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "家居用品"
     },
@@ -3770,11 +3994,19 @@
       "max_cons": 3,
       "industry": "自动化设"
     },
+    "002976": {
+      "name": "瑞玛精密",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "光通信散热+空气悬架+座椅舒适系统+5G通信"
+    },
     "002980": {
       "name": "华盛昌",
-      "count": 5,
+      "count": 6,
       "first_date": "20260804",
-      "last_date": "20260907",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "电网设备"
     },
@@ -3812,9 +4044,9 @@
     },
     "002999": {
       "name": "天禾股份",
-      "count": 1,
+      "count": 2,
       "first_date": "20260902",
-      "last_date": "20260902",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "农资流通+供销社+业绩增长"
     },
@@ -3865,6 +4097,14 @@
       "last_date": "20260825",
       "max_cons": 1,
       "industry": "人形机器人+灵巧手+微型驱动"
+    },
+    "003026": {
+      "name": "中晶科技",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "硅片+订单+股权激励"
     },
     "003029": {
       "name": "吉大正元",
@@ -3954,6 +4194,14 @@
       "max_cons": 1,
       "industry": "农化制品"
     },
+    "600088": {
+      "name": "中视传媒",
+      "count": 2,
+      "first_date": "20260911",
+      "last_date": "20260914",
+      "max_cons": 2,
+      "industry": "AI应用+影视制作+央企传媒"
+    },
     "600095": {
       "name": "湘财股份",
       "count": 2,
@@ -3980,10 +4228,10 @@
     },
     "600108": {
       "name": "亚盛集团",
-      "count": 5,
+      "count": 6,
       "first_date": "20260818",
-      "last_date": "20260907",
-      "max_cons": 3,
+      "last_date": "20260908",
+      "max_cons": 4,
       "industry": "种植业"
     },
     "600110": {
@@ -4004,9 +4252,9 @@
     },
     "600121": {
       "name": "郑州煤电",
-      "count": 2,
+      "count": 3,
       "first_date": "20260831",
-      "last_date": "20260901",
+      "last_date": "20260909",
       "max_cons": 2,
       "industry": "煤炭+算力+国企改革"
     },
@@ -4044,17 +4292,25 @@
     },
     "600162": {
       "name": "香江控股",
-      "count": 4,
+      "count": 5,
       "first_date": "20260811",
-      "last_date": "20260828",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "房地产开"
     },
+    "600163": {
+      "name": "中闽能源",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "抽水蓄能+海上风电+新能源发电"
+    },
     "600172": {
       "name": "黄河旋风",
-      "count": 3,
+      "count": 4,
       "first_date": "20260805",
-      "last_date": "20260825",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "通用设备"
     },
@@ -4082,6 +4338,14 @@
       "max_cons": 1,
       "industry": "元件"
     },
+    "600184": {
+      "name": "光电股份",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "光通信材料+光学材料+防务产品"
+    },
     "600185": {
       "name": "珠免集团",
       "count": 1,
@@ -4092,9 +4356,9 @@
     },
     "600186": {
       "name": "莲花控股",
-      "count": 3,
+      "count": 4,
       "first_date": "20260804",
-      "last_date": "20260814",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "调味发酵"
     },
@@ -4108,10 +4372,10 @@
     },
     "600192": {
       "name": "长城电工",
-      "count": 2,
+      "count": 4,
       "first_date": "20260803",
-      "last_date": "20260810",
-      "max_cons": 1,
+      "last_date": "20260910",
+      "max_cons": 2,
       "industry": "电网设备"
     },
     "600198": {
@@ -4129,6 +4393,14 @@
       "last_date": "20260817",
       "max_cons": 3,
       "industry": "半导体"
+    },
+    "600207": {
+      "name": "安彩高科",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "光伏玻璃+拟控股弘诺玻璃+ST风险澄清"
     },
     "600211": {
       "name": "西藏药业",
@@ -4156,17 +4428,17 @@
     },
     "600227": {
       "name": "赤天化",
-      "count": 5,
+      "count": 6,
       "first_date": "20260810",
-      "last_date": "20260831",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "农化制品"
     },
     "600228": {
       "name": "返利科技",
-      "count": 1,
+      "count": 2,
       "first_date": "20260804",
-      "last_date": "20260804",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "数字媒体"
     },
@@ -4177,6 +4449,14 @@
       "last_date": "20260903",
       "max_cons": 1,
       "industry": "装修装饰"
+    },
+    "600237": {
+      "name": "铜峰电子",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "薄膜电容器+复合铜箔+电子材料"
     },
     "600246": {
       "name": "万通发展",
@@ -4201,6 +4481,14 @@
       "last_date": "20260828",
       "max_cons": 1,
       "industry": "农产品加工+番茄制品+投资收益+中报增长"
+    },
+    "600255": {
+      "name": "鑫科材料",
+      "count": 1,
+      "first_date": "20260909",
+      "last_date": "20260909",
+      "max_cons": 1,
+      "industry": "高速铜连接+高端铜合金+业绩增长"
     },
     "600262": {
       "name": "北方股份",
@@ -4276,9 +4564,9 @@
     },
     "600318": {
       "name": "新力金融",
-      "count": 1,
+      "count": 2,
       "first_date": "20260901",
-      "last_date": "20260901",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "多元金融+供销社+业绩增长"
     },
@@ -4300,9 +4588,9 @@
     },
     "600330": {
       "name": "天通股份",
-      "count": 5,
+      "count": 6,
       "first_date": "20260804",
-      "last_date": "20260907",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "电子化学"
     },
@@ -4324,9 +4612,9 @@
     },
     "600354": {
       "name": "敦煌种业",
-      "count": 5,
+      "count": 6,
       "first_date": "20260818",
-      "last_date": "20260907",
+      "last_date": "20260908",
       "max_cons": 3,
       "industry": "种植业"
     },
@@ -4340,10 +4628,10 @@
     },
     "600359": {
       "name": "新农开发",
-      "count": 2,
+      "count": 4,
       "first_date": "20260818",
-      "last_date": "20260827",
-      "max_cons": 1,
+      "last_date": "20260910",
+      "max_cons": 2,
       "industry": "种植业"
     },
     "600362": {
@@ -4420,17 +4708,17 @@
     },
     "600403": {
       "name": "大有能源",
-      "count": 3,
+      "count": 4,
       "first_date": "20260806",
-      "last_date": "20260824",
+      "last_date": "20260909",
       "max_cons": 2,
       "industry": "煤炭开采"
     },
     "600410": {
       "name": "华胜天成",
-      "count": 2,
+      "count": 3,
       "first_date": "20260804",
-      "last_date": "20260901",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "IT服务Ⅱ"
     },
@@ -4500,10 +4788,10 @@
     },
     "600488": {
       "name": "津药药业",
-      "count": 1,
+      "count": 3,
       "first_date": "20260727",
-      "last_date": "20260727",
-      "max_cons": 1,
+      "last_date": "20260914",
+      "max_cons": 2,
       "industry": "化学制药"
     },
     "600490": {
@@ -4556,10 +4844,10 @@
     },
     "600540": {
       "name": "新赛股份",
-      "count": 6,
+      "count": 7,
       "first_date": "20260803",
-      "last_date": "20260907",
-      "max_cons": 6,
+      "last_date": "20260909",
+      "max_cons": 7,
       "industry": "种植业"
     },
     "600545": {
@@ -4629,8 +4917,8 @@
     "600596": {
       "name": "新安股份",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "农化+草甘膦+有机硅+AI液冷"
     },
@@ -4724,9 +5012,9 @@
     },
     "600644": {
       "name": "乐山电力",
-      "count": 1,
+      "count": 2,
       "first_date": "20260803",
-      "last_date": "20260803",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "电力"
     },
@@ -4788,9 +5076,9 @@
     },
     "600667": {
       "name": "太极实业",
-      "count": 2,
+      "count": 3,
       "first_date": "20260727",
-      "last_date": "20260811",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "工程咨询"
     },
@@ -4828,9 +5116,9 @@
     },
     "600691": {
       "name": "潞化科技",
-      "count": 2,
+      "count": 3,
       "first_date": "20260828",
-      "last_date": "20260831",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "煤气化+尿素+氢能装备"
     },
@@ -4842,11 +5130,19 @@
       "max_cons": 2,
       "industry": "零售+首店经济+仓储物流+资产盘活"
     },
+    "600697": {
+      "name": "欧亚集团",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "零售+免税申请+国企"
+    },
     "600698": {
       "name": "湖南天雁",
-      "count": 4,
+      "count": 5,
       "first_date": "20260724",
-      "last_date": "20260904",
+      "last_date": "20260909",
       "max_cons": 2,
       "industry": "汽车零部"
     },
@@ -4868,9 +5164,9 @@
     },
     "600712": {
       "name": "南宁百货",
-      "count": 1,
+      "count": 2,
       "first_date": "20260804",
-      "last_date": "20260804",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "一般零售"
     },
@@ -4900,9 +5196,9 @@
     },
     "600722": {
       "name": "金牛化工",
-      "count": 4,
+      "count": 5,
       "first_date": "20260810",
-      "last_date": "20260831",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "化学原料"
     },
@@ -4916,17 +5212,17 @@
     },
     "600737": {
       "name": "中粮糖业",
-      "count": 1,
+      "count": 2,
       "first_date": "20260818",
-      "last_date": "20260818",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "农产品加"
     },
     "600744": {
       "name": "华银电力",
-      "count": 1,
+      "count": 2,
       "first_date": "20260807",
-      "last_date": "20260807",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "电力"
     },
@@ -4940,9 +5236,9 @@
     },
     "600769": {
       "name": "祥龙电业",
-      "count": 1,
+      "count": 2,
       "first_date": "20260814",
-      "last_date": "20260814",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "环境治理"
     },
@@ -4961,6 +5257,14 @@
       "last_date": "20260727",
       "max_cons": 1,
       "industry": "通信设备"
+    },
+    "600778": {
+      "name": "友好集团",
+      "count": 1,
+      "first_date": "20260909",
+      "last_date": "20260909",
+      "max_cons": 1,
+      "industry": "零售+业绩增长+便利店扩张"
     },
     "600783": {
       "name": "鲁信创投",
@@ -4988,10 +5292,10 @@
     },
     "600792": {
       "name": "云煤能源",
-      "count": 1,
+      "count": 4,
       "first_date": "20260901",
-      "last_date": "20260901",
-      "max_cons": 1,
+      "last_date": "20260910",
+      "max_cons": 3,
       "industry": "焦炭生产+钢企供货+产能释放"
     },
     "600793": {
@@ -5012,9 +5316,9 @@
     },
     "600802": {
       "name": "福建水泥",
-      "count": 1,
+      "count": 2,
       "first_date": "20260904",
-      "last_date": "20260904",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "水泥熟料+重点项目+福建国资"
     },
@@ -5116,33 +5420,41 @@
     },
     "600865": {
       "name": "百大集团",
-      "count": 3,
+      "count": 5,
       "first_date": "20260903",
-      "last_date": "20260907",
-      "max_cons": 3,
+      "last_date": "20260909",
+      "max_cons": 5,
       "industry": "商业零售+物业租赁+恒隆租约"
     },
     "600869": {
       "name": "远东股份",
-      "count": 1,
+      "count": 2,
       "first_date": "20260902",
-      "last_date": "20260902",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "算力AI订单+液冷散热+光纤互联"
+    },
+    "600876": {
+      "name": "凯盛新能",
+      "count": 3,
+      "first_date": "20260910",
+      "last_date": "20260914",
+      "max_cons": 3,
+      "industry": "光伏玻璃+产线退出预期+央企"
     },
     "600880": {
       "name": "博瑞传播",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "AI应用+数字文创+成都国资"
     },
     "600881": {
       "name": "亚泰集团",
-      "count": 3,
+      "count": 4,
       "first_date": "20260811",
-      "last_date": "20260813",
+      "last_date": "20260908",
       "max_cons": 3,
       "industry": "综合Ⅱ"
     },
@@ -5156,9 +5468,9 @@
     },
     "600903": {
       "name": "贵州燃气",
-      "count": 1,
+      "count": 2,
       "first_date": "20260902",
-      "last_date": "20260902",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "高纯氦气+天然气+页岩气+并购重组"
     },
@@ -5188,9 +5500,9 @@
     },
     "600967": {
       "name": "内蒙一机",
-      "count": 2,
+      "count": 3,
       "first_date": "20260901",
-      "last_date": "20260902",
+      "last_date": "20260911",
       "max_cons": 2,
       "industry": "军工装备+军贸+铁路货车+兵装重组"
     },
@@ -5284,9 +5596,9 @@
     },
     "601086": {
       "name": "国芳集团",
-      "count": 6,
+      "count": 7,
       "first_date": "20260828",
-      "last_date": "20260907",
+      "last_date": "20260914",
       "max_cons": 5,
       "industry": "半年报增长+新零售+连锁零售"
     },
@@ -5313,6 +5625,14 @@
       "last_date": "20260820",
       "max_cons": 1,
       "industry": "天然橡胶龙头+海南自贸区+国企改革"
+    },
+    "601123": {
+      "name": "马矿股份",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "次新股+铁矿采选+钼精矿"
     },
     "601126": {
       "name": "四方股份",
@@ -5348,9 +5668,9 @@
     },
     "601199": {
       "name": "江南水务",
-      "count": 1,
+      "count": 2,
       "first_date": "20260810",
-      "last_date": "20260810",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "环境治理"
     },
@@ -5388,9 +5708,9 @@
     },
     "601231": {
       "name": "环旭电子",
-      "count": 1,
+      "count": 2,
       "first_date": "20260805",
-      "last_date": "20260805",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "消费电子"
     },
@@ -5426,20 +5746,28 @@
       "max_cons": 2,
       "industry": "男裤龙头+零售消费+太空裤"
     },
+    "601567": {
+      "name": "三星电气",
+      "count": 1,
+      "first_date": "20260914",
+      "last_date": "20260914",
+      "max_cons": 1,
+      "industry": "海外配电+智能电网+医疗服务+H股上市"
+    },
     "601579": {
       "name": "会稽山",
-      "count": 2,
+      "count": 3,
       "first_date": "20260813",
-      "last_date": "20260904",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "非白酒"
     },
     "601595": {
       "name": "上海电影",
-      "count": 2,
+      "count": 3,
       "first_date": "20260831",
-      "last_date": "20260907",
-      "max_cons": 1,
+      "last_date": "20260908",
+      "max_cons": 2,
       "industry": "院线经营+IP商业化+上海国资"
     },
     "601606": {
@@ -5538,6 +5866,14 @@
       "max_cons": 1,
       "industry": "通信设备"
     },
+    "601872": {
+      "name": "招商轮船",
+      "count": 1,
+      "first_date": "20260909",
+      "last_date": "20260909",
+      "max_cons": 1,
+      "industry": "油运高景气+干散货+中报增长"
+    },
     "601877": {
       "name": "正泰电器",
       "count": 1,
@@ -5562,6 +5898,14 @@
       "max_cons": 2,
       "industry": "装修装饰"
     },
+    "601890": {
+      "name": "亚星锚链",
+      "count": 1,
+      "first_date": "20260909",
+      "last_date": "20260909",
+      "max_cons": 1,
+      "industry": "锚链龙头+海上油气+军用锚链"
+    },
     "601929": {
       "name": "吉视传媒",
       "count": 1,
@@ -5572,17 +5916,17 @@
     },
     "601949": {
       "name": "中国出版",
-      "count": 2,
+      "count": 3,
       "first_date": "20260904",
-      "last_date": "20260907",
-      "max_cons": 2,
+      "last_date": "20260908",
+      "max_cons": 3,
       "industry": "数智化出版+图书出版+央企背景"
     },
     "601952": {
       "name": "苏垦农发",
-      "count": 1,
+      "count": 2,
       "first_date": "20260818",
-      "last_date": "20260818",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "种植业"
     },
@@ -5596,9 +5940,9 @@
     },
     "601999": {
       "name": "出版传媒",
-      "count": 1,
+      "count": 2,
       "first_date": "20260813",
-      "last_date": "20260813",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "出版"
     },
@@ -5676,9 +6020,9 @@
     },
     "603020": {
       "name": "爱普股份",
-      "count": 1,
+      "count": 2,
       "first_date": "20260810",
-      "last_date": "20260810",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "化学制品"
     },
@@ -5732,10 +6076,10 @@
     },
     "603042": {
       "name": "华脉科技",
-      "count": 1,
+      "count": 3,
       "first_date": "20260907",
-      "last_date": "20260907",
-      "max_cons": 1,
+      "last_date": "20260909",
+      "max_cons": 3,
       "industry": "光纤光缆+FPGA芯片+中报扭亏"
     },
     "603045": {
@@ -5805,8 +6149,8 @@
     "603075": {
       "name": "热威股份",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "电热元件+智能家电+新能源车"
     },
@@ -5821,8 +6165,8 @@
     "603077": {
       "name": "和邦生物",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "磷矿+草甘膦+蛋氨酸"
     },
@@ -5884,9 +6228,9 @@
     },
     "603090": {
       "name": "宏盛股份",
-      "count": 2,
+      "count": 3,
       "first_date": "20260831",
-      "last_date": "20260903",
+      "last_date": "20260914",
       "max_cons": 2,
       "industry": "液冷服务器+氢能源+铝制板翅式换热器+海外扩张"
     },
@@ -5924,9 +6268,9 @@
     },
     "603105": {
       "name": "芯能科技",
-      "count": 1,
+      "count": 2,
       "first_date": "20260824",
-      "last_date": "20260824",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "分布式光伏+工商业储能+户用储能"
     },
@@ -6042,6 +6386,14 @@
       "max_cons": 1,
       "industry": "纺织制造"
     },
+    "603136": {
+      "name": "天目湖",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "一站式文旅+国资赋能"
+    },
     "603137": {
       "name": "恒尚节能",
       "count": 3,
@@ -6100,17 +6452,17 @@
     },
     "603162": {
       "name": "海通发展",
-      "count": 3,
+      "count": 4,
       "first_date": "20260810",
-      "last_date": "20260904",
-      "max_cons": 2,
+      "last_date": "20260909",
+      "max_cons": 3,
       "industry": "航运港口"
     },
     "603163": {
       "name": "圣晖集成",
-      "count": 1,
+      "count": 2,
       "first_date": "20260804",
-      "last_date": "20260804",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "专业工程"
     },
@@ -6148,9 +6500,9 @@
     },
     "603186": {
       "name": "华正新材",
-      "count": 6,
+      "count": 7,
       "first_date": "20260804",
-      "last_date": "20260907",
+      "last_date": "20260909",
       "max_cons": 2,
       "industry": "元件"
     },
@@ -6282,6 +6634,14 @@
       "max_cons": 1,
       "industry": "利润增长+食品餐饮+精品商超"
     },
+    "603248": {
+      "name": "锡华科技",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "风电齿轮箱+大兆瓦装备+高端部件"
+    },
     "603256": {
       "name": "宏和科技",
       "count": 2,
@@ -6305,6 +6665,14 @@
       "last_date": "20260827",
       "max_cons": 2,
       "industry": "航空装备"
+    },
+    "603266": {
+      "name": "天龙股份",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "汽车零部件+4D毫米波雷达+泰国基地+参股半导体"
     },
     "603268": {
       "name": "松发股份",
@@ -6356,9 +6724,9 @@
     },
     "603285": {
       "name": "键邦股份",
-      "count": 3,
+      "count": 4,
       "first_date": "20260806",
-      "last_date": "20260820",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "化学制品"
     },
@@ -6410,6 +6778,14 @@
       "max_cons": 2,
       "industry": "汽车零部"
     },
+    "603308": {
+      "name": "应流股份",
+      "count": 1,
+      "first_date": "20260909",
+      "last_date": "20260909",
+      "max_cons": 1,
+      "industry": "燃气轮机+航空发动机+核能材料"
+    },
     "603311": {
       "name": "金海高科",
       "count": 1,
@@ -6434,11 +6810,19 @@
       "max_cons": 1,
       "industry": "环境治理"
     },
+    "603316": {
+      "name": "诚邦股份",
+      "count": 1,
+      "first_date": "20260910",
+      "last_date": "20260910",
+      "max_cons": 1,
+      "industry": "半导体存储+业绩增长+芯片扩产"
+    },
     "603318": {
       "name": "水发燃气",
-      "count": 2,
+      "count": 3,
       "first_date": "20260821",
-      "last_date": "20260825",
+      "last_date": "20260910",
       "max_cons": 1,
       "industry": "氦气+燃气轮机+天然气+山东国资"
     },
@@ -6452,9 +6836,9 @@
     },
     "603328": {
       "name": "依顿电子",
-      "count": 1,
+      "count": 2,
       "first_date": "20260807",
-      "last_date": "20260807",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "元件"
     },
@@ -6482,11 +6866,19 @@
       "max_cons": 1,
       "industry": "汽车零部"
     },
+    "603336": {
+      "name": "宏辉果蔬",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "创新药+果蔬供应链+速冻食品+苏州国资"
+    },
     "603353": {
       "name": "和顺石油",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "半导体IP+LPDDR5X+成品油"
     },
@@ -6562,6 +6954,14 @@
       "max_cons": 1,
       "industry": "化学纤维"
     },
+    "603386": {
+      "name": "骏亚科技",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "高多层HDI+PCB主营+人形机器人"
+    },
     "603389": {
       "name": "亚振家居",
       "count": 2,
@@ -6604,9 +7004,9 @@
     },
     "603400": {
       "name": "华之杰",
-      "count": 2,
+      "count": 3,
       "first_date": "20260804",
-      "last_date": "20260818",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "通用设备"
     },
@@ -6628,10 +7028,10 @@
     },
     "603421": {
       "name": "鼎信通讯",
-      "count": 1,
+      "count": 4,
       "first_date": "20260806",
-      "last_date": "20260806",
-      "max_cons": 1,
+      "last_date": "20260911",
+      "max_cons": 3,
       "industry": "通信设备"
     },
     "603435": {
@@ -6641,6 +7041,14 @@
       "last_date": "20260827",
       "max_cons": 1,
       "industry": "电子化学"
+    },
+    "603439": {
+      "name": "三力制药",
+      "count": 2,
+      "first_date": "20260911",
+      "last_date": "20260914",
+      "max_cons": 2,
+      "industry": "创新药+中成药+定增"
     },
     "603458": {
       "name": "勘设股份",
@@ -6660,9 +7068,9 @@
     },
     "603466": {
       "name": "风语筑",
-      "count": 3,
+      "count": 4,
       "first_date": "20260804",
-      "last_date": "20260813",
+      "last_date": "20260911",
       "max_cons": 2,
       "industry": "数字媒体"
     },
@@ -6764,9 +7172,9 @@
     },
     "603580": {
       "name": "艾艾精工",
-      "count": 7,
+      "count": 8,
       "first_date": "20260724",
-      "last_date": "20260827",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "塑料"
     },
@@ -6777,6 +7185,14 @@
       "last_date": "20260820",
       "max_cons": 1,
       "industry": "创新药+KAT6/7抑制剂+血凝酶龙头"
+    },
+    "603601": {
+      "name": "再升科技",
+      "count": 1,
+      "first_date": "20260910",
+      "last_date": "20260910",
+      "max_cons": 1,
+      "industry": "石英纤维+PTFE+商业航天"
     },
     "603607": {
       "name": "京华激光",
@@ -6829,16 +7245,16 @@
     "603619": {
       "name": "中曼石油",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "油气开采+坚戈油田+海外布局+机器人概念"
     },
     "603626": {
       "name": "科森科技",
-      "count": 4,
+      "count": 5,
       "first_date": "20260805",
-      "last_date": "20260907",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "消费电子"
     },
@@ -6874,6 +7290,14 @@
       "max_cons": 1,
       "industry": "控制权拟变更+石化工程+产业转型"
     },
+    "603650": {
+      "name": "彤程新材",
+      "count": 1,
+      "first_date": "20260909",
+      "last_date": "20260909",
+      "max_cons": 1,
+      "industry": "拟H股上市+光刻胶+业绩增长"
+    },
     "603655": {
       "name": "朗博科技",
       "count": 2,
@@ -6884,9 +7308,9 @@
     },
     "603657": {
       "name": "春光科技",
-      "count": 3,
+      "count": 4,
       "first_date": "20260727",
-      "last_date": "20260817",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "家电零部"
     },
@@ -6941,8 +7365,8 @@
     "603679": {
       "name": "华体科技",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "华为超充+低空经济+智慧路灯"
     },
@@ -6985,6 +7409,14 @@
       "last_date": "20260812",
       "max_cons": 2,
       "industry": "半导体"
+    },
+    "603693": {
+      "name": "江苏新能",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "海上风电+新能源发电+江苏国资"
     },
     "603696": {
       "name": "安记食品",
@@ -7164,9 +7596,9 @@
     },
     "603823": {
       "name": "百合花",
-      "count": 7,
+      "count": 8,
       "first_date": "20260803",
-      "last_date": "20260907",
+      "last_date": "20260908",
       "max_cons": 2,
       "industry": "化学制品"
     },
@@ -7252,9 +7684,9 @@
     },
     "603900": {
       "name": "莱绅通灵",
-      "count": 2,
+      "count": 3,
       "first_date": "20260827",
-      "last_date": "20260828",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "黄金珠宝+艺术珠宝+黄金租赁"
     },
@@ -7324,17 +7756,17 @@
     },
     "603936": {
       "name": "博敏电子",
-      "count": 5,
+      "count": 6,
       "first_date": "20260804",
-      "last_date": "20260907",
+      "last_date": "20260911",
       "max_cons": 2,
       "industry": "元件"
     },
     "603938": {
       "name": "三孚股份",
-      "count": 2,
+      "count": 4,
       "first_date": "20260804",
-      "last_date": "20260827",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "化学原料"
     },
@@ -7444,10 +7876,10 @@
     },
     "603999": {
       "name": "读者传媒",
-      "count": 1,
+      "count": 2,
       "first_date": "20260907",
-      "last_date": "20260907",
-      "max_cons": 1,
+      "last_date": "20260908",
+      "max_cons": 2,
       "industry": "出版主业+数字出版+AIGC"
     },
     "605006": {
@@ -7457,6 +7889,14 @@
       "last_date": "20260902",
       "max_cons": 2,
       "industry": "玻璃玻纤"
+    },
+    "605011": {
+      "name": "杭州热电",
+      "count": 1,
+      "first_date": "20260911",
+      "last_date": "20260911",
+      "max_cons": 1,
+      "industry": "热电联产+绿色能源+产业基金"
     },
     "605033": {
       "name": "美邦股份",
@@ -7474,6 +7914,14 @@
       "max_cons": 1,
       "industry": "通用设备"
     },
+    "605058": {
+      "name": "澳弘电子",
+      "count": 2,
+      "first_date": "20260911",
+      "last_date": "20260914",
+      "max_cons": 2,
+      "industry": "股权激励+HDI板+AI服务器电源"
+    },
     "605060": {
       "name": "联德股份",
       "count": 1,
@@ -7490,12 +7938,20 @@
       "max_cons": 1,
       "industry": "汽车零部"
     },
+    "605069": {
+      "name": "正和生态",
+      "count": 2,
+      "first_date": "20260911",
+      "last_date": "20260914",
+      "max_cons": 2,
+      "industry": "生态水利+智谱AI+垂直大模型+水务机器人"
+    },
     "605077": {
       "name": "华康股份",
-      "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
-      "max_cons": 1,
+      "count": 2,
+      "first_date": "20260908",
+      "last_date": "20260909",
+      "max_cons": 2,
       "industry": "糖醇+玉米加工+食品配料"
     },
     "605080": {
@@ -7508,9 +7964,9 @@
     },
     "605088": {
       "name": "冠盛股份",
-      "count": 1,
+      "count": 2,
       "first_date": "20260903",
-      "last_date": "20260903",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "汽配出口+机器人研发+电池项目"
     },
@@ -7548,9 +8004,9 @@
     },
     "605162": {
       "name": "新中港",
-      "count": 3,
+      "count": 4,
       "first_date": "20260810",
-      "last_date": "20260826",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "电力"
     },
@@ -7564,9 +8020,9 @@
     },
     "605168": {
       "name": "三人行",
-      "count": 1,
+      "count": 2,
       "first_date": "20260907",
-      "last_date": "20260907",
+      "last_date": "20260914",
       "max_cons": 1,
       "industry": "算力租赁+AI营销+世界杯IP"
     },
@@ -7581,8 +8037,8 @@
     "605177": {
       "name": "东亚药业",
       "count": 1,
-      "first_date": "2026-09-08",
-      "last_date": "2026-09-08",
+      "first_date": "20260908",
+      "last_date": "20260908",
       "max_cons": 1,
       "industry": "头孢回暖+原料药出口+制剂拓展"
     },
@@ -7620,17 +8076,17 @@
     },
     "605198": {
       "name": "安德利",
-      "count": 2,
+      "count": 3,
       "first_date": "20260724",
-      "last_date": "20260824",
+      "last_date": "20260909",
       "max_cons": 1,
       "industry": "农产品加"
     },
     "605258": {
       "name": "协和电子",
-      "count": 1,
+      "count": 2,
       "first_date": "20260827",
-      "last_date": "20260827",
+      "last_date": "20260911",
       "max_cons": 1,
       "industry": "PCB+汽车电子+高频通讯"
     },
@@ -7746,6 +8202,14 @@
       "max_cons": 1,
       "industry": "塑料"
     },
+    "605507": {
+      "name": "国邦医药",
+      "count": 1,
+      "first_date": "2026-09-15",
+      "last_date": "2026-09-15",
+      "max_cons": 1,
+      "industry": "医药原料药+股份回购"
+    },
     "605566": {
       "name": "福莱蒽特",
       "count": 1,
@@ -7764,9 +8228,9 @@
     },
     "605580": {
       "name": "恒盛能源",
-      "count": 2,
+      "count": 3,
       "first_date": "20260903",
-      "last_date": "20260904",
+      "last_date": "20260914",
       "max_cons": 2,
       "industry": "培育钻石+芯片散热+热电联产"
     },

@@ -4,13 +4,13 @@ from datetime import datetime, timedelta
 from collections import defaultdict, Counter
 import math
 
-with open(r'C:\Users\Davis\Desktop\主升浪\stock_data.json', 'r', encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\stock_data.json', 'r', encoding='utf-8') as f:
     stock_data = json.load(f)
 
 def excel_to_date(serial):
     return datetime(1899, 12, 30) + timedelta(days=int(serial))
 
-wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws = wb['Sheet1']
 records = []
 for row in ws.iter_rows(min_row=2, values_only=True):
@@ -383,7 +383,7 @@ def simulate(selection_method, price_db, stock_data, timeline, all_trade_dates, 
 # RUN MULTIPLE MODELS
 # ================================================================
 
-out_path = r'C:\Users\Davis\Desktop\主升浪\model_backtest_results.txt'
+out_path = r'C:\Users\Davis\Desktop\项目\gogo\model_backtest_results.txt'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write("="*120 + "\n")
     f.write("选股模型回测对比\n")

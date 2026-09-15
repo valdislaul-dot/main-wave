@@ -113,7 +113,7 @@
 
 **CI Pipeline:**
 - 无 CI。自动化仅为定时任务:
-  - Windows: `scripts/daily/install_scheduled_task.ps1` 注册计划任务「主升浪每日选股流水线」→ 开机 5 分钟后 + 每日 15:30 跑 `auto_start.bat`（注意 bat 内 BASE 硬编码为旧路径 `C:\Users\Davis\Desktop\主升浪`，本机仓库实际在 `C:\Users\Davis\Desktop\gogo`）
+  - Windows: `scripts/daily/install_scheduled_task.ps1` 注册计划任务「主升浪每日选股流水线」→ 开机 5 分钟后 + 每日 15:30 跑 `auto_start.bat`（注意 bat 内 BASE 硬编码为旧路径 `C:\Users\Davis\Desktop\项目\gogo`，本机仓库实际在 `C:\Users\Davis\Desktop\项目\gogo`）
   - Mac: crontab `0 15 * * 1-5`（SETUP.md 示例）+ `scripts/daily/morning_run.sh` 9:26 竞价
 - 代码同步: Win/Mac 双端共享同一 GitHub 私有仓库，手动 git pull/push（无自动 CI）
 

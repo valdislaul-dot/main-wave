@@ -3,13 +3,13 @@ import openpyxl
 from datetime import datetime, timedelta
 from collections import defaultdict, Counter
 
-with open(r'C:\Users\Davis\Desktop\主升浪\stock_data.json', 'r', encoding='utf-8') as f:
+with open(r'C:\Users\Davis\Desktop\项目\gogo\stock_data.json', 'r', encoding='utf-8') as f:
     stock_data = json.load(f)
 
 def excel_to_date(serial):
     return datetime(1899, 12, 30) + timedelta(days=int(serial))
 
-wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\主升浪\副本主升浪.xlsx')
+wb = openpyxl.load_workbook(r'C:\Users\Davis\Desktop\项目\gogo\副本主升浪.xlsx')
 ws = wb['Sheet1']
 records = []
 for row in ws.iter_rows(min_row=2, values_only=True):
@@ -110,7 +110,7 @@ for serial, stock in records:
 # ================================================================
 # DEEP ANALYSIS: Test multiple hypotheses about filtering criteria
 # ================================================================
-out_path = r'C:\Users\Davis\Desktop\主升浪\deep_strategy_analysis.txt'
+out_path = r'C:\Users\Davis\Desktop\项目\gogo\deep_strategy_analysis.txt'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write("="*120 + "\n")
     f.write("选股策略深度分析 V2 — 筛选条件推测与验证\n")
