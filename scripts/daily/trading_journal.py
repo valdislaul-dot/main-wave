@@ -300,7 +300,7 @@ def print_status():
     print(f'\n{"="*50}')
     print(f'  当前持仓状态')
     print(f'{"="*50}')
-    print(f'  现金: {s["cash"]:,.0f}')
+    # 2026-09-15 用户定死: 账本只记持仓不记现金 → 不再打印现金行
     if s['positions']:
         for p in s['positions']:
             print(f'  持仓: {p["name"]}({p["code"]})')

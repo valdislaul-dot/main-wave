@@ -126,8 +126,8 @@ def generate():
             r.append(f"| {p['name']} ({p['code']}) | {p['buy_price']:.3f} | {p['shares']} | {p['buy_date']} | {p['close']:.2f} | {p['value']:,.0f} | {up:+.1f}% |")
     else:
         r.append("| 空仓 | — | — | — | — | — | — |")
-    r.append(f"| 现金 | — | — | — | — | {cash:,.0f} | — |")
-    r.append(f"| **总资产** | — | — | — | — | **{total:,.0f}** | — |")
+    # 2026-09-15 用户定死: 账本只记持仓不记现金 → 不再输出"现金/总资产"行, 只合计持仓市值
+    r.append(f"| **持仓市值** | — | — | — | — | **{pos_value:,.0f}** | — |")
     r.append("")
     r.append("---")
     r.append("")
@@ -170,16 +170,16 @@ def generate():
     # History
     r.append("## 交易历史")
     r.append("")
-    r.append("| 日期 | 操作 | 标的 | 盈亏 | 总资产 |")
-    r.append("|------|------|------|------|--------|")
+    # 2026-09-15 用户定死: 只记持仓不记现金 → 去掉"总资产"列(原值来自 cash_after)
+    r.append("| 日期 | 操作 | 标的 | 盈亏 |")
+    r.append("|------|------|------|------|")
     for entry in journal[-20:]:  # last 20 entries
         if entry['action'] in ('BUY', 'SELL'):
             dt = entry['date'][:10]
             act = entry['action']
             name = entry['name']
             pnl = f"{entry.get('pnl_pct', 0):+.1f}%" if act == 'SELL' else '—'
-            val = f"{entry.get('cash_after', 0):,.0f}"
-            r.append(f"| {dt} | {act} | {name} | {pnl} | {val} |")
+            r.append(f"| {dt} | {act} | {name} | {pnl} |")
     r.append("")
     r.append("---")
     r.append("")

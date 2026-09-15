@@ -27,14 +27,13 @@ def main():
         elif cmd == '--buy' and len(sys.argv) >= 5:
             name = sys.argv[2]; code = sys.argv[3]
             price = float(sys.argv[4]); shares = int(sys.argv[5]) if len(sys.argv) > 5 else 0
-            from trading_journal import load_portfolio
-            pf = load_portfolio()
             if shares == 0:
-                # 2026-09-03修复: 原候选查找循环pos_pct恒0.5属死代码;
-                # 仓位由温度开关(temperature.py)管, 此处保持半仓近似仅用于自动股数
-                pos_pct = 0.5
-                deploy = pf['cash'] * pos_pct
-                shares = int(deploy / price / 100) * 100
+                # 2026-09-15 用户定死: 账本只记持仓不记现金 → cash 字段停用,
+                # 原"按现金×半仓推算股数"随之失效。改为 fail-loud 要求显式股数,
+                # 否则会静默记成 0 股 (原路径依赖 cash, 停用后恒算出 0)。
+                print('错误: 现金字段已停用, --buy 必须显式给出股数', file=sys.stderr)
+                print('用法: python scripts/daily/run_pipeline.py --buy NAME CODE PRICE SHARES', file=sys.stderr)
+                sys.exit(2)
             cost = shares * price
             record_buy(name, code, price, shares, cost)
         elif cmd == '--sell' and len(sys.argv) >= 5:
