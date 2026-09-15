@@ -1,8 +1,8 @@
 {
-  "date": "2026-09-11",
-  "zt_n": 39,
+  "date": "2026-09-14",
+  "zt_n": 48,
   "max_cons": 4,
-  "money_effect": 3.23,
+  "money_effect": 0.09,
   "history": [
     {
       "date": "2026-08-25",
@@ -81,6 +81,12 @@
       "zt_n": 39,
       "max_cons": 4,
       "money_effect": 3.23
+    },
+    {
+      "date": "2026-09-14",
+      "zt_n": 48,
+      "max_cons": 4,
+      "money_effect": 0.09
     }
   ]
 }

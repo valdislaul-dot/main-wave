@@ -1,82 +1,61 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 51,
+  "total_sessions": 52,
   "current": {
-    "date": "2026-09-14",
-    "captured": "2026-09-14 09:25:35",
-    "total": 39,
-    "buyable": 9,
-    "avg_gap": 2.34,
+    "date": "2026-09-15",
+    "captured": "2026-09-15 09:25:41",
+    "total": 48,
+    "buyable": 6,
+    "avg_gap": 0.2,
     "gap_distribution": {
-      "0-2%": 8,
-      "2-5%": 8,
-      "5-9%": 6,
-      "<-3%": 2,
-      "-3-0%": 11,
-      "9%+": 4
+      "2-5%": 11,
+      "-3-0%": 10,
+      "0-2%": 12,
+      "9%+": 6,
+      "5-9%": 4,
+      "<-3%": 5
     },
     "buyable_stocks": [
       {
-        "code": "002161",
-        "name": "远望谷",
-        "gap_pct": 5.35,
-        "score": 58.8,
-        "limit_days": 1
-      },
-      {
-        "code": "001232",
-        "name": "嘉立创",
-        "gap_pct": 6.34,
-        "score": 51.4,
-        "limit_days": 1
-      },
-      {
-        "code": "600876",
-        "name": "凯盛新能",
-        "gap_pct": 6.21,
-        "score": 48.8,
-        "limit_days": 2
-      },
-      {
-        "code": "600088",
-        "name": "中视传媒",
-        "gap_pct": 7.99,
-        "score": 42.6,
-        "limit_days": 1
-      },
-      {
-        "code": "002585",
-        "name": "双星新材",
-        "gap_pct": 7.63,
-        "score": 42.5,
-        "limit_days": 1
-      },
-      {
-        "code": "000980",
-        "name": "众泰汽车",
-        "gap_pct": 4.25,
-        "score": 42.4,
-        "limit_days": 3
-      },
-      {
-        "code": "603439",
-        "name": "三力制药",
-        "gap_pct": 5.02,
-        "score": 41.1,
+        "code": "002212",
+        "name": "天融信",
+        "gap_pct": 7.97,
+        "score": 49.0,
         "limit_days": 1
       },
       {
         "code": "000993",
         "name": "闽东电力",
-        "gap_pct": 4.54,
-        "score": 37.6,
-        "limit_days": 3
+        "gap_pct": 4.98,
+        "score": 33.0,
+        "limit_days": 4
       },
       {
-        "code": "605011",
-        "name": "杭州热电",
-        "gap_pct": 4.05,
-        "score": 0,
+        "code": "605168",
+        "name": "三人行",
+        "gap_pct": 4.11,
+        "score": -1.0,
+        "limit_days": 1
+      },
+      {
+        "code": "603657",
+        "name": "春光科技",
+        "gap_pct": 4.17,
+        "score": -4.0,
+        "limit_days": 1
+      },
+      {
+        "code": "605580",
+        "name": "恒盛能源",
+        "gap_pct": 5.89,
+        "score": -18.0,
+        "limit_days": 1
+      },
+      {
+        "code": "000978",
+        "name": "桂林旅游",
+        "gap_pct": 6.45,
+        "score": -106.0,
         "limit_days": 1
       }
     ]
@@ -738,7 +717,20 @@
         "-3-0%": 11,
         "9%+": 4
       }
+    },
+    {
+      "date": "2026-09-15",
+      "total": 48,
+      "buyable": 6,
+      "gap_distribution": {
+        "2-5%": 11,
+        "-3-0%": 10,
+        "0-2%": 12,
+        "9%+": 6,
+        "5-9%": 4,
+        "<-3%": 5
+      }
     }
   ],
-  "last_update": "2026-09-14"
+  "last_update": "2026-09-15"
 }
