@@ -14335,5 +14335,185 @@
     "days_in_pool": 1,
     "last_lu_date": "2026-09-14",
     "limit_days": 1
+  },
+  {
+    "code": "002522",
+    "name": "浙江众成",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "600163",
+    "name": "中闽能源",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "605162",
+    "name": "新中港",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "002912",
+    "name": "中新赛克",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 4,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 4
+  },
+  {
+    "code": "603353",
+    "name": "和顺石油",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "600110",
+    "name": "诺德股份",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "605507",
+    "name": "国邦医药",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "603266",
+    "name": "天龙股份",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "002531",
+    "name": "天顺风能",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "002487",
+    "name": "大金重工",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "002213",
+    "name": "大为股份",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "601218",
+    "name": "吉鑫科技",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "603090",
+    "name": "宏盛股份",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 2,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 2
+  },
+  {
+    "code": "001223",
+    "name": "欧克科技",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "002585",
+    "name": "双星新材",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 3,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 3
+  },
+  {
+    "code": "603186",
+    "name": "华正新材",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "002362",
+    "name": "汉王科技",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "603200",
+    "name": "上海洗霸",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "002882",
+    "name": "金龙羽",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 1
+  },
+  {
+    "code": "002232",
+    "name": "启明信息",
+    "exit_date": "2026-09-16",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 2,
+    "last_lu_date": "2026-09-15",
+    "limit_days": 2
   }
 ]

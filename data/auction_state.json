@@ -1,61 +1,61 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 52,
+  "total_sessions": 53,
   "current": {
-    "date": "2026-09-15",
-    "captured": "2026-09-15 09:25:41",
-    "total": 48,
+    "date": "2026-09-16",
+    "captured": "2026-09-16 09:25:34",
+    "total": 31,
     "buyable": 6,
-    "avg_gap": 0.2,
+    "avg_gap": 3.05,
     "gap_distribution": {
-      "2-5%": 11,
-      "-3-0%": 10,
-      "0-2%": 12,
-      "9%+": 6,
+      "2-5%": 7,
+      "9%+": 4,
+      "0-2%": 11,
+      "-3-0%": 3,
       "5-9%": 4,
-      "<-3%": 5
+      "<-3%": 2
     },
     "buyable_stocks": [
       {
-        "code": "002212",
-        "name": "天融信",
-        "gap_pct": 7.97,
-        "score": 49.0,
+        "code": "603090",
+        "name": "宏盛股份",
+        "gap_pct": 4.45,
+        "score": 5.0,
+        "limit_days": 2
+      },
+      {
+        "code": "002487",
+        "name": "大金重工",
+        "gap_pct": 4.21,
+        "score": -2.0,
         "limit_days": 1
       },
       {
-        "code": "000993",
-        "name": "闽东电力",
-        "gap_pct": 4.98,
-        "score": 33.0,
-        "limit_days": 4
-      },
-      {
-        "code": "605168",
-        "name": "三人行",
-        "gap_pct": 4.11,
-        "score": -1.0,
+        "code": "002531",
+        "name": "天顺风能",
+        "gap_pct": 6.91,
+        "score": -12.0,
         "limit_days": 1
       },
       {
-        "code": "603657",
-        "name": "春光科技",
-        "gap_pct": 4.17,
-        "score": -4.0,
+        "code": "002584",
+        "name": "西陇科学",
+        "gap_pct": 6.11,
+        "score": -13.0,
         "limit_days": 1
       },
       {
-        "code": "605580",
-        "name": "恒盛能源",
-        "gap_pct": 5.89,
-        "score": -18.0,
+        "code": "603266",
+        "name": "天龙股份",
+        "gap_pct": 4.6,
+        "score": -20.0,
         "limit_days": 1
       },
       {
-        "code": "000978",
-        "name": "桂林旅游",
-        "gap_pct": 6.45,
-        "score": -106.0,
+        "code": "603082",
+        "name": "北自科技",
+        "gap_pct": 5.9,
+        "score": -29.0,
         "limit_days": 1
       }
     ]
@@ -730,7 +730,20 @@
         "5-9%": 4,
         "<-3%": 5
       }
+    },
+    {
+      "date": "2026-09-16",
+      "total": 31,
+      "buyable": 6,
+      "gap_distribution": {
+        "2-5%": 7,
+        "9%+": 4,
+        "0-2%": 11,
+        "-3-0%": 3,
+        "5-9%": 4,
+        "<-3%": 2
+      }
     }
   ],
-  "last_update": "2026-09-15"
+  "last_update": "2026-09-16"
 }
