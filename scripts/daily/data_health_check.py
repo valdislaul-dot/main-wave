@@ -12,7 +12,7 @@
 用法: python data_health_check.py [--date YYYY-MM-DD]   (默认今天, 返回警告数)
 """
 import json, os, sys, urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 POOL_DIR = os.path.join(BASE, 'data', 'zt_pool')
@@ -31,6 +31,33 @@ def load_json(p, encodings=('utf-8', 'gbk')):
         except (UnicodeDecodeError, json.JSONDecodeError):
             continue
     return None
+
+
+# ── 2026-09-17 修复: 跳过项必须计入结果 ──
+# 原实现把"池文件/候选文件不存在 → 跳过"只打印一行, 收尾仍按 warnings==[] 报
+# "✅ 数据体检全绿"。15:00 前或非交易日运行时 8 项里 6 项被跳过, 却输出全绿,
+# 属"体检对当天产物零覆盖"(实证: logs/data_quality_log.json 2026-09-04 的四次
+# 运行全 warnings=0, 而它们处理的是 09-03 的数据)。
+_SKIPPED_ITEMS = []
+
+
+def _skipped(msg):
+    """记录并打印一个被跳过的体检项"""
+    _SKIPPED_ITEMS.append(msg)
+    print(f'  - {msg}')
+
+
+def _target_date():
+    """体检目标日期 —— 与流水线 update_data.get_today() 同款口径:
+    <15点回滚一天 + 跳过周末。2026-09-17修复: 原用裸 datetime.now(),
+    15:00 前运行时会去找当天的池文件(尚未生成)→ 校验项全被跳过。
+    注: 口径须与 update_data.get_today 保持一致, 改动需同步两处。"""
+    d = datetime.now()
+    if d.hour < 15:
+        d = d - timedelta(days=1)
+    while d.weekday() >= 5:
+        d = d - timedelta(days=1)
+    return d.strftime('%Y-%m-%d')
 
 
 def fetch_quote(code):
@@ -104,9 +131,9 @@ def main():
     args = sys.argv[1:]
     if '--date' in args:
         i = args.index('--date')
-        today = args[i + 1] if len(args) > i + 1 else datetime.now().strftime('%Y-%m-%d')
+        today = args[i + 1] if len(args) > i + 1 else _target_date()
     else:
-        today = datetime.now().strftime('%Y-%m-%d')
+        today = _target_date()  # 2026-09-17修复: 原裸 now() 与流水线回滚口径不一致
     today_c = today.replace('-', '')
     warnings = []
 
@@ -123,20 +150,31 @@ def main():
         sstocks = state.get('stocks', []) if isinstance(state, dict) else []
         smap = {str(s.get('code', '')).replace('sh', '').replace('sz', ''): s for s in sstocks}
         mismatch = []
+        _ths_checked = 0
         for p in pstocks:
             code = str(p.get('code', '')).replace('sh', '').replace('sz', '')
             if code in smap:
                 a = int(smap[code].get('limit_days', 1) or 1)
-                b = int(p.get('limit_days', 1) or 1)
+                # 2026-09-17修复: 优先比对 THS 原始连板数(独立源)。原实现比池文件的
+                # limit_days, 而它在 screen_candidates 写盘前已被 state 覆盖 → 两边
+                # 同源恒等, "交叉校验"形同虚设 (2026-08-20 起一直如此)。
+                _b_raw = p.get('limit_days_ths')
+                if _b_raw is not None:
+                    b = int(_b_raw or 1)
+                    _ths_checked += 1
+                else:
+                    b = int(p.get('limit_days', 1) or 1)
                 if a != b:
-                    mismatch.append(f'{p.get("name")}({code}) state{a}vs池{b}')
+                    mismatch.append(f'{p.get("name")}({code}) state{a}vs源{b}')
         if mismatch:
             warnings.append(f'连板数不一致{len(mismatch)}只: {"; ".join(mismatch[:5])}')
             print(f'  ⚠ {warnings[-1]}')
+        elif _ths_checked:
+            print(f'  ✓ 连板数: state(K线回算) vs THS原始值 一致 ({_ths_checked}只独立源)')
         else:
-            print(f'  ✓ 连板数: state与池文件一致 ({len(pstocks)}只)')
+            _skipped(f'连板数校验: 池文件无 limit_days_ths(旧格式), {len(pstocks)}只仅比了同源副本')
     else:
-        print(f'  - 池文件或state缺失, 跳过连板数校验')
+        _skipped('池文件或state缺失, 跳过连板数校验')
 
     # ── 2. 评分覆盖率 ──
     cand_path = os.path.join(LOG_DIR, f'candidates_{today}.json')
@@ -156,7 +194,7 @@ def main():
         else:
             print(f'  ✓ 评分覆盖率: {n_cand}/{n_pool} ({n_fail}只真失败, {n_designed}只活跃度过滤)')
     else:
-        print(f'  - 候选文件缺失, 跳过覆盖率校验')
+        _skipped('候选文件缺失, 跳过覆盖率校验')
 
     # ── 3. vr20↔换手率交叉验证 ──
     if os.path.exists(cand_path):
@@ -178,7 +216,7 @@ def main():
         else:
             print(f'  ✓ vr↔换手率: {len(cands)}只候选全部合理')
     else:
-        print(f'  - 候选文件缺失, 跳过vr校验')
+        _skipped('候选文件缺失, 跳过vr校验')
 
     # ── 4. 腾讯收盘价 vs 池文件价格 (全池批量, 2026-08-19从5只抽样改全量化) ──
     if os.path.exists(pool_path):
@@ -203,7 +241,7 @@ def main():
         else:
             print(f'  ✓ 收盘价全池校验: {checked}/{len(pstocks)}只 池文件与腾讯一致')
     else:
-        print(f'  - 池文件缺失, 跳过价格校验')
+        _skipped('池文件缺失, 跳过价格校验')
 
     # ── 5. K线最新日期检查 (全池, 2026-08-19从5只抽样改全量化) ──
     if os.path.exists(pool_path):
@@ -229,7 +267,7 @@ def main():
         else:
             print(f'  ✓ K线日期全池检查: {len(pstocks)}只均为最新')
     else:
-        print(f'  - 池文件缺失, 跳过K线校验')
+        _skipped('池文件缺失, 跳过K线校验')
 
     # ── 6. 竞价快照质量 ──
     auction_path = os.path.join(BASE, 'data', 'auction', f'{today}.json')
@@ -245,7 +283,7 @@ def main():
             else:
                 print(f'  ✓ 竞价快照: {len(astocks)}只, open=0占{ratio*100:.0f}%')
     else:
-        print(f'  - 竞价快照缺失, 跳过竞价质量校验')
+        _skipped('竞价快照缺失, 跳过竞价质量校验')
 
     # ── 7. 炸板次数异常校验 (2026-08-20: 区分分钟线重算值与东财原始值) ──
     if os.path.exists(state_path):
@@ -264,11 +302,11 @@ def main():
             warnings.append(f'炸板次数异常{len(recalc_odd)}只(分钟线重算后仍>5次): {"; ".join(recalc_odd[:5])}')
             print(f'  ⚠ {warnings[-1]}')
         elif em_raw_odd:
-            print(f'  - 炸板校验: {len(em_raw_odd)}只未重算(东财原始zbc>5, 提示级): {"; ".join(em_raw_odd[:3])}')
+            _skipped(f'炸板校验: {len(em_raw_odd)}只未重算(东财原始zbc>5, 提示级): {"; ".join(em_raw_odd[:3])}')
         else:
             print(f'  ✓ 炸板次数: {len(sstocks)}只均在合理范围')
     else:
-        print(f'  - 池文件缺失, 跳过炸板校验')
+        _skipped('池文件缺失, 跳过炸板校验')
 
     # ── 8. 赚钱效应合理性 (2026-09-01: 旧代码<=today致恒0连续7天无人发现, 守卫+体检双保险) ──
     ms_path = os.path.join(BASE, 'data', 'market_state.json')
@@ -287,9 +325,9 @@ def main():
             else:
                 print(f'  ✓ 赚钱效应: {_me}% ({_ztn}只样本) 合理')
         else:
-            print(f'  - market_state为空, 跳过赚钱效应校验')
+            _skipped('market_state为空, 跳过赚钱效应校验')
     else:
-        print(f'  - market_state缺失, 跳过赚钱效应校验')
+        _skipped('market_state缺失, 跳过赚钱效应校验')
 
     # ── 落库 ──
     _log_result(today, warnings)
@@ -313,6 +351,13 @@ def main():
     print('-' * 60)
     if warnings:
         print(f'❌ 体检发现 {len(warnings)} 项警告')
+        if _SKIPPED_ITEMS:
+            print(f'  (另有 {len(_SKIPPED_ITEMS)} 项未执行: {"; ".join(_SKIPPED_ITEMS[:3])})')
+    elif _SKIPPED_ITEMS:
+        # 2026-09-17修复: 不把"没检查"报成"检查通过"
+        print(f'⚠ 部分校验未执行({len(_SKIPPED_ITEMS)}项被跳过) — 结果不代表全绿')
+        for _s in _SKIPPED_ITEMS[:5]:
+            print(f'    · {_s}')
     else:
         print(f'✅ 数据体检全绿')
     return len(warnings)

@@ -59,8 +59,17 @@ def _versions():
 
 
 def _iso(value):
-    """epoch -> ISO-8601 UTC 字符串 (D-29: datetime.fromtimestamp().isoformat())。"""
-    return datetime.fromtimestamp(value, timezone.utc).isoformat()
+    """epoch -> ISO-8601 UTC 字符串 (D-29: datetime.fromtimestamp().isoformat())。
+
+    2026-09-16 修复: 越界 epoch (如 10**12 / < -62135596800) 在 Windows 上
+    datetime.fromtimestamp 抛 OSError[Errno 22] —— 原实现让 /health/details
+    返回 500, 违反 T-05-03 "外来字节绝不 5xx / 缺席以 null 诚实回答"。
+    畸形值现以 None 上报 (与缺失同形), 绝不 5xx。
+    """
+    try:
+        return datetime.fromtimestamp(value, timezone.utc).isoformat()
+    except (OSError, OverflowError, ValueError):
+        return None
 
 
 def _latest_succeeded_health_check():
@@ -93,6 +102,13 @@ def _latest_succeeded_health_check():
         finished = job.get("finished_at")
         if not isinstance(finished, int) or isinstance(finished, bool):
             continue  # 畸形 finished_at (如字符串) 不参与比较 —— TypeError 防护
+        # 2026-09-16 修复: 越界 epoch (如 10**12 / < -62135596800) 在 Windows 上
+        # datetime.fromtimestamp 抛 OSError[Errno 22] —— 原实现让 /health/details
+        # 500 (违反 T-05-03), 且该记录数值最大会永久压制次新可信值 (prune 只删
+        # 终态且要攒满 20 个才轮到它)。现以 _iso 可否转换作为可信性判据:
+        # 不可转换 -> 跳过 (与损坏 JSON 同形), 端点仍报最新可信记录。
+        if _iso(finished) is None:
+            continue
         if best_finished is None or finished > best_finished:
             best, best_finished = job, finished
     return best

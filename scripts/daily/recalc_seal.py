@@ -43,8 +43,10 @@ def fetch_minute(code, count=241):
         out = []
         for b in bars:
             # b: [时间戳, open, close, high, low, volume, ...]
+            # 时间戳形如 YYYYMMDDHHMM (12位, 实测 202609161456)
             t = str(b[0])
             out.append({
+                'd': t[:8] if len(t) >= 12 else '',  # YYYYMMDD (2026-09-17: 供目标日期过滤)
                 't': t[-4:] if len(t) >= 4 else t,  # HHMM
                 'o': round(float(b[1]), 2),
                 'c': round(float(b[2]), 2),
@@ -121,6 +123,22 @@ def recalc_pool(stocks, date_str, verbose=True):
             if verbose:
                 print(f'  [跳过] {s.get("name", "")}({code}) 无分钟数据')
             continue
+        # 2026-09-17修复: mkline 只返回「最新一段会话」, 原实现丢弃日期、date_str 形参
+        # 从未被使用 → 交易日 09:15-15:00 之间跑流水线(或补跑历史日期)时, 拿到的是
+        # 【今天】的分钟线却用 state 里【上一交易日】的涨停价比较, 平开/高开票必然满足
+        # "close >= 昨涨停价" → 被写成 09:31 干净早封、炸板次数归零 (封板质量因子从
+        # 10 分档跳到 100 分档), 当晚没重跑就把脏分留到次日竞价表1/表2 (版本守卫只比
+        # version 字段, 挡不住)。实证: zt_pool/20260904.json 的 mtime 是 2026-09-07 09:33。
+        _ds = str(date_str).replace('-', '')
+        _dated = [b for b in bars if b.get('d')]
+        if _dated:
+            _same = [b for b in _dated if b['d'] == _ds]
+            if not _same:
+                if verbose:
+                    print(f'  [跳过] {s.get("name", "")}({code}) 无 {date_str} 分钟数据'
+                          f'(mkline 最新会话={_dated[-1]["d"]})')
+                continue
+            bars = _same
         calc = calc_seal_from_minutes(bars, close)
         if not calc:
             continue
@@ -185,9 +203,23 @@ def main():
     with open(ZT_STATE_PATH, encoding='utf-8') as f:
         state = json.load(f)
     stocks = state.get('stocks', [])
-    print(f'[recalc] 重算封板质量 → {date_str} | 涨停池 {len(stocks)} 只')
+    # 2026-09-17修复: 目标日期以 state.as_of_date 为准 —— 要重算的正是这批股票的
+    # 封板质量, 而 mkline 只返回「最新一段会话」。若用 now, 凌晨补跑(now=次日 而
+    # 分钟线仍是当日会话)会被目标日期过滤误伤, 全部票跳过。
+    state_date = str(state.get('as_of_date') or date_str)
 
-    results = recalc_pool(stocks, date_str, verbose=True)
+    # 2026-09-17新增: 盘中守卫 —— state 日期就是今天但尚未收盘时, 分钟数据不完整,
+    # 重算必然失真 (与 recalc_pool 的目标日期过滤双保险)
+    _now = datetime.now()
+    if state_date == _now.strftime('%Y-%m-%d') and _now.hour < 15:
+        print(f'[recalc] ⚠ 当前 {_now.strftime("%H:%M")} 未收盘, state日期 {state_date} '
+              f'分钟数据不完整 —— 跳过重算(封板质量需收盘后完整分钟线); '
+              f'补跑历史日期请用 --date')
+        return
+
+    print(f'[recalc] 重算封板质量 → {state_date} | 涨停池 {len(stocks)} 只')
+
+    results = recalc_pool(stocks, state_date, verbose=True)
     apply_to_state(results, dry_run=dry_run)
 
 

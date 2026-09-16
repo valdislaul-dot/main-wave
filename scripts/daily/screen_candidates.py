@@ -116,6 +116,9 @@ def main():
         _smap = {s['code']: s for s in _st.get('stocks', [])}
         for p in pool:
             if p['code'] in _smap:
+                # 2026-09-17修复: 覆盖前留底 THS 原始连板数 —— 否则体检项1
+                # (state vs 池文件) 比的是同一份被覆盖过的值, 恒等 = 守卫形同虚设
+                p['limit_days_ths'] = p['limit_days']
                 p['limit_days'] = _smap[p['code']].get('limit_days', p['limit_days'])
     except Exception:
         pass

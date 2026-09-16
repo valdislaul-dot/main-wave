@@ -94,7 +94,8 @@ def record_buy(name, code, price, shares, cost, note=''):
     pf = load_portfolio()
     journal = load_journal()
 
-    pf['cash'] -= cost
+    # 2026-09-17修复: 不再维护 cash —— 用户 2026-09-15 定死"账本只记持仓不记现金",
+    # 手工记账不走本函数, 继续累加只会让 cash 变成与实盘无关的假数字。
     pos = {
         'name': name, 'code': code,
         'buy_date': datetime.now().strftime('%Y-%m-%d'),
@@ -117,7 +118,6 @@ def record_buy(name, code, price, shares, cost, note=''):
         'action': 'BUY',
         'name': name, 'code': code,
         'price': price, 'shares': shares, 'cost': cost,
-        'cash_after': pf['cash'],
         'note': note
     }
     journal.append(entry)
@@ -172,7 +172,7 @@ def record_sell(name, code, price, note=''):
     pnl_amt = proceeds - avg_cost * total_sh
     buy_date = min(p['buy_date'] for p in matched)
 
-    pf['cash'] += proceeds
+    # 2026-09-17修复: 不再维护 cash (同 record_buy, 2026-09-15 用户定死)
     pf['positions'] = positions
     # 2026-09-03修复: 原无条件置None, 剩余持仓被盘后报告/估值漏掉
     pf['position'] = positions[0] if positions else None
@@ -198,20 +198,19 @@ def record_sell(name, code, price, note=''):
         'buy_date': buy_date,
         'buy_price': round(avg_cost, 3),
         'hold_days': (datetime.now() - datetime.strptime(buy_date, '%Y-%m-%d')).days,
-        'cash_after': pf['cash'],
         'note': note
     }
     journal.append(entry)
 
     win_rate = pf['winning_trades'] / pf['total_trades'] * 100 if pf['total_trades'] > 0 else 0
-    total_value = pf['cash']  # No position, all cash
-    total_return = (total_value - INITIAL_CAPITAL) / INITIAL_CAPITAL * 100
 
     save_portfolio(pf)
     save_journal(journal)
 
+    # 2026-09-17修复: 去掉 cash/Return 打印 —— cash 停在 0 后 Return 恒为 -100%
+    # ((0-200000)/200000), 是纯错误数字, 容易被误读为爆仓。
     print(f'[Journal] SELL {name}({code}) @{price:.2f} PnL={pnl:+.1f}%({pnl_amt:+,.0f}) '
-          f'cash={pf["cash"]:,.0f} | WinRate={win_rate:.0f}% | Return={total_return:+.1f}%')
+          f'| WinRate={win_rate:.0f}%')
     return pf
 
 
@@ -226,8 +225,9 @@ def record_hold_valuation(current_price):
 
     pnl = (current_price - pos['buy_price']) / pos['buy_price'] * 100
     position_value = current_price * pos['shares']
-    total_value = pf['cash'] + position_value
-    total_return = (total_value - INITIAL_CAPITAL) / INITIAL_CAPITAL * 100
+    # 2026-09-17修复: 去掉 cash/total_value/total_return —— 现金口径已停用
+    # (2026-09-15 用户定死)。原 total_value=cash+持仓市值 会退化成"持仓市值"
+    # 却仍叫"总资产", total_return 则是巨额负数, 都是误导性数字。
 
     entry = {
         'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -235,10 +235,7 @@ def record_hold_valuation(current_price):
         'name': pos['name'], 'code': pos['code'],
         'price': current_price,
         'position_value': position_value,
-        'cash': pf['cash'],
-        'total_value': total_value,
         'unrealized_pnl_pct': round(pnl, 2),
-        'total_return_pct': round(total_return, 2),
     }
     # Don't add to main journal, save separately
     val_file = os.path.join(LOG_DIR, 'daily_valuations.json')
@@ -275,9 +272,14 @@ def get_status():
     # 统计: 优先用closed列表(新), 否则用旧字段
     closed = pf.get('closed', [])
     if closed:
+        # 2026-09-17修复: record_sell 写入的是 pnl_amt, 原实现只读 t['pnl'] →
+        # 一旦启用 closed 列表, 笔数/胜率/盈亏会全归零(休眠缺陷)。
+        def _amt(t):
+            v = t.get('pnl_amt')
+            return t.get('pnl', 0) if v is None else v
         total_trades = len(closed)
-        winning_trades = sum(1 for t in closed if t.get('pnl', 0) > 0)
-        total_pnl = sum(t.get('pnl', 0) for t in closed)
+        winning_trades = sum(1 for t in closed if (_amt(t) or 0) > 0)
+        total_pnl = sum(_amt(t) or 0 for t in closed)
     else:
         total_trades = pf.get('total_trades', 0)
         winning_trades = pf.get('winning_trades', 0)

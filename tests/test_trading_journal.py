@@ -186,7 +186,7 @@ def test_record_sell_mismatch_name_code_refused_no_double_sell(ledger_files, cap
 
 
 def test_record_sell_correct_pair_sells_only_that_stock(ledger_files):
-    """WR-02: 名码一致 -> 只卖该股; 他股保留, cash 只加该笔 proceeds。"""
+    """WR-02: 名码一致 -> 只卖该股; 他股保留 (2026-09-17: cash 口径已停用)。"""
     pf = _two_position_pf()
     tj.save_portfolio(pf)
     tj.save_journal([])
@@ -196,7 +196,9 @@ def test_record_sell_correct_pair_sells_only_that_stock(ledger_files):
     assert result is not None  # WR-07: 成功返回 pf (与拒绝的 None 区分)
     rest = tj.load_portfolio()
     assert [p['code'] for p in rest['positions']] == ['003040']  # 楚天龙保留
-    assert rest['cash'] == 10000.0 + 5.0 * 100
+    # 2026-09-17 口径变更(承用户 2026-09-15 "账本只记持仓不记现金"):
+    # record_sell 不再维护 cash —— 原断言 "cash 增加该笔 proceeds" 已失效
+    assert rest['cash'] == 10000.0
     sells = [e for e in tj.load_journal() if e['action'] == 'SELL']
     assert len(sells) == 1
     assert sells[0]['code'] == '000428' and sells[0]['shares'] == 100

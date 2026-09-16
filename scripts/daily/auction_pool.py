@@ -36,12 +36,37 @@ def _save_raw(date_str, name, content):
         print(f'[Auction] raw存档失败 {name}: {e}')
 
 
+def _read_json_safe(path):
+    """读取 JSON (utf-8→gbk 双编码 + 解析兜底), 失败返回 None。
+
+    2026-09-17: 池文件/state 是**非原子写** (screen_candidates 直接 open('w')),
+    断电/中断会留半截文件。竞价采集 9:25 只有一次机会, 绝不能因一个坏文件整链
+    抛异常 —— 那会导致当天没有快照, 面板"可买前三"为空而用户误以为"今天没标的"。
+    """
+    if not os.path.exists(path):
+        return None
+    for enc in ('utf-8', 'gbk'):
+        try:
+            with open(path, encoding=enc) as f:
+                return json.load(f)
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            continue
+        except OSError:
+            return None
+    return None
+
+
 def load_zt_pool_state():
-    """加载当前涨停池标的列表"""
-    if os.path.exists(ZT_STATE_PATH):
-        with open(ZT_STATE_PATH, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return {'stocks': [], 'as_of_date': ''}
+    """加载当前涨停池标的列表 (2026-09-17: 损坏/非dict 不再抛异常, 退化空池+告警)"""
+    data = _read_json_safe(ZT_STATE_PATH)
+    if data is None:
+        if os.path.exists(ZT_STATE_PATH):
+            print(f'[Auction Pool] ⚠ state 文件损坏/不可读: {ZT_STATE_PATH} (按空池继续)')
+        return {'stocks': [], 'as_of_date': ''}
+    if not isinstance(data, dict):
+        print(f'[Auction Pool] ⚠ state 文件结构异常(非对象), 按空池继续')
+        return {'stocks': [], 'as_of_date': ''}
+    return data
 
 
 def load_latest_candidates():
@@ -265,24 +290,34 @@ def capture_auction(force=False):
     from zt_pool import get_prev_pool_file
     zt_fn = get_prev_pool_file()
     if zt_fn:
-        try:
-            with open(os.path.join(BASE, 'data', 'zt_pool', zt_fn), encoding='utf-8') as f:
-                _pp = json.load(f)
-        except UnicodeDecodeError:
-            with open(os.path.join(BASE, 'data', 'zt_pool', zt_fn), encoding='gbk') as f:
-                _pp = json.load(f)
-        _pstocks = _pp if isinstance(_pp, list) else _pp.get('stocks', _pp.get('data', []))
-        file_cons = {str(x.get('code', '')).replace('sh', '').replace('sz', ''): int(x.get('limit_days', 1) or 1)
-                     for x in _pstocks if isinstance(x, dict)}
-        # 连板数一致性校验: state vs 池文件, 不一致立即警告(池文件为准)
-        _mismatch = []
-        for _s in zt_state.get('stocks', []):
-            _c = str(_s.get('code', '')).replace('sh', '').replace('sz', '')
-            _st = int(_s.get('limit_days', 1) or 1)
-            if _c in file_cons and _st != file_cons[_c]:
-                _mismatch.append(f'{_s.get("name")}({_c}) state{_st}板vs池文件{file_cons[_c]}板')
-        if _mismatch:
-            print(f'[Auction Pool] ⚠ 连板数不一致({len(_mismatch)}只), 已取池文件值: {"; ".join(_mismatch[:6])}')
+        # 2026-09-17修复: 原 try 只捕 UnicodeDecodeError —— 截断的 JSON 抛
+        # JSONDecodeError、非数字 limit_days 抛 ValueError, 都会穿透并中断采集。
+        _pp = _read_json_safe(os.path.join(BASE, 'data', 'zt_pool', zt_fn))
+        if _pp is None:
+            print(f'[Auction Pool] ⚠ 昨日池文件 {zt_fn} 损坏/不可读 → 跳过连板数修正(采集继续)')
+        else:
+            _pstocks = (_pp if isinstance(_pp, list)
+                        else (_pp.get('stocks', _pp.get('data', [])) if isinstance(_pp, dict) else []))
+            for x in _pstocks:
+                if not isinstance(x, dict):
+                    continue
+                try:
+                    _k = str(x.get('code', '')).replace('sh', '').replace('sz', '')
+                    file_cons[_k] = int(x.get('limit_days', 1) or 1)
+                except (TypeError, ValueError):
+                    continue  # 单票连板数非法 → 不纳入修正表, 不影响其余票
+            # 连板数一致性校验: state vs 池文件, 不一致立即警告(池文件为准)
+            _mismatch = []
+            for _s in zt_state.get('stocks', []):
+                _c = str(_s.get('code', '')).replace('sh', '').replace('sz', '')
+                try:
+                    _st = int(_s.get('limit_days', 1) or 1)
+                except (TypeError, ValueError):
+                    continue
+                if _c in file_cons and _st != file_cons[_c]:
+                    _mismatch.append(f'{_s.get("name")}({_c}) state{_st}板vs池文件{file_cons[_c]}板')
+            if _mismatch:
+                print(f'[Auction Pool] ⚠ 连板数不一致({len(_mismatch)}只), 已取池文件值: {"; ".join(_mismatch[:6])}')
 
     # 3. 构建快照
     snapshot = []

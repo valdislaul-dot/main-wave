@@ -2,10 +2,10 @@
 
 消费方:
 - API 侧:  from scripts.daily.job_lock import acquire   (scripts. 包链导入)
-- GUI 侧:  gui_dashboard.py sys.path.insert 后顶层 import job_lock
 因此本模块保持零 scripts.* 导入、零导入副作用 (不建目录、不打印、不做 I/O)。
+(2026-09-17: 原 GUI 侧消费方 gui_dashboard.py 已随 GUI 面板一同废弃删除)
 
-实现: win32 用 msvcrt.locking 字节区间锁, posix (Mac GUI parity) 用 fcntl.flock,
+实现: win32 用 msvcrt.locking 字节区间锁, posix (Mac parity) 用 fcntl.flock,
 按 ImportError 分叉。锁文件 data/locks/{kind}.lock 零内容 —— 被锁字节对其他进程
 不可读 (probe V2), holder 信息永远不进锁文件; OS 在持有进程死亡时自动释放
 (probe V2 kill 验证), 无 stale 锁清理协议。

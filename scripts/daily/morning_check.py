@@ -127,7 +127,10 @@ def compute_position_decision(pos):
             'open': quote['open'],
             'prev_close': quote['prev_close'],
             'gap_pct': gap_pct,
-            'current_price': quote['current']
+            'current_price': quote['current'],
+            # 2026-09-17新增: 交易所真实涨停价(腾讯字段47) —— A式据它判断"开盘即涨停"
+            # 与报出挂单价, 替代 prev_close*1.1 硬编码(对 20%/5% 标的会算错)
+            'limit_up_price': quote['limit_up'],
         })
         exec_info = sell_execution_price(signal, {
             'open': quote['open'],
@@ -612,6 +615,14 @@ def main():
             if (_r and _r.get('signal')
                     and str(_pos.get('code', '')).zfill(6) == _t1
                     and _r['signal'].get('action') in ('sell', 'sell_half')):
+                # 2026-09-17修复: 硬止损不得被覆盖 —— 用户定稿「硬止损 -10% 保留且
+                # 优先」, 而原实现无条件覆写: 只要持仓票当日 buyable 排第1, 连破位
+                # 止损也被静默改成"继续持有"(唯一刚性风控失效, 摘要却显示"继续持有")。
+                if _r['signal'].get('kind') == 'hard_stop':
+                    print(f'  ⚠ Top1覆盖放行: {_pos.get("name","")}({_pos.get("code","")}) '
+                          f'触发硬止损, 不适用「当日Top1仍是持仓则不卖」规则')
+                    _new.append((_pos, _r))
+                    continue
                 _r['signal'] = {'action': 'hold', 'urgency': 'normal',
                                 'reason': f'当日V3 Top1仍是它({_pos.get("name","")}) → 继续持有',
                                 'reference_price': _r['signal'].get('reference_price', 0),
@@ -832,11 +843,16 @@ def main():
                 _unit_cnt += 1
                 continue
             _ice = code in ice_repair
+            # 冰点修复票综合分上浮 (2026-09-08拍板: 极弱分歧段均笔+3.88% vs 全样本+1.37%)
+            # 2026-09-17修复: V3是负分累加制(域约 -26~79), 原 `* 1.2` 对负分是【更低】=
+            # 降权, 与"上浮参与排序"意图相反 —— 实测冰点票 002531 -12 → -14.4, 被非冰点
+            # 票 -11 反超(第3掉第4)。改为按符号放大 20%: 正分×1.2 / 负分向 0 靠拢 20%,
+            # 两域一致地"上浮"。注: _gw 在硬边界下恒为 1 (窗口外票已在上方 continue)。
+            _ws = final_score * 1.2 if final_score > 0 else final_score * 0.8
             buyable.append({
                 'code': code, 'name': s.get('name', ''),
                 'gap': gap, 'score': final_score,
-                # 冰点修复票综合分×1.2上浮 (2026-09-08拍板: 极弱分歧段均笔+3.88% vs 全样本+1.37%)
-                'weighted': final_score * _gw * (1.2 if _ice else 1.0), 'gap_w': _gw,
+                'weighted': _ws * _gw, 'gap_w': _gw,
                 'ice': _ice,
                 'limit_days': meta['cons'] if meta['cons'] != '?' else s.get('limit_days', cand.get('cons', 1)),
                 'industry': meta['industry'] or cand.get('industry', ''),

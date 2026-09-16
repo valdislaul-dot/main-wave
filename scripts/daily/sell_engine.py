@@ -306,7 +306,7 @@ def sell_signal(position, today_auction, config=None):
             if not mild_break:
                 return _signal('sell', 'urgent',
                     f'硬止损: 浮亏{loss_pct:+.1f}% ≤ {hard_stop:+.0f}% — 无条件卖出',
-                    current_price)
+                    current_price, kind='hard_stop')
 
     # ══════════════════════════════════════════════════════════════
     # A式出场 (2026-09-12 用户拍板: "出场用你的那个")
@@ -318,15 +318,20 @@ def sell_signal(position, today_auction, config=None):
     # 回滚: 把 scoring_config.json 的 sell_a_style.enabled 改 false 即回到决策树。
     # ══════════════════════════════════════════════════════════════
     if bool((config or {}).get('sell_a_style', {}).get('enabled', False)):
-        _lim = round(prev_close * 1.1, 2) if prev_close else None
+        # 2026-09-17修复: 优先用行情源的真实涨停价(腾讯字段47) —— 原硬编码
+        # prev_close*1.1 对 20%(创业板/科创板) 与 5%(ST) 涨跌幅标的全错:
+        # 20%票开盘 +11~+19.9%(非涨停)会被误判"开盘即涨停"并按竞价价成交, ST 票
+        # 则永远等不到该分支(把竞价成交机会丢进盘中)。
+        _lim = today_auction.get('limit_up_price') or (round(prev_close * 1.1, 2) if prev_close else None)
         if _lim and auction_price and auction_price >= _lim - 0.005:
             return _signal('sell', 'urgent',
                 f'A式: 开盘即涨停({auction_price}) → 挂涨停价成交',
-                auction_price, 'A式出场(2026-09-12定稿)')
+                auction_price, 'A式出场(2026-09-12定稿)', kind='a_style')
         return _signal('sell', 'normal',
             f'A式: 不在竞价卖 → 盘中挂涨停价限价卖(涨停价{_lim})',
             auction_price,
             '封板则成交在涨停价(当日最高); 未封则盘中择机卖[70%(H+O)/2+30%收]; 14:45市价兜底',
+            kind='a_style',
         )
 
     # 前日量能 (T-2)
@@ -518,13 +523,18 @@ def sell_signal(position, today_auction, config=None):
     return _signal('hold', 'normal', '默认持有', auction_price)
 
 
-def _signal(action, urgency, reason, reference_price, detail=''):
+def _signal(action, urgency, reason, reference_price, detail='', kind=''):
+    """kind: 信号类别标识 (2026-09-17 新增, 默认空)。
+    目前唯一取值 'hard_stop' —— 硬止损(-10%)。morning_check 的「当日Top1仍是
+    持仓则不卖」覆盖规则据此放行: 用户定稿「硬止损保留且优先」, urgent 里还混有
+    "A式开盘即涨停"等场景信号, 故不能用 urgency 一刀切。"""
     return {
         'action': action,
         'urgency': urgency,
         'reason': reason,
         'reference_price': reference_price,
-        'detail': detail
+        'detail': detail,
+        'kind': kind,
     }
 
 
@@ -545,6 +555,18 @@ def sell_execution_price(signal, today_quote, position):
     c = today_quote.get('close', 0)
     lu = today_quote.get('limit_up_price', 0)
     buy_price = position.get('buy_price', 0)
+
+    # 2026-09-17修复: A式出场恒为「挂涨停价限价单」—— 原实现让 A式信号落进下方
+    # V3.2 公式, 而 9:25 时 H=0、close=竞价价 → note 退化成"执行价=开盘价", 与同一行
+    # reason 的"挂涨停价{lu}限价卖"自相矛盾; 照抄即退化为被回测否定的口径
+    # (A式 +1.05%/59% vs 轮换日开盘价卖 -1.20%/45%, 差 2.25pt/笔)。
+    if signal.get('kind') == 'a_style' and action in ('sell', 'sell_half'):
+        if lu > 0:
+            return {
+                'price': lu, 'shares_pct': 100,
+                'order_type': '限价单(涨停价)',
+                'note': f'挂涨停价{lu:.2f}限价卖 — 封板则成交在涨停价; 未封则盘中择机卖, 14:45市价兜底'
+            }
 
     if action == 'sell_half':
         return {
@@ -582,14 +604,25 @@ def sell_execution_price(signal, today_quote, position):
 def calc_daily_vwap(k):
     """
     从日K线计算日VWAP
-    优先: amount_10k_cny / (volume_lots * 100)  — 真VWAP
+    优先: amount_10k_cny / 成交量(股)            — 真VWAP
     兜底: (H + L + C) / 3                        — 近似VWAP
+
+    2026-09-16修复: 原实现 `vol_lots = k.get('volume_lots', k.get('volume', 0))`
+    然后统一 ×100 —— 只对「volume_lots(手)」的老搜狐行正确; Tushare/池映射
+    追加行没有 volume_lots 字段, 其 volume 已是【股】(kline_source.py:87 手→股),
+    被当手再 ×100 → VWAP 算小 100 倍 (实测 000006 得 0.073 vs 真值 7.32),
+    因 low < vwap 恒为假, "破VWAP"提示永久失效 (烂板高开/断板gap≥5%两条卖出预案
+    静默失效, 面板还会打印 0.07 这种荒谬值)。全库 volume 单位实测统一为【股】
+    (711 样本 0 反例), volume_lots 仅老搜狐行保留(手) → 按字段存在与否取分母。
     """
     amt = k.get('amount_10k_cny', 0)
-    vol_lots = k.get('volume_lots', k.get('volume', 0))
-    # 真VWAP: 成交额 / 成交量
-    if amt and vol_lots and amt > 0 and vol_lots > 0:
-        return (amt * 10000) / (vol_lots * 100)
+    if amt and amt > 0:
+        vol_lots = k.get('volume_lots')
+        if vol_lots and vol_lots > 0:
+            return (amt * 10000) / (vol_lots * 100)  # 老搜狐行: 手 → 股
+        vol = k.get('volume')
+        if vol and vol > 0:
+            return (amt * 10000) / vol               # 追加行: 已是股
 
     # 近似VWAP: (H+L+C)/3 — 无成交额时的最佳替代
     h = k.get('high', 0)

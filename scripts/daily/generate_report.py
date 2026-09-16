@@ -174,11 +174,19 @@ def generate():
     r.append("| 日期 | 操作 | 标的 | 盈亏 |")
     r.append("|------|------|------|------|")
     for entry in journal[-20:]:  # last 20 entries
-        if entry['action'] in ('BUY', 'SELL'):
-            dt = entry['date'][:10]
-            act = entry['action']
-            name = entry['name']
-            pnl = f"{entry.get('pnl_pct', 0):+.1f}%" if act == 'SELL' else '—'
+        if not isinstance(entry, dict):
+            continue
+        # 2026-09-16修复: action 历史中英文混用('买入'/'卖出(清仓)'等),
+        # 原只认 'BUY'/'SELL' 会漏掉早期记录; pnl_pct 可能为 None(格式化会崩)
+        a = str(entry.get('action', ''))
+        is_buy = (a == 'BUY' or '买入' in a)
+        is_sell = (a == 'SELL' or '卖出' in a)
+        if is_buy or is_sell:
+            dt = str(entry.get('date', ''))[:10]
+            act = 'BUY' if is_buy else 'SELL'
+            name = entry.get('name', '')
+            pct = entry.get('pnl_pct')
+            pnl = f"{pct:+.1f}%" if (is_sell and pct is not None) else '—'
             r.append(f"| {dt} | {act} | {name} | {pnl} |")
     r.append("")
     r.append("---")

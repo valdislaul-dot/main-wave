@@ -645,6 +645,11 @@ def gap_weight(gap, config=None):
     梯形: [lo,hi]核心=1, 边缘带[lo-band,lo)/(hi,hi+band]线性衰减, 带外=0
     配置: buy_window=[lo,hi], gap_band=band (band<=0时退化为硬边界)
     回测依据: 一年234交易日, smooth±1.0% 均笔+5.76% vs 硬边界+5.44%, 边缘带8笔+3.33%"""
+    # 2026-09-16修复: gap 为 None/非数值(快照缺 gap_pct)时返回 0.0 —— 原实现
+    # 直接比较抛 TypeError, 调用点 morning_check.py:839 在主流程且无 try 包裹
+    # → 面板整块崩(当天无任何输出)。语义: 无权重的票不入选, 与"带外=0"一致。
+    if not isinstance(gap, (int, float)) or isinstance(gap, bool):
+        return 0.0
     if config is None:
         config = load_config()
     lo, hi = config['buy_window']
