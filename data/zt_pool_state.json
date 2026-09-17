@@ -1,16 +1,16 @@
 {
   "as_of_date": "2026-09-17",
-  "last_updated": "2026-09-17 20:09:29",
+  "last_updated": "2026-09-17 20:11:47",
   "stocks": [
     {
       "code": "601218",
       "name": "吉鑫科技",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 5.74,
-      "prev_close": 5.18,
+      "prev_close": 5.74,
       "first_seal": "14:01:00",
       "last_seal": "14:56:00",
       "seal_fund": 16543828.0,
@@ -24,6 +24,11 @@
           "date": "2026-09-17",
           "close": 5.74,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 5.74,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -33,10 +38,10 @@
       "name": "龙版传媒",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 15.0,
-      "prev_close": 18.67,
+      "prev_close": 15.0,
       "first_seal": "14:47:00",
       "last_seal": "14:47:00",
       "seal_fund": 7600830.0,
@@ -50,6 +55,11 @@
           "date": "2026-09-17",
           "close": 15.0,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 15.0,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -59,10 +69,10 @@
       "name": "克来机电",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 17.0,
-      "prev_close": 16.09,
+      "prev_close": 17.0,
       "first_seal": "14:18:00",
       "last_seal": "14:18:00",
       "seal_fund": 12790800.0,
@@ -76,6 +86,11 @@
           "date": "2026-09-17",
           "close": 17.0,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 17.0,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -85,10 +100,10 @@
       "name": "锡华科技",
       "added_date": "2026-09-15",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 3,
       "close": 22.34,
-      "prev_close": 20.31,
+      "prev_close": 22.34,
       "first_seal": "14:03:00",
       "last_seal": "14:03:00",
       "seal_fund": 50195746.0,
@@ -112,6 +127,11 @@
           "date": "2026-09-17",
           "close": 22.34,
           "cons": 3
+        },
+        {
+          "date": "2026-09-17",
+          "close": 22.34,
+          "cons": 3
         }
       ],
       "seal_recalced": true
@@ -121,10 +141,10 @@
       "name": "恒丰纸业",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 10.19,
-      "prev_close": 8.24,
+      "prev_close": 10.19,
       "first_seal": "13:55:00",
       "last_seal": "13:59:00",
       "seal_fund": 30691251.0,
@@ -138,6 +158,11 @@
           "date": "2026-09-17",
           "close": 10.19,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 10.19,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -147,10 +172,10 @@
       "name": "招商轮船",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 21.85,
-      "prev_close": 20.99,
+      "prev_close": 21.85,
       "first_seal": "13:05:00",
       "last_seal": "13:05:00",
       "seal_fund": 140392410.0,
@@ -164,6 +189,11 @@
           "date": "2026-09-17",
           "close": 21.85,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 21.85,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -173,10 +203,10 @@
       "name": "云煤能源",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 5.34,
-      "prev_close": 5.41,
+      "prev_close": 5.34,
       "first_seal": "13:45:00",
       "last_seal": "13:45:00",
       "seal_fund": 3929706.0,
@@ -190,6 +220,11 @@
           "date": "2026-09-17",
           "close": 5.34,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 5.34,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -199,10 +234,10 @@
       "name": "北特科技",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 47.37,
-      "prev_close": 48.84,
+      "prev_close": 47.37,
       "first_seal": "10:26:00",
       "last_seal": "13:45:00",
       "seal_fund": 28734642.0,
@@ -216,6 +251,11 @@
           "date": "2026-09-17",
           "close": 47.37,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 47.37,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -225,10 +265,10 @@
       "name": "中岩大地",
       "added_date": "2026-09-16",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 2,
+      "days_in_pool": 3,
       "limit_days": 2,
       "close": 20.32,
-      "prev_close": 18.47,
+      "prev_close": 20.32,
       "first_seal": "09:44:00",
       "last_seal": "13:40:00",
       "seal_fund": 13257621.4,
@@ -247,6 +287,11 @@
           "date": "2026-09-17",
           "close": 20.32,
           "cons": 2
+        },
+        {
+          "date": "2026-09-17",
+          "close": 20.32,
+          "cons": 2
         }
       ],
       "seal_recalced": true
@@ -256,10 +301,10 @@
       "name": "新中港",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
-      "limit_days": 2,
+      "days_in_pool": 2,
+      "limit_days": 1,
       "close": 12.2,
-      "prev_close": 11.55,
+      "prev_close": 12.2,
       "first_seal": "13:33:00",
       "last_seal": "13:33:00",
       "seal_fund": 56546841.0,
@@ -273,6 +318,11 @@
           "date": "2026-09-17",
           "close": 12.2,
           "cons": 2
+        },
+        {
+          "date": "2026-09-17",
+          "close": 12.2,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -282,10 +332,10 @@
       "name": "雪天盐业",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 5.94,
-      "prev_close": 6.04,
+      "prev_close": 5.94,
       "first_seal": "13:05:00",
       "last_seal": "13:28:00",
       "seal_fund": 37016892.0,
@@ -299,6 +349,11 @@
           "date": "2026-09-17",
           "close": 5.94,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 5.94,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -308,10 +363,10 @@
       "name": "世嘉科技",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 32.54,
-      "prev_close": 27.84,
+      "prev_close": 32.54,
       "first_seal": "10:11:00",
       "last_seal": "13:29:00",
       "seal_fund": 34733196.0,
@@ -325,6 +380,11 @@
           "date": "2026-09-17",
           "close": 32.54,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 32.54,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -334,10 +394,10 @@
       "name": "澳弘电子",
       "added_date": "2026-09-11",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 5,
+      "days_in_pool": 6,
       "limit_days": 5,
       "close": 48.76,
-      "prev_close": 44.33,
+      "prev_close": 48.76,
       "first_seal": "10:07:00",
       "last_seal": "13:21:00",
       "seal_fund": 29853310.0,
@@ -371,6 +431,11 @@
           "date": "2026-09-17",
           "close": 48.76,
           "cons": 5
+        },
+        {
+          "date": "2026-09-17",
+          "close": 48.76,
+          "cons": 5
         }
       ],
       "seal_recalced": true
@@ -380,10 +445,10 @@
       "name": "均胜电子",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 19.87,
-      "prev_close": 21.62,
+      "prev_close": 19.87,
       "first_seal": "13:18:00",
       "last_seal": "13:18:00",
       "seal_fund": 101315620.0,
@@ -397,6 +462,11 @@
           "date": "2026-09-17",
           "close": 19.87,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 19.87,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -406,10 +476,10 @@
       "name": "华软科技",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 4.85,
-      "prev_close": 4.33,
+      "prev_close": 4.85,
       "first_seal": "13:18:00",
       "last_seal": "13:18:00",
       "seal_fund": 32822375.0,
@@ -423,6 +493,11 @@
           "date": "2026-09-17",
           "close": 4.85,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 4.85,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -432,10 +507,10 @@
       "name": "先导基电",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 36.8,
-      "prev_close": 34.0,
+      "prev_close": 36.8,
       "first_seal": "13:14:00",
       "last_seal": "13:14:00",
       "seal_fund": 186208520.0,
@@ -449,6 +524,11 @@
           "date": "2026-09-17",
           "close": 36.8,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 36.8,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -458,10 +538,10 @@
       "name": "万向德农",
       "added_date": "2026-09-16",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 2,
+      "days_in_pool": 3,
       "limit_days": 2,
       "close": 15.64,
-      "prev_close": 14.22,
+      "prev_close": 15.64,
       "first_seal": "13:03:00",
       "last_seal": "13:09:00",
       "seal_fund": 63842355.0,
@@ -480,6 +560,11 @@
           "date": "2026-09-17",
           "close": 15.64,
           "cons": 2
+        },
+        {
+          "date": "2026-09-17",
+          "close": 15.64,
+          "cons": 2
         }
       ],
       "seal_recalced": true
@@ -489,10 +574,10 @@
       "name": "跨境通",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 3.77,
-      "prev_close": 3.47,
+      "prev_close": 3.77,
       "first_seal": "13:02:00",
       "last_seal": "13:02:00",
       "seal_fund": 6599008.0,
@@ -506,6 +591,11 @@
           "date": "2026-09-17",
           "close": 3.77,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 3.77,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -515,10 +605,10 @@
       "name": "华英农业",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 2.18,
-      "prev_close": 1.91,
+      "prev_close": 2.18,
       "first_seal": "11:21:00",
       "last_seal": "11:21:00",
       "seal_fund": 8254570.0,
@@ -532,6 +622,11 @@
           "date": "2026-09-17",
           "close": 2.18,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 2.18,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -541,10 +636,10 @@
       "name": "龙头股份",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 7.54,
-      "prev_close": 6.67,
+      "prev_close": 7.54,
       "first_seal": "10:44:00",
       "last_seal": "10:44:00",
       "seal_fund": 46669546.0,
@@ -558,6 +653,11 @@
           "date": "2026-09-17",
           "close": 7.54,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 7.54,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -567,10 +667,10 @@
       "name": "冠盛股份",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 24.17,
-      "prev_close": 22.48,
+      "prev_close": 24.17,
       "first_seal": "11:09:00",
       "last_seal": "11:09:00",
       "seal_fund": 56867176.0,
@@ -584,6 +684,11 @@
           "date": "2026-09-17",
           "close": 24.17,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 24.17,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -593,10 +698,10 @@
       "name": "敦煌种业",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 9.75,
-      "prev_close": 10.48,
+      "prev_close": 9.75,
       "first_seal": "10:27:00",
       "last_seal": "11:06:00",
       "seal_fund": 47861775.0,
@@ -610,6 +715,11 @@
           "date": "2026-09-17",
           "close": 9.75,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 9.75,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -619,10 +729,10 @@
       "name": "金杯汽车",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 3.58,
-      "prev_close": 3.33,
+      "prev_close": 3.58,
       "first_seal": "10:59:00",
       "last_seal": "10:59:00",
       "seal_fund": 21943610.0,
@@ -636,6 +746,11 @@
           "date": "2026-09-17",
           "close": 3.58,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 3.58,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -645,10 +760,10 @@
       "name": "众泰汽车",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
-      "limit_days": 5,
+      "days_in_pool": 2,
+      "limit_days": 1,
       "close": 2.37,
-      "prev_close": 2.33,
+      "prev_close": 2.37,
       "first_seal": "10:52:00",
       "last_seal": "10:59:00",
       "seal_fund": 14102685.0,
@@ -662,6 +777,11 @@
           "date": "2026-09-17",
           "close": 2.37,
           "cons": 5
+        },
+        {
+          "date": "2026-09-17",
+          "close": 2.37,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -671,10 +791,10 @@
       "name": "凯迪股份",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 67.25,
-      "prev_close": 67.66,
+      "prev_close": 67.25,
       "first_seal": "10:40:00",
       "last_seal": "10:40:00",
       "seal_fund": 52406580.0,
@@ -688,6 +808,11 @@
           "date": "2026-09-17",
           "close": 67.25,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 67.25,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -697,10 +822,10 @@
       "name": "天海电子",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 37.51,
-      "prev_close": 37.9,
+      "prev_close": 37.51,
       "first_seal": "10:39:00",
       "last_seal": "10:39:00",
       "seal_fund": 19220124.0,
@@ -714,6 +839,11 @@
           "date": "2026-09-17",
           "close": 37.51,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 37.51,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -723,10 +853,10 @@
       "name": "上海物贸",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 9.38,
-      "prev_close": 8.25,
+      "prev_close": 9.38,
       "first_seal": "10:34:00",
       "last_seal": "10:34:00",
       "seal_fund": 34259512.0,
@@ -740,6 +870,11 @@
           "date": "2026-09-17",
           "close": 9.38,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 9.38,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -749,10 +884,10 @@
       "name": "大连圣亚",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 43.31,
-      "prev_close": 39.04,
+      "prev_close": 43.31,
       "first_seal": "10:31:00",
       "last_seal": "10:31:00",
       "seal_fund": 81180264.0,
@@ -766,6 +901,11 @@
           "date": "2026-09-17",
           "close": 43.31,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 43.31,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -775,10 +915,10 @@
       "name": "共达电声",
       "added_date": "2026-09-16",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 2,
+      "days_in_pool": 3,
       "limit_days": 2,
       "close": 40.77,
-      "prev_close": 37.06,
+      "prev_close": 40.77,
       "first_seal": "10:29:00",
       "last_seal": "10:29:00",
       "seal_fund": 137121740.0,
@@ -797,6 +937,11 @@
           "date": "2026-09-17",
           "close": 40.77,
           "cons": 2
+        },
+        {
+          "date": "2026-09-17",
+          "close": 40.77,
+          "cons": 2
         }
       ],
       "seal_recalced": true
@@ -806,10 +951,10 @@
       "name": "南华生物",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 9.1,
-      "prev_close": 8.11,
+      "prev_close": 9.1,
       "first_seal": "10:03:00",
       "last_seal": "10:03:00",
       "seal_fund": 34195070.0,
@@ -823,6 +968,11 @@
           "date": "2026-09-17",
           "close": 9.1,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 9.1,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -832,10 +982,10 @@
       "name": "世联行",
       "added_date": "2026-09-16",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 2,
+      "days_in_pool": 3,
       "limit_days": 2,
       "close": 2.63,
-      "prev_close": 2.39,
+      "prev_close": 2.63,
       "first_seal": "09:32:00",
       "last_seal": "10:14:00",
       "seal_fund": 13336104.1,
@@ -854,6 +1004,11 @@
           "date": "2026-09-17",
           "close": 2.63,
           "cons": 2
+        },
+        {
+          "date": "2026-09-17",
+          "close": 2.63,
+          "cons": 2
         }
       ],
       "seal_recalced": true
@@ -863,10 +1018,10 @@
       "name": "金健米业",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 13.02,
-      "prev_close": 13.53,
+      "prev_close": 13.02,
       "first_seal": "10:18:00",
       "last_seal": "10:18:00",
       "seal_fund": 173401230.0,
@@ -880,6 +1035,11 @@
           "date": "2026-09-17",
           "close": 13.02,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 13.02,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -889,10 +1049,10 @@
       "name": "积成电子",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 8.23,
-      "prev_close": 7.38,
+      "prev_close": 8.23,
       "first_seal": "09:36:00",
       "last_seal": "10:17:00",
       "seal_fund": 44960696.0,
@@ -906,6 +1066,11 @@
           "date": "2026-09-17",
           "close": 8.23,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 8.23,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -915,10 +1080,10 @@
       "name": "华纺股份",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 3.22,
-      "prev_close": 2.75,
+      "prev_close": 3.22,
       "first_seal": "10:09:00",
       "last_seal": "10:09:00",
       "seal_fund": 24392788.0,
@@ -932,6 +1097,11 @@
           "date": "2026-09-17",
           "close": 3.22,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 3.22,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -941,10 +1111,10 @@
       "name": "山子高科",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
-      "limit_days": 2,
+      "days_in_pool": 2,
+      "limit_days": 1,
       "close": 3.01,
-      "prev_close": 2.85,
+      "prev_close": 3.01,
       "first_seal": "09:49:00",
       "last_seal": "10:03:00",
       "seal_fund": 105433979.0,
@@ -958,6 +1128,11 @@
           "date": "2026-09-17",
           "close": 3.01,
           "cons": 2
+        },
+        {
+          "date": "2026-09-17",
+          "close": 3.01,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -967,10 +1142,10 @@
       "name": "中晶科技",
       "added_date": "2026-09-15",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 3,
       "close": 37.0,
-      "prev_close": 33.64,
+      "prev_close": 37.0,
       "first_seal": "09:30:00",
       "last_seal": "10:00:00",
       "seal_fund": 173132840.0,
@@ -994,6 +1169,11 @@
           "date": "2026-09-17",
           "close": 37.0,
           "cons": 3
+        },
+        {
+          "date": "2026-09-17",
+          "close": 37.0,
+          "cons": 3
         }
       ],
       "seal_recalced": true
@@ -1003,10 +1183,10 @@
       "name": "安凯客车",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
-      "limit_days": 2,
+      "days_in_pool": 2,
+      "limit_days": 1,
       "close": 4.06,
-      "prev_close": 3.91,
+      "prev_close": 4.06,
       "first_seal": "09:48:00",
       "last_seal": "09:48:00",
       "seal_fund": 62501731.0,
@@ -1020,6 +1200,11 @@
           "date": "2026-09-17",
           "close": 4.06,
           "cons": 2
+        },
+        {
+          "date": "2026-09-17",
+          "close": 4.06,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -1029,10 +1214,10 @@
       "name": "新宏泽",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 10.84,
-      "prev_close": 9.43,
+      "prev_close": 10.84,
       "first_seal": "09:48:00",
       "last_seal": "09:48:00",
       "seal_fund": 41005118.0,
@@ -1046,6 +1231,11 @@
           "date": "2026-09-17",
           "close": 10.84,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 10.84,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -1055,10 +1245,10 @@
       "name": "百花医药",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 11.87,
-      "prev_close": 16.68,
+      "prev_close": 11.87,
       "first_seal": "09:48:00",
       "last_seal": "09:48:00",
       "seal_fund": 70103900.0,
@@ -1072,6 +1262,11 @@
           "date": "2026-09-17",
           "close": 11.87,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 11.87,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -1081,10 +1276,10 @@
       "name": "三峡新材",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 3.4,
-      "prev_close": 2.79,
+      "prev_close": 3.4,
       "first_seal": "09:45:00",
       "last_seal": "09:45:00",
       "seal_fund": 31467289.0,
@@ -1098,6 +1293,11 @@
           "date": "2026-09-17",
           "close": 3.4,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 3.4,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -1107,10 +1307,10 @@
       "name": "沃顿科技",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
+      "days_in_pool": 2,
       "limit_days": 1,
       "close": 12.63,
-      "prev_close": 11.45,
+      "prev_close": 12.63,
       "first_seal": "09:41:00",
       "last_seal": "09:41:00",
       "seal_fund": 38468454.0,
@@ -1124,6 +1324,11 @@
           "date": "2026-09-17",
           "close": 12.63,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 12.63,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -1133,10 +1338,10 @@
       "name": "科森科技",
       "added_date": "2026-09-17",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 1,
-      "limit_days": 2,
+      "days_in_pool": 2,
+      "limit_days": 1,
       "close": 21.29,
-      "prev_close": 19.95,
+      "prev_close": 21.29,
       "first_seal": "09:41:00",
       "last_seal": "09:41:00",
       "seal_fund": 68183354.0,
@@ -1150,6 +1355,11 @@
           "date": "2026-09-17",
           "close": 21.29,
           "cons": 2
+        },
+        {
+          "date": "2026-09-17",
+          "close": 21.29,
+          "cons": 1
         }
       ],
       "seal_recalced": true
@@ -1159,10 +1369,10 @@
       "name": "华瓷股份",
       "added_date": "2026-09-15",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 3,
+      "days_in_pool": 4,
       "limit_days": 3,
       "close": 19.88,
-      "prev_close": 18.07,
+      "prev_close": 19.88,
       "first_seal": "09:31:00",
       "last_seal": "09:31:00",
       "seal_fund": 44213756.0,
@@ -1186,6 +1396,11 @@
           "date": "2026-09-17",
           "close": 19.88,
           "cons": 3
+        },
+        {
+          "date": "2026-09-17",
+          "close": 19.88,
+          "cons": 3
         }
       ],
       "seal_recalced": true
@@ -1195,10 +1410,10 @@
       "name": "内蒙新华",
       "added_date": "2026-09-16",
       "last_lu_date": "2026-09-17",
-      "days_in_pool": 2,
+      "days_in_pool": 3,
       "limit_days": 2,
       "close": 12.25,
-      "prev_close": 11.14,
+      "prev_close": 12.25,
       "first_seal": "09:30:00",
       "last_seal": "09:30:00",
       "seal_fund": 110049088.0,
@@ -1212,6 +1427,11 @@
           "date": "2026-09-16",
           "close": 11.14,
           "cons": 1
+        },
+        {
+          "date": "2026-09-17",
+          "close": 12.25,
+          "cons": 2
         },
         {
           "date": "2026-09-17",
