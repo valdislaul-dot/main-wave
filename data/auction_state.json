@@ -1,68 +1,61 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 54,
+  "total_sessions": 55,
   "current": {
-    "date": "2026-09-17",
-    "captured": "2026-09-17 09:25:32",
-    "total": 80,
-    "buyable": 7,
-    "avg_gap": 0.38,
+    "date": "2026-09-18",
+    "captured": "2026-09-18 09:25:36",
+    "total": 44,
+    "buyable": 6,
+    "avg_gap": 1.7,
     "gap_distribution": {
-      "0-2%": 22,
-      "-3-0%": 30,
-      "<-3%": 10,
-      "2-5%": 10,
-      "5-9%": 6,
-      "9%+": 2
+      "5-9%": 3,
+      "0-2%": 10,
+      "2-5%": 11,
+      "<-3%": 7,
+      "-3-0%": 8,
+      "9%+": 5
     },
     "buyable_stocks": [
       {
         "code": "001216",
         "name": "华瓷股份",
-        "gap_pct": 7.86,
-        "score": 54.0,
-        "limit_days": 2
+        "gap_pct": 5.53,
+        "score": 37.0,
+        "limit_days": 3
       },
       {
-        "code": "002584",
-        "name": "西陇科学",
-        "gap_pct": 7.33,
-        "score": 25.0,
-        "limit_days": 2
+        "code": "600699",
+        "name": "均胜电子",
+        "gap_pct": 4.08,
+        "score": 2.0,
+        "limit_days": 1
       },
       {
-        "code": "605058",
-        "name": "澳弘电子",
-        "gap_pct": 6.02,
-        "score": 22.0,
-        "limit_days": 4
-      },
-      {
-        "code": "002577",
-        "name": "雷柏科技",
-        "gap_pct": 5.03,
+        "code": "600630",
+        "name": "龙头股份",
+        "gap_pct": 6.1,
         "score": 0,
         "limit_days": 1
       },
       {
-        "code": "001209",
-        "name": "洪兴股份",
-        "gap_pct": 4.94,
-        "score": -12.0,
+        "code": "000920",
+        "name": "沃顿科技",
+        "gap_pct": 4.28,
+        "score": -5.0,
         "limit_days": 1
       },
       {
-        "code": "002388",
-        "name": "新亚制程",
-        "gap_pct": 5.01,
-        "score": -14.0,
+        "code": "000504",
+        "name": "南华生物",
+        "gap_pct": 7.25,
+        "score": -13.0,
         "limit_days": 1
       },
       {
-        "code": "002285",
-        "name": "世联行",
-        "gap_pct": 6.69,
-        "score": -42.0,
+        "code": "605088",
+        "name": "冠盛股份",
+        "gap_pct": 4.8,
+        "score": -20.0,
         "limit_days": 1
       }
     ]
@@ -763,7 +756,20 @@
         "5-9%": 6,
         "9%+": 2
       }
+    },
+    {
+      "date": "2026-09-18",
+      "total": 44,
+      "buyable": 6,
+      "gap_distribution": {
+        "5-9%": 3,
+        "0-2%": 10,
+        "2-5%": 11,
+        "<-3%": 7,
+        "-3-0%": 8,
+        "9%+": 5
+      }
     }
   ],
-  "last_update": "2026-09-17"
+  "last_update": "2026-09-18"
 }
