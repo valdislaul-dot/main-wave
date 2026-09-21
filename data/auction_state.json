@@ -1,61 +1,75 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 55,
+  "total_sessions": 56,
   "current": {
-    "date": "2026-09-18",
-    "captured": "2026-09-18 09:25:36",
-    "total": 44,
-    "buyable": 6,
-    "avg_gap": 1.7,
+    "date": "2026-09-21",
+    "captured": "2026-09-21 09:25:32",
+    "total": 72,
+    "buyable": 8,
+    "avg_gap": 2.54,
     "gap_distribution": {
-      "5-9%": 3,
-      "0-2%": 10,
-      "2-5%": 11,
-      "<-3%": 7,
-      "-3-0%": 8,
-      "9%+": 5
+      "-3-0%": 13,
+      "<-3%": 2,
+      "9%+": 6,
+      "0-2%": 22,
+      "5-9%": 8,
+      "2-5%": 21
     },
     "buyable_stocks": [
       {
-        "code": "001216",
-        "name": "华瓷股份",
-        "gap_pct": 5.53,
-        "score": 37.0,
-        "limit_days": 3
+        "code": "603248",
+        "name": "锡华科技",
+        "gap_pct": 4.52,
+        "score": 41.0,
+        "limit_days": 4
       },
       {
-        "code": "600699",
-        "name": "均胜电子",
-        "gap_pct": 4.08,
-        "score": 2.0,
+        "code": "603316",
+        "name": "诚邦股份",
+        "gap_pct": 4.61,
+        "score": 7.0,
         "limit_days": 1
       },
       {
-        "code": "600630",
-        "name": "龙头股份",
-        "gap_pct": 6.1,
+        "code": "002965",
+        "name": "祥鑫科技",
+        "gap_pct": 6.08,
+        "score": 4.0,
+        "limit_days": 1
+      },
+      {
+        "code": "600448",
+        "name": "华纺股份",
+        "gap_pct": 7.34,
+        "score": 0,
+        "limit_days": 2
+      },
+      {
+        "code": "600606",
+        "name": "绿地控股",
+        "gap_pct": 6.21,
         "score": 0,
         "limit_days": 1
       },
       {
-        "code": "000920",
-        "name": "沃顿科技",
-        "gap_pct": 4.28,
-        "score": -5.0,
+        "code": "000910",
+        "name": "大亚圣象",
+        "gap_pct": 5.45,
+        "score": 0,
         "limit_days": 1
       },
       {
-        "code": "000504",
-        "name": "南华生物",
-        "gap_pct": 7.25,
-        "score": -13.0,
+        "code": "601811",
+        "name": "新华文轩",
+        "gap_pct": 4.32,
+        "score": 0,
         "limit_days": 1
       },
       {
-        "code": "605088",
-        "name": "冠盛股份",
-        "gap_pct": 4.8,
-        "score": -20.0,
+        "code": "600640",
+        "name": "国脉文化",
+        "gap_pct": 6.14,
+        "score": -2.0,
         "limit_days": 1
       }
     ]
@@ -769,7 +783,20 @@
         "-3-0%": 8,
         "9%+": 5
       }
+    },
+    {
+      "date": "2026-09-21",
+      "total": 72,
+      "buyable": 8,
+      "gap_distribution": {
+        "-3-0%": 13,
+        "<-3%": 2,
+        "9%+": 6,
+        "0-2%": 22,
+        "5-9%": 8,
+        "2-5%": 21
+      }
     }
   ],
-  "last_update": "2026-09-18"
+  "last_update": "2026-09-21"
 }
