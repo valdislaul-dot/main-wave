@@ -26,6 +26,7 @@ data/副本主升浪.xlsx
 # 2026-08-31用户定: 持仓/账目/日志与项目说明一律不上传GitHub(仅本地)
 logs/*.log
 CLAUDE.md
+AGENTS.md
 CONTEXT.md
 README.md
 SETUP.md
