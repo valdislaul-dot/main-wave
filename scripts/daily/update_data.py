@@ -201,10 +201,46 @@ def append_latest(code, existing_path, end_date, pool_map=None):
     return len(new_rows)
 
 
+def _tencent_batch_ohlc(codes):
+    """腾讯批量行情 → {code: {name, open, high, low, close, volume}}
+    2026-09-22: 供 snapshot_daily_close 补 K 线库未覆盖的票(非涨停股不在K线更新范围)。
+    volume 统一为股数(腾讯返回手数, ×100) 与 kline_data 同口径。盘后调用即当日收盘。"""
+    import urllib.request
+    out = {}
+    for i in range(0, len(codes), 50):
+        batch = codes[i:i + 50]
+        pre = [('sh' if c.startswith(('6', '9')) else 'sz') + c for c in batch]
+        try:
+            url = 'http://qt.gtimg.cn/q=' + ','.join(pre)
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            raw = urllib.request.urlopen(req, timeout=15).read().decode('gbk', 'ignore')
+        except Exception:
+            continue
+        for line in raw.split(';'):
+            if '"' not in line:
+                continue
+            v = line.split('"')[1].split('~')
+            if len(v) < 35:
+                continue
+            try:
+                if not float(v[5]):
+                    continue
+                out[v[2]] = {'name': v[1], 'open': float(v[5]), 'high': float(v[33]),
+                             'low': float(v[34]), 'close': float(v[3]),
+                             'volume': float(v[6]) * 100}
+            except (ValueError, IndexError):
+                continue
+        time.sleep(0.2)
+    return out
+
+
 def snapshot_daily_close(date_str=None):
     """每日收盘快照 (2026-08-31): data/daily_close/YYYY-MM-DD/daily_data.json
-    宇宙 = 昨日快照代码 ∪ 今日涨停池代码 (滚动累计), OHLCV 取K线当日bar。
-    消费方: generate_report 持仓估值; 回测快照补充。"""
+    宇宙 = 昨日快照代码 ∪ 今日涨停池代码 ∪ 今日竞价池代码 (滚动累计)。OHLCV 优先取
+    K线当日bar; K线库无该票(非涨停股不在K线更新范围)时回退腾讯批量(仅当日盘后)。
+    消费方: generate_report 持仓估值; 回测快照补充; gap窗口分档回测。
+    2026-09-22用户要求: 盘后获取的涨停/竞价数据必须落盘 —— 原快照只含涨停股,
+    当日前可买池9只中7只无收盘价, 导致"gap窗口该定多少"无法用数据回答。"""
     date_str = date_str or get_today()
     dclose = os.path.join(BASE, 'data', 'daily_close')
     os.makedirs(dclose, exist_ok=True)
@@ -223,6 +259,10 @@ def snapshot_daily_close(date_str=None):
         except Exception:
             universe = {}
 
+    # 今日活跃代码 (涨停池 ∪ 竞价池): 回补只针对它们 —— 滚动宇宙里的历史票
+    # 当日价格不参与任何分析, 无谓拉取
+    today_codes = set()
+
     # 今日涨停池并入 (含名称)
     if os.path.exists(ZT_STATE_PATH):
         try:
@@ -231,13 +271,39 @@ def snapshot_daily_close(date_str=None):
             for s in state.get('stocks', []):
                 code = str(s.get('code', '')).zfill(6)
                 universe.setdefault(code, {'name': s.get('name', '')})
+                today_codes.add(code)
         except Exception:
             pass
 
-    # OHLCV 从K线当日bar取
+    # 今日竞价池并入 (2026-09-22): 候选=昨涨停股, 今日多半不涨停 → 不在K线更新范围,
+    # 不并入则其当日OHLC永远缺失, "开盘买→收"无法复算
+    auc_file = os.path.join(BASE, 'data', 'auction', f'{date_str}.json')
+    if os.path.exists(auc_file):
+        try:
+            with open(auc_file, encoding='utf-8') as f:
+                auc = json.load(f)
+            auc_rows = auc.get('stocks', auc) if isinstance(auc, dict) else auc
+            if isinstance(auc_rows, dict):
+                auc_rows = list(auc_rows.values())
+            for s in (auc_rows or []):
+                code = str(s.get('code', '')).zfill(6)
+                if len(code) != 6:
+                    continue
+                universe.setdefault(code, {'name': s.get('name', '')})
+                today_codes.add(code)
+        except Exception:
+            pass
+
+    # K线路径索引 (宇宙可达数千只, 逐只 glob 扫描目录太慢)
+    kp_index = {}
+    for fp in glob.glob(os.path.join(KLINE_DIR, '*.json')):
+        bn = os.path.basename(fp)[:-5]
+        kp_index[bn.split('_')[-1] if '_' in bn else bn] = fp
+
+    # OHLCV 优先从K线当日bar取
     out = {}
     for code in universe:
-        kp = find_kline_path(code)
+        kp = kp_index.get(code)
         if not kp:
             continue
         try:
@@ -254,6 +320,15 @@ def snapshot_daily_close(date_str=None):
                 }
         except Exception:
             continue
+
+    # 腾讯批量回补 K 线库未覆盖的今日活跃票 (仅当日盘后, 盘中/回填历史一律跳过防污染)
+    missing = [c for c in today_codes if c not in out]
+    filled = 0
+    if missing and date_str == get_today() and datetime.now().hour >= 15:
+        live = _tencent_batch_ohlc(missing)
+        for code, row in live.items():
+            out[code] = row
+            filled += 1
     if not out:
         print('[DailyClose] 无数据, 跳过')
         return
@@ -269,7 +344,9 @@ def snapshot_daily_close(date_str=None):
             idx[v['name']] = code
     with open(os.path.join(dclose, 'stock_index.json'), 'w', encoding='utf-8') as f:
         json.dump(idx, f, ensure_ascii=False, indent=1)
-    print(f'[DailyClose] 快照 {date_str}: {len(out)} 只 (宇宙累计 {len(universe)})')
+    print(f'[DailyClose] 快照 {date_str}: {len(out)} 只 (宇宙累计 {len(universe)}'
+          + (f', 腾讯回补 {filled} 只' if filled else '')
+          + (f', 警告: {len(missing) - filled} 只仍缺' if len(missing) > filled else '') + ')')
 
 
 def main():

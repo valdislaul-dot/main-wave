@@ -148,9 +148,10 @@ def test_gap_weight_invalid_input_returns_zero(bad):
 
 
 def test_gap_weight_valid_input_unchanged():
-    """正常输入行为不变 (现行硬边界 4-8%)"""
+    """正常输入行为不变 (现行硬边界 0-8%)"""
     assert gap_weight(4.0) == 1.0
     assert gap_weight(6.0) == 1.0
     assert gap_weight(8.0) == 1.0
-    assert gap_weight(3.9) == 0.0
+    assert gap_weight(0.0) == 1.0
+    assert gap_weight(-0.1) == 0.0
     assert gap_weight(8.1) == 0.0

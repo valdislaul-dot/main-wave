@@ -234,7 +234,8 @@ def main():
                 prev_d = dates_fmt[i - 1]
                 cands = []
                 for code, (f, btype, cons, k) in factor_days.get(prev_d, {}).items():
-                    if btype == '一字' or (cons >= 4 and btype in ('一字', 'T字')):
+                    # 2026-09-22: 删「4板+一字/T字」高危过滤(非A体系); 真一字保留(买不到)
+                    if btype == '一字':
                         continue
                     score = sum(weights[fac] * f[fac] for fac in FACTORS) / 100.0
                     cands.append((score, code))

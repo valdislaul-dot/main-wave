@@ -153,7 +153,9 @@ def main():
                     if not r:
                         continue
                     f, btype, cons, k, kls, idx = r
-                    if btype == '一字' or cons >= 4:
+                    # 2026-09-22: 原「btype=='一字' or cons>=4」中 cons>=4 一并删除
+                    # (非A体系; A的4板+买入 14笔均+4.29%/43%胜 vs 3板及以下 −0.79%/23%胜)
+                    if btype == '一字':
                         continue
                     score = sum(sub_w[fac] * f[fac] for fac in SUB_FACTORS) / 100.0
                     cands.append((score, c))

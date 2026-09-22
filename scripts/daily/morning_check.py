@@ -146,6 +146,44 @@ def compute_position_decision(pos):
             'kline_stale': kline_stale, 'signal': signal, 'exec_info': exec_info}
 
 
+def persist_sell_signals(pos_results):
+    """落盘当日卖点引擎结论 (2026-09-19新增, 供 review_sells 对照卖出后走势)
+
+    logs/sell_signals.json: { 日期: {ts, signals:[...]} } — 同日重跑覆盖为最新(幂等)。
+    记录的是最终生效 signal(含 Top1 覆盖规则改写后的), 供日后核对"引擎说卖→实际卖后走势"。
+    """
+    rows = []
+    for pos, r in pos_results:
+        if not r or not r.get('signal'):
+            continue
+        s = r['signal']; q = r.get('quote') or {}
+        rows.append({
+            'code': pos.get('code'), 'name': pos.get('name'),
+            'gap_pct': r.get('gap_pct'), 'open': q.get('open'),
+            'prev_close': q.get('prev_close'), 'current': q.get('current'),
+            'action': s.get('action'), 'urgency': s.get('urgency'),
+            'kind': s.get('kind', ''), 'reason': s.get('reason'),
+            'detail': s.get('detail', ''), 'ref_price': s.get('reference_price'),
+        })
+    if not rows:
+        return
+    path = os.path.join(LOG_DIR, 'sell_signals.json')
+    hist = {}
+    if os.path.exists(path):
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                hist = json.load(f)
+        except Exception:
+            hist = {}
+    hist[datetime.now().strftime('%Y-%m-%d')] = {
+        'ts': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'signals': rows}
+    try:
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(hist, f, ensure_ascii=False, indent=1)
+    except Exception:
+        pass
+
+
 def compute_environment(pf):
     """静默计算市场环境评级+买入开关 (2026-08-20: 供决策摘要先行打印)
     A式(2026-09-07用户拍板): 仓位恒定55%, 温度只展示不控仓; 风控交个股层
@@ -478,7 +516,13 @@ def stock_scoring_meta(code):
             except Exception:
                 pass
         # K线新鲜度守卫 (2026-09-03修复): 末bar须覆盖T-1池日期, 否则错日bar×错日明细混评
-        meta['kline_fresh'] = True
+        # 2026-09-22修复: 原守卫只判下界(末bar陈旧), 漏判上界 —— 末bar超前于T-1池日期
+        # (盘后/盘中重算时K线已含当日bar)同样造成错日混评(实测爱普股份同日 -25 分 vs -1 分)。
+        # 故先截断至T-1池日期再评分, 与 v3_sim_hold.py 的 _kk=[b for b in kl if b.date<=D] 同口径。
+        # 2026-09-22修复: 原恒置True —— K线文件缺失(如次新股601123从未下载)时守卫失效,
+        # score=None 一路回退到默认0分混入排序(该票当日 -9.27%)。无K线一律判不可信。
+        meta['kline_fresh'] = bool(meta['klines'])
+        _pdate = None
         try:
             from zt_pool import get_prev_pool_file
             _pfn = get_prev_pool_file()
@@ -488,11 +532,15 @@ def stock_scoring_meta(code):
         except Exception:
             pass
         if meta['klines']:
+            _kl = meta['klines']
+            if _pdate:
+                _cut = [b for b in _kl if str(b.get('date')) <= _pdate]
+                if _cut:
+                    _kl = _cut
             from scoring import score_active
-            sc, _ = score_active(code, meta['klines'], meta['detail'] or {})
+            sc, _ = score_active(code, _kl, meta['detail'] or {})
             if sc is None:
                 # 末日非涨停(断板持仓) → 截取至最近一次涨停日打分(与池内口径一致)
-                _kl = meta['klines']
                 _idx = None
                 for i in range(len(_kl) - 1, 0, -1):
                     _pc = _kl[i].get('pct_change')
@@ -535,7 +583,7 @@ def today_top1_code():
         gap = s.get('gap_pct', 0)
         if not code or code.startswith(('300', '301', '688', '8', '9')):
             continue
-        if s.get('one_line') or s.get('high_risk'):
+        if s.get('one_line'):
             continue
         w = _gw(gap)
         if w <= 0:
@@ -546,7 +594,12 @@ def today_top1_code():
             continue
         if not meta or meta.get('score') is None:
             continue
-        sc = meta['score'] * w * (1.2 if code in _ice else 1.0)
+        # 2026-09-22修复: 冰点加权须符号感知, 与 buyable 侧(见 _ws 计算)同口径。
+        # 原 `* 1.2` 对 V3 负分是【更低】=降权 → 与表1的Top1不一致, 会让"Top1仍是持仓
+        # 则不卖"判错票(09-17 已修 buyable 侧, 此处漏改)。
+        _fs = meta['score']
+        _ike = ((1.2 if _fs > 0 else 0.8) if code in _ice else 1.0)
+        sc = _fs * _ike * w
         if sc > best_w:
             best_w, best = sc, code
     return best
@@ -629,6 +682,8 @@ def main():
                                 'detail': '2026-09-12拍板: 模型连续选中同一标的时不触发卖出'}
             _new.append((_pos, _r))
         pos_results = _new
+    # 落盘最终生效的卖点结论 (2026-09-19新增, 供 review_sells 对照卖出后走势)
+    persist_sell_signals(pos_results)
     env_info = compute_environment(pf)
     # ── 🧊 冰点修复信号 (2026-09-08晚用户拍板A+B) ──
     ice_repair = ice_repair_stocks(env_info)
@@ -684,6 +739,7 @@ def main():
     # ── 持仓 + 卖点判断 (详情解释, 用缓存结果) ──
     if pf:
         pos_advice = []
+        break_rows = []
         for pos, r in pos_results:
             name = pos['name']; code = pos['code']
             cost = pos['buy_price']; shares = pos['shares']
@@ -696,6 +752,16 @@ def main():
             if r is not None:
                 quote = r['quote']
                 gap_pct = r['gap_pct']
+
+                # 📉 断板去留分层背景 (2026-09-19, 仅全量模式收集; 独立块在表3后渲染)
+                if not quick:
+                    try:
+                        from break_layer import break_layer_context as _blc
+                        _brk = _blc(code, name, gap_pct)
+                        if _brk:
+                            break_rows.append(_brk)
+                    except Exception:
+                        pass
 
                 # ── 双源交叉验证 (腾讯vs新浪, 偏差>0.5%标红) ──
                 issues = r['issues']
@@ -753,21 +819,8 @@ def main():
                         print(f'  ║')
                         print(f'  ║  {prev["date"]} (H+O)/2=({prev["high"]}+{prev["open"]})/2={ho2_prev}')
                         print(f'  ║  {last["date"]} (H+O)/2=({last["high"]}+{last["open"]})/2={ho2_last}')
-                    # 连板+高危检查
-                    if len(klines) >= 3:
-                        cons = 0; j = len(klines) - 2
-                        while j >= 1:
-                            if klines[j].get('pct_change', 0) >= 9.9 or \
-                               (j > 0 and klines[j]['close'] >= round(klines[j-1]['close']*1.10, 2) - 0.005):
-                                cons += 1; j -= 1
-                            else: break
-                        board_num = cons + 1
-                        last_k = klines[-1]
-                        is_ol = (last_k['high']>0 and last_k['low']>0 and
-                                 (abs(last_k['high']-last_k['low'])<0.001 or
-                                  (last_k['high']>last_k['low'] and abs(last_k['close']-last_k['high'])<0.001)))
-                        if board_num >= 4 and is_ol:
-                            print(f'  ║  ⚠ 高危: {board_num}板一字/T字板, 回撤风险极高')
+                    # 2026-09-22 删除「4板+一字/T字=回撤风险极高」提示:
+                    # 该规则非A体系, 且 A 的 4板+ 买入均+4.29%(43%胜) 优于 3板及以下 −0.79%(23%胜)
                     break
 
             print(f'  ╚══════════════════════════════════════════╝')
@@ -786,6 +839,31 @@ def main():
                 print(f'    建议: {p["reason"]}')
                 if p['exec_note']:
                     print(f'    执行: {p["exec_note"]}')
+
+        # ── 📉 断板去留分层 (2026-09-19新增, 仅全量; 背景概率层不替代卖点引擎) ──
+        if break_rows and not quick:
+            print(f'\n{"=" * 65}')
+            print(f'  📉 断板去留分层 (持仓昨断板: 历史分层背景, 供去留参考)')
+            print(f'{"=" * 65}')
+            for br in break_rows:
+                _tier_txt = '3-4板' if br['tier'] == '34' else '5板+'
+                _rec = '收阳' if br['recover'] else '收阴'
+                st = br['stat']; bl = br['baseline']
+                print(f"  {br['name']}({br['code']}) {br['streak']}连板 → {br['break_date']}断板日: "
+                      f"gap{br['break_gap']:+.1f}% {_rec} {br['break_pct']:+.1f}%")
+                print(f"    今日竞价gap {br['gap_pct']:+.1f}% → {_tier_txt}同类(检验段n={st['n']}): "
+                      f"次日中位{st['d1']:+.2f}% 上涨{st['up']}% 反包{st['fb']}% "
+                      f"(段基线{bl['d1']:+.2f}%/{bl['up']}%)")
+                print(f"    参考: {br['note']}")
+                if br['special']:
+                    sp = br['special']
+                    if sp['valid']:
+                        print(f"    ⚡ 断板日深水拉回收阳(强承接, {_tier_txt}专属): n={sp['n']} "
+                              f"次日中位{sp['d1']:+.2f}% 上涨{sp['up']}% "
+                              f"(深水溃败对照{sp['fail']['d1']:+.2f}%/{sp['fail']['up']}%)")
+                    else:
+                        print(f"    ⚠ 断板日深水拉回收阳: 该组合仅5板+成立, 本票{br['streak']}板不适用 "
+                              f"(3-4板同类 n={sp['n']} 仅{sp['d1']:+.2f}%/{sp['up']}%涨, 深水即坏消息)")
 
     # ── 加载今日竞价数据 ──
     today_auction_file = os.path.join(BASE, 'data', 'auction',
@@ -808,10 +886,13 @@ def main():
     _stale_cnt = 0
     # 评分量纲守卫(2026-09-13): 快照/候选分由盘后流水线按当时active写入,
     # 与现行active版本不符时(如候选是V4分而现行是V3)禁止兜底, 防旧量纲分污染排序
-    _active_ver = str((_lc_ver() or {}).get('active', 'v4')).lower()
+    _cfg_ver = _lc_ver() or {}
+    _active_ver = str(_cfg_ver.get('active', 'v4')).lower()
+    _win_lo, _win_hi = _cfg_ver.get('buy_window', [0.0, 8.0])
     _cand_ver = str((data or {}).get('version', '')).lower()
     _ver_ok = bool(_cand_ver) and _cand_ver == _active_ver
     _unit_cnt = 0
+    _nosco_cnt = 0
     for s in auction_stocks:
         code = s.get('code', '')
         gap = s.get('gap_pct', 0)
@@ -819,12 +900,11 @@ def main():
         is_300 = code.startswith(('300', '301', '688', '8', '9'))
         cand = candidate_scores.get(code, {})
 
-        if is_300 or is_one_line or s.get('high_risk', False):
+        if is_300 or is_one_line:
             continue
-        # 4板+一字/T字高危过滤 (2026-09-03修复: 定稿2026-08-24裁决, T字次日开盘买入-1.17%)
-        if int(cand.get('cons', 0) or 0) >= 4 and cand.get('one_line', False):
-            continue
-        # gap窗口 (2026-09-13改硬边界4-8%: 对齐v3_sim_hold.py模拟口径; V3负分域乘法会反转)
+        # (2026-09-22 删除「4板+一字/T字高危过滤」: 非A体系规则, A实际会买该类票并获利)
+        # gap窗口 (2026-09-13改硬边界; 2026-09-22下限4→0, 依据见 tests/test_gap_weight.py;
+        #              对齐v3_sim_hold.py模拟口径 —— 该脚本已改为读同一份配置; V3负分域乘法会反转)
         _gw = _gw_fn(gap)
         if _gw > 0:
             meta = stock_scoring_meta(code)
@@ -832,13 +912,18 @@ def main():
                 _stale_cnt += 1
                 continue
             auction_score = s.get('score', 0)
-            cand_score = cand.get('score', 0)
+            cand_score = cand.get('score')   # 不给默认0: 缺值≠0分(V3负分域0是合法分)
             # 现场评分优先(与表2细则同源)
             if meta['score'] is not None:
                 final_score = meta['score']
-            elif _ver_ok:
+            elif _ver_ok and cand_score is not None:
                 # 兜底仅同量纲时启用(见循环前守卫说明)
                 final_score = auction_score if auction_score > 0 else cand_score
+            elif cand_score is None:
+                # 2026-09-22修复: 现场评分失败且无候选分(票被活跃度过滤/K线不足) → 不入池,
+                # 原 cand.get('score',0) 的默认0会把"无分"伪装成"0分"参与排序
+                _nosco_cnt += 1
+                continue
             else:
                 _unit_cnt += 1
                 continue
@@ -862,7 +947,9 @@ def main():
             })
 
     if _stale_cnt:
-        print(f'  ⚠ K线滞后跳过 {_stale_cnt} 只候选(未覆盖T-1涨停bar, 防错日评分)')
+        print(f'  ⚠ K线滞后/缺失跳过 {_stale_cnt} 只候选(未覆盖T-1涨停bar, 防错日评分)')
+    if _nosco_cnt:
+        print(f'  ⚠ 现场评分失败且无候选分跳过 {_nosco_cnt} 只(防默认0分污染排序)')
     if _unit_cnt:
         _cv = _cand_ver or '?'
         print(f'  ⚠ 量纲不符跳过 {_unit_cnt} 只(快照分版本"{_cv}"≠现行"{_active_ver}", 防旧分污染排序)')
@@ -918,7 +1005,7 @@ def main():
                   + ('  ✓进可买Top3(已×1.2加权)' if _in_top else '  (未进Top3, 仅提示)'))
     if not quick:
         print(f'\n{"=" * 65}')
-        print(f'  📊 表1: 当日可买前三 (gap硬边界4-8%, 按{"V3" if _active_ver == "v3" else "V4"}评分排序, 已过滤一字/4板+一字/300·688)')
+        print(f'  📊 表1: 当日可买前三 (gap硬边界{_win_lo:.0f}-{_win_hi:.0f}%, 按{"V3" if _active_ver == "v3" else "V4"}评分排序, 已过滤一字/300·688)')
         print(f'{"=" * 65}')
     if top3 and not quick:
         print(f'  {"#":<3}{"标的":<14}{"评分":>6}{"竞价gap":>8}{"连板":>5}{"板块":>9}{"⚠跌停风险":>10}')
@@ -947,7 +1034,7 @@ def main():
     # quick模式: 一行式可买前三 (2026-08-31用户定死: 持仓建议与可买标的必出)
     # A式(2026-09-07): 仓位恒定55%开关恒开, "仅参考"标注逻辑随之移除
     if quick:
-        print(f'\n  ⚡ 可买前三(quick, gap硬边界4-8%, 按{"V3" if _active_ver == "v3" else "V4"}评分排序):')
+        print(f'\n  ⚡ 可买前三(quick, gap硬边界{_win_lo:.0f}-{_win_hi:.0f}%, 按{"V3" if _active_ver == "v3" else "V4"}评分排序):')
         for i, b in enumerate(top3, 1):
             _ice_tag = '🧊' if b.get('ice') else ''
             print(f'    #{i} {_ice_tag}{b["name"]}({b["code"]}) {b["score"]:.0f}分 '
@@ -1003,8 +1090,8 @@ def main():
     # ── 昨日候选（参考） ──
     if data and not quick:
         print(f'\n  --- 昨日候选参考 (T-1={data["date"]}, 已评分) ---')
-        non_one_line = [c for c in data['candidates'][:15] if not c.get('one_line', False)]
-        for i, c in enumerate(non_one_line[:5]):
+        # 2026-09-22 删除「非一字优先」(非A体系规则, A实盘反而偏好一字/T字)
+        for i, c in enumerate(data['candidates'][:5]):
             in_auction = any(a['code'] == c['code'] for a in buyable)
             mark = ' ← 今日竞价池内' if in_auction else ''
             print(f'  #{i+1} {c["name"]}({c["code"]})  {c["score"]:.0f}分  '
@@ -1021,8 +1108,8 @@ def main():
                          for x in pp[0]}
         for r in one_line_watch[:5]:
             cons = max(int(r.get('cons', 1) or 1), file_cons.get(str(r.get('code', '')), 1))
-            warn = '⚠高危' if cons >= 4 else '★优先'
-            print(f'  {r["name"]}({r["code"]}) {cons}板 {warn}')
+            # 2026-09-22: 原 4板+「⚠高危」标签随高危过滤规则一并删除(A实盘会买该类票)
+            print(f'  {r["name"]}({r["code"]}) {cons}板 ★优先')
 
     # ── 🐉 分歧弱转强候选 (半自动提示, 三级分级) ──
     try:

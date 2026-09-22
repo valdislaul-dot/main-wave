@@ -323,6 +323,12 @@ def capture_auction(force=False):
     snapshot = []
     buyable_count = 0
     gap_dist = defaultdict(int)  # gap分布
+    # 可买域跟随现行买入窗口配置 (原硬编码 4.0-8.0, 2026-09-22 下限改 0 后此处漏改)
+    try:
+        from scoring import get_buy_window
+        _win_lo, _win_hi = get_buy_window()
+    except Exception:
+        _win_lo, _win_hi = 0.0, 8.0
 
     for code in sorted(target_codes):
         info = target_info.get(code, {})
@@ -334,11 +340,10 @@ def capture_auction(force=False):
         gap = q.get('gap_pct', 0)
         # 连板数取多源最大(state可能少算, 昨日池文件最准)
         limit_days = max(int(info.get('limit_days', 1) or 1), file_cons.get(code, 1))
-        # 一字判定: 今日竞价gap≈10%=今日一字买不到; 昨日一字(候选one_line)用于4板+一字高危过滤
-        one_line_prev = info.get('one_line', False)
+        # 一字判定: 今日竞价gap≈10%=今日一字买不到
+        # (2026-09-22 删除「连板>=4 且 昨日一字/T字」高危过滤: 非A体系规则, A实际会买该类票)
         is_one_line = gap >= 9.5
-        high_risk = limit_days >= 4 and one_line_prev
-        buyable = 4.0 <= gap <= 8.0 and not is_one_line and not high_risk
+        buyable = _win_lo <= gap <= _win_hi and not is_one_line
 
         if buyable:
             buyable_count += 1
@@ -366,7 +371,6 @@ def capture_auction(force=False):
             'score': info.get('score', 0),
             'limit_days': limit_days,
             'one_line': is_one_line,
-            'high_risk': high_risk,
             'buyable': buyable,
         }
         snapshot.append(entry)

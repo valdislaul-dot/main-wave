@@ -128,10 +128,9 @@ def default_scoring_config():
             "prob":     [[75, 40], [55, 33], [35, 30], [20, 25], [10, 20], [-99, 14]],
             "position": [[40, 100], [20, 50], [-99, 33]]
         },
-        "buy_window": [4.0, 8.0],
+        "buy_window": [0.0, 8.0],
         "filters": {
-            "true_one_line_skip":  True,
-            "board4_one_line_skip": True
+            "true_one_line_skip":  True
         }
     }
 
@@ -663,18 +662,6 @@ def gap_weight(gap, config=None):
     if gap > hi:
         return (hi + band - gap) / band
     return 1.0
-
-
-def should_filter(one_line, true_one_line, cons, config=None):
-    """返回 (filtered: bool, reason: str)"""
-    if config is None:
-        config = load_config()
-    filters = config['filters']
-    if filters.get('true_one_line_skip') and true_one_line:
-        return True, "真一字板(买不到)"
-    if filters.get('board4_one_line_skip') and one_line and cons >= 4:
-        return True, "4板+一字/T字(高危)"
-    return False, ""
 
 
 # ============================================================

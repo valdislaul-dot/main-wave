@@ -42,9 +42,8 @@ for s in auction_stocks:
     is_300 = code.startswith(('300', '301', '688', '8', '9'))
     cand = candidate_scores.get(code, {})
 
-    if is_300 or is_one_line or s.get('high_risk', False):
-        continue
-    if int(cand.get('cons', 0) or 0) >= 4 and cand.get('one_line', False):
+    # 2026-09-22: 删「4板+一字/T字」高危过滤(非A体系); 真一字(今日gap≈10%)保留
+    if is_300 or is_one_line:
         continue
     _gw = gap_weight(gap)
     if _gw > 0:

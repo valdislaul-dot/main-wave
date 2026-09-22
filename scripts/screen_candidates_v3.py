@@ -301,10 +301,8 @@ def main():
 
     results.sort(key=lambda x: x['prob'], reverse=True)
 
-    non_one_line = [r for r in results if not r['one_line']]
-    if len(non_one_line) >= 3:
-        top3 = sorted(non_one_line, key=lambda x: x['prob'], reverse=True)[:3]
-    elif results:
+    # 2026-09-22 删除「非一字优先」(非A体系规则, A实盘反而偏好一字/T字: 31.3% vs 基线 7.6%)
+    if results:
         top3 = sorted(results, key=lambda x: x['prob'], reverse=True)[:3]
     else:
         top3 = []

@@ -202,7 +202,7 @@ def main():
             'code': code, 'name': name,
             'score': score, 'vr20': details.get('vr', 0),
             'gap': details.get('gap', 0), 'cons': details.get('cons', 1),
-            # 2026-09-03修复: 4板+一字/T字过滤定稿(2026-08-24)含T字, 原只写真一字致T字漏网
+            # 2026-09-22: 「4板+一字/T字高危过滤」已删除(非A体系规则, A实盘会买该类票并获利)
             'one_line': details.get('board_type') in ('一字', 'T字'),
             'true_one_line': details.get('board_type') == '一字',
             'open': k['open'], 'close': k['close'],
@@ -219,9 +219,7 @@ def main():
     one_line_today = [r for r in results if r.get('true_one_line', False)]
     preferred_pick_temp = None
     safe_temp = [r for r in results if not r.get('true_one_line', False)]
-    safe_temp = [r for r in safe_temp if not (r.get('one_line') and r.get('cons', 1) >= 4)]
-    non_one_temp = [r for r in safe_temp if not r['one_line']]
-    if non_one_temp: preferred_pick_temp = non_one_temp[0]
+    if safe_temp: preferred_pick_temp = safe_temp[0]
 
     output = {
         'date': today, 'version': version,
@@ -240,12 +238,9 @@ def main():
 
     # Filter
     safe = [r for r in results if not r.get('true_one_line', False)]
-    safe = [r for r in safe if not (r.get('one_line') and r.get('cons', 1) >= 4)]
-    non_one_line = [r for r in safe if not r['one_line']]
-
-    if len(non_one_line) >= 3:
-        top3_by_score = sorted(non_one_line, key=lambda x: x['score'], reverse=True)[:3]
-    elif len(safe) >= 3:
+    # 2026-09-22 删除「非一字优先」(源自首个 commit a87cb59, 非A体系):
+    # A实盘一字/T字买入占 31.3% vs 池子基线 7.6%(窗口内 9.3%) = 3.4~4.1x, A反而偏好该类
+    if len(safe) >= 3:
         top3_by_score = sorted(safe, key=lambda x: x['score'], reverse=True)[:3]
     else:
         top3_by_score = sorted(results, key=lambda x: x['score'], reverse=True)[:3]
@@ -255,7 +250,7 @@ def main():
     # Output
     print(f'\n{"="*85}')
     print(f' 明日候选清单 | {today} 涨停股筛选 | {version}评分 | 6+年数据校准')
-    print(f' 排除300/301/688/科创 | 一字板跳过 | 4板+一字过滤')
+    print(f' 排除300/301/688/科创 | 一字板跳过')
     print(f'{"="*85}')
     print(f'{"#":<3} {"代码":<8} {"名称":<8} {"评分":>5} {"量比":>5} {"gap":>6} {"板":>3} {"一":>3} {"换手":>5} {"首封":>8} {"回封":>5}分 {"炸":>2}次 {"末封":>8} {"行业":<8}')
     print(f'{"-"*100}')
@@ -270,32 +265,29 @@ def main():
     if preferred_pick:
         preferred = preferred_pick
         sc = preferred['score']
-        lo = preferred['close'] * 1.04; hi = preferred['close'] * 1.08
+        _wlo, _whi = get_buy_window()
+        lo = preferred['close'] * (1 + _wlo / 100); hi = preferred['close'] * (1 + _whi / 100)
         print(f'\n>> 首选: {preferred["name"]}({preferred["code"]}) 评分{sc:.0f} 量比{preferred["vr20"]:.1f}x')
-        print(f'>> 仓位: 由温度开关决定(极弱空仓/弱市半仓/强市全仓), 门槛50分')
-        print(f'>> 买入区间: {lo:.2f} - {hi:.2f} (竞价涨幅4%-8%)')
+        print(f'>> 仓位: A式恒定55% (2026-09-07拍板, 温度仅展示不控仓)')
+        print(f'>> 买入区间: {lo:.2f} - {hi:.2f} (竞价涨幅{_wlo:g}%-{_whi:g}%)')
         if len(top3_by_score) > 1:
             print(f'>> 备选: {top3_by_score[1]["name"]}({top3_by_score[1]["code"]}) | {top3_by_score[2]["name"]}({top3_by_score[2]["code"]})')
-        risky_ol = [r for r in results if r.get('one_line') and r.get('cons', 1) >= 4]
-        if risky_ol:
-            names = ','.join(r['name'] for r in risky_ol[:3])
-            print(f'>> [!] 已过滤高位一字板: {names}')
 
     # 一字板隔日关注
     one_line_today = [r for r in results if r.get('true_one_line', False)]
     if one_line_today:
         print(f'\n{"="*85}')
         print(f' [!] 一字板隔日关注 | 今日一字板({len(one_line_today)}只) -> 次日68%可交易, 连板率60.5%')
-        print(f' 次日若竞价落入4-8%区间, 是重要加分项')
+        _wlo2, _whi2 = get_buy_window()
+        print(f' 次日若竞价落入{_wlo2:g}-{_whi2:g}%区间, 是重要加分项')
         print(f'{"="*85}')
         print(f'{"代码":<8} {"名称":<8} {"连板":>4} {"换手":>6} {"行业":<10} {"次日关注点"}')
         print(f'{"-"*65}')
         for r in one_line_today[:10]:
             cons = r.get('cons', 1)
             ref = r['close']
-            lo = round(ref * 1.04, 2); hi = round(ref * 1.08, 2)
-            warn = '[!]高危' if cons >= 4 else '[*]优先'
-            print(f'{r["code"]:<8} {r["name"]:<8} {cons:>3}板 {r["turnover"]:>5.1f}% {r["industry"]:<10} {warn} 区间{lo}-{hi}')
+            lo = round(ref * (1 + _wlo2 / 100), 2); hi = round(ref * (1 + _whi2 / 100), 2)
+            print(f'{r["code"]:<8} {r["name"]:<8} {cons:>3}板 {r["turnover"]:>5.1f}% {r["industry"]:<10} [*]优先 区间{lo}-{hi}')
         print(f'{"="*85}')
 
     print(f'\n[Screen] 评分完成: {len(results)}只 | 缺K线/评分失败: {score_fail}只')

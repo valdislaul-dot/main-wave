@@ -4,13 +4,20 @@
 源自: 资料/妖股研究_强连板发现体系.md (research_streaks.py 回测)
 只提示不自动交易 (与「🐉分歧候选」同套路)。
 
-指纹层(盘后): 涨停池筛 2~4 板股, 命中 4 条件:
+指纹层(盘后): 涨停池筛 2~4 板股, 命中 3 条件:
   ① 量比缩量  (2板<0.8x 极度缩量 / 3-4板<1.2x 缩量不爆量)
-  ② 启动价 <30 元   (连板起点前收盘价, 低价股接力成本低)
-  ③ 前20日涨幅 +3~8% (温和蓄势, 非超跌反弹)
-  ④ 板块 >= 2 只    (同行业涨停家数, 题材共振)
+  ② 启动价 <10 元   (连板起点前收盘价)
+  ③ 板块 >= 2 只    (同题材共振家数)
 
-晋级层(次日竞价 --next): 指纹股验证 竞价gap 4-8%
+2026-09-21 修订 (依据 09-19 独立全样本复现, 12636 个2板事件, 基线成妖率 2.03%):
+  - 删除原条件③「前20日涨幅 +3~8%」—— 复现成妖率 2.12% / 1.04x, 零增量
+  - 启动价阈值 30元 → 10元 —— 复现 <10元 2.76%(1.36x), 10-30元 降至 1.42%(0.70x)
+  - 板块计数改用 scoring.sector_resonance_count —— 原 Counter 整串匹配在同花顺
+    复合原因串下恒等于 1, 条件③自 2026-08-20 换源起永远为假 (模块哑了一个月)
+  报告: logs/analysis/yaogu_theory_verification_2026-09-19.md §5
+
+晋级层(次日竞价 --next): 指纹股验证 竞价gap 落在现行买入窗口内
+  (窗口由 scoring_config.json buy_window 提供; 2026-09-22 下限 4→0)
 
 用法:
   python yao_watch.py          # 盘后: 出指纹股清单 (存 logs/yao_watch.json)
@@ -18,7 +25,8 @@
 """
 import json, os, sys, glob
 from datetime import datetime
-from collections import Counter
+
+from scoring import sector_resonance_count, get_buy_window
 
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ZT_STATE = os.path.join(BASE, 'data', 'zt_pool_state.json')
@@ -26,12 +34,11 @@ KLINE_DIR = os.path.join(BASE, 'data', 'kline_data')
 AUCTION_DIR = os.path.join(BASE, 'data', 'auction')
 WATCH_FILE = os.path.join(BASE, 'logs', 'yao_watch.json')
 
-# 指纹阈值 (源自报告发现5/6/8)
+# 指纹阈值 (源自报告发现5/6/8; 2026-09-21 按 09-19 复现结果修订)
 BOARD_MIN, BOARD_MAX = 2, 4   # 观察 2~4 板
-PRICE_MAX = 30.0              # 启动价 < 30元
-PRE20_MIN, PRE20_MAX = 3.0, 8.0   # 前20日涨幅 +3~8%
-SECTOR_MIN = 2                # 板块 >= 2只
-GAP_MIN, GAP_MAX = 4.0, 8.0   # 晋级: 竞价 gap 4-8%
+PRICE_MAX = 10.0              # 启动价 < 10元
+SECTOR_MIN = 2                # 同题材共振 >= 2只
+GAP_MIN, GAP_MAX = get_buy_window()   # 晋级判据跟随现行买入窗口(2026-09-22起不再硬编码)
 
 
 def _vol_ratio_max(board):
@@ -132,7 +139,7 @@ def main():
     with open(ZT_STATE, encoding='utf-8') as f:
         state = json.load(f)
     stocks = state.get('stocks', [])
-    sector_cnt = Counter(str(s.get('industry', '')) for s in stocks)
+    _all_industries = [s.get('industry', '') for s in stocks]
 
     hits = []
     near = []  # 接近命中(缺1个条件)
@@ -148,18 +155,17 @@ def main():
             continue
         fp['name'] = name
         fp['industry'] = s.get('industry', '')
-        fp['sector'] = sector_cnt.get(s.get('industry', ''), 1)
+        fp['sector'] = sector_resonance_count(s.get('industry', ''), _all_industries)
 
         vol_max = _vol_ratio_max(board)
         conds = {
             f'量比<{vol_max}x': fp['vol_ratio'] < vol_max,
-            f'启动<{PRICE_MAX}元': fp['start_price'] < PRICE_MAX,
-            '前20日+3~8%': fp['pre20'] is not None and PRE20_MIN <= fp['pre20'] <= PRE20_MAX,
+            f'启动<{PRICE_MAX:.0f}元': fp['start_price'] < PRICE_MAX,
             f'板块≥{SECTOR_MIN}只': fp['sector'] >= SECTOR_MIN,
         }
         fp['conds'] = conds
         n_ok = sum(conds.values())
-        if n_ok == 4:
+        if n_ok == len(conds):
             hits.append(fp)
         elif n_ok >= 2:
             fp['miss'] = [k for k, v in conds.items() if not v]
@@ -168,24 +174,28 @@ def main():
     print('=' * 60)
     print(f'  妖股指纹层 — 涨停池 {len(stocks)} 只, 观察 {BOARD_MIN}-{BOARD_MAX} 板')
     print('=' * 60)
-    print(f'  阈值: 量比(2板<0.8x/3-4板<1.2x) | 启动<{PRICE_MAX}元 | 前20日+{PRE20_MIN}~{PRE20_MAX}% | 板块≥{SECTOR_MIN}只')
+    print(f'  阈值: 量比(2板<0.8x/3-4板<1.2x) | 启动<{PRICE_MAX:.0f}元 | 板块≥{SECTOR_MIN}只'
+          f'  [前20日涨幅仅展示, 不参与筛选]')
     print('-' * 60)
+
+    def _pre20(h):
+        return f"{h['pre20']:+.1f}%" if h['pre20'] is not None else 'n/a'
 
     if hits:
         hits.sort(key=lambda x: x['vol_ratio'])
-        print(f'  ⭐ 命中 {len(hits)} 只 (4条件全中):')
+        print(f'  ⭐ 命中 {len(hits)} 只 (3条件全中):')
         for h in hits:
             print(f"    {h['name']}({h['code']}) {h['board']}板 {h['industry']} | "
-                  f"量比{h['vol_ratio']:.2f}x 启动{h['start_price']:.2f}元 前20日{h['pre20']:+.1f}% 板块{h['sector']}只")
+                  f"量比{h['vol_ratio']:.2f}x 启动{h['start_price']:.2f}元 板块{h['sector']}只 前20日{_pre20(h)}")
     else:
-        print('  ⭐ 命中 0 只 (4条件全中)')
+        print('  ⭐ 命中 0 只 (3条件全中)')
 
     if near:
         near.sort(key=lambda x: -sum(x['conds'].values()))
-        print(f'\n  ◐ 接近命中 {len(near)} 只 (缺1-2个条件):')
+        print(f'\n  ◐ 接近命中 {len(near)} 只 (缺1个条件):')
         for h in near:
             print(f"    {h['name']}({h['code']}) {h['board']}板 {h['industry']} | "
-                  f"量比{h['vol_ratio']:.2f}x 启动{h['start_price']:.2f}元 前20日{h['pre20']:+.1f}% 板块{h['sector']}只 "
+                  f"量比{h['vol_ratio']:.2f}x 启动{h['start_price']:.2f}元 板块{h['sector']}只 前20日{_pre20(h)} "
                   f"→ 缺: {'、'.join(h['miss'])}")
     else:
         print('\n  ◐ 接近命中 0 只')

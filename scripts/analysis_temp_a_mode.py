@@ -10,7 +10,8 @@ A模式规则(日线近似, 源自 trader_a.strategy_notes + 两笔案例):
   卖出: 持有中每日: 涨停→持有; 断板→若H>=涨停价按涨停价卖(挂单), 否则开盘价卖;
         盘中low<=买价*0.9→硬止损
 现有体系(对照组, 与backtest_v4口径一致):
-  候选: T-1池内V4评分Top1, gap4-8%平滑窗, 过滤一字/4板+一字T字
+  候选: T-1池内V4评分Top1, gap4-8%平滑窗, 过滤一字
+  (2026-09-22 口径变更: 原含「4板+一字T字」过滤, 已删 — 非A体系, 复现旧报告需回退该行)
   卖出: 昨涨停低开弱转强失败→HIGH卖 / 昨断板gap<4→HIGH卖 / 硬止损-10% / 否则留
 """
 import json, os, sys
@@ -311,7 +312,8 @@ def backtest_current(ktbl, pools, dates_fmt):
                     j -= 1
                 lu_px = round(k0['close'] * 1.10, 2)
                 btype = '一字' if (k1['open'] >= lu_px - 0.005 and k1['low'] >= lu_px - 0.005) else 'T字' if (k1['open'] >= lu_px - 0.005 and k1['close'] >= lu_px - 0.005) else '换手'
-                if btype == '一字' or (cons >= 4 and btype in ('一字', 'T字')):
+                # 2026-09-22: 删「4板+一字/T字」高危过滤(非A体系); 真一字保留(买不到)
+                if btype == '一字':
                     continue
                 vr = vr20(kls, idx)
                 gap = (k1['open'] - k0['close']) / k0['close'] * 100
@@ -370,7 +372,8 @@ def backtest_fusion(ktbl, pools, dates_fmt):
             j -= 1
         lu_px = round(k0['close'] * 1.10, 2)
         btype = '一字' if (k1['open'] >= lu_px - 0.005 and k1['low'] >= lu_px - 0.005) else 'T字' if (k1['open'] >= lu_px - 0.005 and k1['close'] >= lu_px - 0.005) else '换手'
-        if btype == '一字' or (cons >= 4 and btype in ('一字', 'T字')):
+        # 2026-09-22: 删「4板+一字/T字」高危过滤(非A体系); 真一字保留(买不到)
+        if btype == '一字':
             return None
         vr = vr20(kls, idx)
         gap = (k1['open'] - k0['close']) / k0['close'] * 100

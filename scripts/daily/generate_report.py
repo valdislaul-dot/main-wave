@@ -2,7 +2,7 @@
 生成每日 Markdown 报告
 被 run_pipeline.py 盘后自动调用
 """
-import json, os
+import json, os, sys
 BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime, timedelta
 
@@ -139,11 +139,18 @@ def generate():
 
     if cand_data and cand_data['candidates']:
         cands = sorted(cand_data['candidates'], key=lambda c: -(c.get('score') or 0))[:5]
-        r.append("| # | 代码 | 名称 | 评分 | 量比 | 连板 | 封板 | 仓位 | 竞价观察(4-8%) |")
+        # 窗口动态取自配置 (2026-09-22 下限 4→0; 原硬编码 1.04/1.08 与标题 0-8% 已不一致)
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from scoring import get_buy_window
+            _wlo, _whi = get_buy_window()
+        except Exception:
+            _wlo, _whi = 0.0, 8.0
+        r.append(f"| # | 代码 | 名称 | 评分 | 量比 | 连板 | 封板 | 仓位 | 竞价观察({_wlo:g}-{_whi:g}%) |")
         r.append("|---|------|------|------|------|------|------|------|----------------|")
         for i, c in enumerate(cands):
             ref_close = c['close']
-            lo = ref_close * 1.04; hi = ref_close * 1.08
+            lo = ref_close * (1 + _wlo / 100); hi = ref_close * (1 + _whi / 100)
             seal = c.get('seal_time', '?')
             r.append(f"| {i+1} | {c['code']} | {c['name']} | {c['score']:.0f} | {c['vr20']:.1f}x | {c['cons']}板 | {seal} | 55% | {lo:.2f}-{hi:.2f} |")
 
@@ -162,7 +169,7 @@ def generate():
     if pos_rows:
         r.append("**卖出判断**(V4.1引擎): 昨涨停低开→竞价卖 | 烂板高开→弱转强观察 | 昨断板gap<4%→开盘价卖 | gap≥4%→持有 | 硬止损-10%兜底")
         r.append("")
-    r.append("**买入**(A式): 开关恒开, 竞价面板Top1(综合分=评分×gap权重) gap4-8%平滑窗(边缘3-4/8-9衰减) → 恒定55%仓位；一字板封死 → 顺延备选")
+    r.append("**买入**(A式): 开关恒开, 竞价面板Top1(综合分=评分×gap权重) gap硬边界0-8%(低开排除) → 恒定55%仓位；一字板封死 → 顺延备选")
     r.append("")
     r.append("---")
     r.append("")

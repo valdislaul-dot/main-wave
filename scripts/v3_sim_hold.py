@@ -76,7 +76,12 @@ def kb(c, d):
 
 
 def pick_of(T):
-    """当日 V3 评分 Top1 (gap4-8%, 排除一字)"""
+    """当日 V3 评分 Top1 (gap窗口读现行配置, 排除一字)
+
+    2026-09-22: 窗口不再硬编码 —— 生产配置改过一次(4→0下限)后,
+    硬编码会让模拟口径与生产悄悄分叉(正是 09-21 发现的"模拟虚高"同类问题)。
+    """
+    _lo, _hi = scoring.get_buy_window()
     prev = [x for x in DAYS if x < T]
     if not prev or T not in auc:
         return None
@@ -97,7 +102,7 @@ def pick_of(T):
         g = s.get('gap_pct')
         if g is None and s.get('open') and s.get('prev_close'):
             g = (s['open'] - s['prev_close']) / s['prev_close'] * 100
-        if g is None or not (4.0 <= float(g) <= 8.0):
+        if g is None or not (_lo <= float(g) <= _hi):
             continue
         if '一字' in (row.get('board_type') or ''):
             continue
