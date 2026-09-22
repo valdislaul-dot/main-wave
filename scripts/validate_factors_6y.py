@@ -218,8 +218,10 @@ def run():
         s, n = dow_data[dow]
         rate = n / s * 100 if s > 0 else 0
         diff = rate - base_rate
-        wt = config['dow_score'].get('monday' if dow == 0 else ('friday' if dow == 4 else None), 0)
-        print(f"{dow_names[dow]:<12} {s:>8} {rate:>7.1f}% {diff:>+7.1f}% {wt:>8}")
+        # 2026-09-23: dow_score 已从配置直接删除(无来源因子, 见 scoring.factor_enabled)
+        _dows = config.get('dow_score')
+        wt = _dows.get('monday' if dow == 0 else ('friday' if dow == 4 else None), 0) if _dows else '已删除'
+        print(f"{dow_names[dow]:<12} {s:>8} {rate:>7.1f}% {diff:>+7.1f}% {str(wt):>8}")
 
 
 if __name__ == '__main__':

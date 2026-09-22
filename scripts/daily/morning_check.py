@@ -1051,7 +1051,7 @@ def main():
         from scoring import load_config as _lc2, score_active
         _cfg2 = _lc2()
         _V3_NAMES = {'vr': '量比', 'gap': 'Gap', 'one_line': '一字板', 'cons': '连板',
-                     'dow': '周几', 'seal_time': '封板', 'zhaban': '炸板',
+                     'seal_time': '封板', 'zhaban': '炸板',
                      'sector': '板块', 'divergence': '分歧'}
         for b in top3:
             meta = stock_scoring_meta(b['code'])

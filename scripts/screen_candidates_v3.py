@@ -2,7 +2,7 @@
 盘后选股 v3.0 — 集成六维动态权重 + Sigmoid概率 + 硬止损
 基于 v2.1，借鉴 zhouyiqing8888/Quantitative 的六维评分思路
 """
-import json, os, time, random, math, requests
+import json, os, sys, time, random, math, requests
 from datetime import datetime, timedelta
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -46,7 +46,8 @@ def fetch_zt_pool(date_yyyymmdd):
     result = []
     for p in pool:
         code = p["c"]
-        if code.startswith(('300', '301', '688')):
+        # 2026-09-23: 补齐 '8','9'(北交所/B股), 与 zt_pool/morning_check 的5处前缀过滤对齐
+        if code.startswith(('300', '301', '688', '8', '9')):
             continue
         result.append({
             'code': code, 'name': p["n"],
@@ -306,7 +307,9 @@ def main():
         top3 = sorted(results, key=lambda x: x['prob'], reverse=True)[:3]
     else:
         top3 = []
-    top3_pick = sorted(top3, key=lambda x: x['vr20'])[0] if top3 else None
+    # 2026-09-23: 原 tie-break=取最低 vr20(隐性偏好缩量, 与A实际买入U型分布不符),
+    # 改为与 screen_candidates.py 同口径: 首选=top3 内概率最高(已是降序)
+    top3_pick = top3[0] if top3 else None
 
     print(f'\n{"="*110}')
     print(f' V3.0 候选清单 | {today} | 六维动态权重 + Sigmoid概率 | 首板/连板分别加权')
@@ -322,7 +325,14 @@ def main():
     if top3_pick:
         print(f'\n>> V3首选: {top3_pick["name"]}({top3_pick["code"]}) '
               f'连板概率{top3_pick["prob"]:.1f}% 评分{top3_pick["score"]:.0f}')
-        lo = top3_pick["close"] * 1.04; hi = top3_pick["close"] * 1.08
+        # 窗口动态取自配置 (2026-09-23: 原硬编码 1.04/1.08, 09-22 下限改0后此处漏改)
+        try:
+            sys.path.insert(0, os.path.join(BASE, 'scripts', 'daily'))
+            from scoring import get_buy_window
+            _wlo, _whi = get_buy_window()
+        except Exception:
+            _wlo, _whi = 0.0, 8.0
+        lo = top3_pick["close"] * (1 + _wlo / 100); hi = top3_pick["close"] * (1 + _whi / 100)
         print(f'>> 买入区间: {lo:.2f} - {hi:.2f}')
 
     output = {

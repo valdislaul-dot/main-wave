@@ -1,12 +1,6 @@
 {
   "version": "3.2+v4卖点(2026-09-12恢复V3评分)",
   "active": "v3",
-  "_disabled_factors_note": "2026-09-23用户拍板「跟A保持一致」: seal_time/sector/activity_filter 三项在A的两份源资料(干货_怎么选.doc/干货合集-卖点.docx)中均无依据, 全部可追溯到 commit ca5b37e「V3.0」, 暂停使用。从此列表移除即恢复。同类无来源项 dow_score(周一+2/周五-1) 已直接删除。",
-  "disabled_factors": [
-    "seal_time",
-    "sector",
-    "activity_filter"
-  ],
   "buy_window": [
     0.0,
     8.0
@@ -426,6 +420,10 @@
       15
     ],
     "fallback": 5
+  },
+  "dow_score": {
+    "monday": 2,
+    "friday": -1
   },
   "mapping": {
     "prob": [

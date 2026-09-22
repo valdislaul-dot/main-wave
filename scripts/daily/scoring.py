@@ -102,7 +102,8 @@ def default_scoring_config():
         },
         "one_line_score":      {"true_one": 20, "t_board": 10},
         "cons_score":          {"first": -2, "2": 6, "3": 14, "4": 22, "5": 26, "6plus": 30},
-        "dow_score":           {"monday": 2, "friday": -1},
+        # 2026-09-23用户拍板「跟A保持一致」: 以下三项在A的源资料中无依据, 暂停使用
+        "disabled_factors":    ["seal_time", "sector", "activity_filter"],
         "seal_time_tiers":     [[5, 14], [10, 6], [15, 4], [20, 7], [25, 2],
                                  [30, 1], [40, -5], [50, 2], [60, -3], [120, -10], [240, -9]],
         # 基于1,008样本实测: 0-5min=28.4% | 5-10=19.8% | 10-15=18.2% | 15-20=20.8%
@@ -140,6 +141,19 @@ def load_config():
         with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
             return json.load(f)
     return default_scoring_config()
+
+
+def factor_enabled(name, config=None):
+    """无来源因子暂停开关 (2026-09-23用户拍板「跟A保持一致」)
+
+    seal_time / sector / activity_filter 三项在 A 的两份源资料
+    (干货_怎么选.doc / 干货合集-卖点.docx) 中均无依据, 全部可追溯到 commit ca5b37e「V3.0」,
+    暂停使用。生效项由 config['disabled_factors'] 声明, 从列表移除即恢复。
+    (dow_score 周一+2/周五-1 属同类无来源项, 已直接删除而非暂停)
+    """
+    if config is None:
+        config = load_config()
+    return name not in (config.get('disabled_factors') or [])
 
 
 def save_config(cfg):
@@ -312,13 +326,14 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
     t1 = pdb[today_dt]
     cons = t1['cons_lu_before']
 
-    # -------- v3.1: 近1年活跃度过滤 --------
+    # -------- v3.1: 近1年活跃度过滤 (2026-09-23 暂停, 见 factor_enabled) --------
     from datetime import timedelta
-    cutoff = (datetime.strptime(today_dt, '%Y-%m-%d') - timedelta(days=365)).strftime('%Y-%m-%d')
-    recent_lu = sum(1 for dt, entry in pdb.items()
-                    if dt >= cutoff and dt != today_dt and entry['is_limit_up'])
-    if recent_lu < 2:
-        return None, None  # 近1年涨停<2次, 不纳入候选
+    if factor_enabled('activity_filter', config):
+        cutoff = (datetime.strptime(today_dt, '%Y-%m-%d') - timedelta(days=365)).strftime('%Y-%m-%d')
+        recent_lu = sum(1 for dt, entry in pdb.items()
+                        if dt >= cutoff and dt != today_dt and entry['is_limit_up'])
+        if recent_lu < 2:
+            return None, None  # 近1年涨停<2次, 不纳入候选
 
     score = 0.0
     bd = {}  # 分项明细(2026-09-13: 供竞价面板表2还原V3累加制得分; 只记录不参与计算)
@@ -369,23 +384,11 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         bd['cons'] = config['cons_score']['6plus']
     score += bd['cons']
 
-    # -------- 周几 --------
-    tomorrow = datetime.strptime(today_dt, '%Y-%m-%d') + timedelta(days=1)
-    while tomorrow.weekday() >= 5:
-        tomorrow = tomorrow + timedelta(days=1)
-    dow = tomorrow.weekday()
-    bd['dow'] = 0
-    if dow == 0:
-        bd['dow'] = config['dow_score']['monday']
-    elif dow == 4:
-        bd['dow'] = config['dow_score']['friday']
-    score += bd['dow']
-
-    # -------- 封板时间 --------
+    # -------- 封板时间 (2026-09-23 暂停, 见 factor_enabled) --------
     if details_raw is None:
         details_raw = {}
     seal_time = details_raw.get('seal_time', '1459')
-    if seal_time and seal_time != '?':
+    if factor_enabled('seal_time', config) and seal_time and seal_time != '?':
         try:
             # seal_time格式: "092500" 或 "09:25:00" → 转换为距9:30的分钟数
             st_clean = seal_time.replace(':', '')
@@ -422,13 +425,15 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         bd['zhaban'] = -_zb
         score += bd['zhaban']
 
-    # -------- 板块共振 --------
+    # -------- 板块共振 (2026-09-23 暂停, 见 factor_enabled) --------
+    # 注: sector_count 本身仍供 divergence 使用(板块>=2只给满额), 故此处只停加分
     sector_count = details_raw.get('sector_count', 1)
-    for thresh, val in config['sector_tiers']:
-        if sector_count >= thresh:
-            bd['sector'] = val
-            score += val
-            break
+    if factor_enabled('sector', config):
+        for thresh, val in config['sector_tiers']:
+            if sector_count >= thresh:
+                bd['sector'] = val
+                score += val
+                break
 
     # -------- 分歧质量 (2026-08-13新增: 烂板出妖/预期差) --------
     # 爆量+烂板(炸板回封或封板>60min)+收盘涨停 = 大分歧日 → 加分, 修正"烂板一味扣分"
@@ -463,7 +468,6 @@ def compute_score(code, klines, details_raw=None, version='v3', config=None):
         'open': t1['open'],
         'close': t1['close'],
         't2_lu': False,
-        'tomorrow_dow': dow,
         'divergence': div_bonus,
         'vol_class': t1.get('vol_class', 'normal'),
         'v3_breakdown': bd,
@@ -509,13 +513,14 @@ def score_v4(code, klines, details_raw=None, config=None):
     if _i >= 5 and pdb[_ds[_i - 5]].get('close'):
         ret5 = (t1['close'] / pdb[_ds[_i - 5]]['close'] - 1) * 100
 
-    # 活跃度过滤(与v3一致)
+    # 活跃度过滤(与v3一致; 2026-09-23 暂停, 见 factor_enabled)
     from datetime import timedelta
-    cutoff = (datetime.strptime(today_dt, '%Y-%m-%d') - timedelta(days=365)).strftime('%Y-%m-%d')
-    recent_lu = sum(1 for dt, entry in pdb.items()
-                    if dt >= cutoff and dt != today_dt and entry['is_limit_up'])
-    if recent_lu < 2:
-        return None, None
+    if factor_enabled('activity_filter', config):
+        cutoff = (datetime.strptime(today_dt, '%Y-%m-%d') - timedelta(days=365)).strftime('%Y-%m-%d')
+        recent_lu = sum(1 for dt, entry in pdb.items()
+                        if dt >= cutoff and dt != today_dt and entry['is_limit_up'])
+        if recent_lu < 2:
+            return None, None
 
     if details_raw is None:
         details_raw = {}
@@ -699,15 +704,9 @@ def full_breakdown(code, klines, details_raw=None, version='v3', config=None):
     else:
         items.append(('一字/T字', '否', 0))
     items.append(('连板', f'{cons + 1}板', config['cons_score'][{0: 'first', 1: '2', 2: '3', 3: '4', 4: '5'}.get(cons, '6plus')]))
-    tmrw = datetime.strptime(today_dt, '%Y-%m-%d') + timedelta(days=1)
-    while tmrw.weekday() >= 5:
-        tmrw += timedelta(days=1)
-    dow = tmrw.weekday()
-    dow_v = config['dow_score']['monday'] if dow == 0 else (config['dow_score']['friday'] if dow == 4 else 0)
-    items.append(('周几', '周一' if dow == 0 else ('周五' if dow == 4 else '其他'), dow_v))
     seal_time = details_raw.get('seal_time', '1459')
     seal_v, seal_disp = 0, '?'
-    if seal_time and seal_time != '?':
+    if factor_enabled('seal_time', config) and seal_time and seal_time != '?':
         try:
             st_clean = str(seal_time).replace(':', '')
             mins = max(0, (int(st_clean[:2]) - 9) * 60 + int(st_clean[2:4]) - 30)
@@ -739,7 +738,9 @@ def full_breakdown(code, klines, details_raw=None, version='v3', config=None):
             zb_pen = zhaban * config['zhaban']['fallback']
     items.append(('炸板扣分', f'炸{zhaban}次', -zb_pen))
     sector_count = int(details_raw.get('sector_count', 1) or 1)
-    items.append(('板块共振', f'{sector_count}只', next((v for th, v in config['sector_tiers'] if sector_count >= th), 0)))
+    sec_v = next((v for th, v in config['sector_tiers'] if sector_count >= th), 0) \
+        if factor_enabled('sector', config) else 0
+    items.append(('板块共振', f'{sector_count}只', sec_v))
     div_cfg = config.get('divergence', {})
     div_v = 0
     if div_cfg.get('enabled', True):
