@@ -3,6 +3,7 @@ data/kline_data/
 data/zt_pool_history/
 data/dt_block/
 data/minute_kline/
+data/m5_research/
 # auction 纳入版本管理(校准用)
 data/stock_db.json
 data/raw/
