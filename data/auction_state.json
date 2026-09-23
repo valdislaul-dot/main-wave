@@ -1,82 +1,89 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 57,
+  "total_sessions": 58,
   "current": {
-    "date": "2026-09-22",
-    "captured": "2026-09-22 09:25:56",
-    "total": 93,
-    "buyable": 9,
-    "avg_gap": 1.39,
+    "date": "2026-09-23",
+    "captured": "2026-09-23 09:25:42",
+    "total": 58,
+    "buyable": 30,
+    "avg_gap": 1.74,
     "gap_distribution": {
-      "0-2%": 26,
-      "-3-0%": 22,
-      "9%+": 13,
-      "2-5%": 19,
-      "<-3%": 5,
-      "5-9%": 8
+      "0-2%": 14,
+      "5-9%": 3,
+      "-3-0%": 14,
+      "2-5%": 13,
+      "9%+": 7,
+      "<-3%": 7
     },
     "buyable_stocks": [
       {
-        "code": "603316",
-        "name": "诚邦股份",
-        "gap_pct": 5.12,
-        "score": 27.0,
-        "limit_days": 2
+        "code": "001216",
+        "name": "华瓷股份",
+        "gap_pct": 4.5,
+        "score": 138.0,
+        "limit_days": 6
       },
       {
-        "code": "601086",
-        "name": "国芳集团",
-        "gap_pct": 6.17,
-        "score": 22.0,
-        "limit_days": 2
+        "code": "000504",
+        "name": "南华生物",
+        "gap_pct": 0.0,
+        "score": 92.0,
+        "limit_days": 4
       },
       {
-        "code": "002589",
-        "name": "瑞康医药",
-        "gap_pct": 5.83,
-        "score": 19.0,
-        "limit_days": 2
-      },
-      {
-        "code": "002792",
-        "name": "通宇通讯",
-        "gap_pct": 4.52,
-        "score": 11.0,
+        "code": "600770",
+        "name": "综艺股份",
+        "gap_pct": 5.13,
+        "score": 68.0,
         "limit_days": 1
       },
       {
-        "code": "001389",
-        "name": "广合科技",
-        "gap_pct": 7.57,
-        "score": 7.0,
-        "limit_days": 1
-      },
-      {
-        "code": "601123",
-        "name": "马矿股份",
-        "gap_pct": 4.81,
-        "score": 0,
+        "code": "000607",
+        "name": "华媒控股",
+        "gap_pct": 0.0,
+        "score": 67.0,
         "limit_days": 2
       },
       {
-        "code": "600448",
-        "name": "华纺股份",
-        "gap_pct": 7.97,
-        "score": -3.0,
-        "limit_days": 3
-      },
-      {
-        "code": "002388",
-        "name": "新亚制程",
-        "gap_pct": 6.42,
-        "score": -14.0,
-        "limit_days": 1
+        "code": "600664",
+        "name": "哈药股份",
+        "gap_pct": 3.74,
+        "score": 45.0,
+        "limit_days": 2
       },
       {
         "code": "603020",
         "name": "爱普股份",
-        "gap_pct": 7.16,
-        "score": -25.0,
+        "gap_pct": 0.0,
+        "score": 27.0,
+        "limit_days": 2
+      },
+      {
+        "code": "000560",
+        "name": "我爱我家",
+        "gap_pct": 6.55,
+        "score": 26.0,
+        "limit_days": 2
+      },
+      {
+        "code": "000676",
+        "name": "智度股份",
+        "gap_pct": 4.03,
+        "score": 26.0,
+        "limit_days": 1
+      },
+      {
+        "code": "600503",
+        "name": "华丽家族",
+        "gap_pct": 0.0,
+        "score": 25.0,
+        "limit_days": 2
+      },
+      {
+        "code": "600641",
+        "name": "先导基电",
+        "gap_pct": 1.74,
+        "score": 20.0,
         "limit_days": 1
       }
     ]
@@ -816,7 +823,20 @@
         "<-3%": 5,
         "5-9%": 8
       }
+    },
+    {
+      "date": "2026-09-23",
+      "total": 58,
+      "buyable": 30,
+      "gap_distribution": {
+        "0-2%": 14,
+        "5-9%": 3,
+        "-3-0%": 14,
+        "2-5%": 13,
+        "9%+": 7,
+        "<-3%": 7
+      }
     }
   ],
-  "last_update": "2026-09-22"
+  "last_update": "2026-09-23"
 }
