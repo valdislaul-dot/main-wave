@@ -17584,5 +17584,203 @@
     "days_in_pool": 2,
     "last_lu_date": "2026-09-24",
     "limit_days": 2
+  },
+  {
+    "code": "601579",
+    "name": "会稽山",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "001368",
+    "name": "通达创智",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "603396",
+    "name": "金辰股份",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 3,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 3
+  },
+  {
+    "code": "603968",
+    "name": "醋化股份",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "605366",
+    "name": "宏柏新材",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "601218",
+    "name": "吉鑫科技",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 2,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 2
+  },
+  {
+    "code": "002852",
+    "name": "道道全",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "002342",
+    "name": "巨力索具",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "603278",
+    "name": "大业股份",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 2,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 2
+  },
+  {
+    "code": "002962",
+    "name": "五方光电",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "002232",
+    "name": "启明信息",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "001201",
+    "name": "东瑞股份",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "600418",
+    "name": "江淮汽车",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 3
+  },
+  {
+    "code": "000980",
+    "name": "众泰汽车",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "002480",
+    "name": "新筑股份",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "002347",
+    "name": "泰尔股份",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "000020",
+    "name": "深华发A",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "000503",
+    "name": "国新健康",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "002640",
+    "name": "跨境通",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "000513",
+    "name": "丽珠集团",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
+  },
+  {
+    "code": "600802",
+    "name": "福建水泥",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 3,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 3
+  },
+  {
+    "code": "001330",
+    "name": "博纳影业",
+    "exit_date": "2026-09-29",
+    "exit_reason": "断板(未收盘涨停)",
+    "days_in_pool": 1,
+    "last_lu_date": "2026-09-28",
+    "limit_days": 1
   }
 ]

@@ -1,90 +1,90 @@
 {
   "created": "2026-08-05",
-  "total_sessions": 59,
+  "total_sessions": 60,
   "current": {
-    "date": "2026-09-28",
-    "captured": "2026-09-28 09:26:58",
-    "total": 46,
-    "buyable": 14,
-    "avg_gap": 0.63,
+    "date": "2026-09-29",
+    "captured": "2026-09-29 09:25:47",
+    "total": 31,
+    "buyable": 15,
+    "avg_gap": 2.13,
     "gap_distribution": {
-      "-3-0%": 13,
-      "0-2%": 8,
-      "5-9%": 2,
-      "9%+": 7,
-      "<-3%": 11,
-      "2-5%": 5
+      "9%+": 5,
+      "2-5%": 6,
+      "-3-0%": 7,
+      "0-2%": 6,
+      "5-9%": 3,
+      "<-3%": 4
     },
     "buyable_stocks": [
       {
-        "code": "002819",
-        "name": "东方中科",
-        "gap_pct": 3.15,
-        "score": 16.0,
+        "code": "001330",
+        "name": "博纳影业",
+        "gap_pct": 6.92,
+        "score": 74.0,
+        "limit_days": 1
+      },
+      {
+        "code": "002912",
+        "name": "中新赛克",
+        "gap_pct": 4.08,
+        "score": 17.0,
         "limit_days": 2
       },
       {
-        "code": "600802",
-        "name": "福建水泥",
-        "gap_pct": 0.6,
-        "score": 6.0,
-        "limit_days": 2
-      },
-      {
-        "code": "002413",
-        "name": "雷科防务",
-        "gap_pct": 3.79,
-        "score": -1.0,
+        "code": "000513",
+        "name": "丽珠集团",
+        "gap_pct": 2.18,
+        "score": 2.0,
         "limit_days": 1
       },
       {
-        "code": "002836",
-        "name": "新宏泽",
-        "gap_pct": 1.87,
-        "score": -1.0,
+        "code": "002640",
+        "name": "跨境通",
+        "gap_pct": 2.27,
+        "score": 1.0,
         "limit_days": 1
       },
       {
-        "code": "002395",
-        "name": "双象股份",
-        "gap_pct": 2.35,
-        "score": -4.0,
+        "code": "002242",
+        "name": "九阳股份",
+        "gap_pct": 6.97,
+        "score": -3.0,
         "limit_days": 1
       },
       {
-        "code": "002321",
-        "name": "华英农业",
-        "gap_pct": 1.76,
+        "code": "000020",
+        "name": "深华发A",
+        "gap_pct": 2.46,
         "score": -5.0,
-        "limit_days": 3
+        "limit_days": 1
       },
       {
-        "code": "605018",
-        "name": "长华集团",
-        "gap_pct": 1.57,
-        "score": -7.0,
+        "code": "001201",
+        "name": "东瑞股份",
+        "gap_pct": 0.99,
+        "score": -5.0,
+        "limit_days": 1
+      },
+      {
+        "code": "002232",
+        "name": "启明信息",
+        "gap_pct": 0.43,
+        "score": -5.0,
+        "limit_days": 1
+      },
+      {
+        "code": "600488",
+        "name": "津药药业",
+        "gap_pct": 7.81,
+        "score": -8.0,
         "limit_days": 1
       },
       {
         "code": "601218",
         "name": "吉鑫科技",
-        "gap_pct": 0.0,
-        "score": -7.0,
-        "limit_days": 1
-      },
-      {
-        "code": "000678",
-        "name": "襄阳轴承",
-        "gap_pct": 7.95,
+        "gap_pct": 4.13,
         "score": -8.0,
-        "limit_days": 1
-      },
-      {
-        "code": "603767",
-        "name": "中马传动",
-        "gap_pct": 2.1,
-        "score": -8.0,
-        "limit_days": 1
+        "limit_days": 2
       }
     ]
   },
@@ -849,7 +849,20 @@
         "<-3%": 11,
         "2-5%": 5
       }
+    },
+    {
+      "date": "2026-09-29",
+      "total": 31,
+      "buyable": 15,
+      "gap_distribution": {
+        "9%+": 5,
+        "2-5%": 6,
+        "-3-0%": 7,
+        "0-2%": 6,
+        "5-9%": 3,
+        "<-3%": 4
+      }
     }
   ],
-  "last_update": "2026-09-28"
+  "last_update": "2026-09-29"
 }
